@@ -1,0 +1,75 @@
+body {
+    background-color: #000; /* Dark background */
+    color: #fff; /* White text */
+    font-family: 'Orbitron', sans-serif;
+    /* Your other styles */ 
+}
+
+nav {
+    background-color: #111;
+    overflow: hidden;
+}
+
+hr {
+    text-align: center;
+}
+nav ul {
+    padding: 0;
+    list-style: none;
+    text-align: center;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #39ff14; /* Neon green */
+    padding: 15px;
+    display: inline-block;
+}
+
+nav ul li a:hover {
+    background-color: #222;
+}
+
+#hero {
+    text-align: center;
+    padding: 50px 0;
+    color: #ff00f7; /* Neon pink */
+}
+
+#introduction, #featured-works, #latest-blogs {
+    padding: 20px;
+    border-top: 2px dashed #39ff14; /* Neon green border */
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.8em;
+}
+
+footer form {
+    margin-top: 20px;
+}
+
+footer input[type=email] {
+    padding: 5px;
+    margin: 5px 0;
+}
+
+footer input[type=submit] {
+    padding: 5px 15px;
+    background-color: #39ff14; /* Neon green, adjust as per your theme */
+    color: #000;
+    border: none;
+    cursor: pointer;
+}
+
+footer input[type=submit]:hover {
+    background-color: #2ecc71;
+}
+
+/* Add more styling as needed */
