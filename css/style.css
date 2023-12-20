@@ -71,5 +71,12 @@ footer input[type=submit] {
 footer input[type=submit]:hover {
     background-color: #2ecc71;
 }
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    header nav ul li {
+        display: block;
+        margin: 10px 0;
+    }
+}
 
 /* Add more styling as needed */
