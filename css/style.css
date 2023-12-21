@@ -40,7 +40,7 @@ nav ul li a:hover {
     color: #ff00f7; /* Neon pink */
 }
 
-#introduction, #featured-works, #latest-blogs {
+#dashed {
     padding: 20px;
     border-top: 2px dashed #39ff14; /* Neon green border */
 }
