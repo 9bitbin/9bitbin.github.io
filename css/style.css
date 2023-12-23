@@ -1,8 +1,10 @@
 body {
-    background-color: #000; /* Dark background */
-    color: #fff; /* White text */
+    background-color: #000;
+    /* Dark background */
+    color: #fff;
+    /* White text */
     font-family: 'Orbitron', sans-serif;
-    /* Your other styles */ 
+    /* Your other styles */
 }
 
 nav {
@@ -13,6 +15,7 @@ nav {
 hr {
     text-align: center;
 }
+
 nav ul {
     padding: 0;
     list-style: none;
@@ -25,7 +28,8 @@ nav ul li {
 
 nav ul li a {
     text-decoration: none;
-    color: #39ff14; /* Neon green */
+    color: #39ff14;
+    /* Neon green */
     padding: 15px;
     display: inline-block;
 }
@@ -36,13 +40,15 @@ nav ul li a:hover {
 
 #hero {
     text-align: center;
-    padding: 50px 0;
-    color: #ff00f7; /* Neon pink */
+    padding: 0.2px 0;
+    color: #ff00f7;
+    /* Neon pink */
 }
 
 #dashed {
     padding: 20px;
-    border-top: 2px dashed #39ff14; /* Neon green border */
+    border-top: 2px dashed #39ff14;
+    /* Neon green border */
 }
 
 footer {
@@ -62,7 +68,8 @@ footer input[type=email] {
 
 footer input[type=submit] {
     padding: 5px 15px;
-    background-color: #39ff14; /* Neon green, adjust as per your theme */
+    background-color: #39ff14;
+    /* Neon green, adjust as per your theme */
     color: #000;
     border: none;
     cursor: pointer;
@@ -71,6 +78,7 @@ footer input[type=submit] {
 footer input[type=submit]:hover {
     background-color: #2ecc71;
 }
+
 /* Responsive Design */
 @media screen and (max-width: 768px) {
     header nav ul li {
