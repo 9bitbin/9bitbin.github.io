@@ -1,0 +1,74 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e8f5e9; /* Light Green Background */
+    color: #2e7d32; /* Dark Green Text */
+}
+
+/* Container Styling */
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 100, 0, 0.2);
+    border-left: 8px solid #2e7d32; /* Green Accent */
+}
+
+/* Heading Styles */
+h1, h2 {
+    color: #1b5e20;
+    border-bottom: 2px solid #66bb6a;
+    padding-bottom: 5px;
+}
+
+/* General Links (Green) */
+a {
+    color: #1b5e20;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Voting Resource Links (Blue) */
+.voting-resources a {
+    color: #1565c0; /* Blue */
+}
+
+.voting-resources a:hover {
+    text-decoration: underline;
+    color: #0d47a1; /* Darker Blue on Hover */
+}
+
+/* Video Container */
+.video-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.video-container img {
+    width: 100%;
+    border-radius: 10px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.video-container img:hover {
+    transform: scale(1.05);
+}
+
+/* Lists */
+ul {
+    background: #c8e6c9;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+ul li {
+    margin-bottom: 8px;
+}
