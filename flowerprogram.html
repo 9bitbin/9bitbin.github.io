@@ -1,260 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <title>Motivation & Love for Estefany ❤️</title>
-      <style>
-         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@700&display=swap');
-         body {
-         margin: 0;
-         overflow: hidden;
-         background: black;
-         font-family: 'Kanit', sans-serif;
-         }
-         canvas {
-         position: absolute;
-         top: 0;
-         left: 0;
-         z-index: 1;
-         }
-         .floating-text {
-         position: absolute;
-         font-size: 29px;
-         font-weight: bold;
-         color: white;
-         text-shadow: 0 0 5px black, 0 0 10px black;
-         opacity: 0;
-         transition: opacity 1s ease-in-out;
-         z-index: 3;
-         pointer-events: none;
-         animation: rgbText 4s linear infinite;
-         }
-         .shin-chan {
-         position: absolute;
-         width: 80px;
-         height: 80px;
-         opacity: 0;
-         pointer-events: none;
-         z-index: 4;
-         transition: opacity 0.2s ease-in-out;
-         object-fit: cover;
-         border-radius: 8px;
-         }
-         .couple-image {
-         position: absolute;
-         width: 150px;
-         height: 150px;
-         opacity: 0;
-         pointer-events: none;
-         z-index: 4;
-         transition: opacity 0.5s ease-in-out;
-         object-fit: cover;
-         border-radius: 12px;
-         box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 105, 180, 0.6);
-         }
-         #startButton, #muteButton, #prevButton, #nextButton {
-         position: fixed;
-         top: 10px;
-         padding: 10px 20px;
-         font-size: 16px;
-         z-index: 100;
-         cursor: pointer;
-         }
-         #startButton { left: 50%; transform: translateX(-50%); }
-         #muteButton { right: 10px; display: none; }
-         #prevButton { right: 220px; display: none; }
-         #nextButton { right: 120px; display: none; }
-         @keyframes rgbText {
-         0% { color: red; }
-         33% { color: green; }
-         66% { color: blue; }
-         100% { color: red; }
-         }
-      </style>
-   </head>
-   <body>
-      <canvas id="matrixCanvas"></canvas>
-      <canvas id="abstractCanvas"></canvas>
-      <audio id="bgMusic"></audio>
-      <button id="startButton" onclick="startMusic()">🎶 Start Music 🎶</button>
-      <button id="muteButton" onclick="toggleMute()">🔊 Mute</button>
-      <button id="prevButton" onclick="prevSong()">⏮️ Previous</button>
-      <button id="nextButton" onclick="nextSong()">⏭️ Next</button>
-      <script>
-         // Playlist
-         const playlist = ["msc/two.mp3", "msc/oops.mp3", "msc/three.mp3"];
-         let currentSongIndex = 0;
-         
-         const bgMusic = document.getElementById('bgMusic');
-         const startButton = document.getElementById('startButton');
-         const muteButton = document.getElementById('muteButton');
-         const prevButton = document.getElementById('prevButton');
-         const nextButton = document.getElementById('nextButton');
-         
-         function startMusic() {
-             playSong();
-             startButton.style.display = 'none';
-             muteButton.style.display = 'block';
-             nextButton.style.display = 'block';
-             prevButton.style.display = 'block';
-         }
-         
-         function playSong() {
-             bgMusic.src = playlist[currentSongIndex];
-             bgMusic.play();
-         }
-         
-         function nextSong() {
-             currentSongIndex = (currentSongIndex + 1) % playlist.length;
-             playSong();
-         }
-         
-         function prevSong() {
-             currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
-             playSong();
-         }
-         
-         bgMusic.onended = nextSong;
-         
-         function toggleMute() {
-             bgMusic.muted = !bgMusic.muted;
-             muteButton.innerText = bgMusic.muted ? '🔇 Unmute' : '🔊 Mute';
-         }
-         
-         // Canvas Setup
-         const abstractCanvas = document.getElementById("abstractCanvas");
-         const matrixCanvas = document.getElementById("matrixCanvas");
-         const abstractCtx = abstractCanvas.getContext("2d");
-         const matrixCtx = matrixCanvas.getContext("2d");
-         
-         function resizeCanvas() {
-             abstractCanvas.width = matrixCanvas.width = window.innerWidth;
-             abstractCanvas.height = matrixCanvas.height = window.innerHeight;
-         }
-         window.addEventListener('resize', resizeCanvas);
-         resizeCanvas();
-         
-         // Abstract Background Animation
-         const particles = [];
-         for (let i = 0; i < 150; i++) {
-             particles.push({
-                 x: Math.random() * abstractCanvas.width,
-                 y: Math.random() * abstractCanvas.height,
-                 size: Math.random() * 8 + 4,
-                 speedX: (Math.random() - 0.5) * 3,
-                 speedY: (Math.random() - 0.5) * 3,
-                 color: `hsl(${Math.random() * 360}, 100%, 70%)`
-             });
-         }
-         
-         function drawParticles() {
-             abstractCtx.clearRect(0, 0, abstractCanvas.width, abstractCanvas.height);
-             particles.forEach(p => {
-                 p.x += p.speedX;
-                 p.y += p.speedY;
-                 if (p.x < 0 || p.x > abstractCanvas.width) p.speedX *= -1;
-                 if (p.y < 0 || p.y > abstractCanvas.height) p.speedY *= -1;
-                 abstractCtx.fillStyle = p.color;
-                 abstractCtx.beginPath();
-                 abstractCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                 abstractCtx.fill();
-             });
-             requestAnimationFrame(drawParticles);
-         }
-         drawParticles();
-         
-         // Matrix Rain
-         const drops = Array(Math.floor(matrixCanvas.width / 10)).fill(1);
-         function drawMatrix() {
-             matrixCtx.fillStyle = "rgba(0, 0, 0, 0.05)";
-             matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-             matrixCtx.fillStyle = "lime";
-             matrixCtx.font = "8px monospace";
-         
-             drops.forEach((y, i) => {
-                 matrixCtx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), i * 10, y * 10);
-                 drops[i]++;
-                 if (y * 10 > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
-             });
-             requestAnimationFrame(drawMatrix);
-         }
-         drawMatrix();
-         
-         // ========== Motivational & Love Phrases ==========
-         const phrases = [
-             "Believe in yourself 💪",
-             "We are capable of amazing things 🌟",
-             "Progress, not perfection 📈",
-             "Stay strong and keep going 💥",
-             "Every step counts 🚶‍♂️",
-             "We are worthy of greatness 👑",
-             "Dream big, work hard 💼",
-             "Keep shining bright ✨",
-             "Challenges make you stronger 💪"
-         ];
-         
-         const estefanyMessage = "Estefany, I love you ❤️";
-         
-         function createFloatingText(text) {
-             const span = document.createElement('span');
-             span.className = 'floating-text';
-             span.innerText = text;
-             document.body.appendChild(span);
-         
-             const x = Math.random() * (window.innerWidth - 300);
-             const y = Math.random() * (window.innerHeight - 50);
-             span.style.left = `${x}px`;
-             span.style.top = `${y}px`;
-         
-             setTimeout(() => span.style.opacity = 1, 100);
-             setTimeout(() => {
-                 span.style.opacity = 0;
-                 setTimeout(() => span.remove(), 1000);
-             }, 4000);
-         }
-         
-         let phraseCounter = 0;
-         
-         function showRandomPhrase() {
-             if (phraseCounter % 5 === 0) {
-                 createFloatingText(estefanyMessage);
-             } else {
-                 const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-                 createFloatingText(phrase);
-             }
-             phraseCounter++;
-         }
-         
-         setInterval(showRandomPhrase, 3000);
-         
-         // Shin Chan Stickers
-         const shinChanGifs = [
-         "https://media.giphy.com/media/Ywj2iCO1TOkyQ/giphy.gif",
-             "https://media1.giphy.com/media/QX1CrKhEo9NDRD6sL3/giphy.gif",
-             "https://media4.giphy.com/media/MWqc0k2qiD1As/giphy.gif"
-         
-         
-         ];
-         setInterval(() => showImage(shinChanGifs, 'shin-chan', 2000), 1000);
-         
-         // Couple Images
-         const coupleImages = ["texts/photo1.jpg", "texts/photo2.JPG"];
-         setInterval(() => showImage(coupleImages, 'couple-image', 2000), 3000);
-         
-         function showImage(images, className, duration) {
-             const img = document.createElement('img');
-             img.src = images[Math.floor(Math.random() * images.length)];
-             img.className = className;
-             positionElement(img, 150, 150);
-             document.body.appendChild(img);
-             setTimeout(() => img.style.opacity = 1, 50);
-             setTimeout(() => img.style.opacity = 0, duration);
-             setTimeout(() => img.remove(), duration + 500);
-         }
-         
-         function positionElement(el, w, h) {
-             el.style.left = Math.random() * (window.innerWidth - w) + 'px';
-             el.style.top = Math.random() * (window.innerHeight - h) + 'px';
-         }
-      </script>
-   </body>
+<head>
+    <title>Motivation & Love for Estefany ❤️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .floating-text {
+            position: absolute;
+            font-size: 29px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 5px black, 0 0 10px black;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            z-index: 3;
+            pointer-events: none;
+            animation: rgbText 4s linear infinite;
+        }
+
+        .shin-chan {
+            position: absolute;
+            width: 145px;
+            height: 145px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4;
+            transition: opacity 0.2s ease-in-out;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .couple-image {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4;
+            transition: opacity 0.5s ease-in-out;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 105, 180, 0.6);
+        }
+
+        #startButton, #muteButton, #prevButton, #nextButton {
+            position: fixed;
+            top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            z-index: 100;
+            cursor: pointer;
+        }
+
+        #startButton { left: 50%; transform: translateX(-50%); }
+        #muteButton { right: 10px; display: none; }
+        #prevButton { right: 220px; display: none; }
+        #nextButton { right: 120px; display: none; }
+
+        @keyframes rgbText {
+            0% { color: red; }
+            33% { color: green; }
+            66% { color: blue; }
+            100% { color: red; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="matrixCanvas"></canvas>
+<canvas id="abstractCanvas"></canvas>
+
+<audio id="bgMusic"></audio>
+
+<button id="startButton" onclick="startMusic()">🎶 Start Music 🎶</button>
+<button id="muteButton" onclick="toggleMute()">🔊 Mute</button>
+<button id="prevButton" onclick="prevSong()">⏮️ Previous</button>
+<button id="nextButton" onclick="nextSong()">⏭️ Next</button>
+
+<script>
+// Playlist
+const playlist = ["msc/two.mp3", "msc/oops.mp3", "msc/three.mp3"];
+let currentSongIndex = 0;
+
+const bgMusic = document.getElementById('bgMusic');
+const startButton = document.getElementById('startButton');
+const muteButton = document.getElementById('muteButton');
+const prevButton = document.getElementById('prevButton');
+const nextButton = document.getElementById('nextButton');
+
+function startMusic() {
+    playSong();
+    startButton.style.display = 'none';
+    muteButton.style.display = 'block';
+    nextButton.style.display = 'block';
+    prevButton.style.display = 'block';
+}
+
+function playSong() {
+    bgMusic.src = playlist[currentSongIndex];
+    bgMusic.play();
+}
+
+function nextSong() {
+    currentSongIndex = (currentSongIndex + 1) % playlist.length;
+    playSong();
+}
+
+function prevSong() {
+    currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+    playSong();
+}
+
+bgMusic.onended = nextSong;
+
+function toggleMute() {
+    bgMusic.muted = !bgMusic.muted;
+    muteButton.innerText = bgMusic.muted ? '🔇 Unmute' : '🔊 Mute';
+}
+
+// Canvas Setup
+const abstractCanvas = document.getElementById("abstractCanvas");
+const matrixCanvas = document.getElementById("matrixCanvas");
+const abstractCtx = abstractCanvas.getContext("2d");
+const matrixCtx = matrixCanvas.getContext("2d");
+
+function resizeCanvas() {
+    abstractCanvas.width = matrixCanvas.width = window.innerWidth;
+    abstractCanvas.height = matrixCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// Abstract Background Animation
+const particles = [];
+for (let i = 0; i < 150; i++) {
+    particles.push({
+        x: Math.random() * abstractCanvas.width,
+        y: Math.random() * abstractCanvas.height,
+        size: Math.random() * 8 + 4,
+        speedX: (Math.random() - 0.5) * 3,
+        speedY: (Math.random() - 0.5) * 3,
+        color: `hsl(${Math.random() * 360}, 100%, 70%)`
+    });
+}
+
+function drawParticles() {
+    abstractCtx.clearRect(0, 0, abstractCanvas.width, abstractCanvas.height);
+    particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.x < 0 || p.x > abstractCanvas.width) p.speedX *= -1;
+        if (p.y < 0 || p.y > abstractCanvas.height) p.speedY *= -1;
+        abstractCtx.fillStyle = p.color;
+        abstractCtx.beginPath();
+        abstractCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        abstractCtx.fill();
+    });
+    requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// Matrix Rain
+const drops = Array(Math.floor(matrixCanvas.width / 10)).fill(1);
+function drawMatrix() {
+    matrixCtx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+    matrixCtx.fillStyle = "lime";
+    matrixCtx.font = "8px monospace";
+
+    drops.forEach((y, i) => {
+        matrixCtx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), i * 10, y * 10);
+        drops[i]++;
+        if (y * 10 > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
+    });
+    requestAnimationFrame(drawMatrix);
+}
+drawMatrix();
+
+// ========== Motivational & Love Phrases ==========
+const phrases = [
+    "Believe in yourself 💪",
+    "We are capable of amazing things 🌟",
+    "Progress, not perfection 📈",
+    "Stay strong and keep going 💥",
+    "Every step counts 🚶‍♂️",
+    "We are worthy of greatness 👑",
+    "Dream big, work hard 💼",
+    "Keep shining bright ✨",
+    "Challenges make you stronger 💪"
+];
+
+const estefanyMessage = "Estefany, I love you ❤️";
+
+function createFloatingText(text) {
+    const span = document.createElement('span');
+    span.className = 'floating-text';
+    span.innerText = text;
+    document.body.appendChild(span);
+
+    const x = Math.random() * (window.innerWidth - 300);
+    const y = Math.random() * (window.innerHeight - 50);
+    span.style.left = `${x}px`;
+    span.style.top = `${y}px`;
+
+    setTimeout(() => span.style.opacity = 1, 100);
+    setTimeout(() => {
+        span.style.opacity = 0;
+        setTimeout(() => span.remove(), 1000);
+    }, 4000);
+}
+
+let phraseCounter = 0;
+
+function showRandomPhrase() {
+    if (phraseCounter % 5 === 0) {
+        createFloatingText(estefanyMessage);
+    } else {
+        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+        createFloatingText(phrase);
+    }
+    phraseCounter++;
+}
+
+setInterval(showRandomPhrase, 3000);
+
+// Shin Chan Stickers
+const shinChanGifs = [
+"https://media.giphy.com/media/Ywj2iCO1TOkyQ/giphy.gif",
+    "https://media1.giphy.com/media/QX1CrKhEo9NDRD6sL3/giphy.gif",
+    "https://media4.giphy.com/media/MWqc0k2qiD1As/giphy.gif"
+
+
+];
+setInterval(() => showImage(shinChanGifs, 'shin-chan', 2000), 3000);
+
+// Couple Images
+const coupleImages = ["texts/photo1.jpg", "texts/photo2.JPG"];
+setInterval(() => showImage(coupleImages, 'couple-image', 2000), 2877);
+
+function showImage(images, className, duration) {
+    const img = document.createElement('img');
+    img.src = images[Math.floor(Math.random() * images.length)];
+    img.className = className;
+    positionElement(img, 150, 150);
+    document.body.appendChild(img);
+    setTimeout(() => img.style.opacity = 1, 50);
+    setTimeout(() => img.style.opacity = 0, duration);
+    setTimeout(() => img.remove(), duration + 500);
+}
+
+function positionElement(el, w, h) {
+    el.style.left = Math.random() * (window.innerWidth - w) + 'px';
+    el.style.top = Math.random() * (window.innerHeight - h) + 'px';
+}
+</script>
+
+</body>
 </html>
