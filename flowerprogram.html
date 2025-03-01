@@ -220,12 +220,11 @@ function showShinChanSticker() {
     document.body.appendChild(img);
 
     setTimeout(() => img.style.opacity = 1, 50);
-    setTimeout(() => img.style.opacity = 0, 500);
-    setTimeout(() => img.remove(), 700);
+    setTimeout(() => img.style.opacity = 0, 2000);  // Visible for 2 seconds
+    setTimeout(() => img.remove(), 1500);            // Removed after 2.5 seconds (fade-out)
 }
 
-setInterval(showShinChanSticker, 1000);
-
+setInterval(showShinChanSticker, 1000);  // Frequency stays the same (every 1 second)
 // ========== Couple Images Floating ==========
 const coupleImages = [
     "texts/photo1.jpg",
