@@ -267,6 +267,77 @@ function positionElement(el, w, h) {
     el.style.left = Math.random() * (window.innerWidth - w) + 'px';
     el.style.top = Math.random() * (window.innerHeight - h) + 'px';
 }
+
+// === Balloon and Happy Birthday Feature for March 6th ===
+
+// Create a glowing "Happy Birthday" message at the top of the screen
+
+// Create a floating balloon
+// Create a glowing "Happy Birthday" message at the top of the screen with wiggling animation
+function createHappyBirthdayMessage() {
+    const birthdayMessage = document.createElement('div');
+    birthdayMessage.innerText = "🎉 Happy Birthday Estefany 🎉";
+    birthdayMessage.style.position = 'fixed';
+    birthdayMessage.style.top = '77px';
+    birthdayMessage.style.left = '50%';
+    birthdayMessage.style.transform = 'translateX(-50%)';
+    birthdayMessage.style.fontSize = '48px';
+    birthdayMessage.style.fontWeight = 'bold';
+    birthdayMessage.style.color = 'white';
+    birthdayMessage.style.textShadow = '0 0 10px pink, 0 0 20px hotpink, 0 0 30px pink';
+    birthdayMessage.style.zIndex = '10';
+    birthdayMessage.style.whiteSpace = 'nowrap'; // Forces landscape text
+    birthdayMessage.style.animation = 'wiggle 1.5s infinite ease-in-out';
+    document.body.appendChild(birthdayMessage);
+
+    // Add wiggle animation via CSS injection
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes wiggle {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            25% { transform: translateX(-50%) rotate(-3deg); }
+            50% { transform: translateX(-50%) rotate(3deg); }
+            75% { transform: translateX(-50%) rotate(-3deg); }
+            100% { transform: translateX(-50%) rotate(0deg); }
+        }
+    `;
+    document.head.appendChild(style);
+}
+function createBalloon() {
+    const balloon = document.createElement('div');
+    balloon.innerText = '🎈';
+    balloon.style.position = 'fixed';
+    balloon.style.bottom = '-50px'; // Start below the screen
+    balloon.style.left = Math.random() * window.innerWidth + 'px';
+    balloon.style.fontSize = '50px';
+    balloon.style.opacity = '0';
+    balloon.style.transition = 'opacity 1s, transform 8s linear';
+    balloon.style.zIndex = '5';
+    document.body.appendChild(balloon);
+
+    // Make the balloon visible and float up
+    setTimeout(() => {
+        balloon.style.opacity = '1';
+        balloon.style.transform = `translateY(-${window.innerHeight + 100}px)`;
+    }, 100);
+
+    // Remove the balloon after animation
+    setTimeout(() => balloon.remove(), 9000);
+}
+
+// Start the birthday feature (called only if it's March 6th)
+function startBirthdayCelebration() {
+    createHappyBirthdayMessage();
+    setInterval(createBalloon, 800);
+}
+
+// Check if today is March 6th
+const today = new Date();
+if (today.getMonth() === 2 && today.getDate() === 1
+) { // Month is zero-based, so 2 = March
+    startBirthdayCelebration();
+}
+
 </script>
 
 </body>
