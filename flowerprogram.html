@@ -38,7 +38,7 @@
             animation: rgbText 4s linear infinite;
         }
 
-        .shin-chan {
+        .shin-chan, .couple-image {
             position: absolute;
             width: 80px;
             height: 80px;
@@ -46,6 +46,8 @@
             pointer-events: none;
             z-index: 4;
             transition: opacity 0.2s ease-in-out;
+            object-fit: cover;
+            border-radius: 8px;
         }
 
         @keyframes rgbText {
@@ -85,7 +87,7 @@ function createParticle() {
         x: Math.random() * abstractCanvas.width,
         y: Math.random() * abstractCanvas.height,
         size: Math.random() * 8 + 4,
-        speedX: (Math.random() - 0.10) * 3,
+        speedX: (Math.random() - 0.5) * 3,
         speedY: (Math.random() - 0.5) * 3,
         color: `hsl(${Math.random() * 360}, 100%, 70%)`
     };
@@ -152,13 +154,7 @@ const phrases = [
     "We are worthy of greatness 👑",
     "Dream big, work hard 💼",
     "Keep shining bright ✨",
-    "Challenges make you stronger 💪",
-    "Stay positive, work hard, make it happen ⚡",
-    "The best is yet to come 🚀",
-    "Trust the process 🌀",
-    "One day at a time ⏳",
-    "Believe in the beauty of your dreams 🌈",
-    "We are unstoppable 🔥"
+    "Challenges make you stronger 💪"
 ];
 
 const estefanyMessage = "Estefany, I love you ❤️";
@@ -195,16 +191,11 @@ function showRandomPhrase() {
 
 setInterval(showRandomPhrase, 3000);
 
-// Start with a few phrases
-for (let i = 0; i < 5; i++) {
-    setTimeout(showRandomPhrase, i * 1000);
-}
-
 // ========== Shin Chan GIF Stickers ==========
 const shinChanGifs = [
-    "https://media.giphy.com/media/Ywj2iCO1TOkyQ/giphy.gif",  // Example Shin Chan GIFs
-    "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYjcwOTI4dWlkNGE4b3F1dWx1dXFoYnppMmpsenJzaGY5azkyeDFvaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QX1CrKhEo9NDRD6sL3/giphy.gif",
-    "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWxmbWM2MGNvanJyMml5YmwwczVlZmVmZTBjcjZpNjQ3bHlieTFsZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MWqc0k2qiD1As/giphy.gif"
+    "https://media.giphy.com/media/Ywj2iCO1TOkyQ/giphy.gif",
+    "https://media1.giphy.com/media/QX1CrKhEo9NDRD6sL3/giphy.gif",
+    "https://media4.giphy.com/media/MWqc0k2qiD1As/giphy.gif"
 ];
 
 function showShinChanSticker() {
@@ -212,11 +203,7 @@ function showShinChanSticker() {
     img.src = shinChanGifs[Math.floor(Math.random() * shinChanGifs.length)];
     img.className = 'shin-chan';
 
-    const x = Math.random() * (window.innerWidth - 80);
-    const y = Math.random() * (window.innerHeight - 80);
-    img.style.left = `${x}px`;
-    img.style.top = `${y}px`;
-
+    positionFloatingElement(img);
     document.body.appendChild(img);
 
     setTimeout(() => img.style.opacity = 1, 50);
@@ -224,7 +211,37 @@ function showShinChanSticker() {
     setTimeout(() => img.remove(), 700);
 }
 
-setInterval(showShinChanSticker, 500);
+setInterval(showShinChanSticker, 1000);
+
+// ========== Couple Images Floating ==========
+const coupleImages = [
+    "img/photo1.jpg",
+    "img/photo2.JPG",
+    "img/photo3.JPG",
+    "img/photo4.JPG"
+];
+
+function showCoupleImage() {
+    const img = document.createElement('img');
+    img.src = coupleImages[Math.floor(Math.random() * coupleImages.length)];
+    img.className = 'couple-image';
+
+    positionFloatingElement(img);
+    document.body.appendChild(img);
+
+    setTimeout(() => img.style.opacity = 1, 50);
+    setTimeout(() => img.style.opacity = 0, 1999);
+    setTimeout(() => img.remove(), 99999999999999);
+}
+
+setInterval(showCoupleImage, 3000);
+
+function positionFloatingElement(el) {
+    const x = Math.random() * (window.innerWidth - 80);
+    const y = Math.random() * (window.innerHeight - 80);
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+}
 </script>
 
 </body>
