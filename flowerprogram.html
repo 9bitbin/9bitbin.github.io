@@ -21,7 +21,7 @@
 
         .floating-text {
             position: absolute;
-            font-size: 24px;
+            font-size: 40px;
             font-weight: bold;
             color: white;
             text-shadow: 
@@ -38,7 +38,7 @@
             animation: rgbText 4s linear infinite;
         }
 
-        .shin-chan, .couple-image {
+        .shin-chan {
             position: absolute;
             width: 80px;
             height: 80px;
@@ -48,6 +48,19 @@
             transition: opacity 0.2s ease-in-out;
             object-fit: cover;
             border-radius: 8px;
+        }
+
+        .couple-image {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4;
+            transition: opacity 0.5s ease-in-out;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 105, 180, 0.6);
         }
 
         @keyframes rgbText {
@@ -230,17 +243,15 @@ function showCoupleImage() {
     document.body.appendChild(img);
 
     setTimeout(() => img.style.opacity = 1, 50);
-    setTimeout(() => img.style.opacity = 0, 1999);
-    setTimeout(() => img.remove(), 99999999999999);
+    setTimeout(() => img.style.opacity = 0, 2000);
+    setTimeout(() => img.remove(), 2500);
 }
 
 setInterval(showCoupleImage, 3000);
 
 function positionFloatingElement(el) {
-    const x = Math.random() * (window.innerWidth - 80);
-    const y = Math.random() * (window.innerHeight - 80);
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
+    el.style.left = Math.random() * (window.innerWidth - 150) + 'px';
+    el.style.top = Math.random() * (window.innerHeight - 150) + 'px';
 }
 </script>
 
