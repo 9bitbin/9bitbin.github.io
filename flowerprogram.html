@@ -3,6 +3,27 @@
    <head>
       <title>Motivation & Love for Estefany ❤️</title>
       <style>
+        @media screen and (orientation: portrait) {
+    body::before {
+        content: "Please rotate your device to landscape mode 🌟";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        color: white;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    body > * {
+        display: none;
+    }
+}
+
          @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@700&display=swap');
          body {
          margin: 0;
