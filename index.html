@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Himal Shrestha | Portfolio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <img src="headshot.jpg" alt="Himal Shrestha Headshot" id="headshot" />
+    <h1>Hi, I'm Himal Shrestha</h1>
+    <p>Computer Programming & IT Student | IT Support Specialist</p>
+
+    <!-- Dark mode toggle switch -->
+    <label class="switch">
+      <input type="checkbox" id="darkModeToggle" />
+      <span class="slider"></span>
+    </label>
+
+    <a href="#projects" class="cta">See My Work</a>
+  </header>
+
+  <section id="about">
+    <h2>About Me</h2>
+    <p>
+      I'm Himal Shrestha, a passionate IT and programming student currently completing a B.S. in Computer Programming and Information Systems at SUNY Farmingdale. 
+      I have experience in IT support, scripting, and data analytics, and have interned in environments using Microsoft Azure, Intune, and business intelligence tools.
+    </p>
+  </section>
+
+  <section id="projects">
+    <h2>Projects</h2>
+
+    <div class="project">
+      <h3>Enter Project here</h3>
+      <p>
+       lorem ipsum dolor sit amet, consectetur adipiscing elit.
+       Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+      </p>
+      <a href="#" target="_blank">View GitHub Repo</a>
+    </div>
+
+    <div class="project">
+       <h3>Enter Project here</h3>
+      <p>
+       lorem ipsum dolor sit amet, consectetur adipiscing elit.
+       Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+      </p>
+      <a href="#" target="_blank">View GitHub Repo</a>
+    </div>
+  </section>
+
+  <section id="experience">
+    <h2>Experience & Projects</h2>
+
+    <div class="job">
+      <h3>Data Rebels Project | BCS 425 - Business Intelligence (Spring 2025)</h3>
+      <ul>
+        <li>Designed and implemented a unified data warehouse solution for ShopEase, integrating sales, inventory, and customer feedback.</li>
+        <li>Developed star schema data models and OLAP reports for multidimensional business analysis.</li>
+        <li>Used Azure Synapse, Power BI, Tableau for cloud pipeline and interactive dashboards.</li>
+        <li>Collaborated in Agile team, conducted SWOT analysis, and presented project findings to simulate vendor-client communication.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <h3>IT Support Specialist Intern | Infinite Consulting Corp (Sept 2024 - Dec 2024)</h3>
+      <ul>
+        <li>Managed cloud infrastructure & security with Microsoft Azure, Office 365, Microsoft Entra, and Intune.</li>
+        <li>Set up laptops using autopilot scripts and Microsoft Intune.</li>
+        <li>Facilitated communication through Microsoft Teams and improved ticket tracking with NinjaOne.</li>
+        <li>Created and updated SOPs to standardize installation and troubleshooting.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <h3>Office Assistant / IT | Trusdale Properties Corp (May 2024 - July 2024)</h3>
+      <ul>
+        <li>Managed desktop issues, printer functionality, and network setups.</li>
+        <li>Handled tenant records, rent billing, and communications.</li>
+        <li>Resolved internet and power-related technical issues.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <h3>IT Skills Instructor | The Viscardi Center (Feb 2024 - May 2024)</h3>
+      <ul>
+        <li>Developed lesson plans for Microsoft Word and PowerPoint, improving student proficiency by 20%.</li>
+        <li>Provided technical support resolving over 50 software issues for students.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <h3>Management Information Systems Intern | St. Joseph Hospital (Aug 2022)</h3>
+      <ul>
+        <li>Registered 100+ students in LMS, reducing onboarding issues by 15%.</li>
+        <li>Documented workflows improving staff adoption and reducing support requests by 10%.</li>
+        <li>Imaged 30+ laptops with Windows 10 and resolved 50+ support tickets via Ivanti.</li>
+        <li>Assisted with password resets and distributed weekly EPIC EMR/EHR reports.</li>
+        <li>Deployed and maintained 20+ clinical workstations in compliance with IT standards.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="skills">
+    <h2>Skills</h2>
+    <ul>
+      <li><strong>Languages:</strong> Python, Java, JavaScript, HTML, CSS, SQL, C#, Bash</li>
+      <li><strong>Frameworks/Tools:</strong> Git, VSCode, Azure, Power BI, Tableau, NinjaOne</li>
+      <li><strong>Systems:</strong> Windows, macOS, Linux</li>
+      <li><strong>Networking:</strong> LAN, DHCP, VPN, DNS, ADDS</li>
+    </ul>
+  </section>
+
+  <!-- <section id="resume">
+    <h2>Resume</h2>
+    <a href="UpdatedNewHimalResume.pdf" download>
+      <button>📄 Download My Resume</button>
+    </a>
+  </section> -->
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <ul>
+    <li>📧 Email: <a href="mailto:Shresthahimal12@yahoo.com">Shresthahimal12@yahoo.com</a></li>
+<li>🔗 LinkedIn: <a href="https://www.linkedin.com/in/himalstha" target="_blank" rel="noopener noreferrer">linkedin.com/in/himalstha</a></li>
+<li>💼 GitHub: <a href="https://github.com/9bitbin" target="_blank" rel="noopener noreferrer">github.com/9bitbin</a></li>
+<li>🌐 Portfolio: <a href="https://9bitbin.github.io" target="_blank" rel="noopener noreferrer">9bitbin.github.io</a></li>
+
+    </ul>
+    <section id="email-me">
+
+  <footer>
+    <p>&copy; 2025 Himal Shrestha</p>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById("darkModeToggle");
+
+    // Check saved theme preference on load
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-mode");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+      if (this.checked) {
+        document.body.classList.add("dark-mode");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.body.classList.remove("dark-mode");
+        localStorage.setItem("theme", "light");
+      }
+    });
+  </script>
+  
+</body>
+</html>
