@@ -1,0 +1,59 @@
+---
+layout: default
+title: "Archive"
+permalink: /archive.html
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Archive | Rotating Soul</title>
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <style>
+    body {
+      background-color: #000;
+      color: #00FF99;
+      font-family: 'VT323', monospace;
+      text-align: center;
+      margin: 0;
+      padding: 3rem 1rem;
+    }
+    .neon { text-shadow: 0 0 10px #00FF99, 0 0 20px #00FF99; }
+    a { color: #00FF99; text-decoration: none; }
+    a:hover { text-shadow: 0 0 10px #00FF99; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 0.4rem 0; }
+    footer { margin-top: 2rem; color: #00cc88; }
+  </style>
+</head>
+<body>
+  <h1 class="neon">🧾 Archive</h1>
+  <p class="tagline">Every thought and system — logged.</p>
+
+  <nav>
+    <a href="{{ "/" | relative_url }}">Home</a> |
+    <a href="{{ "/themes/" | relative_url }}">Themes</a> |
+    <a href="{{ "/about.html" | relative_url }}">About</a> |
+    <a href="{{ "/contact.html" | relative_url }}">Contact</a>
+  </nav>
+
+  <section class="post-list" style="max-width:700px;margin:2rem auto;text-align:left;">
+    <ul>
+      {% assign all_posts = site.mind-over-machine 
+         | concat: site.himals-realm 
+         | concat: site.reflective-engineer 
+         | concat: site.tech-and-tranquility 
+         | concat: site.wired-soul-journal %}
+      {% for post in all_posts reversed %}
+        <li>
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          <small> — {{ post.date | date: "%B %d, %Y" }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
+</body>
+</html>
