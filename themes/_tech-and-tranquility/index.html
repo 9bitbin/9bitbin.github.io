@@ -1,28 +1,49 @@
+---
+layout: default
+title: "💬 Tech & Tranquility"
+permalink: /themes/tech-and-tranquility/
+---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Tech & Tranquility | Rotating Soul</title>
-  <link rel="stylesheet" href="/assets/css/base.css">
+  <meta charset="UTF-8" />
+  <title>💬 Tech & Tranquility | Rotating Soul</title>
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <style>
+    body {
+      background-color: #000;
+      color: #66CCFF;
+      font-family: 'VT323', monospace;
+      text-align: center;
+      margin: 0;
+      padding: 2rem;
+    }
+    .neon { text-shadow: 0 0 10px #66CCFF, 0 0 20px #66CCFF, 0 0 30px #66CCFF; }
+    a { color: #66CCFF; text-decoration: none; }
+    a:hover { text-shadow: 0 0 10px #66CCFF, 0 0 20px #66CCFF; }
+    footer { margin-top: 2rem; font-size: 0.9rem; color: #55aaff; }
+  </style>
 </head>
-<body data-theme="Tech & Tranquility">
+<body>
   <h1 class="neon">💬 Tech & Tranquility</h1>
-  <p class="tagline">“Bridges between people and progress.”</p>
+  <p>Bridges between people and progress.</p>
 
-  <nav class="nav">
-    <a href="/">Home</a>
-    <a href="/themes/wired-soul-journal/">Next → Wired Soul Journal</a>
+  <nav>
+    <a href="{{ "/" | relative_url }}">Home</a> |
+    <a href="{{ "/themes/" | relative_url }}">Themes</a> |
+    <a href="{{ "/archive.html" | relative_url }}">Archive</a> |
+    <a href="{{ "/about.html" | relative_url }}">About</a> |
+    <a href="{{ "/contact.html" | relative_url }}">Contact</a>
   </nav>
 
-  <section class="post-list">
-    <ul>
-      {% for post in site.tech-and-tranquility reversed %}
-        <li><a href="{{ post.url }}">{{ post.title }}</a>
-          <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-        </li>
-      {% endfor %}
-    </ul>
-  </section>
+  <h2>🌐 Community & Society</h2>
+  <ul>
+    {% for post in site.tech-and-tranquility %}
+      <li><a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      <small>— {{ post.date | date: "%B %d, %Y" }}</small></li>
+    {% endfor %}
+  </ul>
 
   <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
 </body>
