@@ -13,13 +13,14 @@
     <h1 id="title" class="neon"></h1>
     <p id="tagline" class="tagline"></p>
 
-    <nav class="nav">
-      <a href="/">Home</a>
-      <a href="/themes/">Themes</a>
-      <a href="/archive.html">Archive</a>
-      <a href="/about.html">About</a>
-      <a href="/contact.html">Contact</a>
-    </nav>
+<nav class="nav">
+  <a href="{{ "/" | relative_url }}">Home</a>
+  <a href="{{ "/themes/" | relative_url }}">Themes</a>
+  <a href="{{ "/archive.html" | relative_url }}">Archive</a>
+  <a href="{{ "/about.html" | relative_url }}">About</a>
+  <a href="{{ "/contact.html" | relative_url }}">Contact</a>
+</nav>
+
 
     <section class="intro">
       <p>Welcome to <strong>Rotating Soul</strong> — a digital reflection cycling through

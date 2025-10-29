@@ -5,7 +5,10 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
 
-# --- collections for each theme ---
+# Put collections under /themes
+collections_dir: themes
+
+# One collection per theme
 collections:
   mind-over-machine:
     output: true
@@ -22,7 +25,3 @@ collections:
   wired-soul-journal:
     output: true
     permalink: /themes/wired-soul-journal/:name/
-
-# Include folders in site build
-include:
-  - themes
