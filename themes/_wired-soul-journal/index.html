@@ -8,42 +8,23 @@ permalink: /themes/wired-soul-journal/
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🎨 Wired Soul Journal | Rotating Soul</title>
+  <title>🎨 Wired Soul Journal</title>
   <link rel="stylesheet" href="/assets/css/base.css" />
-  <style>
-    body {
-      background-color: #000;
-      color: #FF00FF;
-      font-family: 'VT323', monospace;
-      text-align: center;
-      margin: 0;
-      padding: 2rem;
-    }
-    .neon { text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF; }
-    a { color: #FF00FF; text-decoration: none; }
-    a:hover { text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF; }
-    footer { margin-top: 2rem; font-size: 0.9rem; color: #dd00dd; }
-  </style>
 </head>
-<body>
+<body data-theme="magenta">
   <h1 class="neon">🎨 Wired Soul Journal</h1>
-  <p>Glitch, art, and emotion.</p>
+  <p class="tagline">Glitch, art, and emotion.</p>
 
   <nav>
-    <a href="{{ "/" | relative_url }}">Home</a> |
-    <a href="{{ "/themes/" | relative_url }}">Themes</a> |
-    <a href="{{ "/archive.html" | relative_url }}">Archive</a> |
-    <a href="{{ "/about.html" | relative_url }}">About</a> |
-    <a href="{{ "/contact.html" | relative_url }}">Contact</a>
+    <a href="{{ '/' | relative_url }}">Home</a> |
+    <a href="{{ '/themes/' | relative_url }}">Themes</a> |
+    <a href="{{ '/archive.html' | relative_url }}">Archive</a> |
+    <a href="{{ '/about.html' | relative_url }}">About</a>
   </nav>
 
-  <h2>🌈 Creative Sparks</h2>
-  <ul>
-    {% for post in site.wired-soul-journal %}
-      <li><a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-      <small>— {{ post.date | date: "%B %d, %Y" }}</small></li>
-    {% endfor %}
-  </ul>
+  <section class="theme-page">
+    {{ content }}
+  </section>
 
   <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
 </body>

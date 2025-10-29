@@ -8,42 +8,23 @@ permalink: /themes/himals-realm/
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🧠 Himal’s Realm | Rotating Soul</title>
+  <title>🧠 Himal’s Realm</title>
   <link rel="stylesheet" href="/assets/css/base.css" />
-  <style>
-    body {
-      background-color: #000;
-      color: #B49BFF;
-      font-family: 'VT323', monospace;
-      text-align: center;
-      margin: 0;
-      padding: 2rem;
-    }
-    .neon { text-shadow: 0 0 10px #B49BFF, 0 0 20px #B49BFF, 0 0 30px #B49BFF; }
-    a { color: #B49BFF; text-decoration: none; }
-    a:hover { text-shadow: 0 0 10px #B49BFF, 0 0 20px #B49BFF; }
-    footer { margin-top: 2rem; font-size: 0.9rem; color: #9d85ff; }
-  </style>
 </head>
-<body>
+<body data-theme="lavender">
   <h1 class="neon">🧠 Himal’s Realm</h1>
-  <p>Where thoughts find structure.</p>
+  <p class="tagline">Where thoughts find structure.</p>
 
   <nav>
-    <a href="{{ "/" | relative_url }}">Home</a> |
-    <a href="{{ "/themes/" | relative_url }}">Themes</a> |
-    <a href="{{ "/archive.html" | relative_url }}">Archive</a> |
-    <a href="{{ "/about.html" | relative_url }}">About</a> |
-    <a href="{{ "/contact.html" | relative_url }}">Contact</a>
+    <a href="{{ '/' | relative_url }}">Home</a> |
+    <a href="{{ '/themes/' | relative_url }}">Themes</a> |
+    <a href="{{ '/archive.html' | relative_url }}">Archive</a> |
+    <a href="{{ '/about.html' | relative_url }}">About</a>
   </nav>
 
-  <h2>🪞 Reflections & Philosophy</h2>
-  <ul>
-    {% for post in site.himals-realm %}
-      <li><a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-      <small>— {{ post.date | date: "%B %d, %Y" }}</small></li>
-    {% endfor %}
-  </ul>
+  <section class="theme-page">
+    {{ content }}
+  </section>
 
   <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
 </body>

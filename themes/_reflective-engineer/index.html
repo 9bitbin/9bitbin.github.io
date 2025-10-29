@@ -8,42 +8,23 @@ permalink: /themes/reflective-engineer/
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🌿 The Reflective Engineer | Rotating Soul</title>
+  <title>🌿 The Reflective Engineer</title>
   <link rel="stylesheet" href="/assets/css/base.css" />
-  <style>
-    body {
-      background-color: #000;
-      color: #00FF99;
-      font-family: 'VT323', monospace;
-      text-align: center;
-      margin: 0;
-      padding: 2rem;
-    }
-    .neon { text-shadow: 0 0 10px #00FF99, 0 0 20px #00FF99, 0 0 30px #00FF99; }
-    a { color: #00FF99; text-decoration: none; }
-    a:hover { text-shadow: 0 0 10px #00FF99, 0 0 20px #00FF99; }
-    footer { margin-top: 2rem; font-size: 0.9rem; color: #00cc88; }
-  </style>
 </head>
-<body>
+<body data-theme="emerald">
   <h1 class="neon">🌿 The Reflective Engineer</h1>
-  <p>Building systems within.</p>
+  <p class="tagline">Building systems within.</p>
 
   <nav>
-    <a href="{{ "/" | relative_url }}">Home</a> |
-    <a href="{{ "/themes/" | relative_url }}">Themes</a> |
-    <a href="{{ "/archive.html" | relative_url }}">Archive</a> |
-    <a href="{{ "/about.html" | relative_url }}">About</a> |
-    <a href="{{ "/contact.html" | relative_url }}">Contact</a>
+    <a href="{{ '/' | relative_url }}">Home</a> |
+    <a href="{{ '/themes/' | relative_url }}">Themes</a> |
+    <a href="{{ '/archive.html' | relative_url }}">Archive</a> |
+    <a href="{{ '/about.html' | relative_url }}">About</a>
   </nav>
 
-  <h2>🧩 Growth & Balance</h2>
-  <ul>
-    {% for post in site.reflective-engineer %}
-      <li><a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-      <small>— {{ post.date | date: "%B %d, %Y" }}</small></li>
-    {% endfor %}
-  </ul>
+  <section class="theme-page">
+    {{ content }}
+  </section>
 
   <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
 </body>
