@@ -102,3 +102,103 @@ footer {
   transform: scale(1.05);
   box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
 }
+
+/* ===========================
+   Markdown Post Styling
+   =========================== */
+
+.post-content,
+.markdown-body {
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  color: #00FFFF;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 2rem auto;
+  text-align: left;
+}
+
+/* Headings inside Markdown posts */
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  color: inherit;
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  font-weight: normal;
+}
+
+/* Links inside posts */
+.post-content a,
+.markdown-body a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.post-content a:hover,
+.markdown-body a:hover {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+/* Code blocks / inline code */
+code, pre {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  padding: 3px 6px;
+  font-family: 'VT323', monospace;
+  color: inherit;
+  text-shadow: 0 0 8px currentColor;
+}
+
+/* Lists and paragraphs */
+.post-content p, .markdown-body p,
+.post-content li, .markdown-body li {
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
+}
+
+/* ===========================
+   Theme Page Styling
+   =========================== */
+
+.theme-page {
+  max-width: 800px;
+  margin: 2rem auto;
+  text-align: left;
+  font-family: 'VT323', monospace;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+}
+
+/* Headings inside theme pages */
+.theme-page h1, .theme-page h2, .theme-page h3 {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  font-weight: normal;
+}
+
+.theme-page p, .theme-page li {
+  margin-bottom: 1rem;
+}
+
+/* Code and inline blocks inside theme pages */
+.theme-page code, .theme-page pre {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  padding: 3px 6px;
+  font-family: 'VT323', monospace;
+  text-shadow: 0 0 8px currentColor;
+}
+
+/* Links in theme pages */
+.theme-page a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.theme-page a:hover {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
