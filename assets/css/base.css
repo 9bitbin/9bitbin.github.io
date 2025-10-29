@@ -1,0 +1,97 @@
+/* ===========================
+   Base Styles — Rotating Soul
+   =========================== */
+
+/* Import a clean monospaced font for your early build */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* Global reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Basic page setup */
+body {
+  font-family: 'VT323', monospace;
+  background-color: #000;
+  color: #e0e0e0;
+  text-align: center;
+  line-height: 1.6;
+  padding: 2rem;
+}
+
+/* Header + Navbar */
+header {
+  margin-bottom: 2rem;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+nav {
+  margin-top: 1rem;
+}
+
+nav a {
+  color: #00ffff;
+  text-decoration: none;
+  margin: 0 10px;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+}
+
+nav a:hover {
+  text-shadow: 0 0 8px #00ffff;
+}
+
+/* Main content */
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+main h2 {
+  margin-bottom: 1rem;
+  color: #66ccff;
+  font-size: 1.6rem;
+}
+
+p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* Blog list */
+ul {
+  list-style-type: none;
+  margin-top: 1rem;
+}
+
+ul li {
+  margin: 0.5rem 0;
+}
+
+ul li a {
+  color: #00ffff;
+  text-decoration: none;
+}
+
+ul li a:hover {
+  text-shadow: 0 0 8px #00ffff;
+}
+
+/* Footer */
+footer {
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  color: #00cccc;
+  letter-spacing: 0.3px;
+  border-top: 1px solid #222;
+  padding-top: 1rem;
+}
