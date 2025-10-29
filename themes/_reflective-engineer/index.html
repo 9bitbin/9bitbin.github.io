@@ -7,25 +7,29 @@ permalink: /themes/reflective-engineer/
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>🌿 The Reflective Engineer</title>
+  <meta charset="UTF-8">
+  <title>🌿 The Reflective Engineer | Rotating Soul</title>
   <link rel="stylesheet" href="/assets/css/base.css" />
 </head>
+
 <body data-theme="emerald">
   <h1 class="neon">🌿 The Reflective Engineer</h1>
   <p class="tagline">Building systems within.</p>
 
-  <nav>
-    <a href="{{ '/' | relative_url }}">Home</a> |
-    <a href="{{ '/themes/' | relative_url }}">Themes</a> |
-    <a href="{{ '/archive.html' | relative_url }}">Archive</a> |
-    <a href="{{ '/about.html' | relative_url }}">About</a>
-  </nav>
-
-  <section class="theme-page">
-    {{ content }}
+  <section class="post-list">
+    <ul>
+      {% assign posts = site.pages | where_exp: "p", "p.path contains 'themes/reflective-engineer/'" | sort: 'date' | reverse %}
+      {% for post in posts %}
+        {% if post.extname == ".md" %}
+          <li>
+            <a href="{{ post.url | relative_url }}">{{ post.title | default: post.name }}</a>
+            <span class="date"> — {{ post.date | date: "%B %d, %Y" }}</span>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
   </section>
 
-  <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
+  <footer><a href="{{ '/themes/' | relative_url }}">← Back to Themes</a></footer>
 </body>
 </html>

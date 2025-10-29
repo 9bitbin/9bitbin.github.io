@@ -1,37 +1,35 @@
 ---
 layout: default
-title: Themes
-permalink: /themes/
+title: "🎨 Wired Soul Journal"
+permalink: /themes/wired-soul-journal/
 ---
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Themes | Rotating Soul</title>
+  <meta charset="UTF-8">
+  <title>🎨 Wired Soul Journal | Rotating Soul</title>
   <link rel="stylesheet" href="/assets/css/base.css" />
 </head>
-<body>
-  <h1 class="neon">Themes</h1>
-  <p class="tagline">Choose a mode of the Rotating Soul.</p>
 
-  <nav class="nav">
-    <a href="{{ "/" | relative_url }}">Home</a>
-    <a href="{{ "/archive.html" | relative_url }}">Archive</a>
-    <a href="{{ "/about.html" | relative_url }}">About</a>
-    <a href="{{ "/contact.html" | relative_url }}">Contact</a>
-  </nav>
+<body data-theme="magenta">
+  <h1 class="neon">🎨 Wired Soul Journal</h1>
+  <p class="tagline">Glitch, art, and emotion.</p>
 
   <section class="post-list">
     <ul>
-      <li><a href="{{ "/themes/mind-over-machine/" | relative_url }}">🧰 Mind over Machine</a></li>
-      <li><a href="{{ "/themes/himals-realm/" | relative_url }}">🧠 Himal’s Realm</a></li>
-      <li><a href="{{ "/themes/reflective-engineer/" | relative_url }}">🌿 The Reflective Engineer</a></li>
-      <li><a href="{{ "/themes/tech-and-tranquility/" | relative_url }}">💬 Tech & Tranquility</a></li>
-      <li><a href="{{ "/themes/wired-soul-journal/" | relative_url }}">🎨 Wired Soul Journal</a></li>
+      {% assign posts = site.pages | where_exp: "p", "p.path contains 'themes/wired-soul-journal/'" | sort: 'date' | reverse %}
+      {% for post in posts %}
+        {% if post.extname == ".md" %}
+          <li>
+            <a href="{{ post.url | relative_url }}">{{ post.title | default: post.name }}</a>
+            <span class="date"> — {{ post.date | date: "%B %d, %Y" }}</span>
+          </li>
+        {% endif %}
+      {% endfor %}
     </ul>
   </section>
 
-  <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
+  <footer><a href="{{ '/themes/' | relative_url }}">← Back to Themes</a></footer>
 </body>
 </html>
