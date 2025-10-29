@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Reflective Engineer | Rotating Soul</title>
+  <link rel="stylesheet" href="/assets/css/base.css">
+</head>
+<body data-theme="The Reflective Engineer">
+  <h1 class="neon">🌿 The Reflective Engineer</h1>
+  <p class="tagline">“Building systems within.”</p>
+
+  <nav class="nav">
+    <a href="/">Home</a>
+    <a href="/themes/tech-and-tranquility/">Next → Tech & Tranquility</a>
+  </nav>
+
+  <section class="post-list">
+    <ul>
+      {% for post in site.reflective-engineer reversed %}
+        <li><a href="{{ post.url }}">{{ post.title }}</a>
+          <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
+</body>
+</html>

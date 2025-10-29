@@ -2,7 +2,6 @@
 layout: post
 title: "Walk Reset Button"
 date: 2025-10-29
-collection: reflective-engineer
 ---
 
 A short walk can reboot the entire system.

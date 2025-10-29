@@ -2,7 +2,6 @@
 layout: post
 title: "sudo fix-life.sh"
 date: 2025-10-29
-collection: mind-over-machine
 ---
 
 Sometimes I treat my thoughts like a misconfigured shell.

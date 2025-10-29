@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tech & Tranquility | Rotating Soul</title>
+  <link rel="stylesheet" href="/assets/css/base.css">
+</head>
+<body data-theme="Tech & Tranquility">
+  <h1 class="neon">💬 Tech & Tranquility</h1>
+  <p class="tagline">“Bridges between people and progress.”</p>
+
+  <nav class="nav">
+    <a href="/">Home</a>
+    <a href="/themes/wired-soul-journal/">Next → Wired Soul Journal</a>
+  </nav>
+
+  <section class="post-list">
+    <ul>
+      {% for post in site.tech-and-tranquility reversed %}
+        <li><a href="{{ post.url }}">{{ post.title }}</a>
+          <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
+</body>
+</html>

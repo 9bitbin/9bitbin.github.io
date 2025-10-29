@@ -2,8 +2,8 @@
 layout: post
 title: "Fi–Te Balance"
 date: 2025-10-29
-collection: himals-realm
 ---
+
 
 The Fi–Te axis is a quiet war between authenticity and efficiency.
 
