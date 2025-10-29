@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Archive"
+title: "🧾 Archive"
 permalink: /archive.html
 ---
 
@@ -8,7 +8,7 @@ permalink: /archive.html
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Archive | Rotating Soul</title>
+  <title>🧾 Archive | Rotating Soul</title>
   <link rel="stylesheet" href="/assets/css/base.css" />
   <style>
     body {
@@ -21,35 +21,36 @@ permalink: /archive.html
     }
     .neon { text-shadow: 0 0 10px #00FF99, 0 0 20px #00FF99; }
     a { color: #00FF99; text-decoration: none; }
-    a:hover { text-shadow: 0 0 10px #00FF99; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 0.4rem 0; }
-    footer { margin-top: 2rem; color: #00cc88; }
+    a:hover { text-shadow: 0 0 10px #00FF99, 0 0 20px #00FF99; }
+    ul { list-style: none; padding: 0; max-width: 700px; margin: 2rem auto; text-align: left; }
+    li { margin: 0.5rem 0; }
+    footer { margin-top: 3rem; color: #00cc88; }
+    .post-date { float: right; color: #00cc88; }
   </style>
 </head>
+
 <body>
   <h1 class="neon">🧾 Archive</h1>
-  <p class="tagline">Every thought and system — logged.</p>
+  <p class="tagline">Every post from every realm — logged and glowing.</p>
 
   <nav>
-    <a href="{{ "/" | relative_url }}">Home</a> |
-    <a href="{{ "/themes/" | relative_url }}">Themes</a> |
-    <a href="{{ "/about.html" | relative_url }}">About</a> |
-    <a href="{{ "/contact.html" | relative_url }}">Contact</a>
+    <a href="{{ '/' | relative_url }}">Home</a> |
+    <a href="{{ '/themes/' | relative_url }}">Themes</a> |
+    <a href="{{ '/about.html' | relative_url }}">About</a> |
+    <a href="{{ '/contact.html' | relative_url }}">Contact</a>
   </nav>
 
-  <section class="post-list" style="max-width:700px;margin:2rem auto;text-align:left;">
+  <section class="theme-page">
     <ul>
-      {% assign all_posts = site.mind-over-machine 
-         | concat: site.himals-realm 
-         | concat: site.reflective-engineer 
-         | concat: site.tech-and-tranquility 
-         | concat: site.wired-soul-journal %}
-      {% for post in all_posts reversed %}
-        <li>
-          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-          <small> — {{ post.date | date: "%B %d, %Y" }}</small>
-        </li>
+      {% assign all_posts = site.pages | where_exp:"p", "p.path contains 'themes/'" %}
+      {% assign sorted_posts = all_posts | sort: 'date' | reverse %}
+      {% for post in sorted_posts %}
+        {% if post.title %}
+          <li>
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+            <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+          </li>
+        {% endif %}
       {% endfor %}
     </ul>
   </section>
