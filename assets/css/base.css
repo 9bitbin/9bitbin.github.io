@@ -1,33 +1,50 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=VT323&display=swap');
 
+:root {
+  --cyan: #00FFFF;
+  --lavender: #B49BFF;
+  --emerald: #00FF99;
+  --softblue: #66CCFF;
+  --magenta: #FF00FF;
+}
+
 body {
   margin: 0;
   background: #000;
-  color: #0ff;
+  color: var(--cyan);
   font-family: 'VT323', monospace;
   text-align: center;
   overflow-x: hidden;
+  animation: flicker 0.15s infinite alternate;
 }
 
 .neon {
   font-family: 'Orbitron', sans-serif;
-  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  text-shadow: 0 0 8px currentColor, 0 0 20px currentColor;
+  animation: glow 2s ease-in-out infinite alternate;
 }
 
+.nav {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
 .nav a {
   margin: 0 12px;
   text-decoration: none;
   color: inherit;
-  transition: 0.2s;
+  font-size: 1.2em;
+  transition: all 0.25s;
 }
 .nav a:hover {
-  text-shadow: 0 0 8px #fff;
+  text-shadow: 0 0 10px #fff, 0 0 20px #fff;
+  transform: scale(1.08);
 }
 
 .tagline {
   font-size: 1.3em;
   margin-top: 0;
   opacity: 0.9;
+  animation: softfade 3s ease-in-out infinite alternate;
 }
 
 footer {
@@ -36,9 +53,26 @@ footer {
   opacity: 0.7;
 }
 
-/* Accent color overrides by theme */
-[data-theme*="Mind over Machine"] { color: #00FFFF; }
-[data-theme*="Himal’s Realm"] { color: #B49BFF; }
-[data-theme*="Reflective Engineer"] { color: #00FF99; }
-[data-theme*="Tech & Tranquility"] { color: #66CCFF; }
-[data-theme*="Wired Soul Journal"] { color: #FF00FF; }
+/* Accent color themes */
+[data-theme*="Mind over Machine"] { color: var(--cyan); }
+[data-theme*="Himal’s Realm"] { color: var(--lavender); }
+[data-theme*="Reflective Engineer"] { color: var(--emerald); }
+[data-theme*="Tech & Tranquility"] { color: var(--softblue); }
+[data-theme*="Wired Soul Journal"] { color: var(--magenta); }
+
+/* Animations */
+@keyframes flicker {
+  0% { opacity: 0.99; }
+  50% { opacity: 1; }
+  100% { opacity: 0.97; }
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+  to { text-shadow: 0 0 15px currentColor, 0 0 30px currentColor; }
+}
+
+@keyframes softfade {
+  from { opacity: 0.85; }
+  to { opacity: 1; }
+}
