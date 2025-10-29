@@ -1,0 +1,6 @@
+title: Rotating Soul
+description: Reflections in code, mind, and life.
+theme: jekyll-theme-console
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
