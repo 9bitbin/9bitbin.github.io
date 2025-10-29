@@ -1,6 +1,8 @@
 ---
+layout: post
 title: "Civic Tech Bridge"
 date: 2025-10-29
+collection: tech-and-tranquility
 ---
 
 Technology is most beautiful when it connects people, not just devices.

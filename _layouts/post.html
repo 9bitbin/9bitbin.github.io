@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ page.title }} | Rotating Soul</title>
+  <link rel="stylesheet" href="/assets/css/base.css">
+</head>
+<body data-theme="{{ page.collection | capitalize }}">
+  <main class="center">
+    <h1 class="neon">{{ page.title }}</h1>
+    <p class="tagline">{{ page.date | date: "%B %d, %Y" }}</p>
+    <article class="post-content">
+      {{ content }}
+    </article>
+
+    <a href="/themes/{{ page.collection }}/" class="nav">⟵ Back to {{ page.collection | replace: '-', ' ' | capitalize }}</a>
+  </main>
+  <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
+</body>
+</html>

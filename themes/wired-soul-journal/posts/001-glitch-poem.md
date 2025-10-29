@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "Glitch Poem"
 date: 2025-10-29
 ---

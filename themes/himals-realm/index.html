@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Himal’s Realm | Rotating Soul</title>
-  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/base.css">
 </head>
 <body data-theme="Himal’s Realm">
   <h1 class="neon">🧠 Himal’s Realm</h1>
   <p class="tagline">“Where thoughts find structure.”</p>
+
   <nav class="nav">
     <a href="/">Home</a>
     <a href="/themes/reflective-engineer/">Next → The Reflective Engineer</a>
   </nav>
-  <ul>
-    <li><a href="/themes/himals-realm/posts/001-fi-te-balance.md">Fi-Te Balance</a></li>
-  </ul>
+
+  <section>
+    <h2>Posts</h2>
+    <ul>
+      {% for post in site.himals-realm reversed %}
+        <li>
+          <a href="{{ post.url }}">{{ post.title }}</a>
+          <small>({{ post.date | date: "%b %d, %Y" }})</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
   <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
 </body>
 </html>

@@ -4,3 +4,25 @@ theme: jekyll-theme-console
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+
+# --- collections for each theme ---
+collections:
+  mind-over-machine:
+    output: true
+    permalink: /themes/mind-over-machine/:name/
+  himals-realm:
+    output: true
+    permalink: /themes/himals-realm/:name/
+  reflective-engineer:
+    output: true
+    permalink: /themes/reflective-engineer/:name/
+  tech-and-tranquility:
+    output: true
+    permalink: /themes/tech-and-tranquility/:name/
+  wired-soul-journal:
+    output: true
+    permalink: /themes/wired-soul-journal/:name/
+
+# Include folders in site build
+include:
+  - themes
