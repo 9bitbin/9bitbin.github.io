@@ -1,26 +1,49 @@
+---
+layout: default
+title: "🧰 Mind over Machine"
+permalink: /themes/mind-over-machine/
+---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mind over Machine | Rotating Soul</title>
+  <title>🧰 Mind over Machine | Rotating Soul</title>
   <link rel="stylesheet" href="/assets/css/base.css" />
+  <style>
+    body {
+      background-color: #000;
+      color: #00ffff;
+      font-family: 'VT323', monospace;
+      text-align: center;
+      margin: 0;
+      padding: 2rem;
+    }
+    .neon { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff; }
+    a { color: #00ffff; text-decoration: none; }
+    a:hover { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
+    footer { margin-top: 2rem; font-size: 0.9rem; color: #00cccc; }
+  </style>
 </head>
-<body data-theme="Mind over Machine">
+<body>
   <h1 class="neon">🧰 Mind over Machine</h1>
-  <p class="tagline">“Command lines and clarity.”</p>
+  <p>Command lines and clarity.</p>
 
-  <nav class="nav">
-    <a href="/">Home</a>
-    <a href="/themes/himals-realm/">Next → Himal’s Realm</a>
+  <nav>
+    <a href="{{ "/" | relative_url }}">Home</a> |
+    <a href="{{ "/themes/" | relative_url }}">Themes</a> |
+    <a href="{{ "/archive.html" | relative_url }}">Archive</a> |
+    <a href="{{ "/about.html" | relative_url }}">About</a> |
+    <a href="{{ "/contact.html" | relative_url }}">Contact</a>
   </nav>
 
-  <section>
-    <h2>Posts</h2>
-    <ul>
-      <li><a href="/themes/mind-over-machine/posts/001-sudo-fix-life.md">sudo fix-life.sh</a></li>
-      <li><a href="/themes/mind-over-machine/posts/002-aws-node-tips.md">AWS & Node Tips</a></li>
-    </ul>
-  </section>
+  <h2>📜 Logs & Tutorials</h2>
+  <ul>
+    {% for post in site.mind-over-machine %}
+      <li><a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      <small>— {{ post.date | date: "%B %d, %Y" }}</small></li>
+    {% endfor %}
+  </ul>
 
   <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
 </body>
