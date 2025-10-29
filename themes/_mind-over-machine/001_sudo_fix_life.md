@@ -1,13 +1,18 @@
 ---
-layout: post
 title: "sudo fix-life.sh"
 date: 2025-10-29
+layout: default
 ---
 
-Sometimes I treat my thoughts like a misconfigured shell.
+### Reboot Sequence: Initiated
 
-A few commands here, a few resets there — and eventually things compile again.  
-Debugging code has taught me that the same patience needed to fix a program applies to untangling the self.
+When systems crash — human or machine — the fix isn't always in the command line.  
+Sometimes it’s in the silence between keystrokes.
 
-Each error message is just a prompt for reflection.  
-Run the script, read the logs, and keep iterating.
+I used to think clarity came from control, but it really comes from knowing when to **reboot**.  
+The same logic I use to repair machines is the one I use to repair myself:  
+check logs, find errors, patch habits, and restart.
+
+```bash
+sudo apt-get remove negativity
+sudo systemctl enable focus

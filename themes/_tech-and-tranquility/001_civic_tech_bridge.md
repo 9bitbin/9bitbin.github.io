@@ -1,12 +1,16 @@
 ---
-layout: post
 title: "Civic Tech Bridge"
 date: 2025-10-29
+layout: default
 ---
 
-Technology is most beautiful when it connects people, not just devices.
+### Where People Meet Progress
 
-At the Urban League meetup, we discussed how civic data could serve community voices — not algorithms.  
-It reminded me that good design is empathy translated into interface.
+I’ve seen how technology can divide or connect — it depends on who writes the code.  
+When I joined local community projects through the Urban League,  
+I realized tech isn’t just hardware or code — it’s **infrastructure for belonging**.
 
-A bridge doesn’t just span distance; it builds understanding.
+Bridging civic life and digital design means listening before building.  
+You can’t automate empathy, but you can **engineer accessibility**.
+
+That’s what I call “Tech & Tranquility” — where systems serve people, not the other way around.
