@@ -1,32 +1,132 @@
+---
+layout: default
+title: "Rotating Soul"
+permalink: /
+---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rotating Soul</title>
-  <link rel="icon" href="/favicon.ico" />
+  <title>Rotating Soul | Himal Shrestha</title>
   <link rel="stylesheet" href="/assets/css/base.css" />
-  <script src="/assets/js/rotate.js" defer></script>
+  <style>
+    body {
+      background-color: #000;
+      color: #00ffff;
+      font-family: 'VT323', monospace;
+      text-align: center;
+      margin: 0;
+      padding: 3rem 1rem;
+    }
+
+    .neon {
+      font-size: 2.5rem;
+      text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+      animation: flicker 1.5s infinite alternate;
+    }
+
+    @keyframes flicker {
+      from { opacity: 1; }
+      to { opacity: 0.85; }
+    }
+
+    .tagline {
+      color: #66ccff;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+
+    nav {
+      margin: 1.5rem 0;
+    }
+
+    nav a {
+      color: #00ffff;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-shadow: 0 0 10px #00ffff;
+    }
+
+    .theme-list {
+      margin-top: 2rem;
+    }
+
+    .theme-link {
+      display: block;
+      margin: 1rem auto;
+      padding: 1rem;
+      max-width: 300px;
+      border: 1px solid #00ffff;
+      border-radius: 10px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.25s ease-in-out;
+    }
+
+    .theme-link:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+    }
+
+    footer {
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: #00cccc;
+    }
+  </style>
+
+  <script>
+    // Rotating title + tagline
+    const titles = [
+      { emoji: "🧰", title: "Mind over Machine", color: "#00FFFF", tagline: "Command lines and clarity." },
+      { emoji: "🧠", title: "Himal’s Realm", color: "#B49BFF", tagline: "Where thoughts find structure." },
+      { emoji: "🌿", title: "The Reflective Engineer", color: "#00FF99", tagline: "Building systems within." },
+      { emoji: "💬", title: "Tech & Tranquility", color: "#66CCFF", tagline: "Bridges between people and progress." },
+      { emoji: "🎨", title: "Wired Soul Journal", color: "#FF00FF", tagline: "Glitch, art, and emotion." }
+    ];
+
+    let current = 0;
+    function rotateTheme() {
+      const t = titles[current];
+      document.getElementById("mainTitle").innerHTML = `${t.emoji} ${t.title}`;
+      document.getElementById("mainTitle").style.textShadow = `0 0 10px ${t.color}, 0 0 20px ${t.color}, 0 0 30px ${t.color}`;
+      document.getElementById("tagline").innerText = t.tagline;
+      document.body.style.color = t.color;
+      document.querySelectorAll(".theme-link").forEach(a => a.style.borderColor = t.color);
+      current = (current + 1) % titles.length;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      rotateTheme();
+      setInterval(rotateTheme, 3500);
+    });
+  </script>
 </head>
+
 <body>
-  <main class="center">
-    <h1 id="title" class="neon"></h1>
-    <p id="tagline" class="tagline"></p>
+  <h1 id="mainTitle" class="neon">Rotating Soul</h1>
+  <p id="tagline" class="tagline">Reflections in code, mind, and life.</p>
 
-<nav class="nav">
-  <a href="{{ "/" | relative_url }}">Home</a>
-  <a href="{{ "/themes/" | relative_url }}">Themes</a>
-  <a href="{{ "/archive.html" | relative_url }}">Archive</a>
-  <a href="{{ "/about.html" | relative_url }}">About</a>
-  <a href="{{ "/contact.html" | relative_url }}">Contact</a>
-</nav>
+  <nav>
+    <a href="{{ "/" | relative_url }}">Home</a> |
+    <a href="{{ "/themes/" | relative_url }}">Themes</a> |
+    <a href="{{ "/archive.html" | relative_url }}">Archive</a> |
+    <a href="{{ "/about.html" | relative_url }}">About</a> |
+    <a href="{{ "/contact.html" | relative_url }}">Contact</a>
+  </nav>
 
-
-    <section class="intro">
-      <p>Welcome to <strong>Rotating Soul</strong> — a digital reflection cycling through
-      logic, philosophy, growth, community, and art.</p>
-    </section>
-  </main>
+  <section class="theme-list">
+    <a class="theme-link" href="{{ "/themes/mind-over-machine/" | relative_url }}">🧰 Mind over Machine</a>
+    <a class="theme-link" href="{{ "/themes/himals-realm/" | relative_url }}">🧠 Himal’s Realm</a>
+    <a class="theme-link" href="{{ "/themes/reflective-engineer/" | relative_url }}">🌿 The Reflective Engineer</a>
+    <a class="theme-link" href="{{ "/themes/tech-and-tranquility/" | relative_url }}">💬 Tech & Tranquility</a>
+    <a class="theme-link" href="{{ "/themes/wired-soul-journal/" | relative_url }}">🎨 Wired Soul Journal</a>
+  </section>
 
   <footer>© 2025 Himal Shrestha | “Rebooting the Soul”</footer>
 </body>
