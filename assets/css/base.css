@@ -1,0 +1,71 @@
+/* ===========================
+   Home Page Styling
+   =========================== */
+
+body {
+  background-color: #000;
+  color: #00ffff;
+  font-family: 'VT323', monospace;
+  text-align: center;
+  margin: 0;
+  padding: 3rem 1rem;
+}
+
+.neon {
+  font-size: 2.5rem;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+  animation: flicker 1.5s infinite alternate;
+}
+
+@keyframes flicker {
+  from { opacity: 1; }
+  to { opacity: 0.85; }
+}
+
+.tagline {
+  color: #66ccff;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+nav {
+  margin: 1.5rem 0;
+}
+
+nav a {
+  color: #00ffff;
+  text-decoration: none;
+  margin: 0 10px;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-shadow: 0 0 10px #00ffff;
+}
+
+.theme-list {
+  margin-top: 2rem;
+}
+
+.theme-link {
+  display: block;
+  margin: 1rem auto;
+  padding: 1rem;
+  max-width: 300px;
+  border: 1px solid #00ffff;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.25s ease-in-out;
+}
+
+.theme-link:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+}
+
+footer {
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  color: #00cccc;
+}
