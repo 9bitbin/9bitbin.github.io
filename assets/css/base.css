@@ -1,84 +1,104 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=VT323&display=swap');
+/* ===========================
+   Rotating Soul Global Style
+   =========================== */
 
-:root {
-  --cyan: #00FFFF;
-  --lavender: #B49BFF;
-  --emerald: #00FF99;
-  --softblue: #66CCFF;
-  --magenta: #FF00FF;
-}
+/* Import Google Font (VT323) */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
-html, body {
-  margin: 0;
-  background: #000;
-  color: var(--cyan);
+/* Global body setup */
+body {
+  background-color: #000;
+  color: #00FFFF;
   font-family: 'VT323', monospace;
+  margin: 0;
+  padding: 2rem 1rem;
   text-align: center;
-  overflow-x: hidden;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
 }
 
+/* Neon text base */
 .neon {
-  font-family: 'Orbitron', sans-serif;
-  text-shadow: 0 0 8px currentColor, 0 0 20px currentColor;
-  animation: glow 2s ease-in-out infinite alternate;
+  text-shadow:
+    0 0 10px currentColor,
+    0 0 20px currentColor,
+    0 0 30px currentColor;
+  animation: flicker 1.6s infinite alternate;
 }
 
-.nav { margin: 15px 0; }
-.nav a {
-  margin: 0 12px;
+/* Flicker animation for titles */
+@keyframes flicker {
+  from { opacity: 1; }
+  to { opacity: 0.88; }
+}
+
+/* Headings */
+h1, h2, h3 {
+  font-weight: normal;
+  margin: 1.2rem 0;
+}
+
+/* Navigation */
+nav {
+  margin: 1rem 0 2rem 0;
+}
+
+nav a {
+  color: #00FFFF;
   text-decoration: none;
-  color: inherit;
-  font-size: 1.1em;
-  transition: all 0.25s;
+  margin: 0 10px;
+  font-weight: bold;
 }
-.nav a:hover { text-shadow: 0 0 10px #fff, 0 0 20px #fff; transform: scale(1.06); }
 
-.tagline { font-size: 1.25em; margin-top: 0; opacity: 0.9; }
+nav a:hover {
+  text-shadow: 0 0 10px #00FFFF, 0 0 20px #00FFFF;
+}
 
-footer { margin-top: 60px; font-size: 0.9em; opacity: 0.7; }
+/* Links in text */
+a {
+  color: inherit;
+  text-decoration: underline;
+}
 
-/* Post list styling */
-.post-list { margin-top: 18px; }
-.post-list ul {
+a:hover {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+/* Lists */
+ul {
   list-style: none;
   padding: 0;
-  width: min(760px, 92%);
-  margin: 0 auto;
-  text-align: left;
-}
-.post-list li {
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-.post-list li a {
-  color: inherit;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-.post-list li:hover a {
-  text-shadow: 0 0 8px currentColor, 0 0 18px currentColor;
-  transform: translateX(2px);
-}
-.post-content {
-  width: min(760px, 92%);
-  margin: 0 auto;
-  text-align: left;
-  line-height: 1.6;
-  font-size: 1.1em;
 }
 
-/* Accent color themes */
-[data-theme*="Mind over Machine"] { color: var(--cyan); }
-[data-theme*="Himal’s Realm"]     { color: var(--lavender); }
-[data-theme*="Reflective Engineer"]{ color: var(--emerald); }
-[data-theme*="Tech & Tranquility"] { color: var(--softblue); }
-[data-theme*="Wired Soul Journal"] { color: var(--magenta); }
+li {
+  margin: 0.4rem 0;
+}
 
-/* Animations */
-@keyframes glow {
-  from { text-shadow: 0 0 6px currentColor, 0 0 12px currentColor; }
-  to   { text-shadow: 0 0 16px currentColor, 0 0 32px currentColor; }
+/* Footer */
+footer {
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  color: #00cccc;
+  letter-spacing: 0.3px;
+}
+
+/* Theme color accents */
+[data-theme="cyan"]   { color: #00FFFF; }
+[data-theme="lavender"] { color: #B49BFF; }
+[data-theme="emerald"]  { color: #00FF99; }
+[data-theme="softblue"] { color: #66CCFF; }
+[data-theme="magenta"]  { color: #FF00FF; }
+
+/* Optional glowing buttons */
+.button-glow {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.button-glow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
 }
