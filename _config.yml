@@ -1,15 +1,5 @@
-title: Rotating Soul
-description: Reflections in code, mind, and life.
-theme: minima
-
-plugins:
-  - jekyll-feed
-  - jekyll-seo-tag
-
-# Put collections under /themes
 collections_dir: themes
 
-# One collection per theme
 collections:
   mind-over-machine:
     output: true
@@ -26,3 +16,6 @@ collections:
   wired-soul-journal:
     output: true
     permalink: /themes/wired-soul-journal/:name/
+
+include:
+  - themes
