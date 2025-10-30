@@ -14,7 +14,7 @@ document.body.prepend(canvas);
 
 let stars = [];
 let numStars = 600;         // Number of stars to render
-let speed = 0.0001;         // 🌙 Dreamy slow motion
+let speed = 0.00001;         // 🌙 Dreamy slow motion
 let width, height;
 
 // Mouse-based parallax control
