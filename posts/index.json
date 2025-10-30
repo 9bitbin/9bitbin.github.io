@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Reclaiming the Command Line",
+    "date": "2025-10-29",
+    "theme": "mind-over-machine",
+    "path": "posts/mind-over-machine-2025-10-29.html",
+    "excerpt": "This post explores how embracing the command line can bring clarity and speed to everyday developer workflows."
+  },
+  {
+    "title": "Glitch as Poem",
+    "date": "2025-06-08",
+    "theme": "wired-soul-journal",
+    "path": "posts/wired-soul-journal-2025-06-08.html",
+    "excerpt": "An exploration of glitch aesthetics and how brokenness can be beautiful in art and code."
+  },
+  {
+    "title": "Designing with Quiet",
+    "date": "2025-01-15",
+    "theme": "tech-tranquility",
+    "path": "posts/tech-tranquility-2025-01-15.html",
+    "excerpt": "Thoughts on humane product design and the small choices that make technology less intrusive."
+  },
+  {
+    "title": "Structures for Thought",
+    "date": "2024-07-12",
+    "theme": "himals-realm",
+    "path": "posts/himals-realm-2024-07-12.html",
+    "excerpt": "An essay about shaping notes into systems and the small habits that let ideas scale."
+  },
+  {
+    "title": "Engineering Introspection",
+    "date": "2023-11-05",
+    "theme": "reflective-engineer",
+    "path": "posts/reflective-engineer-2023-11-05.html",
+    "excerpt": "On the craft of engineering systems while reflecting on personal growth and process."
+  }
+]
