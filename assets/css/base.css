@@ -1,0 +1,123 @@
+/* ==========================================================
+   🌌 ROTATING SOUL — BASE STYLESHEET (Enhanced Neon Edition)
+   Author: Himal Shrestha (9bitbin)
+   Purpose: Defines your Y2K / Neon / Terminal visual foundation
+   ========================================================== */
+
+/* ========== GLOBAL RESET ========== */
+body {
+  background-color: #0a0a0a;        /* Deep black background */
+  color: #e0e0e0;                   /* Soft light gray text for readability */
+  font-family: 'Arial', monospace;  /* Retro monospace font for Y2K vibe */
+  text-align: center;               /* Centers layout content */
+  margin: 0;
+  padding: 0;
+}
+
+/* ========== HEADINGS ========== */
+h1, h2 {
+  text-shadow: 0 0 8px #00ffff;     /* Cyan glow under all major headings */
+  animation: flicker 3s infinite;    /* Subtle flicker animation (looping) */
+}
+
+/* ========== NAVIGATION LINKS ========== */
+nav {
+  margin-top: 10px;                 /* Adds space under header */
+}
+
+nav a {
+  color: #00ffff;                   /* Cyan by default */
+  margin: 0 12px;                   /* Spacing between nav items */
+  text-decoration: none;            /* Removes underline */
+  font-size: 1.2em;
+  position: relative;               /* Allows pseudo-element glow border */
+  transition: 0.3s ease-in-out;     /* Smooth hover transition */
+}
+
+/* Hover glow and pulse animation */
+nav a:hover {
+  color: #ff00ff;                   /* Switches to magenta */
+  text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;  /* Double glow */
+  animation: glowPulse 1.5s infinite; /* Gentle pulse animation */
+}
+
+/* Optional subtle underline glow effect */
+nav a::after {
+  content: '';
+  display: block;
+  height: 2px;
+  width: 0%;
+  background: #ff00ff;
+  transition: width 0.3s;
+  margin: 0 auto;
+}
+
+nav a:hover::after {
+  width: 60%;                       /* Expanding underline when hovered */
+}
+
+/* ========== FOOTER ========== */
+footer {
+  margin-top: 40px;
+  font-size: 0.9em;
+  color: #888;
+  text-shadow: 0 0 3px #333;
+}
+
+/* ========== COLOR ACCENT CLASSES ========== */
+/* Each theme color for consistent branding across sections */
+.cyan { color: #00ffff; }      /* Mind over Machine */
+.lavender { color: #b49bff; }  /* Himal’s Realm */
+.emerald { color: #00ff99; }   /* Reflective Engineer */
+.softblue { color: #66ccff; }  /* Tech & Tranquility */
+.magenta { color: #ff00ff; }   /* Wired Soul Journal */
+
+/* ========== ANIMATIONS ========== */
+/* Neon text flicker effect (used on headers) */
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    opacity: 0.4;
+  }
+}
+
+/* Soft glowing pulse for hover links */
+@keyframes glowPulse {
+  0% {
+    text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff;
+  }
+  50% {
+    text-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff;
+  }
+  100% {
+    text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff;
+  }
+}
+
+/* ==========================================================
+   💡 FUTURE IDEAS
+   ----------------------------------------------------------
+   • Add background gradients per theme page.
+   • Integrate flicker.js (for random neon text effects).
+   • Add theme-colored buttons for posts and navigation.
+   ========================================================== */
+
+/* ==========================================================
+   🌌 STARFIELD BACKGROUND LAYER
+   ----------------------------------------------------------
+   Positions the canvas behind everything else.
+   ========================================================== */
+#starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;                /* keeps stars behind page content */
+  background: rgb(0, 0, 0);
+  filter: brightness(0.9) contrast(1.3) blur(0.2px);
+}
+
+
