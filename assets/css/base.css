@@ -122,3 +122,52 @@ footer {
   background: black;
   filter: brightness(1.1) contrast(1.4);
 }
+
+/* ==========================================================
+   💚 SOCIAL LINKS — Green glow with yellow hover (Contact Page Only)
+   ========================================================== */
+.social-links a {
+  color: #00ff66; /* neon green */
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  text-shadow:
+    0 0 5px #00ff66,
+    0 0 10px #00ff66,
+    0 0 20px #00ff66;
+}
+
+.social-links a:hover {
+  color: #ffff66; /* yellow hover */
+  text-shadow:
+    0 0 8px #ffff66,
+    0 0 16px #ffff66,
+    0 0 32px #ffff66;
+}
+
+/* Optional glowing underline */
+.social-links a::after {
+  content: '';
+  display: block;
+  height: 2px;
+  width: 0%;
+  background: #ffff66;
+  transition: width 0.3s ease;
+  margin: 0 auto;
+}
+
+.social-links a:hover::after {
+  width: 60%;
+}
+
+/* Layout styling for spacing */
+.social-links {
+  list-style: none;
+  padding: 0;
+  margin: 30px 0;
+}
+
+.social-links li {
+  margin: 10px 0;
+}
