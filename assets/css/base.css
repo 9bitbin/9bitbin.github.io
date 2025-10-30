@@ -1,48 +1,66 @@
 /* ==========================================================
-   🌌 ROTATING SOUL — BASE STYLESHEET (Enhanced Neon Edition)
+   🌌 ROTATING SOUL — ENHANCED BASE STYLES
    Author: Himal Shrestha (9bitbin)
-   Purpose: Defines your Y2K / Neon / Terminal visual foundation
    ========================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Bancroft&display=swap');
+
+/* Optional local fallback */
+@font-face {
+  font-family: 'Bancroft';
+  src: url('fonts/Bancroft.ttf') format('truetype');
+  font-display: swap;
+}
+
 /* ========== GLOBAL RESET ========== */
-body {
-  background-color: #0a0a0a;        /* Deep black background */
-  color: #e0e0e0;                   /* Soft light gray text for readability */
-  font-family: 'Arial', monospace;  /* Retro monospace font for Y2K vibe */
-  text-align: center;
-  font-weight: 600;               /* Centers layout content */
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: #000;
+  color: #e0e0e0;
+  font-family: 'Bancroft', 'Arial', monospace;
+  text-align: center;
+  font-weight: 600;
+  overflow: hidden; /* prevent scroll flicker when mouse moves */
 }
 
-/* ========== HEADINGS ========== */
-h1, h2 {
-  text-shadow: 0 0 8px #00ffff;     /* Cyan glow under all major headings */
-  animation: flicker 3s infinite;    /* Subtle flicker animation (looping) */
+/* ========== MAIN CONTENT AREA ========== */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+  position: relative;
+  z-index: 1; /* content floats above starfield */
 }
 
-/* ========== NAVIGATION LINKS ========== */
+/* ========== NAVIGATION ========== */
 nav {
-  margin-top: 10px;                 /* Adds space under header */
+  margin-top: 10px;
+  z-index: 1;
 }
 
 nav a {
-  color: #00ffff;                   /* Cyan by default */
-  margin: 0 12px;                   /* Spacing between nav items */
-  text-decoration: none;            /* Removes underline */
+  color: #00ffff;
+  margin: 0 12px;
+  text-decoration: none;
   font-size: 1.2em;
-  position: relative;               /* Allows pseudo-element glow border */
-  transition: 0.3s ease-in-out;     /* Smooth hover transition */
+  position: relative;
+  transition: 0.3s ease-in-out;
 }
 
-/* Hover glow and pulse animation */
 nav a:hover {
-  color: #ff00ff;                   /* Switches to magenta */
-  text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;  /* Double glow */
-  animation: glowPulse 1.5s infinite; /* Gentle pulse animation */
+  color: #ff00ff;
+  text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+  animation: glowPulse 1.5s infinite;
 }
 
-/* Optional subtle underline glow effect */
 nav a::after {
   content: '';
   display: block;
@@ -54,71 +72,53 @@ nav a::after {
 }
 
 nav a:hover::after {
-  width: 60%;                       /* Expanding underline when hovered */
+  width: 60%;
+}
+
+/* ========== HEADINGS ========== */
+h1, h2 {
+  text-shadow: 0 0 8px #00ffff;
+  animation: flicker 3s infinite;
+  margin: 0.5em 0;
 }
 
 /* ========== FOOTER ========== */
 footer {
-  margin-top: 40px;
   font-size: 0.9em;
   color: #888;
   text-shadow: 0 0 3px #333;
+  z-index: 1;
+  position: relative;
+  margin-bottom: 10px;
 }
 
-/* ========== COLOR ACCENT CLASSES ========== */
-/* Each theme color for consistent branding across sections */
-.cyan { color: #00ffff; }      /* Mind over Machine */
-.lavender { color: #b49bff; }  /* Himal’s Realm */
-.emerald { color: #00ff99; }   /* Reflective Engineer */
-.softblue { color: #66ccff; }  /* Tech & Tranquility */
-.magenta { color: #ff00ff; }   /* Wired Soul Journal */
+/* ========== COLOR ACCENTS ========== */
+.cyan { color: #00ffff; }
+.lavender { color: #b49bff; }
+.emerald { color: #00ff99; }
+.softblue { color: #66ccff; }
+.magenta { color: #ff00ff; }
 
 /* ========== ANIMATIONS ========== */
-/* Neon text flicker effect (used on headers) */
 @keyframes flicker {
-  0%, 18%, 22%, 25%, 53%, 57%, 100% {
-    opacity: 1;
-  }
-  20%, 24%, 55% {
-    opacity: 0.4;
-  }
+  0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.4; }
 }
 
-/* Soft glowing pulse for hover links */
 @keyframes glowPulse {
-  0% {
-    text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff;
-  }
-  50% {
-    text-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff;
-  }
-  100% {
-    text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff;
-  }
+  0% { text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff; }
+  50% { text-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff; }
+  100% { text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff; }
 }
 
-/* ==========================================================
-   💡 FUTURE IDEAS
-   ----------------------------------------------------------
-   • Add background gradients per theme page.
-   • Integrate flicker.js (for random neon text effects).
-   • Add theme-colored buttons for posts and navigation.
-   ========================================================== */
-
-/* ==========================================================
-   🌌 STARFIELD BACKGROUND LAYER
-   ----------------------------------------------------------
-   Positions the canvas behind everything else.
-   ========================================================== */
-
-
+/* ========== STARFIELD CANVAS ========== */
 #starfield {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
-  background: black; /* deep black space */
-  filter: brightness(1) contrast(1.3);
+  z-index: 0;
+  background: black;
+  filter: brightness(1.1) contrast(1.4);
 }
