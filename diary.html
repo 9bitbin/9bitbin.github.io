@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himal Shrestha | Diary</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="stars-bg" id="starField"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo pixel-font">Y2K</div>
+            <button class="hamburger" onclick="toggleMobileMenu()" id="hamburger">☰</button>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="diary.html" class="nav-link active">Diary</a>
+                <a href="resume.html" class="nav-link">Resume</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="admin.html" class="nav-link">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Check -->
+    <div id="diaryAuthContainer"></div>
+
+    <!-- Main Content (Hidden until authenticated) -->
+    <main id="diaryContent" class="container" style="display: none;">
+        <section class="hero">
+            <div class="glass-panel" style="text-align: center; padding: 40px;">
+                <h1 class="page-title neon-text">MY DIARY</h1>
+                <p class="page-subtitle">Private thoughts & feelings 🔐</p>
+                <button class="chrome-button" onclick="lockDiary()" style="margin-top: 20px;">🔒 Lock Diary</button>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-box stat-pink glass-panel">
+                    <div class="stat-number" id="diaryEntryCount">00</div>
+                    <div class="stat-label pixel-font">Entries</div>
+                </div>
+                <div class="stat-box stat-blue glass-panel">
+                    <div class="stat-number" id="diaryWordCount">0000</div>
+                    <div class="stat-label pixel-font">Words</div>
+                </div>
+                <div class="stat-box stat-purple glass-panel">
+                    <div class="stat-number" id="diaryDaysActive">00</div>
+                    <div class="stat-label pixel-font">Days</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="diaryContainer" class="diary-container"></section>
+
+        <footer>
+            <p class="pixel-font">Last Updated: <span id="lastUpdated">Today</span></p>
+            <p class="comic-font">💫 Made with HTML5, CSS3, and JavaScript ✨</p>
+        </footer>
+    </main>
+
+    <script src="storage.js"></script>
+    <script src="app.js"></script>
+    <script src="diary.js"></script>
+</body>
+</html>

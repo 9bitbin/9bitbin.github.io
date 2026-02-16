@@ -1,0 +1,107 @@
+═══════════════════════════════════════════════════════════════════════════════
+  Y2K PORTFOLIO - QUICK START GUIDE
+═══════════════════════════════════════════════════════════════════════════════
+
+⏱️  ESTIMATED TIME: 5 MINUTES
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: OPEN IN BROWSER (30 seconds)
+─────────────────────────────────────
+
+1. Look for the "index.html" file in your folder
+2. Right-click on it
+3. Select "Open with" → Choose your browser (Chrome, Firefox, Safari, etc.)
+4. Your portfolio will open!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 2: EXPLORE THE SITE (1 minute)
+──────────────────────────────────
+
+You'll see a splash screen. Click "ENTER SITE" to continue.
+
+Then explore:
+  • HOME - Your portfolio homepage
+  • ABOUT - MySpace-style profile
+  • BLOG - Read blog posts
+  • DIARY - Private journal (needs password)
+  • RESUME - Professional resume (needs password)
+  • CONTACT - Send messages & sign guestbook
+  • ADMIN - Manage your content (needs password)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 3: TRY THE PASSWORDS (2 minutes)
+─────────────────────────────────────
+
+Three special areas need passwords:
+
+DIARY PAGE:
+  Password: diary123
+  What you'll see: Your private thoughts & feelings
+
+RESUME PAGE:
+  Password: resume123
+  What you'll see: Your professional resume
+  Bonus: Can print or download as text file
+
+ADMIN PAGE:
+  Password: admin123
+  What you'll do: Create & edit blog posts and diary entries
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 4: CREATE YOUR FIRST POST (1.5 minutes)
+─────────────────────────────────────────────
+
+1. Click "ADMIN" in the top navigation
+2. Enter password: admin123
+3. Click "BLOG" tab
+4. Fill in:
+   - Title: "My First Post"
+   - Mood: Choose one from dropdown
+   - Content: Write something cool!
+5. Click "Save Post"
+6. Done! Your post now appears on the BLOG page
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASSWORDS AT A GLANCE:
+──────────────────────
+
+┌─────────────────────────────────────┐
+│ Page    │ Password   │ Access        │
+├─────────────────────────────────────┤
+│ Diary   │ diary123   │ Read entries  │
+│ Resume  │ resume123  │ Read resume   │
+│ Admin   │ admin123   │ Manage posts  │
+└─────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TROUBLESHOOTING:
+────────────────
+
+❌ Page looks weird/no colors?
+   → Make sure styles.css is in the same folder as index.html
+   → Press Ctrl+Shift+Delete to clear cache and refresh
+
+❌ Password not working?
+   → Make sure CAPS LOCK is off
+   → Type exactly: diary123, resume123, or admin123
+
+❌ Data disappeared?
+   → Browser private/incognito mode might be blocking storage
+   → Check F12 → Application → Local Storage
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+THAT'S IT! 🎉
+
+Your Y2K portfolio is ready to use. All your posts and data are saved locally
+in your browser. No installation, no server needed!
+
+For more info, read README.md
+
+═══════════════════════════════════════════════════════════════════════════════

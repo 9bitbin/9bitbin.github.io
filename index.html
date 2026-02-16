@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himal Shrestha | IT Specialist & Developer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="stars-bg" id="starField"></div>
+    
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <h1 class="pixel-font" style="font-size: 2.5rem; color: var(--vaporwave-pink); text-shadow: 0 0 10px var(--vaporwave-pink);">
+                ✨ WELCOME ✨
+            </h1>
+            <p class="comic-font" style="font-size: 1.2rem; margin: 20px 0; color: var(--vaporwave-cyan);">
+                Himal Shrestha
+            </p>
+            <button class="chrome-button" onclick="closeSplash()" style="padding: 15px 40px; font-size: 1.1rem;">
+                → ENTER SITE ←
+            </button>
+            <p class="pixel-font" style="font-size: 0.8rem; margin-top: 30px; color: var(--y2k-lime);">
+                [ Loading... 100% ]
+            </p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo pixel-font">Y2K</div>
+            <button class="hamburger" onclick="toggleMobileMenu()" id="hamburger">☰</button>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="diary.html" class="nav-link">Diary</a>
+                <a href="resume.html" class="nav-link">Resume</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="admin.html" class="nav-link">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <section class="hero">
+            <div class="glass-panel" style="text-align: center; padding: 40px;">
+                <h1 class="page-title neon-text">IT SPECIALIST | HUMAN-CENTERED TECHNOLOGY</h1>
+                <p class="page-subtitle">Turning Tech Complexity into Clarity</p>
+                <p class="comic-font" style="margin-top: 20px; font-size: 1rem;">
+                    📍 New York | Welcome to my corner of the internet ✨
+                </p>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-box stat-pink glass-panel">
+                    <div class="stat-number" id="visitorCount">000000</div>
+                    <div class="stat-label pixel-font">Visitors</div>
+                </div>
+                <div class="stat-box stat-blue glass-panel">
+                    <div class="stat-number" id="blogCount">00</div>
+                    <div class="stat-label pixel-font">Posts</div>
+                </div>
+                <div class="stat-box stat-purple glass-panel">
+                    <div class="stat-number" id="diaryCount">00</div>
+                    <div class="stat-label pixel-font">Entries</div>
+                </div>
+                <div class="stat-box stat-lime glass-panel">
+                    <div class="stat-number" id="guestbookCount">00</div>
+                    <div class="stat-label pixel-font">Signs</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-section">
+            <h2 class="section-title">Latest Blog Post</h2>
+            <div id="latestBlogContainer" class="glass-panel blog-post"></div>
+        </section>
+
+        <section class="quick-links">
+            <h2 class="section-title">Quick Links</h2>
+            <div class="quick-links-grid">
+                <a href="about.html" class="chrome-button">👤 About Me</a>
+                <a href="blog.html" class="chrome-button">📝 My Blog</a>
+                <a href="diary.html" class="chrome-button">📔 My Diary</a>
+                <a href="contact.html" class="chrome-button">📧 Contact</a>
+            </div>
+        </section>
+
+        <footer>
+            <p class="pixel-font">Last Updated: <span id="lastUpdated">Today</span></p>
+            <p class="comic-font">💫 Made with HTML5, CSS3, and JavaScript ✨</p>
+        </footer>
+    </main>
+
+    <script src="storage.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

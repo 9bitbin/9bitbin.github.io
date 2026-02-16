@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himal Shrestha | Admin</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="stars-bg" id="starField"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo pixel-font">Y2K</div>
+            <button class="hamburger" onclick="toggleMobileMenu()" id="hamburger">☰</button>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="diary.html" class="nav-link">Diary</a>
+                <a href="resume.html" class="nav-link">Resume</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="admin.html" class="nav-link active">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Check -->
+    <div id="adminAuthContainer"></div>
+
+    <!-- Main Content (Hidden until authenticated) -->
+    <main id="adminContent" class="container" style="display: none;">
+        <section class="hero">
+            <div class="glass-panel" style="text-align: center; padding: 40px;">
+                <h1 class="page-title neon-text">ADMIN PANEL</h1>
+                <p class="page-subtitle">Content Management</p>
+                <button class="chrome-button" onclick="logoutAdmin()" style="margin-top: 20px;">🚪 Logout</button>
+            </div>
+        </section>
+
+        <section class="admin-tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchAdminTab('blog')">📝 Blog</button>
+                <button class="tab-button" onclick="switchAdminTab('diary')">📔 Diary</button>
+            </div>
+
+            <!-- Blog Tab -->
+            <div id="blogTab" class="tab-content active">
+                <div class="glass-panel" style="padding: 20px; margin: 20px 0;">
+                    <h3 class="section-title">Create/Edit Post</h3>
+                    <form onsubmit="handleSaveBlogPost(event)">
+                        <input type="hidden" id="blogPostId">
+                        <input type="text" id="blogTitle" placeholder="Post Title" required style="width: 100%; padding: 10px; margin: 10px 0; border: 2px solid var(--y2k-pink);">
+                        <select id="blogMood" style="width: 100%; padding: 10px; margin: 10px 0; border: 2px solid var(--y2k-pink);">
+                            <option value="happy">😊 Happy</option>
+                            <option value="excited">🤩 Excited</option>
+                            <option value="creative">🎨 Creative</option>
+                            <option value="thoughtful">🤔 Thoughtful</option>
+                        </select>
+                        <textarea id="blogContent" placeholder="Post Content" required style="width: 100%; padding: 10px; margin: 10px 0; border: 2px solid var(--y2k-pink); min-height: 150px;"></textarea>
+                        <button type="submit" class="chrome-button">💾 Save Post</button>
+                        <button type="button" class="chrome-button" onclick="document.getElementById('blogPostId').value = ''; document.getElementById('blogTitle').value = ''; document.getElementById('blogContent').value = '';">🆕 New Post</button>
+                    </form>
+                </div>
+
+                <h3 class="section-title">Posts (<span id="blogListCount">0</span>)</h3>
+                <div id="blogListContainer" class="admin-list"></div>
+            </div>
+
+            <!-- Diary Tab -->
+            <div id="diaryTab" class="tab-content">
+                <div class="glass-panel" style="padding: 20px; margin: 20px 0;">
+                    <h3 class="section-title">Create/Edit Entry</h3>
+                    <form onsubmit="handleSaveDiaryEntry(event)">
+                        <input type="hidden" id="diaryEntryId">
+                        <textarea id="diaryEntryContent" placeholder="Diary Entry" required style="width: 100%; padding: 10px; margin: 10px 0; border: 2px solid var(--y2k-purple); min-height: 150px;"></textarea>
+                        <button type="submit" class="chrome-button">💾 Save Entry</button>
+                        <button type="button" class="chrome-button" onclick="document.getElementById('diaryEntryId').value = ''; document.getElementById('diaryEntryContent').value = '';">🆕 New Entry</button>
+                    </form>
+                </div>
+
+                <h3 class="section-title">Entries (<span id="diaryListCount">0</span>)</h3>
+                <div id="diaryListContainer" class="admin-list"></div>
+            </div>
+        </section>
+
+        <footer>
+            <p class="pixel-font">Last Updated: <span id="lastUpdated">Today</span></p>
+            <p class="comic-font">💫 Made with HTML5, CSS3, and JavaScript ✨</p>
+        </footer>
+    </main>
+
+    <script src="storage.js"></script>
+    <script src="app.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himal Shrestha | Blog</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="stars-bg" id="starField"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo pixel-font">Y2K</div>
+            <button class="hamburger" onclick="toggleMobileMenu()" id="hamburger">☰</button>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="blog.html" class="nav-link active">Blog</a>
+                <a href="diary.html" class="nav-link">Diary</a>
+                <a href="resume.html" class="nav-link">Resume</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="admin.html" class="nav-link">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <section class="hero">
+            <div class="glass-panel" style="text-align: center; padding: 40px;">
+                <h1 class="page-title neon-text">MY BLOG</h1>
+                <p class="page-subtitle">Thoughts, updates, and musings</p>
+            </div>
+        </section>
+
+        <section class="search-section">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search posts..." onkeyup="searchBlogPosts()">
+        </section>
+
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-box stat-pink glass-panel">
+                    <div class="stat-number" id="blogPostCount">00</div>
+                    <div class="stat-label pixel-font">Posts</div>
+                </div>
+                <div class="stat-box stat-blue glass-panel">
+                    <div class="stat-number" id="blogViewCount">00</div>
+                    <div class="stat-label pixel-font">Views</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="blogContainer" class="blog-container"></section>
+
+        <footer>
+            <p class="pixel-font">Last Updated: <span id="lastUpdated">Today</span></p>
+            <p class="comic-font">💫 Made with HTML5, CSS3, and JavaScript ✨</p>
+        </footer>
+    </main>
+
+    <script src="storage.js"></script>
+    <script src="app.js"></script>
+    <script src="blog.js"></script>
+</body>
+</html>
