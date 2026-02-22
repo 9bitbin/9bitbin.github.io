@@ -287,6 +287,12 @@ document.addEventListener('DOMContentLoaded', function() {
     initStarField();
     updateVisitorCount();
     updateLastUpdated();
+
+    const splash = document.getElementById('splashScreen');
+    if (splash) {
+        incrementVisitorCount();
+        updateVisitorCount();
+    }
     
     // Check for authentication needs
     if (document.getElementById('diaryAuthContainer')) {
