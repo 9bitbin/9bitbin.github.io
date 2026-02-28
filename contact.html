@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - 9bitbin</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="main-wrapper">
+        <header>
+            <div class="theme-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="terminalToggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="toggle-label">Terminal Mode</span>
+                <button id="retroBtn" class="retro-btn">⚡ Retro FX</button>
+            </div>
+            <h1>🌟 9bitbin</h1>
+            <p class="subtitle">Get in Touch</p>
+            <p class="emoji-line">💻 Mobile Developer | 🛠️ IT Support | 📊 Data Enthusiast | 🎮 Tech Lover</p>
+        </header>
+
+        <nav>
+            <a href="index.html#about">About</a>
+            <a href="index.html#skills">Skills</a>
+            <a href="index.html#projects">Projects</a>
+            <a href="index.html#connect">Connect</a>
+        </nav>
+
+        <div class="container">
+            <section class="section">
+                <h2>📧 Contact Me</h2>
+                <p class="intro-text">
+                    Feel free to reach out! I'm always open to collaborating on interesting projects, 
+                    discussing tech, biomechanics, movement science, or just connecting with fellow enthusiasts.
+                </p>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <p style="font-size: 1.1rem; margin-bottom: 1rem;">
+                        <strong>Email:</strong>
+                    </p>
+                    <a href="mailto:Shresthahimal12@yahoo.com" class="connect-btn">
+                        ✉️ Shresthahimal12@yahoo.com
+                    </a>
+                </div>
+
+                <div class="connect-links" style="margin-top: 3rem;">
+                    <a href="https://github.com/9bitbin" class="connect-btn" target="_blank">
+                        👨‍💻 GitHub
+                    </a>
+                </div>
+
+                <p style="text-align: center; margin-top: 3rem; font-style: italic; color: #667eea;">
+                    Let's create and innovate together! ✨🚀
+                </p>
+            </section>
+        </div>
+
+        <footer>
+            <p>Thanks for stopping by! 😄👨‍💻</p>
+            <p>&copy; 2026 9bitbin. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script>
+        const toggle = document.getElementById('terminalToggle');
+        const retroBtn = document.getElementById('retroBtn');
+        const body = document.body;
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'terminal') {
+            body.classList.add('terminal-mode');
+            toggle.checked = true;
+            retroBtn.style.display = 'inline-block';
+        } else {
+            retroBtn.style.display = 'none';
+        }
+        
+        // Check for saved retro effects preference
+        const savedRetro = localStorage.getItem('retroEffects');
+        if (savedRetro === 'enabled') {
+            body.classList.add('retro-effects');
+            retroBtn.classList.add('active');
+        }
+        
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('terminal-mode');
+                localStorage.setItem('theme', 'terminal');
+                retroBtn.style.display = 'inline-block';
+            } else {
+                body.classList.remove('terminal-mode');
+                localStorage.setItem('theme', 'default');
+                retroBtn.style.display = 'none';
+                // Also disable retro effects when switching off terminal mode
+                body.classList.remove('retro-effects');
+                retroBtn.classList.remove('active');
+                localStorage.setItem('retroEffects', 'disabled');
+            }
+        });
+        
+        retroBtn.addEventListener('click', function() {
+            if (body.classList.contains('retro-effects')) {
+                body.classList.remove('retro-effects');
+                retroBtn.classList.remove('active');
+                localStorage.setItem('retroEffects', 'disabled');
+            } else {
+                body.classList.add('retro-effects');
+                retroBtn.classList.add('active');
+                localStorage.setItem('retroEffects', 'enabled');
+            }
+        });
+    </script>
+</body>
+</html>
