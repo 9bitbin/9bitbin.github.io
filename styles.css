@@ -1,0 +1,488 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #e0e0e0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background-attachment: fixed;
+}
+
+.main-wrapper {
+    background: #1e1e1e;
+    min-height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+}
+
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+header .subtitle {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    margin-bottom: 1rem;
+}
+
+header .emoji-line {
+    font-size: 1.5rem;
+    margin-top: 1rem;
+}
+
+nav {
+    background: #2c2c2c;
+    padding: 1rem;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+nav a {
+    color: white;
+    margin: 0 1rem;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+nav a:hover {
+    background: #667eea;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 2rem;
+}
+
+.section {
+    margin-bottom: 3rem;
+    animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section h2 {
+    color: #667eea;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 0.5rem;
+}
+
+.intro-text {
+    font-size: 1.1rem;
+    color: #b0b0b0;
+    margin-bottom: 1.5rem;
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.skill-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+}
+
+.skill-card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.project {
+    background: #2a2a2a;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+    border-left: 5px solid #667eea;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.project:hover {
+    transform: translateX(10px);
+    box-shadow: 0 4px 10px rgba(102,126,234,0.3);
+}
+
+.project h3 {
+    color: #667eea;
+    margin-bottom: 0.5rem;
+}
+
+.tech-tags {
+    margin-top: 1rem;
+}
+
+.tag {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.connect-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.connect-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem 2rem;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.connect-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+footer {
+    background: #1a1a1a;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+}
+
+footer p {
+    margin-bottom: 0.5rem;
+}
+
+ul {
+    list-style-position: inside;
+    margin-left: 1rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+/* Theme Toggle Switch */
+.theme-toggle {
+    position: absolute;
+    top: 1.5rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.toggle-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.retro-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.retro-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.retro-btn.active {
+    background: #00ff00;
+    color: #000;
+    border-color: #00ff00;
+    box-shadow: 0 0 15px #00ff00;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 15px #00ff00; }
+    50% { box-shadow: 0 0 25px #00ff00; }
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #00ff00;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+header {
+    position: relative;
+}
+
+/* Terminal Mode Theme */
+body.terminal-mode {
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+    background: #000000;
+    color: #00ff00;
+}
+
+body.terminal-mode .main-wrapper {
+    background: #000000;
+    box-shadow: 0 0 50px rgba(0, 255, 0, 0.3);
+}
+
+body.terminal-mode header {
+    background: #000000;
+    border-bottom: 2px solid #00ff00;
+}
+
+body.terminal-mode nav {
+    background: #000000;
+    border-bottom: 1px solid #00ff00;
+}
+
+body.terminal-mode nav a {
+    color: #00ff00;
+    border: 1px solid transparent;
+}
+
+body.terminal-mode nav a:hover {
+    background: transparent;
+    border: 1px solid #00ff00;
+    text-decoration: none;
+}
+
+body.terminal-mode .section h2 {
+    color: #00ff00;
+    border-bottom: 3px solid #00ff00;
+    text-shadow: 0 0 10px #00ff00;
+}
+
+body.terminal-mode .intro-text {
+    color: #00ff00;
+}
+
+body.terminal-mode .intro-text strong {
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+body.terminal-mode .skills-grid .skill-card {
+    background: #000000;
+    border: 2px solid #00ff00;
+    color: #00ff00;
+}
+
+body.terminal-mode .skill-card:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+body.terminal-mode .project {
+    background: #000000;
+    border: 1px solid #00ff00;
+    border-left: 5px solid #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+}
+
+body.terminal-mode .project:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+body.terminal-mode .project h3 {
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+body.terminal-mode .project p {
+    color: #00ff00;
+}
+
+body.terminal-mode .tag {
+    background: #000000;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+}
+
+body.terminal-mode .connect-btn {
+    background: #000000;
+    border: 2px solid #00ff00;
+    color: #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+body.terminal-mode .connect-btn:hover {
+    background: #00ff00;
+    color: #000000;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+}
+
+body.terminal-mode footer {
+    background: #000000;
+    border-top: 2px solid #00ff00;
+    color: #00ff00;
+}
+
+body.terminal-mode h3 {
+    color: #00ff00;
+}
+
+/* Retro Terminal Effects */
+body.retro-effects::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.08) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 9999;
+    animation: scanlines 10s linear infinite;
+}
+
+@keyframes scanlines {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(10px); }
+}
+
+body.retro-effects::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(0, 255, 0, 0) 0%, rgba(0, 255, 0, 0.05) 100%);
+    pointer-events: none;
+    z-index: 9998;
+    animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+    0% { opacity: 0.98; }
+    50% { opacity: 1; }
+    100% { opacity: 0.98; }
+}
+
+body.retro-effects.terminal-mode * {
+    text-shadow: 0 0 3px #00ff00, 0 0 6px #00ff00;
+}
+
+body.retro-effects .main-wrapper {
+    animation: screenGlow 3s ease-in-out infinite;
+}
+
+@keyframes screenGlow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.05); }
+}
+
+body.retro-effects.terminal-mode .section h2,
+body.retro-effects.terminal-mode .project h3 {
+    animation: textGlow 2s ease-in-out infinite;
+}
+
+@keyframes textGlow {
+    0%, 100% { 
+        text-shadow: 0 0 3px #00ff00, 0 0 6px #00ff00;
+    }
+    50% { 
+        text-shadow: 0 0 6px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
+    }
+}
+
+body.retro-effects.terminal-mode .skill-card,
+body.retro-effects.terminal-mode .project {
+    animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% { 
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+    }
+    50% { 
+        box-shadow: 0 0 12px rgba(0, 255, 0, 0.3);
+    }
+}

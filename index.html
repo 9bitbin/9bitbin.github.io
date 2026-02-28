@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9bitbin - IT Enthusiast & Developer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="main-wrapper">
+        <header>
+            <div class="theme-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="terminalToggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="toggle-label">Terminal Mode</span>
+                <button id="retroBtn" class="retro-btn">⚡ Retro FX</button>
+            </div>
+            <h1>🌟 9bitbin</h1>
+            <p class="subtitle">IT Enthusiast, Developer & Problem Solver</p>
+            <p class="emoji-line">💻 Mobile Developer | 🛠️ IT Support | 📊 Data Enthusiast | 🎮 Tech Lover</p>
+        </header>
+
+        <nav>
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#projects">Projects</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+
+        <div class="container">
+            <section id="about" class="section">
+                <h2>👋 About Me</h2>
+                <p class="intro-text">
+                    Hi there! I'm <strong>9bitbin</strong>, a passionate Computer Programming student and tech enthusiast 
+                    with a knack for solving problems and helping others succeed. I'm currently based in <strong>New York</strong>, 
+                    navigating the worlds of mobile app development, IT support, and software engineering. I love diving deep 
+                    into tech—whether it's Kotlin, Java, AWS, or managing intricate IT systems.
+                </p>
+                <p class="intro-text">
+                    Beyond tech, I'm deeply interested in <strong>biomechanics</strong>, <strong>tensegrity</strong>, and working with <strong>fascia</strong> to help optimize body function and movement for better health and well-being.
+                </p>
+                <p class="intro-text">
+                    I'm always excited to learn, collaborate, and grow. Whether you're into tech discussions, movement science, or game dev, 
+                    let's connect! 💼✨
+                </p>
+            </section>
+
+            <section id="skills" class="section">
+                <h2>🚀 What I Do</h2>
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <h3>💻 Mobile Development</h3>
+                        <p>Building Android apps using Kotlin, Jetpack Compose, and modern Android controls.</p>
+                    </div>
+                    <div class="skill-card">
+                        <h3>🛠️ IT Support</h3>
+                        <p>Hands-on experience solving technical challenges and managing infrastructure.</p>
+                    </div>
+                    <div class="skill-card">
+                        <h3>📊 Data & Web Dev</h3>
+                        <p>Building and managing databases in MySQL, PHP, and JavaScript.</p>
+                    </div>
+                    <div class="skill-card">
+                        <h3>🎨 UI Development</h3>
+                        <p>Creating cool user interfaces with JavaFX, FXML, and Scene Builder.</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #667eea; margin-bottom: 1rem;">🎯 Technical Skills</h3>
+                    <div class="tech-tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">Kotlin</span>
+                        <span class="tag">PHP</span>
+                        <span class="tag">Python</span>
+                        <span class="tag">HTML</span>
+                        <span class="tag">CSS</span>
+                        <span class="tag">JavaScript</span>
+                        <span class="tag">MySQL</span>
+                        <span class="tag">Firebase</span>
+                        <span class="tag">Android Studio</span>
+                        <span class="tag">IntelliJ</span>
+                        <span class="tag">Git</span>
+                        <span class="tag">AWS</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="projects" class="section">
+                <h2>🌱 Current Projects</h2>
+                <div class="project">
+                    <h3>💰 Personal Finance Manager App</h3>
+                    <p>A comprehensive mobile application for managing personal finances, developed as part of my Mobile App Development class project.</p>
+                    <div class="tech-tags">
+                        <span class="tag">Kotlin</span>
+                        <span class="tag">Android</span>
+                        <span class="tag">Mobile Dev</span>
+                    </div>
+                </div>
+                <div class="project">
+                    <h3>🔐 Registration & Login App</h3>
+                    <p>Modern authentication system built with Jetpack Compose, focusing on clean UI and secure user management.</p>
+                    <div class="tech-tags">
+                        <span class="tag">Kotlin</span>
+                        <span class="tag">Jetpack Compose</span>
+                        <span class="tag">Android</span>
+                    </div>
+                </div>
+                <div class="project">
+                    <h3>🎨 JavaFX UI Projects</h3>
+                    <p>Building interactive applications including TipCalculator and ColorChooser apps for learning and growth.</p>
+                    <div class="tech-tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">JavaFX</span>
+                        <span class="tag">FXML</span>
+                        <span class="tag">Scene Builder</span>
+                    </div>
+                </div>
+                <div class="project">
+                    <h3>🎮 Minecraft SMP Server</h3>
+                    <p>Setup and management of a Minecraft SMP server for a fun gaming community!</p>
+                    <div class="tech-tags">
+                        <span class="tag">Server Management</span>
+                        <span class="tag">Gaming</span>
+                        <span class="tag">Community</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>Thanks for stopping by! 😄👨‍💻</p>
+            <p>&copy; 2026 9bitbin. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script>
+        const toggle = document.getElementById('terminalToggle');
+        const retroBtn = document.getElementById('retroBtn');
+        const body = document.body;
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'terminal') {
+            body.classList.add('terminal-mode');
+            toggle.checked = true;
+            retroBtn.style.display = 'inline-block';
+        } else {
+            retroBtn.style.display = 'none';
+        }
+        
+        // Check for saved retro effects preference
+        const savedRetro = localStorage.getItem('retroEffects');
+        if (savedRetro === 'enabled') {
+            body.classList.add('retro-effects');
+            retroBtn.classList.add('active');
+        }
+        
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('terminal-mode');
+                localStorage.setItem('theme', 'terminal');
+                retroBtn.style.display = 'inline-block';
+            } else {
+                body.classList.remove('terminal-mode');
+                localStorage.setItem('theme', 'default');
+                retroBtn.style.display = 'none';
+                // Also disable retro effects when switching off terminal mode
+                body.classList.remove('retro-effects');
+                retroBtn.classList.remove('active');
+                localStorage.setItem('retroEffects', 'disabled');
+            }
+        });
+        
+        retroBtn.addEventListener('click', function() {
+            if (body.classList.contains('retro-effects')) {
+                body.classList.remove('retro-effects');
+                retroBtn.classList.remove('active');
+                localStorage.setItem('retroEffects', 'disabled');
+            } else {
+                body.classList.add('retro-effects');
+                retroBtn.classList.add('active');
+                localStorage.setItem('retroEffects', 'enabled');
+            }
+        });
+    </script>
+</body>
+</html>
