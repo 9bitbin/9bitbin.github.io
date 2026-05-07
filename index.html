@@ -1,190 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>9bitbin - IT Enthusiast & Developer</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>9bitbin | IT Support & Systems Portfolio</title>
+  <meta name="description" content="9bitbin portfolio for IT support, systems learning, mobile development, and technical projects." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="main-wrapper">
-        <header>
-            <div class="theme-toggle">
-                <label class="switch">
-                    <input type="checkbox" id="terminalToggle">
-                    <span class="slider"></span>
-                </label>
-                <span class="toggle-label">Terminal Mode</span>
-                <button id="retroBtn" class="retro-btn">⚡ Retro FX</button>
-            </div>
-            <h1>🌟 9bitbin</h1>
-            <p class="subtitle">IT Enthusiast, Developer & Problem Solver</p>
-            <p class="emoji-line">💻 Mobile Developer | 🛠️ IT Support | 📊 Data Enthusiast | 🎮 Tech Lover</p>
-        </header>
+  <div class="site-shell">
+    <nav class="navbar">
+      <div class="container nav-inner">
+        <a href="index.html" class="logo">9bitbin</a>
 
-        <nav>
-            <a href="#about">About</a>
-            <a href="#skills">Skills</a>
-            <a href="#projects">Projects</a>
-            <a href="contact.html">Contact</a>
-        </nav>
-
-        <div class="container">
-            <section id="about" class="section">
-                <h2>👋 About Me</h2>
-                <p class="intro-text">
-                    Hi there! I'm <strong>9bitbin</strong>, a passionate Computer Programming student and tech enthusiast 
-                    with a knack for solving problems and helping others succeed. I'm currently based in <strong>New York</strong>, 
-                    navigating the worlds of mobile app development, IT support, and software engineering. I love diving deep 
-                    into tech—whether it's Kotlin, Java, AWS, or managing intricate IT systems.
-                </p>
-                <p class="intro-text">
-                    Beyond tech, I'm deeply interested in <strong>biomechanics</strong>, <strong>tensegrity</strong>, and working with <strong>fascia</strong> to help optimize body function and movement for better health and well-being.
-                </p>
-                <p class="intro-text">
-                    I'm always excited to learn, collaborate, and grow. Whether you're into tech discussions, movement science, or game dev, 
-                    let's connect! 💼✨
-                </p>
-            </section>
-
-            <section id="skills" class="section">
-                <h2>🚀 What I Do</h2>
-                <div class="skills-grid">
-                    <div class="skill-card">
-                        <h3>💻 Mobile Development</h3>
-                        <p>Building Android apps using Kotlin, Jetpack Compose, and modern Android controls.</p>
-                    </div>
-                    <div class="skill-card">
-                        <h3>🛠️ IT Support</h3>
-                        <p>Hands-on experience solving technical challenges and managing infrastructure.</p>
-                    </div>
-                    <div class="skill-card">
-                        <h3>📊 Data & Web Dev</h3>
-                        <p>Building and managing databases in MySQL, PHP, and JavaScript.</p>
-                    </div>
-                    <div class="skill-card">
-                        <h3>🎨 UI Development</h3>
-                        <p>Creating cool user interfaces with JavaFX, FXML, and Scene Builder.</p>
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem;">
-                    <h3 style="color: #667eea; margin-bottom: 1rem;">🎯 Technical Skills</h3>
-                    <div class="tech-tags">
-                        <span class="tag">Java</span>
-                        <span class="tag">Kotlin</span>
-                        <span class="tag">PHP</span>
-                        <span class="tag">Python</span>
-                        <span class="tag">HTML</span>
-                        <span class="tag">CSS</span>
-                        <span class="tag">JavaScript</span>
-                        <span class="tag">MySQL</span>
-                        <span class="tag">Firebase</span>
-                        <span class="tag">Android Studio</span>
-                        <span class="tag">IntelliJ</span>
-                        <span class="tag">Git</span>
-                        <span class="tag">AWS</span>
-                    </div>
-                </div>
-            </section>
-
-            <section id="projects" class="section">
-                <h2>🌱 Current Projects</h2>
-                <div class="project">
-                    <h3>💰 Personal Finance Manager App</h3>
-                    <p>A comprehensive mobile application for managing personal finances, developed as part of my Mobile App Development class project.</p>
-                    <div class="tech-tags">
-                        <span class="tag">Kotlin</span>
-                        <span class="tag">Android</span>
-                        <span class="tag">Mobile Dev</span>
-                    </div>
-                </div>
-                <div class="project">
-                    <h3>🔐 Registration & Login App</h3>
-                    <p>Modern authentication system built with Jetpack Compose, focusing on clean UI and secure user management.</p>
-                    <div class="tech-tags">
-                        <span class="tag">Kotlin</span>
-                        <span class="tag">Jetpack Compose</span>
-                        <span class="tag">Android</span>
-                    </div>
-                </div>
-                <div class="project">
-                    <h3>🎨 JavaFX UI Projects</h3>
-                    <p>Building interactive applications including TipCalculator and ColorChooser apps for learning and growth.</p>
-                    <div class="tech-tags">
-                        <span class="tag">Java</span>
-                        <span class="tag">JavaFX</span>
-                        <span class="tag">FXML</span>
-                        <span class="tag">Scene Builder</span>
-                    </div>
-                </div>
-                <div class="project">
-                    <h3>🎮 Minecraft SMP Server</h3>
-                    <p>Setup and management of a Minecraft SMP server for a fun gaming community!</p>
-                    <div class="tech-tags">
-                        <span class="tag">Server Management</span>
-                        <span class="tag">Gaming</span>
-                        <span class="tag">Community</span>
-                    </div>
-                </div>
-            </section>
+        <div class="nav-links">
+          <a href="#about">About</a>
+          <a href="#skills">Skills</a>
+          <a href="#projects">Projects</a>
+          <a href="contact.html">Contact</a>
         </div>
 
-        <footer>
-            <p>Thanks for stopping by! 😄👨‍💻</p>
-            <p>&copy; 2026 9bitbin. All rights reserved.</p>
-        </footer>
-    </div>
-    
-    <script>
-        const toggle = document.getElementById('terminalToggle');
-        const retroBtn = document.getElementById('retroBtn');
-        const body = document.body;
-        
-        // Check for saved theme preference
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'terminal') {
-            body.classList.add('terminal-mode');
-            toggle.checked = true;
-            retroBtn.style.display = 'inline-block';
-        } else {
-            retroBtn.style.display = 'none';
-        }
-        
-        // Check for saved retro effects preference
-        const savedRetro = localStorage.getItem('retroEffects');
-        if (savedRetro === 'enabled') {
-            body.classList.add('retro-effects');
-            retroBtn.classList.add('active');
-        }
-        
-        toggle.addEventListener('change', function() {
-            if (this.checked) {
-                body.classList.add('terminal-mode');
-                localStorage.setItem('theme', 'terminal');
-                retroBtn.style.display = 'inline-block';
-            } else {
-                body.classList.remove('terminal-mode');
-                localStorage.setItem('theme', 'default');
-                retroBtn.style.display = 'none';
-                // Also disable retro effects when switching off terminal mode
-                body.classList.remove('retro-effects');
-                retroBtn.classList.remove('active');
-                localStorage.setItem('retroEffects', 'disabled');
-            }
-        });
-        
-        retroBtn.addEventListener('click', function() {
-            if (body.classList.contains('retro-effects')) {
-                body.classList.remove('retro-effects');
-                retroBtn.classList.remove('active');
-                localStorage.setItem('retroEffects', 'disabled');
-            } else {
-                body.classList.add('retro-effects');
-                retroBtn.classList.add('active');
-                localStorage.setItem('retroEffects', 'enabled');
-            }
-        });
-    </script>
+        <div class="nav-actions">
+          <button id="terminalToggle" class="mode-btn" type="button" aria-pressed="false">Terminal</button>
+          <button id="retroBtn" class="mode-btn retro" type="button" aria-pressed="false">Retro FX</button>
+          <a class="nav-btn" href="contact.html">Connect</a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">IT Support • Systems Learning • Developer Portfolio</p>
+            <h1>Building calm, useful systems for real technical problems.</h1>
+            <p class="hero-text">
+              I’m 9bitbin, an IT enthusiast and problem solver based in New York. I’m growing from hands-on help desk support into deeper systems work, Linux, infrastructure, automation, and clean documentation.
+            </p>
+
+            <div class="hero-buttons">
+              <a href="#projects" class="btn btn-primary">View Projects</a>
+              <a href="https://github.com/9bitbin" class="btn btn-secondary" target="_blank" rel="noopener">GitHub Profile</a>
+            </div>
+          </div>
+
+          <aside class="hero-card" aria-label="Portfolio focus card">
+            <div class="card-glow"></div>
+            <h2>Current Focus</h2>
+            <p>Turning technical curiosity into visible, documented proof of skill.</p>
+
+            <div class="feature">
+              <span class="feature-icon">🛠️</span>
+              <span>Help desk troubleshooting and user support</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">🐧</span>
+              <span>Linux, permissions, storage, and home lab practice</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">⚙️</span>
+              <span>Automation-minded documentation and repeatable fixes</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">💻</span>
+              <span>Frontend, mobile, data, and practical app projects</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="stats" aria-label="Portfolio highlights">
+        <div class="container stats-grid">
+          <div class="stat-card">
+            <h2>4+</h2>
+            <p>Project areas</p>
+          </div>
+          <div class="stat-card">
+            <h2>IT</h2>
+            <p>Support foundation</p>
+          </div>
+          <div class="stat-card">
+            <h2>Linux</h2>
+            <p>Systems direction</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="section-block">
+        <div class="container split-grid">
+          <div>
+            <p class="eyebrow">About Me</p>
+            <h2>Technical growth with a systems mindset.</h2>
+          </div>
+          <div class="content-card">
+            <p>
+              I’m interested in technology that feels practical, structured, and human. My background includes IT support, mobile development, data/web projects, and experimenting with tools that help people solve problems more clearly.
+            </p>
+            <p>
+              My long-term direction is to keep building toward systems administration and infrastructure: Linux, storage, permissions, networking, automation, and clean troubleshooting documentation.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="skills" class="section-block muted">
+        <div class="container">
+          <div class="section-title">
+            <p class="eyebrow">Skill Areas</p>
+            <h2>What I’m building on.</h2>
+            <p>Balanced between support experience, development projects, and infrastructure learning.</p>
+          </div>
+
+          <div class="services-grid">
+            <article class="service-card">
+              <div class="service-icon">📱</div>
+              <h3>Mobile Development</h3>
+              <p>Kotlin, Jetpack Compose, Android Studio, Firebase, and app interface building.</p>
+            </article>
+
+            <article class="service-card">
+              <div class="service-icon">🛠️</div>
+              <h3>IT Support</h3>
+              <p>Troubleshooting, technical communication, account support, documentation, and user-focused problem solving.</p>
+            </article>
+
+            <article class="service-card">
+              <div class="service-icon">🌐</div>
+              <h3>Web & Data</h3>
+              <p>HTML, CSS, JavaScript, PHP, MySQL, Python, Git, and practical frontend projects.</p>
+            </article>
+
+            <article class="service-card">
+              <div class="service-icon">🐧</div>
+              <h3>Systems Direction</h3>
+              <p>Linux learning, home lab planning, storage concepts, permissions, networking, and automation practice.</p>
+            </article>
+          </div>
+
+          <div class="tech-stack" aria-label="Technical skills list">
+            <span>Java</span><span>Kotlin</span><span>PHP</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>MySQL</span><span>Firebase</span><span>Git</span><span>AWS</span><span>Linux</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects" class="section-block">
+        <div class="container">
+          <div class="section-title">
+            <p class="eyebrow">Projects</p>
+            <h2>Proof of practice.</h2>
+            <p>Projects that show application building, UI thinking, and technical curiosity.</p>
+          </div>
+
+          <div class="project-grid">
+            <article class="project-card">
+              <div class="project-topline">Mobile App</div>
+              <h3>Personal Finance Manager App</h3>
+              <p>A mobile application concept focused on tracking and managing personal finances with a clear user experience.</p>
+            </article>
+
+            <article class="project-card">
+              <div class="project-topline">Authentication</div>
+              <h3>Registration & Login App</h3>
+              <p>A modern authentication project using Android development concepts and Jetpack Compose UI structure.</p>
+            </article>
+
+            <article class="project-card">
+              <div class="project-topline">Java UI</div>
+              <h3>JavaFX UI Projects</h3>
+              <p>Interface projects including TipCalculator and ColorChooser using JavaFX, FXML, and Scene Builder.</p>
+            </article>
+
+            <article class="project-card">
+              <div class="project-topline">Server Management</div>
+              <h3>Minecraft SMP Server</h3>
+              <p>Gaming community server management with attention to setup, stability, permissions, and user experience.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="connect" class="section-block cta-section">
+        <div class="container">
+          <div class="cta-card">
+            <p class="eyebrow">Connect</p>
+            <h2>Open to technical conversations, projects, and learning opportunities.</h2>
+            <p>
+              I’m especially interested in IT support, systems administration, Linux, documentation, infrastructure basics, and practical technical growth.
+            </p>
+            <div class="hero-buttons center-buttons">
+              <a href="mailto:Shresthahimal12@yahoo.com" class="btn btn-primary">Email Me</a>
+              <a href="https://github.com/9bitbin" class="btn btn-secondary" target="_blank" rel="noopener">View GitHub</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-inner">
+        <p>9bitbin © 2026</p>
+        <p>New York, NY</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const terminalToggle = document.getElementById('terminalToggle');
+    const retroBtn = document.getElementById('retroBtn');
+    const body = document.body;
+
+    function updateButtons() {
+      const terminalEnabled = body.classList.contains('terminal-mode');
+      const retroEnabled = body.classList.contains('retro-effects');
+      terminalToggle.setAttribute('aria-pressed', terminalEnabled);
+      retroBtn.setAttribute('aria-pressed', retroEnabled);
+      retroBtn.style.display = terminalEnabled ? 'inline-flex' : 'none';
+    }
+
+    if (localStorage.getItem('theme') === 'terminal') {
+      body.classList.add('terminal-mode');
+    }
+
+    if (localStorage.getItem('retroEffects') === 'enabled') {
+      body.classList.add('retro-effects');
+    }
+
+    updateButtons();
+
+    terminalToggle.addEventListener('click', () => {
+      body.classList.toggle('terminal-mode');
+      const terminalEnabled = body.classList.contains('terminal-mode');
+      localStorage.setItem('theme', terminalEnabled ? 'terminal' : 'default');
+
+      if (!terminalEnabled) {
+        body.classList.remove('retro-effects');
+        localStorage.setItem('retroEffects', 'disabled');
+      }
+
+      updateButtons();
+    });
+
+    retroBtn.addEventListener('click', () => {
+      body.classList.toggle('retro-effects');
+      localStorage.setItem('retroEffects', body.classList.contains('retro-effects') ? 'enabled' : 'disabled');
+      updateButtons();
+    });
+  </script>
 </body>
 </html>
