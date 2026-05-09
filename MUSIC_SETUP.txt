@@ -1,0 +1,30 @@
+MUSIC SETUP
+
+This version has:
+- Start With Music screen
+- No "without music" option
+- Play / pause button
+- Next song button
+- Volume slider
+- Auto-next when a song ends
+
+Add your legal MP3 files to the same folder as mothers-day.html.
+
+Default playlist filenames:
+1. i-just-called-to-say-i-love-you.mp3
+2. song-2.mp3
+3. song-3.mp3
+
+To add more songs:
+1. Open script.js.
+2. Find the playlist section near the top.
+3. Add more items like this:
+
+{
+  title: "Song Name",
+  file: "song-file-name.mp3"
+}
+
+Important:
+A normal browser cannot automatically scan a local folder for every MP3 file.
+That is why the songs must be listed in the playlist inside script.js.
