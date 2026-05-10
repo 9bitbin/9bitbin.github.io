@@ -14,15 +14,11 @@ const songTitle = document.getElementById("songTitle");
 const playlist = [
   {
     title: "Stevie Wonder - I Just Called to Say I Love You",
-    file: "stevie-wonder-i-just-called.mp3"
+    file: "i-just-called-to-say-i-love-you.mp3"
   },
   {
-    title: "Mother's Day Instrumental",
-    file: "mothers-day-instrumental.mp3"
-  },
-  {
-    title: "Family Theme",
-    file: "family-theme.mp3"
+    title: "song-2",
+    file: "song-2.mp3"
   }
 ];
 
