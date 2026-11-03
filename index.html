@@ -183,6 +183,54 @@
   .sub { font-size: 15px; margin-top: 28px; }
   .sub + .grid { margin-top: 10px; }
 
+  /* music deck */
+  .deck { margin-top: 22px; padding: 18px; background: #0B0D09; border: 2px solid var(--brass-dk); border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgba(196,154,78,.2), inset 0 0 30px rgba(0,0,0,.7); }
+  .deck-row { display: grid; grid-template-columns: 96px 1fr 72px; gap: 14px; align-items: center; }
+  .dgear { width: 100%; aspect-ratio: 1; overflow: visible; }
+  .dgear g { transform-box: fill-box; transform-origin: center; fill: rgba(168,100,58,.28); stroke: var(--copper); stroke-width: 2.4; }
+  .dg2 { margin-top: 34px; }
+  .screen { position: relative; height: 150px; background: #050705; border: 1px solid var(--led-dim); border-radius: 4px; overflow: hidden;
+    box-shadow: inset 0 0 22px rgba(109,255,142,.10); transform: scale(calc(1 + var(--thump, 0) * .018)); }
+  .screen::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px); }
+  #viz { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .scr-title { position: absolute; left: 12px; right: 12px; top: 8px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .scr-time { position: absolute; right: 12px; bottom: 8px; font-size: 13px; }
+  .deck-ctl { display: grid; grid-template-columns: 120px auto 1fr; gap: 18px; align-items: center; margin-top: 16px; }
+  .vu { width: 120px; }
+  .vu-face { fill: #0B0D09; stroke: var(--brass); stroke-width: 2.5; }
+  .vu-red { fill: none; stroke: #E0664A; stroke-width: 3; opacity: .8; }
+  .vu-needle { stroke: var(--copper); stroke-width: 2.5; stroke-linecap: round; transform-origin: 60px 62px; transform: rotate(-60deg); }
+  .vu-hub { fill: var(--brass); }
+  .transport { display: flex; gap: 8px; }
+  .tbtn { width: 46px; height: 46px; padding: 0; font-size: 17px; border-radius: 50%; }
+  .tbtn.play { width: 58px; height: 58px; font-size: 22px; }
+  .sliders { display: grid; gap: 8px; }
+  .sl { display: grid; grid-template-columns: 42px 1fr; align-items: center; gap: 10px; }
+  .sl .k { font-family: "DotGothic16"; font-size: 12px; color: var(--led-dim); letter-spacing: .08em; }
+  .sl input { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: #080A07; border: 1px solid var(--seam); border-radius: 4px; cursor: pointer; }
+  .sl input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; border: 1px solid #3B2B10; background: linear-gradient(180deg, #E2BE73, var(--brass-dk)); }
+  .sl input::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #3B2B10; background: var(--brass); }
+  .tracks { list-style: none; padding: 0; margin-top: 14px; display: grid; gap: 8px; counter-reset: trk; }
+  .trk { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; width: 100%; text-align: left; cursor: pointer;
+    padding: 12px 14px; background: #0E100C; border: 1px solid var(--seam); border-radius: 4px; color: var(--paper); font: inherit; }
+  .trk:hover { border-color: var(--brass-dk); }
+  .trk.on { border-color: var(--led); box-shadow: inset 0 0 18px rgba(109,255,142,.10); }
+  .trk .n { font-family: "DotGothic16"; color: var(--led-dim); text-align: center; }
+  .trk.on .n { color: var(--led); text-shadow: var(--led-glow); }
+  .trk b { font-family: "Chakra Petch"; font-weight: 600; display: block; }
+  .trk small { color: var(--dim); font-size: 14px; }
+  .trk .len { font-family: "DotGothic16"; color: var(--dim); font-size: 13px; }
+  .tracks-empty { margin-top: 14px; color: var(--dim); }
+  @media (max-width: 620px) {
+    .deck-row { grid-template-columns: 1fr; }
+    .dgear { display: none; }
+    .deck-ctl { grid-template-columns: auto 1fr; }
+    .vu { display: none; }
+    .sliders { grid-column: 1 / -1; }
+  }
+
   /* résumé */
   .cv h3 { font-family: "DotGothic16"; font-size: 15px; letter-spacing: .08em; color: var(--led); text-shadow: var(--led-glow); font-weight: 400; margin-top: 28px; padding-bottom: 6px; border-bottom: 1px solid var(--brass-dk); }
   .job { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; margin-top: 16px; }
@@ -318,7 +366,38 @@
       <h2>Music</h2>
       <p class="lede">Baritenor vocals, character-driven songwriting, and ambient pieces for games.</p>
       <div class="pipe" aria-hidden="true"></div>
-      <div class="grid" data-list="music"></div>
+
+      <!-- steam-deck player: gears turn while playing, needle + screen react to the beat -->
+      <div class="deck" id="deck">
+        <div class="deck-row">
+          <svg class="dgear dg1" aria-hidden="true"><g data-teeth="16" id="dg1"></g></svg>
+          <div class="screen">
+            <canvas id="viz" aria-hidden="true"></canvas>
+            <div class="scr-title led" id="npTitle">NO TAPE LOADED</div>
+            <div class="scr-time led" id="npTime">0:00 / 0:00</div>
+          </div>
+          <svg class="dgear dg2" aria-hidden="true"><g data-teeth="11" id="dg2"></g></svg>
+        </div>
+        <div class="deck-ctl">
+          <svg class="vu" viewBox="0 0 120 70" aria-hidden="true">
+            <path class="vu-face" d="M8 62 A52 52 0 0 1 112 62 Z"/>
+            <path class="vu-red" d="M93 25 A52 52 0 0 1 107 44" />
+            <line class="vu-needle" id="vuNeedle" x1="60" y1="62" x2="60" y2="18"/>
+            <circle class="vu-hub" cx="60" cy="62" r="5"/>
+          </svg>
+          <div class="transport">
+            <button class="btn ghost tbtn" id="pPrev" aria-label="Previous track">&#9198;</button>
+            <button class="btn tbtn play" id="pPlay" aria-label="Play">&#9654;</button>
+            <button class="btn ghost tbtn" id="pNext" aria-label="Next track">&#9197;</button>
+          </div>
+          <div class="sliders">
+            <label class="sl"><span class="k">TIME</span><input type="range" id="pSeek" min="0" max="1000" value="0" aria-label="Seek"></label>
+            <label class="sl"><span class="k">VOL</span><input type="range" id="pVol" min="0" max="100" value="85" aria-label="Volume"></label>
+          </div>
+        </div>
+      </div>
+      <ol class="tracks" id="trackList"></ol>
+      <p class="tracks-empty" id="tracksEmpty" hidden>Tracks are on the way. Check back soon.</p>
     </section>
 
     <section class="view" id="games" role="tabpanel" hidden>
@@ -468,9 +547,6 @@
   // ===== EDIT YOUR LINKS HERE =====
   // pending: true shows a dashed tile for something not live yet.
   const MODULES = {
-    music: [
-      { title: "Listen", line: "Vocals, songwriting, and game & ambient tracks.", url: "/music/", feature: true },
-    ],
     gamesFeature: [
       { title: "Parry Brawl", line: "Platform fighter. Parry to stun, then punish.", url: "/pinned/games/parry-brawl/", feature: true },
       { title: "Larry the Cat", line: "Horror game starring a cat named Larry.", url: "/pinned/larry_the_cat.html" },
@@ -614,6 +690,116 @@
     } finally { cfSend.disabled = false; }
   });
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  // ===== MUSIC PLAYER =====
+  // ADD SONGS HERE: put the .mp3 files in the music/audio/ folder, then add a line for each one.
+  const TRACKS = [
+    // { title: "Song name", note: "One line about it", src: "/music/audio/song-name.mp3" },
+  ];
+  const audio = new Audio();
+  audio.preload = "metadata";
+  const $p = id => document.getElementById(id);
+  const list = $p("trackList"), playBtn = $p("pPlay"), seek = $p("pSeek"), vol = $p("pVol");
+  const fmtT = s => isFinite(s) ? Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0") : "0:00";
+  let cur = -1, actx = null, analyser = null, freq = null, wave = null;
+
+  TRACKS.forEach((t, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = '<button class="trk"><span class="n">' + String(i + 1).padStart(2, "0") + '</span><span><b></b><small></small></span><span class="len">--:--</span></button>';
+    li.querySelector("b").textContent = t.title;
+    li.querySelector("small").textContent = t.note || "";
+    li.querySelector("button").onclick = () => (i === cur ? toggle() : load(i, true));
+    const probe = new Audio(); probe.preload = "metadata"; probe.src = t.src;
+    probe.onloadedmetadata = () => { li.querySelector(".len").textContent = fmtT(probe.duration); };
+    list.appendChild(li);
+  });
+  $p("tracksEmpty").hidden = TRACKS.length > 0;
+  [playBtn, $p("pPrev"), $p("pNext")].forEach(b => b.disabled = !TRACKS.length);
+
+  function setupAudio() {          // Web Audio lets the visuals "hear" the song
+    if (actx) return;
+    try {
+      actx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = actx.createMediaElementSource(audio);
+      analyser = actx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = .78;
+      src.connect(analyser); analyser.connect(actx.destination);
+      freq = new Uint8Array(analyser.frequencyBinCount); wave = new Uint8Array(analyser.fftSize);
+    } catch (e) { actx = null; }
+  }
+  function load(i, play) {
+    cur = (i + TRACKS.length) % TRACKS.length;
+    audio.src = TRACKS[cur].src;
+    $p("npTitle").textContent = "▶ " + String(cur + 1).padStart(2, "0") + "  " + TRACKS[cur].title.toUpperCase();
+    [...list.querySelectorAll(".trk")].forEach((b, k) => b.classList.toggle("on", k === cur));
+    if (play) start();
+  }
+  function start() {
+    if (cur < 0) return load(0, true);
+    setupAudio(); if (actx && actx.state === "suspended") actx.resume();
+    audio.play().catch(() => {});
+  }
+  function toggle() { audio.paused ? start() : audio.pause(); }
+  playBtn.onclick = toggle;
+  $p("pNext").onclick = () => load(cur + 1, true);
+  $p("pPrev").onclick = () => (audio.currentTime > 3 ? (audio.currentTime = 0) : load(cur - 1, true));
+  audio.onended = () => load(cur + 1, true);
+  const syncBtn = () => { const on = !audio.paused; playBtn.innerHTML = on ? "&#10074;&#10074;" : "&#9654;"; playBtn.setAttribute("aria-label", on ? "Pause" : "Play"); };
+  audio.onplay = audio.onpause = syncBtn;
+  audio.ontimeupdate = () => {
+    if (audio.duration) seek.value = audio.currentTime / audio.duration * 1000;
+    $p("npTime").textContent = fmtT(audio.currentTime) + " / " + fmtT(audio.duration);
+  };
+  seek.oninput = () => { if (audio.duration) audio.currentTime = seek.value / 1000 * audio.duration; };
+  vol.oninput = () => { audio.volume = vol.value / 100; };
+  audio.volume = .85;
+
+  // visuals: gears, needle, screen thump and the LED wave
+  const cv = $p("viz"), g1 = $p("dg1"), g2 = $p("dg2"), needle = $p("vuNeedle"), screen = cv.parentElement;
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let a1 = 0, spin = 0, lvl = 0, last = performance.now();
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    const playing = !audio.paused;
+    let bass = 0, loud = 0;
+    if (analyser && playing) {
+      analyser.getByteFrequencyData(freq); analyser.getByteTimeDomainData(wave);
+      for (let k = 0; k < 6; k++) bass += freq[k]; bass /= 6 * 255;
+      for (let k = 0; k < freq.length; k++) loud += freq[k]; loud /= freq.length * 255;
+    }
+    // gears: ease up to speed when playing, wind down when paused, kick on bass
+    const target = playing ? (calm ? 12 : 30 + bass * 160) : 0;
+    spin += (target - spin) * Math.min(1, dt * (playing ? 1.6 : .9));
+    a1 += spin * dt;
+    g1.style.transform = "rotate(" + a1 + "deg)";
+    g2.style.transform = "rotate(" + (-a1 * 16 / 11 + 12) + "deg)";
+    // needle: fast attack, slow fall
+    const want = playing ? Math.min(1, loud * 2.2) : 0;
+    lvl = want > lvl ? lvl + (want - lvl) * .5 : lvl - dt * .9; if (lvl < 0) lvl = 0;
+    needle.style.transform = "rotate(" + (-60 + lvl * 120) + "deg)";
+    if (!calm) screen.style.setProperty("--thump", playing ? Math.max(0, bass - .45) * 2 : 0);
+    // LED screen
+    if (!document.getElementById("music").hidden) {
+      const w = cv.clientWidth, h = cv.clientHeight, dpr = devicePixelRatio || 1;
+      if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+      const c = cv.getContext("2d"); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+      const n = 40, bw = w / n, base = h - 30;
+      c.fillStyle = "rgba(109,255,142,.85)"; c.shadowColor = "rgba(109,255,142,.8)"; c.shadowBlur = 8;
+      for (let k = 0; k < n; k++) {          // spectrum bars
+        const v = playing && freq ? freq[Math.floor(k * freq.length * .7 / n)] / 255 : .03 + .02 * Math.sin(now / 600 + k * .5);
+        const bh = Math.max(2, v * (h - 60));
+        c.globalAlpha = .35; c.fillRect(k * bw + 1, base - bh, bw - 3, bh);
+      }
+      c.globalAlpha = 1; c.lineWidth = 2; c.strokeStyle = "#6DFF8E"; c.beginPath();   // waveform line
+      for (let x = 0; x <= w; x += 3) {
+        const v = playing && wave ? (wave[Math.floor(x / w * (wave.length - 1))] - 128) / 128 : Math.sin(now / 900 + x / 40) * .04;
+        const y = base - (h - 60) / 2 + v * (h - 70) / 2;
+        x ? c.lineTo(x, y) : c.moveTo(x, y);
+      }
+      c.stroke(); c.shadowBlur = 0;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 
   // ===== INTEREST readout =====
   const INTERESTS = [
