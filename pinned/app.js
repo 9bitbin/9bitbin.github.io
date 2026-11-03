@@ -1,7 +1,7 @@
 import { haversine, bearing, compassOf, fmtDist, fmtAcc, buildMapModel } from "./map.js";
 // Pinned: shared sticky-note board for two
 import { CONFIG } from "./config.js";
-import { openChurch } from "./church.js";
+import { openChurch } from "./church.js?v=85.4";   // bump with index.html's ?v=
 
 // ---------------------------------------------------------------- constants
 const BOARD_W = 420;                 // virtual board width (same on every phone)
