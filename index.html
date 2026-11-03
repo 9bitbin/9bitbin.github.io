@@ -107,6 +107,22 @@
   .ident p { margin-top: 14px; max-width: 50ch; color: var(--dim); font-size: 18px; }
   .readout { display: grid; gap: 8px; padding: 14px 16px; background: #080A07; border: 1px solid var(--led-dim); border-radius: 4px; box-shadow: inset 0 0 18px rgba(109,255,142,.08); min-width: 260px; }
   .readout div { display: flex; justify-content: space-between; gap: 18px; font-size: 14px; }
+  /* INTEREST line: cycles games / music / code / help desk, each with its own little animation */
+  .interest { display: inline-flex; align-items: center; gap: 8px; position: relative; transition: opacity .25s; }
+  .interest.out { opacity: 0; }
+  .interest .ico { display: inline-block; font-size: 16px; line-height: 1; text-shadow: none; }
+  .interest.games .ico { animation: sway 1.2s ease-in-out infinite; }
+  .interest.games::after { content: ""; position: absolute; left: 3px; top: -2px; width: 2px; height: 6px; border-radius: 1px;
+    background: var(--led); box-shadow: var(--led-glow); animation: laser .6s linear infinite; }
+  .interest.music .ico { animation: beat .5s ease-in-out infinite alternate; }
+  .interest.code .txt::after { content: "_"; animation: blink2 .8s steps(1) infinite; }
+  .interest.desk .ico { animation: ring 1.4s ease-in-out infinite; }
+  @keyframes sway { 0%,100% { transform: translateX(-3px); } 50% { transform: translateX(3px); } }
+  @keyframes laser { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-14px); opacity: 0; } }
+  @keyframes beat { from { transform: translateY(0) rotate(-8deg); } to { transform: translateY(-4px) rotate(8deg); } }
+  @keyframes blink2 { 50% { opacity: 0; } }
+  @keyframes ring { 0%,40%,100% { transform: rotate(0); } 5%,15%,25% { transform: rotate(-14deg); } 10%,20%,30% { transform: rotate(14deg); } }
+  @media (prefers-reduced-motion: reduce) { .interest .ico, .interest::after, .interest .txt::after { animation: none !important; } }
   .readout .k { color: var(--led-dim); font-family: "DotGothic16"; letter-spacing: .06em; }
 
   /* rail */
@@ -279,7 +295,7 @@
     </div>
     <div class="readout">
       <div><span class="k">LOC</span><span class="led">LONG ISLAND NY</span></div>
-      <div><span class="k">FOCUS</span><span class="led">IAM / ENDPOINTS</span></div>
+      <div><span class="k">INTEREST</span><span class="led interest" id="interest" aria-live="off"><span class="ico" aria-hidden="true">👾</span><span class="txt">GAMES</span></span></div>
       <div><span class="k">STATUS</span><span class="led">OPEN TO ROLES</span></div>
     </div>
   </div>
@@ -598,6 +614,27 @@
     } finally { cfSend.disabled = false; }
   });
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  // ===== INTEREST readout =====
+  const INTERESTS = [
+    { cls: "games", ico: "👾", txt: "GAMES" },
+    { cls: "music", ico: "🎵", txt: "MUSIC" },
+    { cls: "code",  ico: "💻", txt: "CODE" },
+    { cls: "desk",  ico: "🎧", txt: "HELP DESK" },
+  ];
+  const intEl = document.getElementById("interest");
+  let intI = 0;
+  const showInterest = () => {
+    const it = INTERESTS[intI];
+    intEl.className = "led interest " + it.cls;
+    intEl.querySelector(".ico").textContent = it.ico;
+    intEl.querySelector(".txt").textContent = it.txt;
+  };
+  showInterest();
+  setInterval(() => {
+    intEl.classList.add("out");
+    setTimeout(() => { intI = (intI + 1) % INTERESTS.length; showInterest(); }, 250);
+  }, 2600);
 
   // ===== clock =====
   const clock = document.getElementById("clock");
