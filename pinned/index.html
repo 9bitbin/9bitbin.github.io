@@ -186,19 +186,6 @@
       <div class="more-list" id="nmList"></div>
       <div class="sheet-actions"><button class="btn" id="nmClose">Cancel</button></div>
     </section>
-    <section class="games-screen" id="gamesScreen" hidden aria-label="Games">
-      <header class="gs-bar">
-        <button class="gs-back" id="gsBack">‹ Back</button>
-        <h2 id="gsTitle">Games</h2>
-        <span class="gs-spacer" aria-hidden="true"></span>
-      </header>
-      <div class="gs-tabs" id="gsTabs"><button id="gsTabGames" class="on">Games</button><button id="gsTabScores">Scores</button></div>
-      <div class="gs-list" id="gsList"></div>
-      <div class="gs-scores" id="gsScores" hidden></div>
-      <div class="gs-play" id="gsPlay" hidden>
-        <iframe id="gsFrame" title="Game" allow="autoplay; fullscreen"></iframe>
-      </div>
-    </section>
     <section class="sheet more" id="more" hidden aria-label="More">
       <h2>More</h2>
       <div class="more-list">
@@ -295,6 +282,21 @@
       <button id="sDelete" data-for="stroke" class="danger">Delete</button>
       <button id="sDone" data-for="both" class="primary">Done</button>
       <p class="selhint">Drag a corner to resize · top dot to rotate · two fingers to do both</p>
+    </div>
+  </section>
+
+  <!-- Games screen lives outside the board so /pinned/?games can open it directly -->
+  <section class="games-screen" id="gamesScreen" hidden aria-label="Games">
+    <header class="gs-bar">
+      <button class="gs-back" id="gsBack">‹ Back</button>
+      <h2 id="gsTitle">Games</h2>
+      <span class="gs-spacer" aria-hidden="true"></span>
+    </header>
+    <div class="gs-tabs" id="gsTabs"><button id="gsTabGames" class="on">Games</button><button id="gsTabScores">Scores</button></div>
+    <div class="gs-list" id="gsList"></div>
+    <div class="gs-scores" id="gsScores" hidden></div>
+    <div class="gs-play" id="gsPlay" hidden>
+      <iframe id="gsFrame" title="Game" allow="autoplay; fullscreen"></iframe>
     </div>
   </section>
 

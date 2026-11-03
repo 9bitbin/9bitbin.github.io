@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    BASE RESET & ROOT
    ============================================================ */
 *, *::before, *::after {
@@ -8,16 +8,21 @@
 }
 
 :root {
-  --bg:         #0d0d1a;
-  --bg-alt:     #12122a;
-  --surface:    #1a1a35;
-  --border:     rgba(102, 126, 234, 0.18);
-  --accent:     #667eea;
-  --accent2:    #764ba2;
-  --text:       #e4e4f0;
-  --text-muted: #9090b0;
-  --radius:     12px;
-  --radius-lg:  20px;
+  /* brass + LED palette, same as index.html */
+  --bg:         #11130F;
+  --bg-alt:     #161811;
+  --surface:    #1A1C16;
+  --border:     #3A3A2C;
+  --accent:     #C49A4E;
+  --accent2:    #7A5A26;
+  --brass-lt:   #E2BE73;
+  --led:        #6DFF8E;
+  --led-dim:    #275C36;
+  --led-glow:   0 0 6px rgba(109,255,142,.75), 0 0 18px rgba(109,255,142,.35);
+  --text:       #E8E0C8;
+  --text-muted: #9A9478;
+  --radius:     4px;
+  --radius-lg:  6px;
   --transition: 0.25s ease;
 }
 
@@ -26,11 +31,20 @@ html {
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Barlow', 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(196,154,78,.10), transparent 45%),
+    radial-gradient(circle at 90% 60%, rgba(109,255,142,.05), transparent 40%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 2px, transparent 2px 4px);
+  background-attachment: fixed;
   color: var(--text);
   line-height: 1.7;
   min-height: 100vh;
+}
+
+h1, h2, h3, .logo, .btn, .nav-btn, .mode-btn {
+  font-family: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif;
 }
 
 a {
@@ -69,10 +83,9 @@ main {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(13, 13, 26, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(#22251C, #1A1C16);
+  border-bottom: 3px solid var(--accent2);
+  box-shadow: inset 0 -1px 0 var(--accent), 0 6px 20px rgba(0, 0, 0, 0.5);
 }
 
 .nav-inner {
@@ -86,12 +99,10 @@ main {
 
 .logo {
   font-size: 1.25rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -139,9 +150,10 @@ main {
 }
 
 .mode-btn[aria-pressed="true"] {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff;
-  border-color: transparent;
+  background: linear-gradient(180deg, var(--brass-lt), var(--accent) 45%, var(--accent2));
+  color: #1A1408;
+  border: 1px solid #3B2B10;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 0 #2A1E0A;
 }
 
 .mode-btn.retro {
@@ -160,8 +172,10 @@ main {
   align-items: center;
   padding: 0.4rem 1rem;
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff;
+  background: linear-gradient(180deg, var(--brass-lt), var(--accent) 45%, var(--accent2));
+  color: #1A1408;
+  border: 1px solid #3B2B10;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 0 #2A1E0A;
   font-size: 0.85rem;
   font-weight: 600;
   transition: opacity var(--transition), transform var(--transition);
@@ -192,26 +206,26 @@ main {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff;
-  box-shadow: 0 4px 18px rgba(102, 126, 234, 0.35);
+  background: linear-gradient(180deg, var(--brass-lt), var(--accent) 45%, var(--accent2));
+  color: #1A1408;
+  border: 1px solid #3B2B10;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 0 #2A1E0A;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+.btn-primary:active {
+  transform: translateY(1px);
 }
 
 .btn-secondary {
   background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
+  color: var(--led);
+  border: 1px solid var(--led-dim);
+  text-shadow: var(--led-glow);
+  box-shadow: inset 0 0 10px rgba(109, 255, 142, 0.12);
 }
 
 .btn-secondary:hover {
-  background: rgba(102, 126, 234, 0.12);
-  border-color: var(--accent);
-  transform: translateY(-2px);
+  border-color: var(--led);
 }
 
 /* ============================================================
@@ -219,7 +233,7 @@ main {
    ============================================================ */
 .hero {
   padding: 6rem 0 5rem;
-  background: radial-gradient(ellipse 80% 60% at 60% 0%, rgba(102, 126, 234, 0.12) 0%, transparent 70%);
+  background: radial-gradient(ellipse 80% 60% at 60% 0%, rgba(196, 154, 78, 0.10) 0%, transparent 70%);
 }
 
 .hero-grid {
@@ -235,20 +249,19 @@ main {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
+  font-family: 'DotGothic16', monospace;
+  font-weight: 400;
+  color: var(--led);
+  text-shadow: var(--led-glow);
   margin-bottom: 1rem;
 }
 
 .hero-copy h1 {
   font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  line-height: 1.1;
   margin-bottom: 1.25rem;
-  background: linear-gradient(135deg, #ffffff 40%, #a8a8d0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text);
 }
 
 .hero-text {
@@ -271,8 +284,9 @@ main {
 /* Hero Card */
 .hero-card {
   position: relative;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: linear-gradient(160deg, #22251C, #1A1C16);
+  border: 2px solid var(--accent2);
+  box-shadow: inset 0 0 0 1px rgba(196, 154, 78, 0.25), inset 0 0 40px rgba(0, 0, 0, 0.6), 0 10px 30px rgba(0, 0, 0, 0.5);
   border-radius: var(--radius-lg);
   padding: 2rem;
   overflow: hidden;
@@ -284,11 +298,12 @@ main {
   right: -60px;
   width: 180px;
   height: 180px;
-  background: radial-gradient(circle, rgba(102, 126, 234, 0.25), transparent 70%);
+  background: radial-gradient(circle, rgba(109, 255, 142, 0.12), transparent 70%);
   pointer-events: none;
 }
 
 .hero-card h2 {
+  color: var(--accent);
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
@@ -351,11 +366,10 @@ a.contact-row:hover {
 
 .stat-card h2 {
   font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-weight: 400;
+  font-family: 'DotGothic16', monospace;
+  color: var(--led);
+  text-shadow: var(--led-glow);
 }
 
 .stat-card p {
@@ -427,7 +441,7 @@ a.contact-row:hover {
 }
 
 .service-card {
-  background: var(--surface);
+  background: #0E100C;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.75rem;
@@ -435,14 +449,17 @@ a.contact-row:hover {
 }
 
 .service-card:hover {
-  border-color: rgba(102, 126, 234, 0.5);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.12);
+  border-color: var(--led);
+  box-shadow: inset 0 0 18px rgba(109, 255, 142, 0.10), 0 0 12px rgba(109, 255, 142, 0.15);
 }
 
 .service-icon {
   font-size: 1.75rem;
   margin-bottom: 1rem;
+}
+
+.service-card h3, .project-card h3 {
+  color: var(--accent);
 }
 
 .service-card h3 {
@@ -467,9 +484,9 @@ a.contact-row:hover {
 
 .tech-stack span {
   padding: 0.35rem 0.9rem;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: #0E100C;
+  border: 1px solid var(--accent2);
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -491,7 +508,7 @@ a.contact-row:hover {
 }
 
 .project-card {
-  background: var(--surface);
+  background: #0E100C;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.75rem;
@@ -499,9 +516,8 @@ a.contact-row:hover {
 }
 
 .project-card:hover {
-  border-color: rgba(102, 126, 234, 0.5);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.12);
+  border-color: var(--led);
+  box-shadow: inset 0 0 18px rgba(109, 255, 142, 0.10), 0 0 12px rgba(109, 255, 142, 0.15);
 }
 
 .project-topline {
@@ -509,7 +525,9 @@ a.contact-row:hover {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
+  font-family: 'DotGothic16', monospace;
+  font-weight: 400;
+  color: var(--led);
   margin-bottom: 0.65rem;
 }
 
@@ -529,7 +547,7 @@ a.contact-row:hover {
    CTA SECTION
    ============================================================ */
 .cta-section {
-  background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+  background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(196, 154, 78, 0.08) 0%, transparent 70%);
 }
 
 .cta-card {
@@ -537,8 +555,9 @@ a.contact-row:hover {
   max-width: 680px;
   margin: 0 auto;
   padding: 4rem 2rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: linear-gradient(160deg, #22251C, #1A1C16);
+  border: 2px solid var(--accent2);
+  box-shadow: inset 0 0 0 1px rgba(196, 154, 78, 0.25), inset 0 0 40px rgba(0, 0, 0, 0.6), 0 10px 30px rgba(0, 0, 0, 0.5);
   border-radius: var(--radius-lg);
 }
 
@@ -559,8 +578,8 @@ a.contact-row:hover {
    FOOTER
    ============================================================ */
 footer {
-  background: var(--bg-alt);
-  border-top: 1px solid var(--border);
+  background: linear-gradient(#22251C, #1A1C16);
+  border-top: 3px solid var(--accent2);
   padding: 1.75rem 0;
 }
 
@@ -839,7 +858,7 @@ body.terminal-mode .email-spoiler {
 
 .email-spoiler.revealed {
   filter: none;
-  background: rgba(102, 126, 234, 0.08);
+  background: rgba(196, 154, 78, 0.08);
   border-color: var(--accent);
   border-style: solid;
   color: var(--text);

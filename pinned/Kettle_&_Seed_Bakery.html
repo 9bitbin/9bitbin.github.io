@@ -1,26 +1,28 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#11130F;color:#E8E0C8}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Kettle &amp; Seed Bakery</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Figtree:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Barlow:wght@400;500;700&family=DotGothic16&display=swap">
 <style>
-/* Layout: a kettle-steam hero on dark rye green, then a counter-board menu, hours, and a pickup pre-order card */
+/* Layout: a kettle-steam hero, then a counter-board menu, hours, and a pickup pre-order card.
+   Colors follow the 9BITBIN brass + LED theme (see /theme.css). */
 :root{
-  --bg:#F3F4EF; --surface:#FFFFFF; --ink:#1E2A25; --muted:#5B6660;
-  --rye:#1F3A30; --on-rye:#F3F4EF; --sesame:#D9A21B; --sesame-ink:#2A1E00;
-  --line:#D8DDD4; --banner:#E7EADF;
-  --display:"Bagel Fat One", "Arial Rounded MT Bold", system-ui, sans-serif;
-  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --bg:#11130F; --surface:#1A1C16; --ink:#E8E0C8; --muted:#9A9478;
+  --rye:#1A1C16; --on-rye:#E8E0C8; --sesame:#C49A4E; --sesame-ink:#1A1408;
+  --line:#3A3A2C; --banner:#0E100C; color-scheme:dark;
+  --display:"Chakra Petch", system-ui, sans-serif;
+  --body:"Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"DotGothic16", ui-monospace, Menlo, monospace;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#121815; --surface:#1A221E; --ink:#E9ECE5; --muted:#A4ADA6;
-  --rye:#0C1411; --on-rye:#E9ECE5; --sesame:#E8B43A; --sesame-ink:#211700;
-  --line:#2C3631; --banner:#1E2723; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#121815; --surface:#1A221E; --ink:#E9ECE5; --muted:#A4ADA6;
-  --rye:#0C1411; --on-rye:#E9ECE5; --sesame:#E8B43A; --sesame-ink:#211700;
-  --line:#2C3631; --banner:#1E2723; color-scheme:dark}
+header.top{border-bottom:3px solid #7A5A26;box-shadow:inset 0 -1px 0 #C49A4E}
+.hero{background:linear-gradient(160deg,#22251C,#1A1C16) !important}
+.hero h1{font-weight:700 !important}
+h2{font-weight:700 !important;color:#C49A4E}
+.eyebrow{color:#6DFF8E !important;text-shadow:0 0 6px rgba(109,255,142,.75),0 0 18px rgba(109,255,142,.35)}
+.btn{border-radius:3px !important;font-family:"Chakra Petch",system-ui,sans-serif !important;letter-spacing:.04em}
+.btn.primary{background:linear-gradient(180deg,#E2BE73,#C49A4E 45%,#7A5A26) !important;border-color:#3B2B10 !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 0 #2A1E0A}
+.btn.ghost{color:#6DFF8E !important;border-color:#275C36 !important;text-shadow:0 0 6px rgba(109,255,142,.75)}
+.col{border-radius:4px !important;background:linear-gradient(160deg,#22251C,#1A1C16) !important;border:2px solid #7A5A26 !important}
 
 body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--body)}
 .wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}

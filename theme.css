@@ -1,0 +1,112 @@
+/*
+  9BITBIN THEME — shared brass + LED look from index.html.
+  Link it from any page:  <link rel="stylesheet" href="/theme.css">
+  Fonts (put this <link> before it):
+  https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Barlow:wght@400;500;600&family=DotGothic16&display=swap
+
+  Pieces you can use:
+    .site-bar      top bar with the 9BITBIN mark and a back link
+    .plate         riveted brass panel
+    .btn / .btn.ghost   brass button / green LED button
+    .led           green LED text
+    .pipe          brass pipe divider
+    .t-field       dark input / select / textarea look
+*/
+:root {
+  --soot: #11130F;
+  --plate: #1A1C16;
+  --plate-2: #22251C;
+  --well: #0E100C;
+  --seam: #3A3A2C;
+  --brass: #C49A4E;
+  --brass-lt: #E2BE73;
+  --brass-dk: #7A5A26;
+  --copper: #A8643A;
+  --paper: #E8E0C8;
+  --dim: #9A9478;
+  --led: #6DFF8E;
+  --led-dim: #275C36;
+  --danger: #E0664A;
+  --led-glow: 0 0 6px rgba(109,255,142,.75), 0 0 18px rgba(109,255,142,.35);
+  --f-head: "Chakra Petch", system-ui, sans-serif;
+  --f-body: "Barlow", system-ui, sans-serif;
+  --f-led: "DotGothic16", monospace;
+  color-scheme: dark;
+}
+
+.theme-page {
+  margin: 0;
+  background: var(--soot);
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(196,154,78,.10), transparent 45%),
+    radial-gradient(circle at 90% 60%, rgba(109,255,142,.05), transparent 40%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 2px, transparent 2px 4px);
+  background-attachment: fixed;
+  color: var(--paper);
+  font-family: var(--f-body);
+  font-size: 16px; line-height: 1.55; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.theme-page a { color: var(--brass-lt); text-underline-offset: 3px; }
+.theme-page :focus-visible { outline: 2px solid var(--led); outline-offset: 3px; }
+.theme-page h1, .theme-page h2, .theme-page h3, .theme-page h4 { font-family: var(--f-head); color: var(--brass); line-height: 1.15; }
+.theme-page ::selection { background: var(--brass-dk); color: var(--paper); }
+
+.led { font-family: var(--f-led); color: var(--led); text-shadow: var(--led-glow); letter-spacing: .06em; }
+
+/* top bar */
+.site-bar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 14px; padding: 10px 20px;
+  background: linear-gradient(var(--plate-2), var(--plate));
+  border-bottom: 3px solid var(--brass-dk);
+  box-shadow: inset 0 -1px 0 var(--brass), 0 6px 20px rgba(0,0,0,.5);
+  font-family: var(--f-body);
+}
+.site-bar .sig { font-family: var(--f-head); font-weight: 700; letter-spacing: .08em; color: var(--brass); text-decoration: none; font-size: 16px; }
+.site-bar .here { margin-left: auto; font-size: 14px; }
+@media print { .site-bar { display: none; } }
+
+/* riveted plate */
+.plate {
+  position: relative;
+  background: linear-gradient(160deg, var(--plate-2), var(--plate));
+  border: 2px solid var(--brass-dk);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(196,154,78,.25), inset 0 0 40px rgba(0,0,0,.6), 0 10px 30px rgba(0,0,0,.5);
+}
+.plate::before {
+  content: ""; position: absolute; inset: 8px; pointer-events: none;
+  background:
+    radial-gradient(circle, var(--brass-lt) 0 2px, var(--brass-dk) 3px, transparent 4px) 0 0 / 10px 10px no-repeat,
+    radial-gradient(circle, var(--brass-lt) 0 2px, var(--brass-dk) 3px, transparent 4px) 100% 0 / 10px 10px no-repeat,
+    radial-gradient(circle, var(--brass-lt) 0 2px, var(--brass-dk) 3px, transparent 4px) 0 100% / 10px 10px no-repeat,
+    radial-gradient(circle, var(--brass-lt) 0 2px, var(--brass-dk) 3px, transparent 4px) 100% 100% / 10px 10px no-repeat;
+}
+
+/* buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: var(--f-head); font-weight: 600; font-size: 14px; letter-spacing: .04em;
+  color: #1A1408; background: linear-gradient(180deg, var(--brass-lt), var(--brass) 45%, var(--brass-dk));
+  border: 1px solid #3B2B10; border-radius: 3px; padding: 8px 14px; cursor: pointer; text-decoration: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 0 #2A1E0A;
+}
+.btn:active { transform: translateY(1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.2); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.ghost { background: var(--plate); color: var(--led); border-color: var(--led-dim); text-shadow: var(--led-glow); box-shadow: inset 0 0 10px rgba(109,255,142,.12); }
+
+/* brass pipe divider */
+.pipe { height: 10px; margin: 22px 0 0; border-radius: 5px; background: linear-gradient(180deg, var(--brass-lt), var(--brass) 40%, var(--brass-dk)); box-shadow: 0 2px 0 #2A1E0A; position: relative; }
+.pipe::before, .pipe::after { content: ""; position: absolute; top: -4px; width: 14px; height: 18px; border-radius: 2px; background: linear-gradient(90deg, var(--brass-dk), var(--brass-lt), var(--brass-dk)); }
+.pipe::before { left: 24px; } .pipe::after { right: 24px; }
+
+/* form fields */
+.t-field, .theme-page input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]), .theme-page select, .theme-page textarea {
+  background: #080A07; color: var(--paper); border: 1px solid var(--seam); border-radius: 3px;
+  font-family: var(--f-body); font-size: 15px; padding: 8px 10px;
+}
+.theme-page input:focus, .theme-page select:focus, .theme-page textarea:focus { outline: none; border-color: var(--led); box-shadow: 0 0 0 1px var(--led-dim), inset 0 0 10px rgba(109,255,142,.08); }
+.theme-page input[type=checkbox], .theme-page input[type=radio], .theme-page input[type=range] { accent-color: var(--brass); }
+
+@media (prefers-reduced-motion: reduce) { .theme-page * { animation: none !important; transition: none !important; } }

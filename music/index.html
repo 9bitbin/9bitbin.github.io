@@ -16,145 +16,101 @@
 <meta name="description" content="Himal Shrestha: baritenor vocals, songwriting, and ambient music for games.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Barlow:wght@400;500;600&family=DotGothic16&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/theme.css">
 <style>
-  :root {
-    --fog: #E4E8EB;
-    --ink: #1F2C36;
-    --slate: #66757F;
-    --line: #C7CED4;
-    --lamp: #C9962B;
-    --row: #EDF0F2;
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --fog: #18212A;
-      --ink: #DCE3E8;
-      --slate: #8C9AA5;
-      --line: #2E3A45;
-      --lamp: #E6BC5C;
-      --row: #1E2832;
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --fog: #18212A; --ink: #DCE3E8; --slate: #8C9AA5;
-    --line: #2E3A45; --lamp: #E6BC5C; --row: #1E2832; color-scheme: dark;
-  }
-
   * { box-sizing: border-box; margin: 0; }
-  body {
-    background: var(--fog);
-    color: var(--ink);
-    font-family: "Hanken Grotesk", system-ui, sans-serif;
-    font-size: 17px;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-  }
-  .page { max-width: 640px; margin: 0 auto; padding: 72px 20px 140px; }
+  .page { max-width: 720px; margin: 0 auto; padding: 36px 20px 140px; }
 
-  header { margin-bottom: 64px; }
+  .hero { padding: 30px 32px; }
   .name {
-    font-size: clamp(56px, 16vw, 104px);
-    font-weight: 800;
-    letter-spacing: -0.045em;
-    line-height: 0.9;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.08em;
+    font-family: var(--f-head); font-weight: 700; color: var(--paper);
+    font-size: clamp(48px, 13vw, 86px); line-height: .95;
+    display: flex; align-items: flex-start; gap: 0.12em;
   }
   .lamp {
-    width: 0.16em; height: 0.16em; margin-top: 0.08em;
-    border-radius: 50%;
-    background: var(--line);
-    transition: background .4s, box-shadow .4s;
+    width: 0.16em; height: 0.16em; margin-top: 0.1em; border-radius: 50%;
+    background: var(--led-dim); transition: background .4s, box-shadow .4s;
   }
-  body.playing .lamp {
-    background: var(--lamp);
-    box-shadow: 0 0 0.25em var(--lamp);
-    animation: hum 2.6s ease-in-out infinite;
-  }
+  body.playing .lamp { background: var(--led); box-shadow: var(--led-glow); animation: hum 2.6s ease-in-out infinite; }
   @keyframes hum { 50% { opacity: .55; } }
-  .bio { margin-top: 20px; max-width: 34ch; color: var(--slate); font-size: 19px; }
+  .bio { margin-top: 14px; max-width: 40ch; color: var(--dim); font-size: 18px; }
 
-  section { margin-top: 56px; }
-  h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
-  .about { color: var(--slate); margin-top: 4px; font-size: 15px; }
-  ul { list-style: none; padding: 0; margin-top: 16px; border-top: 1px solid var(--line); }
+  section.list { margin-top: 24px; padding: 26px 28px; }
+  h2 { font-size: 24px; font-weight: 700; }
+  .about { color: var(--dim); margin-top: 2px; font-size: 15px; }
+  ul { list-style: none; padding: 0; margin-top: 16px; display: grid; gap: 8px; }
 
   .track {
-    display: grid;
-    grid-template-columns: 44px 1fr auto;
-    gap: 14px;
-    align-items: center;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--line);
+    display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center;
+    padding: 12px 14px; background: var(--well); border: 1px solid var(--seam); border-radius: 4px;
   }
-  .track.current { background: var(--row); margin: 0 -12px; padding: 14px 12px; border-radius: 6px; }
+  .track.current { border-color: var(--led); box-shadow: inset 0 0 18px rgba(109,255,142,.10), 0 0 12px rgba(109,255,142,.15); }
   .play {
-    width: 44px; height: 44px; border-radius: 50%;
-    border: 1.5px solid var(--ink); background: none; color: var(--ink);
-    display: grid; place-items: center; cursor: pointer;
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer; color: #1A1408;
+    border: 1px solid #3B2B10; background: linear-gradient(180deg, var(--brass-lt), var(--brass) 45%, var(--brass-dk));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 0 #2A1E0A;
+    display: grid; place-items: center;
   }
-  .play:disabled { border-color: var(--line); color: var(--line); cursor: default; }
+  .play:disabled { background: var(--plate); border-color: var(--seam); color: var(--seam); box-shadow: none; cursor: default; }
   .play svg { width: 14px; height: 14px; fill: currentColor; }
-  .play:focus-visible, .bar:focus-visible, a:focus-visible { outline: 2px solid var(--lamp); outline-offset: 3px; }
-  .title { font-weight: 600; }
-  .note { font-size: 14px; color: var(--slate); }
-  .meta { text-align: right; font-size: 13px; color: var(--slate); white-space: nowrap; }
-  .tag { display: block; }
+  .title { font-family: var(--f-head); font-weight: 600; font-size: 17px; }
+  .note { font-size: 14px; color: var(--dim); }
+  .meta { text-align: right; font-size: 13px; color: var(--dim); white-space: nowrap; }
+  .tag { display: block; color: var(--brass); }
+  .len { font-family: var(--f-led); color: var(--led-dim); }
 
-  footer { margin-top: 72px; color: var(--slate); }
-  footer a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
+  footer { margin-top: 24px; padding: 18px 24px; color: var(--dim); }
 
   .player {
-    position: fixed; left: 0; right: 0; bottom: 0;
-    background: var(--fog); border-top: 1px solid var(--line);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    background: linear-gradient(var(--plate-2), var(--plate));
+    border-top: 3px solid var(--brass-dk); box-shadow: inset 0 1px 0 var(--brass), 0 -6px 20px rgba(0,0,0,.5);
     padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
-    transform: translateY(100%); transition: transform .3s ease;
+    transform: translateY(110%); transition: transform .3s ease;
   }
   .player.open { transform: none; }
-  .player-inner { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: center; }
-  .now { font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; gap: 12px; }
-  .now span:last-child { color: var(--slate); font-weight: 400; font-variant-numeric: tabular-nums; }
-  .bar { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; margin-top: 8px; background: var(--line); border-radius: 2px; cursor: pointer; }
-  .bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--lamp); }
-  .bar::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--lamp); }
+  .player-inner { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: center; }
+  .now { font-family: var(--f-head); font-size: 15px; font-weight: 600; display: flex; justify-content: space-between; gap: 12px; }
+  .now span:last-child { font-family: var(--f-led); color: var(--led); text-shadow: var(--led-glow); font-weight: 400; }
+  .bar { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; margin-top: 8px; background: #080A07; border: 1px solid var(--seam); border-radius: 3px; cursor: pointer; }
+  .bar::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--led); box-shadow: var(--led-glow); }
+  .bar::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: var(--led); }
 
+  @media (max-width: 600px) { .hero, section.list { padding: 22px 20px; } }
   @media (prefers-reduced-motion: reduce) {
     body.playing .lamp { animation: none; }
     .player { transition: none; }
   }
 </style>
 </head>
-<body>
+<body class="theme-page">
+<header class="site-bar"><a class="sig" href="/#music">‹ 9BITBIN</a><span class="here led">MUSIC</span></header>
 <main class="page">
-  <p style="margin-bottom:32px"><a href="/" style="color:var(--slate);text-underline-offset:3px">← Back to the hub</a></p>
-  <header>
+  <header class="hero plate">
     <h1 class="name">Himal<span class="lamp" aria-hidden="true"></span></h1>
     <p class="bio">Baritenor singer and songwriter. Character-driven songs and ambient music for quiet, empty places.</p>
   </header>
 
-  <section data-section="voice">
+  <section class="list plate" data-section="voice">
     <h2>Voice</h2>
     <p class="about">Recordings where I'm singing.</p>
     <ul></ul>
   </section>
 
-  <section data-section="songwriting">
+  <section class="list plate" data-section="songwriting">
     <h2>Songwriting</h2>
     <p class="about">Lyrics and songs I wrote, including demos.</p>
     <ul></ul>
   </section>
 
-  <section data-section="ambient">
+  <section class="list plate" data-section="ambient">
     <h2>Game &amp; ambient</h2>
     <p class="about">Atmosphere for games and late nights.</p>
     <ul></ul>
   </section>
 
-  <footer>
+  <footer class="plate">
     <p>For singing, writing, or game music, email <a href="mailto:coolhimal20@gmail.com">coolhimal20@gmail.com</a></p>
   </footer>
 </main>

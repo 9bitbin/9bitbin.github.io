@@ -1453,6 +1453,8 @@ async function boot() {
   document.documentElement.classList.toggle("no-deco", ls.get("pinned-deco", true) === false);
   if (api.hasSession()) setTimeout(() => syncThemes().catch(() => {}), 800);
   wireStatic();
+  // /pinned/?games opens straight to the Games screen (the Back bar in each game links here)
+  if (new URLSearchParams(location.search).has("games")) { history.replaceState(null, "", location.pathname); openGames(); }
   if (init.landing === "linked") return show("#linked");
   if (!api.hasSession()) return showLogin(init.linkError);
   await afterLogin();

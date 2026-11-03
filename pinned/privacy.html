@@ -4,24 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy and your data · Pinned</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=DotGothic16&display=swap" rel="stylesheet"><link rel="stylesheet" href="/theme.css">
   <style>
-    :root { --bg:#fbf6ee; --ink:#2b2622; --muted:#6d6259; --accent:#e0584f; --line:#e6dccd; }
-    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#1d1a17; --ink:#f3ece2; --muted:#b5a89a; --accent:#ff7b72; --line:#3b342d; } }
-    :root[data-theme="dark"] { --bg:#1d1a17; --ink:#f3ece2; --muted:#b5a89a; --accent:#ff7b72; --line:#3b342d; }
-    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
-    main { max-width:680px; margin:0 auto; padding:24px 16px 64px; }
-    h1 { font-size:1.8rem; margin:8px 0 4px; }
+    /* colors and fonts come from /theme.css */
+    :root { --ink: var(--paper); --muted: var(--dim); --accent: var(--brass); --line: var(--brass-dk); }
+    main { max-width:720px; margin:28px auto 64px; padding:28px 30px; }
+    @media (max-width:600px) { main { margin:16px 10px 48px; padding:22px 18px; } }
+    h1 { font-size:2rem; margin:8px 0 4px; }
     h2 { font-size:1.15rem; margin:28px 0 8px; color:var(--accent); }
     p, li { color:var(--ink); }
     ul { padding-left:20px; }
     .muted { color:var(--muted); }
-    .box { border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin:12px 0; }
+    .box { border:1px solid var(--line); border-radius:4px; padding:14px 16px; margin:12px 0; background: var(--well); }
     a { color:var(--accent); }
   </style>
 </head>
-<body>
-<main>
-  <a href="./">← Back to Pinned</a>
+<body class="theme-page">
+<header class="site-bar"><a class="sig" href="./">‹ PINNED</a><span class="here led">PRIVACY</span></header>
+<main class="plate">
   <h1>Privacy and your data</h1>
   <p class="muted">Plain language, written for the people using Pinned. Last updated 20 October 2026.</p>
 
