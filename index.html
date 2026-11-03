@@ -767,12 +767,13 @@
 
   // ===== MUSIC PLAYER =====
   // ADD SONGS HERE: put the .mp3 files in the music/audio/ folder, then add a line for each one.
+  // Keep src relative (no leading "/") so it also plays when you open index.html straight from your computer.
   const TRACKS = [
-    // { title: "Song name", note: "One line about it", src: "/music/audio/song-name.mp3" },
-    { title: "Eventually",                       note: "Made with Suno", src: "/music/audio/eventually.mp3" },
-    { title: "Almost Home",                      note: "Made with Suno", src: "/music/audio/almost-home.mp3" },
-    { title: "Not The Ending (Metal Rebirth)",   note: "Made with Suno", src: "/music/audio/not-the-ending-metal-rebirth.mp3" },
-    { title: "Definitely Not The Ending Scream", note: "Made with Suno", src: "/music/audio/definitely-not-the-ending-scream.mp3" },
+    // { title: "Song name", note: "One line about it", src: "music/audio/song-name.mp3" },
+    { title: "Eventually",                       note: "Made with Suno", src: "music/audio/eventually.mp3" },
+    { title: "Almost Home",                      note: "Made with Suno", src: "music/audio/almost-home.mp3" },
+    { title: "Not The Ending (Metal Rebirth)",   note: "Made with Suno", src: "music/audio/not-the-ending-metal-rebirth.mp3" },
+    { title: "Definitely Not The Ending Scream", note: "Made with Suno", src: "music/audio/definitely-not-the-ending-scream.mp3" },
   ];
   const audio = new Audio();
   audio.preload = "metadata";
@@ -821,6 +822,11 @@
   $p("pNext").onclick = () => load(cur + 1, true);
   $p("pPrev").onclick = () => (audio.currentTime > 3 ? (audio.currentTime = 0) : load(cur - 1, true));
   audio.onended = () => load(cur + 1, true);
+  audio.onerror = () => {            // show it on the screen instead of failing silently
+    if (cur < 0) return;
+    $p("npTitle").textContent = "TAPE JAMMED: CAN'T LOAD " + TRACKS[cur].src.split("/").pop().toUpperCase();
+    syncBtn();
+  };
   const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 4.8v14.4a.8.8 0 0 0 1.2.7l11.4-7.2a.8.8 0 0 0 0-1.4L8.7 4.1a.8.8 0 0 0-1.2.7z"/></svg>';
   const ICON_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="4.5" width="4.6" height="15" rx="1"/><rect x="13.9" y="4.5" width="4.6" height="15" rx="1"/></svg>';
   const syncBtn = () => {
