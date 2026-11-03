@@ -187,8 +187,30 @@
     .cv-text { display: block; }
   }
 
-  footer { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 24px; padding: 18px 24px; color: var(--dim); font-size: 15px; }
-  footer a { color: var(--paper); text-underline-offset: 3px; }
+  footer { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto; gap: 10px 24px; align-items: center; padding: 22px 28px; color: var(--dim); font-size: 15px; }
+  .ft-brand b { display: block; font-family: "Chakra Petch"; font-size: 17px; color: var(--brass); letter-spacing: .04em; }
+  .ft-links { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+  .ft-links a { color: var(--paper); text-decoration: none; font-family: "Chakra Petch"; font-size: 15px; }
+  .ft-links a:hover { color: var(--led); text-shadow: var(--led-glow); }
+  .ft-legal { grid-column: 1 / -1; padding-top: 10px; border-top: 1px solid var(--seam); font-size: 13px; }
+  @media (max-width: 620px) { footer { grid-template-columns: 1fr; } }
+
+  /* contact form */
+  .contact-form { display: grid; gap: 14px; margin-top: 22px; max-width: 640px; }
+  .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px) { .cf-row { grid-template-columns: 1fr; } }
+  .contact-form label { display: grid; gap: 6px; font-family: "DotGothic16"; font-size: 13px; letter-spacing: .08em; color: #5FCB7C; text-transform: uppercase; }
+  .contact-form input, .contact-form select, .contact-form textarea {
+    font: 16px "Barlow", sans-serif; color: var(--paper); background: #080A07; border: 1px solid var(--seam); border-radius: 3px; padding: 10px 12px; text-transform: none; letter-spacing: 0; }
+  .contact-form textarea { resize: vertical; min-height: 140px; }
+  .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { outline: none; border-color: var(--led); box-shadow: 0 0 0 1px var(--led-dim), inset 0 0 10px rgba(109,255,142,.08); }
+  .contact-form [aria-invalid="true"] { border-color: #E0664A; }
+  .cf-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .cf-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .cf-status { font-size: 14px; }
+  .cf-status.err { color: #E0664A; text-shadow: none; }
+  .cf-alt { margin-top: 18px; color: var(--dim); font-size: 15px; }
+  .cf-alt a { color: var(--brass); text-underline-offset: 3px; }
 
   /* boot */
   .boot { position: fixed; inset: 0; z-index: 20; background: var(--soot); display: grid; place-items: center; transition: opacity .5s ease; }
@@ -269,7 +291,8 @@
     <button class="mod" role="tab" data-view="apps"><kbd>3</kbd>Apps</button>
     <button class="mod" role="tab" data-view="tools"><kbd>4</kbd>IT tools</button>
     <button class="mod" role="tab" data-view="resume"><kbd>5</kbd>Résumé</button>
-    <p class="hint">Press 1–5 to switch.</p>
+    <button class="mod" role="tab" data-view="contact"><kbd>6</kbd>Contact</button>
+    <p class="hint">Press 1–6 to switch.</p>
   </nav>
 
   <main class="panel plate" id="panel">
@@ -378,11 +401,50 @@
       </div>
       </div>
     </section>
+
+    <section class="view" id="contact" role="tabpanel" hidden>
+      <h2>Contact</h2>
+      <p class="lede">Hiring, a project, or just saying hi. Send a message and it lands in my inbox. I usually reply within a day or two.</p>
+      <div class="pipe" aria-hidden="true"></div>
+
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="cf-row">
+          <label>Name<input name="name" autocomplete="name" required maxlength="100"></label>
+          <label>Email<input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+        </div>
+        <label>Subject
+          <select name="topic">
+            <option>Job or role</option>
+            <option>Freelance or website</option>
+            <option>Music</option>
+            <option>Games or apps</option>
+            <option>Something else</option>
+          </select>
+        </label>
+        <label>Message<textarea name="message" rows="6" required maxlength="5000"></textarea></label>
+        <!-- spam trap: real people leave this empty -->
+        <input type="text" name="_honey" class="cf-trap" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="cf-actions">
+          <button class="btn" type="submit" id="cfSend">Send message</button>
+          <span class="cf-status led" id="cfStatus" role="status"></span>
+        </div>
+      </form>
+      <p class="cf-alt">Prefer your own email app? <a href="mailto:coolhimal20@gmail.com">coolhimal20@gmail.com</a></p>
+    </section>
   </main>
 
   <footer class="plate">
-    <a href="mailto:coolhimal20@gmail.com">coolhimal20@gmail.com</a>
-    <a href="https://github.com/9bitbin">github.com/9bitbin</a>
+    <div class="ft-brand">
+      <b>Himal Shrestha</b>
+      <span>IT Support &amp; Systems · Long Island, NY</span>
+    </div>
+    <nav class="ft-links" aria-label="Elsewhere">
+      <a href="#contact" data-go="contact">Contact</a>
+      <a href="/resume.pdf">Résumé (PDF)</a>
+      <a href="https://www.linkedin.com/in/himalstha/" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/9bitbin" rel="noopener">GitHub</a>
+    </nav>
+    <p class="ft-legal">© <span id="year">2026</span> Himal Shrestha. All rights reserved.</p>
   </footer>
 </div>
 
@@ -459,7 +521,7 @@
 
   // ===== gauge =====
   const ticksEl = document.getElementById("ticks");
-  const angles = [-70, -35, 0, 35, 70];
+  const angles = [-75, -45, -15, 15, 45, 75];
   angles.forEach(a => {
     const r1 = 58, r2 = 48, rad = (a - 90) * Math.PI / 180;
     ticksEl.innerHTML += '<line class="tick" x1="' + (75 + r2*Math.cos(rad)) + '" y1="' + (80 + r2*Math.sin(rad)) + '" x2="' + (75 + r1*Math.cos(rad)) + '" y2="' + (80 + r1*Math.sin(rad)) + '"/>';
@@ -489,13 +551,52 @@
     e.preventDefault(); show(a.dataset.go, true); panel.scrollIntoView({ block: "start" });
   }));
   document.addEventListener("keydown", e => {
-    if (e.target.closest("input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target.closest("input, textarea, select") || e.metaKey || e.ctrlKey || e.altKey) return;
     const i = Number(e.key) - 1;
     if (tabs[i]) { show(tabs[i].dataset.view, true); tabs[i].focus(); }
   });
   window.addEventListener("hashchange", () => show(location.hash.slice(1)));
   show(location.hash.slice(1) || "music");
 
+
+  // ===== contact form =====
+  // Sent through FormSubmit (formsubmit.co), which forwards it to the address below.
+  // The very first message triggers a one-time "activate this form" email from FormSubmit: click it once.
+  const CONTACT_TO = "coolhimal20@gmail.com";
+  const form = document.getElementById("contactForm");
+  const cfStatus = document.getElementById("cfStatus");
+  const cfSend = document.getElementById("cfSend");
+  const say = (msg, bad) => { cfStatus.textContent = msg; cfStatus.classList.toggle("err", !!bad); };
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const d = Object.fromEntries(new FormData(form));
+    if (d._honey) return;                                   // bot
+    let bad = null;
+    for (const k of ["name", "email", "message"]) {
+      const f = form.elements[k];
+      const ok = k === "email" ? /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d[k].trim()) : d[k].trim().length > 0;
+      f.setAttribute("aria-invalid", !ok);
+      if (!ok && !bad) bad = f;
+    }
+    if (bad) { say(bad.name === "email" ? "Check your email address." : "Please fill in every field.", true); bad.focus(); return; }
+    cfSend.disabled = true; say("SENDING...");
+    try {
+      const r = await fetch("https://formsubmit.co/ajax/" + CONTACT_TO, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          name: d.name.trim(), email: d.email.trim(), topic: d.topic, message: d.message.trim(),
+          _subject: "9bitbin: " + d.topic + " from " + d.name.trim(), _replyto: d.email.trim(), _template: "table", _captcha: "false",
+        }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || j.success === false || j.success === "false") throw new Error(j.message || "Send failed");
+      form.reset(); say("SENT. THANKS, I'LL GET BACK TO YOU.");
+    } catch (err) {
+      say("Couldn't send. Email me directly at " + CONTACT_TO + ".", true);
+    } finally { cfSend.disabled = false; }
+  });
+  document.getElementById("year").textContent = new Date().getFullYear();
 
   // ===== clock =====
   const clock = document.getElementById("clock");
@@ -514,7 +615,7 @@
   if (seen || reduce || location.hash) {
     boot.remove();
   } else {
-    const lines = ["PRESSURE ........ NOMINAL", "GEARS ........... ENGAGED", "MODULES ......... 5 ONLINE", "", "<b>HIMAL SHRESTHA</b>"];
+    const lines = ["PRESSURE ........ NOMINAL", "GEARS ........... ENGAGED", "MODULES ......... 6 ONLINE", "", "<b>HIMAL SHRESTHA</b>"];
     let i = 0;
     const step = () => {
       if (i >= lines.length) { setTimeout(finish, 650); return; }
