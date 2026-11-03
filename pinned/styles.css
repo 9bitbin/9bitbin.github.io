@@ -1341,3 +1341,35 @@ body.drawmode .fun-toggle, body.drawmode #boardScreen .fun-tray { display: none;
 .ch-chat-form input { flex: 1; min-width: 0; min-height: 40px; border-radius: 999px; border: 1px solid #7a4f12; background: #1d1410; color: #fff7e0; padding: 0 14px; font: inherit; font-size: 14px; }
 .ch-chat-form button { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; background: #f6d77a; color: #2a1a08; font-weight: 700; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .ch-live-dot { animation: none !important; } }
+
+/* Phone: the roster and chat rise from the bottom as a sheet (soy-v78) */
+.ch-grab { display: none; }
+@media (max-width: 600px) {
+  .ch-dockwrap { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(20, 14, 12, 0), rgba(20, 14, 12, 0.92) 40%); }
+  .ch-panel { position: absolute; left: 0; right: 0; top: auto; bottom: 84px; width: auto; max-width: none; max-height: 40dvh; transform: none; border-radius: 18px 18px 0 0; z-index: 20; animation: chSheetUp 0.25s ease-out; }
+  .ch-panel.sheet-out { animation: chSheetDown 0.24s ease-in forwards; }
+  .ch-grab { display: block; flex: 0 0 auto; position: relative; width: 100%; height: 24px; background: none; border: 0; cursor: pointer; touch-action: none; }
+  .ch-grab::before { content: ""; position: absolute; left: 50%; top: 9px; width: 44px; height: 4px; margin-left: -22px; border-radius: 2px; background: rgba(246, 215, 122, 0.6); }
+}
+@keyframes chSheetUp { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes chSheetDown { from { transform: none; } to { transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) { .ch-panel, .ch-panel.sheet-out { animation: none !important; } }
+
+/* Away status (soy-v81) */
+.ch-row-online.away { color: #f6d77a; }
+.ch-row-online.away .ch-live-dot { background: #f6c44a; box-shadow: 0 0 0 2px #1d1410, 0 0 8px 1px rgba(246, 196, 74, 0.6); animation: none; }
+
+/* ---- soy-v84: waves, moods and candles */
+.ch-candle { position: absolute; left: 50%; top: -16px; width: 7px; height: 11px; margin-left: -3.5px; border-radius: 50% 50% 40% 40%; background: radial-gradient(circle at 50% 70%, #fff3c4 0%, #f6b64a 55%, rgba(246, 140, 40, 0) 100%); box-shadow: 0 0 8px 3px rgba(246, 190, 90, 0.45); animation: chCandleFlick 1.8s ease-in-out infinite; pointer-events: none; }
+@keyframes chCandleFlick { 0%, 100% { transform: scale(1) translateY(0); opacity: 0.95; } 30% { transform: scale(1.08, 0.94) translateY(-1px); opacity: 1; } 60% { transform: scale(0.94, 1.06); opacity: 0.85; } }
+.ch-row-candle { font-size: 12px; }
+.ch-wave-btn { margin-left: 8px; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid #7a4f12; background: transparent; color: #f6d77a; font: inherit; font-size: 12px; cursor: pointer; }
+.ch-wave-btn:disabled { opacity: 0.5; cursor: default; }
+.ch-wave { position: fixed; left: 50%; top: 16px; transform: translateX(-50%); z-index: 60; padding: 8px 16px; border-radius: 999px; background: rgba(29, 20, 16, 0.92); border: 1px solid rgba(246, 215, 122, 0.4); color: #fff7e0; font-size: 14px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); pointer-events: none; }
+.ch-mine { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; border-bottom: 1px solid rgba(246, 215, 122, 0.12); }
+.ch-moods { display: flex; flex-wrap: wrap; gap: 6px; }
+.ch-mood { min-height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(246, 215, 122, 0.25); background: transparent; color: #fff7e0; font: inherit; font-size: 12px; cursor: pointer; }
+.ch-mood.on, .ch-tool.on { background: #f6d77a; color: #2a1a08; border-color: #f6d77a; }
+@media (prefers-reduced-motion: reduce) { .ch-candle { animation: none !important; } }
+
+.ch-mood-tag { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); font-size: 14px; line-height: 1; pointer-events: none; }

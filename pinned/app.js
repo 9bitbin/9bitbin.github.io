@@ -61,7 +61,7 @@ const QUESTIONS = [
 
 const $ = (s) => document.querySelector(s);
 // ---- Batch A: small platform helpers ----
-const APP_VERSION = "soy-v77";
+const APP_VERSION = "soy-v85";
 
 const prefersReducedMotion = () => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { return false; } };
 const canVibrate = typeof navigator !== "undefined" && "vibrate" in navigator;
@@ -173,6 +173,12 @@ function createSupabaseApi() {
       manualSignOut = true;
       try { await sb.auth.signOut({ scope: "local" }); } finally { manualSignOut = false; }
       session = null;
+    },
+    async deleteAccount() {
+      const { error } = await sb.functions.invoke("delete-account");
+      if (error) throw new Error("Could not delete the account. Try again, or email us.");
+      session = null;
+      await sb.auth.signOut({ scope: "local" });
     },
     async me() {
       if (!session) return null;
@@ -358,6 +364,7 @@ function createSupabaseApi() {
     async listPings(boardId) { return must(await sb.from("pings").select("*").eq("board_id", boardId).order("created_at", { ascending: false }).limit(40)); },
     async sendPing(boardId, kind) { return must(await sb.from("pings").insert({ board_id: boardId, user_id: myId(), kind }).select().single()); },
 
+    pauseBoard() { for (const c of [channel, extras, chatCh, inkCh]) if (c) sb.removeChannel(c); channel = extras = chatCh = inkCh = null; },
     subscribe(boardId, h) {
       if (channel) sb.removeChannel(channel);
       if (extras) sb.removeChannel(extras);
@@ -410,10 +417,11 @@ function createSupabaseApi() {
       };
     },
     church(me, h, boardId) {
-      // one channel per room: presence only (name, colour, seat), so only people in this room see each other
+      // one shared church for everyone: presence only (name, colour, seat)
       let presence = { name: me.name, color: me.color, seat: null };
-      const chCh = sb.channel("church-" + boardId, { config: { presence: { key: me.id }, broadcast: { self: false } } });
+      const chCh = sb.channel("church", { config: { presence: { key: me.id }, broadcast: { self: false } } });
       chCh.on("broadcast", { event: "chat" }, ({ payload }) => h.onChat && h.onChat(payload));
+      chCh.on("broadcast", { event: "poke" }, ({ payload }) => h.onPoke && h.onPoke(payload));
       chCh.on("presence", { event: "sync" }, () => {
         const out = {};
         for (const [k, metas] of Object.entries(chCh.presenceState())) out[k] = metas[metas.length - 1];
@@ -423,6 +431,7 @@ function createSupabaseApi() {
       return {
         track: (p) => { presence = { ...presence, ...p }; chCh.track(presence); },
         say: (msg) => chCh.send({ type: "broadcast", event: "chat", payload: msg }),
+        poke: (msg) => chCh.send({ type: "broadcast", event: "poke", payload: msg }),
         close: () => sb.removeChannel(chCh),
       };
     },
@@ -493,6 +502,7 @@ function createDemoApi() {
     async signOut() { localStorage.removeItem("soy-demo-me" + who); },
     onSignedOut() {},
     async checkSession() { return true; },
+    async deleteAccount() { localStorage.removeItem("soy-demo-me" + who); },
     async me() { return db().profiles[meId()] || null; },
     async signIn(name, color) { const d = db(); d.profiles[meId()] = { id: meId(), name, color, muted: [] }; save(d); return d.profiles[meId()]; },
     async listThemes() { return []; },          // demo mode keeps themes on this device only
@@ -701,6 +711,7 @@ function createDemoApi() {
     async answerStatus(boardId, qdate) { return db().answers.filter((a) => a.board_id === boardId && a.qdate === qdate).map((a) => a.user_id); },
     async listPings(boardId) { return db().pings.filter((p) => p.board_id === boardId).sort((a, b) => (a.created_at < b.created_at ? 1 : -1)).slice(0, 40); },
     async sendPing(boardId, kind) { const d = db(); const row = { id: uid(), board_id: boardId, user_id: meId(), kind, created_at: new Date().toISOString() }; d.pings.push(row); save(d); emit({ type: "ping", row }); return row; },
+    pauseBoard() {},
     subscribe(boardId, h) { handlers = h; },
     live(boardId, me, h) {
       const ch = "BroadcastChannel" in window ? new BroadcastChannel("soy-live-" + boardId) : null;
@@ -719,8 +730,8 @@ function createDemoApi() {
       return { send: (p) => post({ k: "m", p }), track: (p) => { presence = { ...presence, ...p }; post({ k: "pres", p: presence }); pub(); } };
     },
     church(me, h, boardId) {
-      // demo mode: the same presence idea over BroadcastChannel, one channel per room
-      const ch = "BroadcastChannel" in window ? new BroadcastChannel("soy-church-" + boardId) : null;
+      // demo mode: one shared church over BroadcastChannel
+      const ch = "BroadcastChannel" in window ? new BroadcastChannel("soy-church") : null;
       const peers = {}; let presence = { name: me.name, color: me.color, seat: null };
       const pub = () => h.onPresence({ ...peers, [me.id]: presence });
       const post = (m) => ch && ch.postMessage({ ...m, from: me.id });
@@ -729,6 +740,7 @@ function createDemoApi() {
         if (m.k === "pres") { peers[m.from] = m.p; pub(); if (m.ask) post({ k: "pres", p: presence }); }
         if (m.k === "bye") { delete peers[m.from]; pub(); }
         if (m.k === "chat" && h.onChat) h.onChat(m.p);
+        if (m.k === "poke" && h.onPoke) h.onPoke(m.p);
       };
       post({ k: "pres", p: presence, ask: true });
       const bye = () => post({ k: "bye" });
@@ -737,6 +749,7 @@ function createDemoApi() {
       return {
         track: (p) => { presence = { ...presence, ...p }; post({ k: "pres", p: presence }); pub(); },
         say: (msg) => post({ k: "chat", p: msg }),
+        poke: (msg) => post({ k: "poke", p: msg }),
         close: () => { bye(); if (ch) ch.close(); },
       };
     },
@@ -1273,6 +1286,14 @@ function renderFeelSwitches() {
 // ---- Update log and credits (Settings, About) ----
 // RULE: every release adds one entry at the TOP of UPDATE_LOG. Its `v` must match APP_VERSION and the sw.js CACHE name.
 const UPDATE_LOG = [
+  { v: "soy-v85", date: "2026-11-01", title: "Dock and moods visible on phones", items: ["The church bar (faces, Who, Chat) stays at the bottom of the screen on phones", "The roster sheet sits above the bar instead of covering it", "Moods show as an emoji above each person in the scene"] },
+  { v: "soy-v84", date: "2026-11-01", title: "Waves, moods and candles", items: ["Wave to someone in the church; they feel a buzz and see a wave (once every 30 seconds per person)", "Pick a mood in the church roster so others can see how you are", "Light a candle in the church; others see it glow beside you", "Settings → Delete my account (needs the delete-account function deployed)"] },
+  { v: "soy-v83", date: "2026-10-30", title: "Home brings you back", items: ["Home button returns to a readable size, centred on your newest notes, even after zooming far out"] },
+  { v: "soy-v82", date: "2026-10-30", title: "Discord link is live", items: ["Settings → About now has a Join the Pinned Discord link"] },
+  { v: "soy-v81", date: "2026-10-30", title: "Zoom anywhere, away status, Discord link", items: ["Zoom out and in with no fixed limit on phone and desktop", "Church pauses the board while you sit there; leaving catches up", "People show as Away after five minutes with no touch", "Settings → About has a Join the Discord link once the invite is added", "iPhone users get a one-time tip about Add to Home Screen"] },
+  { v: "soy-v80", date: "2026-10-30", title: "Drawings stay on the board", items: ["Lines no longer vanish when the board refreshes; deletes still arrive live"] },
+  { v: "soy-v79", date: "2026-10-23", title: "One church for everyone", items: ["The church is one shared room for all users again, whichever room you joined from"] },
+  { v: "soy-v78", date: "2026-10-23", title: "Phone: roster and chat as a sheet", items: ["On phones the roster and chat slide up from the bottom and slide back down; tap the handle, swipe down, or press the button again"] },
   { v: "soy-v77", date: "2026-10-23", title: "Roster and chat on the left", items: ["Roster and chat panels sit on the left so the aisle and floor stay visible"] },
   { v: "soy-v76", date: "2026-10-23", title: "Church: who is here, and chat", items: [
     "A dock under the church shows who is online, with a green dot for each person",
@@ -1456,7 +1477,7 @@ function scheduleResub() {
   clearTimeout(reconnectT);
   if (!navigator.onLine || !state.board) return;
   const delay = Math.min(30000, 1500 * Math.pow(2, reconnectTries++));
-  reconnectT = setTimeout(() => { if (state.board && navigator.onLine) { api.subscribe(state.board.id, boardHandlers()); refreshReads(); } }, delay);
+  reconnectT = setTimeout(() => { if (state.board && navigator.onLine && !state.churchPaused) { api.subscribe(state.board.id, boardHandlers()); refreshReads(); } }, delay);
 }
 
 // ================================================================ boot
@@ -2178,7 +2199,7 @@ function onResume(force = false) {
   if (!state.board || document.visibilityState !== "visible") return;
   if (!force && Date.now() - lastResume < 3000) return;
   lastResume = Date.now();
-  if (hiddenAt && Date.now() - hiddenAt > 20000) api.subscribe(state.board.id, boardHandlers());
+  if (hiddenAt && Date.now() - hiddenAt > 20000 && !state.churchPaused) api.subscribe(state.board.id, boardHandlers());
   hiddenAt = 0;
   resync().catch(() => {});
   refreshMembers().catch(() => {});
@@ -2246,8 +2267,7 @@ async function resync() {
 async function loadExtras() {
   try {
     const strokes = await api.listStrokes(state.board.id);
-    const ids = new Set(strokes.map((s) => s.id));
-    for (const id of [...state.strokes.keys()]) if (!ids.has(id)) removeInk(id);
+    // add-only: never remove lines on a timer. Real deletes arrive as realtime DELETE events.
     for (const s of strokes) addInk(s);
   } catch { /* strokes arrive with the v4 upgrade */ }
   try {
@@ -2530,7 +2550,7 @@ function renderLoc() {
 
 // ================================================================ endless canvas
 // world coords: notes keep x/y forever. screen = world * s + t
-const MIN_S = 0.08, MAX_S = 3;   // 8% lets you see a big area of the board at once
+const MIN_S = 0.0005, MAX_S = 500;   // effectively unlimited zoom: far out to see the whole map, far in to read tiny writing
 let viewRaf = 0, viewSaveT = 0, viewSendT = 0;
 function vp() { return $("#scroller").getBoundingClientRect(); }
 function toWorld(cx, cy) { const r = vp(), v = state.view; return { x: (cx - r.left - v.tx) / v.s, y: (cy - r.top - v.ty) / v.s }; }
@@ -2595,8 +2615,13 @@ function goHome(animate = true) {
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const n of notes) { const b = noteBox(n); x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.w); y1 = Math.max(y1, b.y + b.h); }
   const pad = 40;
-  const s = Math.min(1.2, Math.max(MIN_S, Math.min(r.width / (x1 - x0 + pad * 2), (r.height - 140) / (y1 - y0 + pad * 2))));
-  centerOn((x0 + x1) / 2, (y0 + y1) / 2 + 30 / s, s, animate);
+  const fit = Math.min(r.width / (x1 - x0 + pad * 2), (r.height - 140) / (y1 - y0 + pad * 2));
+  // Home never leaves you zoomed out too far: at least 60% size, and if the newest notes are spread
+  // too far apart to fit at that size, centre on the newest note instead.
+  const s = Math.min(1.2, Math.max(0.6, fit));
+  if (fit >= 0.6) return centerOn((x0 + x1) / 2, (y0 + y1) / 2 + 30 / s, s, animate);
+  const b = noteBox(notes[0]);
+  centerOn(b.x + b.w / 2, b.y + b.h / 2 + 30 / s, s, animate);
 }
 
 function initView() {
@@ -5834,13 +5859,13 @@ function renderMutes() {
 
 async function renderAccount() {
   const st = $("#acctStatus"), row = $("#acctLinkRow"), out = $("#logoutBtn"), chg = $("#acctChangeOpen"), crow = $("#acctChangeRow");
-  st.textContent = "…"; row.hidden = true; out.hidden = true; chg.hidden = true; crow.hidden = true;
+  st.textContent = "…"; row.hidden = true; out.hidden = true; chg.hidden = true; crow.hidden = true; $("#deleteAcctBtn").hidden = true;
   renderModRow();
   try {
     const a = await api.account();
     if (a.pending) { st.textContent = `Check ${a.pending} and tap the link to finish updating your email.`; row.hidden = false; $("#acctEmail").value = a.pending; $("#acctLinkBtn").textContent = "Resend link"; }
     else if (a.anonymous) { st.textContent = "No email yet. Add one so you can sign back in on a new phone."; row.hidden = false; $("#acctLinkBtn").textContent = "Add email"; }
-    else { st.textContent = `Signed in as ${a.email}`; out.hidden = false; chg.hidden = false; }
+    else { st.textContent = `Signed in as ${a.email}`; out.hidden = false; chg.hidden = false; $("#deleteAcctBtn").hidden = false; }
   } catch { st.textContent = ""; }
 }
 
@@ -5864,6 +5889,13 @@ async function onChangeEmail() {
     renderAccount();
   } catch (e) { toast(e.message, 5000); }
   busy(btn, false);
+}
+
+async function onDeleteAccount() {
+  if (!confirm("Delete your Pinned account? Your profile and sign-in are removed and cannot be recovered. Notes you stuck on boards stay where they are.")) return;
+  const btn = $("#deleteAcctBtn"); busy(btn, true, "Deleting…");
+  try { await api.deleteAccount(); location.reload(); }
+  catch (e) { busy(btn, false); toast(e.message, 6000); }
 }
 
 async function onLogout() {
@@ -6027,6 +6059,7 @@ function wireStatic() {
   $("#changeEmail").onclick = () => { clearInterval(pollTimer); ls.set(PENDING, null); setError($("#loginError")); $("#loginForm").hidden = false; $("#loginWait").hidden = true; };
   $("#acctLinkBtn").onclick = onLinkEmail;
   $("#logoutBtn").onclick = onLogout;
+  $("#deleteAcctBtn").onclick = onDeleteAccount;
   $("#welcomeGo").onclick = onWelcome;
   $("#nameInput").addEventListener("keydown", (e) => e.key === "Enter" && onWelcome());
   $("#createBoard").onclick = onCreateBoard;
@@ -6197,7 +6230,17 @@ function wireStatic() {
     const open = $(".fun-tray").classList.toggle("open");
     $("#funToggle").setAttribute("aria-expanded", String(open));
   };
-  $("#toolChurch").onclick = () => { if (state.me && state.board) openChurch({ me: state.me, api, boardEl: $("#boardScreen"), boardId: state.board.id }); };
+  $("#toolChurch").onclick = () => {
+    if (!state.me || !state.board) return;
+    const boardId = state.board.id;
+    openChurch({ me: state.me, api, boardEl: $("#boardScreen"), boardId, onLeave: () => {
+      // back on the board: reconnect the live feeds and catch up on anything missed
+      state.churchPaused = false;
+      if (state.board && state.board.id === boardId) { api.subscribe(boardId, boardHandlers()); resync().catch(() => {}); refreshReads(); }
+    } });
+    // only pause the board if the church actually opened
+    if (!$("#churchScreen").hidden) { state.churchPaused = true; api.pauseBoard?.(); }
+  };
   $("#toolFind").onclick = () => (others().filter((m) => state.views[m.id]).length > 1 ? openPeople() : findSomeone());
   $("#toolDraw").onclick = () => setInkMode(!inkMode);
   $("#bDone").onclick = () => setInkMode(false);
@@ -6357,3 +6400,13 @@ function wireStatic() {
 }
 
 boot();
+
+// Discord invite: paste the invite link here once the server has one. Empty = link hidden.
+const DISCORD_URL = "https://discord.gg/9WjxKhWXaj";
+try { const dl = $("#discordLink"); if (dl && DISCORD_URL) { dl.href = DISCORD_URL; dl.hidden = false; } } catch { /* ignore */ }
+
+// iPhone tip: Add to Home Screen lives in Safari's Share menu. Show the tip once per device.
+try {
+  const iosTab = /iPhone|iPad/.test(navigator.userAgent) && !navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
+  if (iosTab && !ls.get("pinned-ios-tip", false)) { ls.set("pinned-ios-tip", true); setTimeout(() => toast("Tip: tap Share, then Add to Home Screen", 7000), 4000); }
+} catch { /* ignore */ }

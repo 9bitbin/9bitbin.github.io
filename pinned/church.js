@@ -465,6 +465,9 @@ function chLampsArt() {
 
 // ---------------------------------------------------------------- the church screen
 let chBoardId = "room";
+let chLastAct = 0, chIsAway = false, chIdleT = 0;
+const CH_IDLE_MS = 5 * 60 * 1000;   // five minutes with no touch or key = away
+function chTouch() { chLastAct = Date.now(); if (chIsAway && chLive) { chIsAway = false; chLive.track({ away: false }); } }
 let chMsgs = [], chLastSent = 0, chUnread = 0, chPanel = null;
 let chRoot = null, chOpen = false, chLive = null, chMe = null, chApi = null, chPushed = false, chSeat = null;
 let chPeople = {}, chSynced = false, chOnLeave = () => {}, chBoardEl = null;
@@ -497,11 +500,18 @@ function chBuildRoot() {
         <button class="ch-dock-btn" id="chWhoBtn" type="button" aria-expanded="false" aria-controls="chRoster"><i class="ch-live-dot" aria-hidden="true"></i><span id="chWhoTxt">Only you</span><span class="ch-caret" aria-hidden="true">▴</span></button>
         <button class="ch-dock-btn" id="chChatBtn" type="button" aria-expanded="false" aria-controls="chChat">💬 Chat <span class="ch-badge" id="chBadge" hidden>0</span></button>
       </div>
+      <div class="ch-wave" id="chWave" role="status" aria-live="polite" hidden></div>
       <section class="ch-panel" id="chRoster" hidden aria-label="Who is in the church">
+        <button class="ch-grab" type="button" aria-label="Slide down to close"></button>
         <header class="ch-panel-head"><div><h2>In the church</h2><div class="ch-panel-sub" id="chRosterCount"></div></div><button class="ch-x" id="chRosterClose" type="button" aria-label="Close">✕</button></header>
+        <div class="ch-mine">
+          <div class="ch-moods" role="group" aria-label="Your mood">${CH_MOODS.map((m) => `<button type="button" class="ch-mood" data-mood="${m.id}" aria-pressed="false">${m.emoji} ${m.label}</button>`).join("")}</div>
+          <button class="ch-tool" type="button" id="chCandleBtn" aria-pressed="false">🕯 Light a candle</button>
+        </div>
         <ul class="ch-roster-list" id="chRosterList"></ul>
       </section>
       <section class="ch-panel" id="chChat" hidden aria-label="Church chat">
+        <button class="ch-grab" type="button" aria-label="Slide down to close"></button>
         <header class="ch-panel-head"><div><h2>Church chat</h2><div class="ch-panel-sub" id="chChatCount"></div></div><button class="ch-x" id="chChatClose" type="button" aria-label="Close">✕</button></header>
         <div class="ch-msgs" id="chMsgs" aria-live="polite"></div>
         <form class="ch-chat-form" id="chForm" autocomplete="off"><input id="chInput" maxlength="200" placeholder="Say something kind…" aria-label="Message to the church"><button type="submit">Send</button></form>
@@ -531,7 +541,7 @@ function chPaintPeople() {
     const me = id === chMe.id;
     const name = me ? "You" : (p.name || "Visitor");
     return `<div class="ch-person${me ? " me" : ""}${p.away ? " away" : ""}" style="left:${left};top:${top};--pc:${chEsc(p.color || "#c2410c")}" data-id="${chEsc(id)}" role="img" aria-label="${chEsc(name)}${pew ? ", sitting" : ", standing"}">
-      <span class="ch-fig" aria-hidden="true"></span><span class="ch-name">${chEsc(name)}</span></div>`;
+      <span class="ch-fig" aria-hidden="true"></span>${p.candle ? '<span class="ch-candle" aria-hidden="true"></span>' : ""}${CH_MOODS.find((m) => m.id === p.mood) ? `<span class="ch-mood-tag" aria-hidden="true">${CH_MOODS.find((m) => m.id === p.mood).emoji}</span>` : ""}<span class="ch-name">${chEsc(name)}</span></div>`;
   }).join("");
   box.innerHTML = html;
   const count = entries.length;
@@ -548,6 +558,53 @@ function CH_SEAT_NAME(id) {
 function chOrdered(entries) {
   return [...entries].sort(([a], [b]) => (a === chMe.id ? -1 : b === chMe.id ? 1 : 0));
 }
+const CH_MOODS = [
+  { id: "grateful", emoji: "🙏", label: "Grateful" },
+  { id: "peaceful", emoji: "🕊", label: "Peaceful" },
+  { id: "joyful", emoji: "🎶", label: "Joyful" },
+  { id: "reflective", emoji: "💭", label: "Reflective" },
+  { id: "hopeful", emoji: "🌅", label: "Hopeful" },
+];
+const CH_WAVE_GAP = 30000;   // one wave per person every 30 seconds
+const chWaves = {};          // target id -> when we last waved to them
+let chMood = "", chCandle = false, chWaveT = 0, chBannerT = 0;
+function chWaveWait(id) { return Date.now() - (chWaves[id] || 0) < CH_WAVE_GAP; }
+function chRefreshRoster() { if (chRoot) chPaintFoot(Object.entries(chPeople).filter(([, p]) => p)); }
+function chOnPoke(m) {
+  if (!m || !chRoot || !chMe || m.to !== chMe.id) return;
+  const box = chRoot.querySelector("#chWave");
+  box.textContent = `${String(m.name || "Someone").slice(0, 30)} waved to you 👋`;
+  box.hidden = false;
+  clearTimeout(chBannerT); chBannerT = setTimeout(() => { box.hidden = true; }, 4000);
+  try { if (navigator.vibrate) navigator.vibrate([80, 60, 80]); } catch { /* not supported */ }
+}
+function chSendWave(id) {
+  if (!chLive || !chMe || !id || chWaveWait(id)) return;
+  chWaves[id] = Date.now();
+  try { chLive.poke({ to: id, from: chMe.id, name: chMe.name }); } catch { /* channel closed */ }
+  chRefreshRoster();
+  clearTimeout(chWaveT); chWaveT = setTimeout(chRefreshRoster, CH_WAVE_GAP + 50);
+}
+function chSetMood(id) {
+  chMood = chMood === id ? "" : id;
+  chPaintMine();
+  if (chLive) chLive.track({ mood: chMood });
+}
+function chSetCandle(on) {
+  chCandle = on;
+  chPaintMine();
+  if (chLive) chLive.track({ candle: chCandle });
+}
+function chPaintMine() {
+  if (!chRoot) return;
+  chRoot.querySelectorAll(".ch-mood").forEach((b) => {
+    const on = b.dataset.mood === chMood;
+    b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on));
+  });
+  const c = chRoot.querySelector("#chCandleBtn");
+  c.classList.toggle("on", chCandle); c.setAttribute("aria-pressed", String(chCandle));
+  c.textContent = chCandle ? "🕯 Put out candle" : "🕯 Light a candle";
+}
 function chPaintFoot(entries) {
   if (!chRoot) return;
   const ordered = chOrdered(entries);
@@ -562,14 +619,29 @@ function chPaintFoot(entries) {
   chRoot.querySelector("#chRosterList").innerHTML = ordered.map(([id, p]) => {
     const me = id === chMe.id;
     const name = me ? "You" : (p.name || "Visitor");
-    return `<li class="ch-row${me ? " me" : ""}"><span class="ch-face" style="--pc:${chEsc(p.color || "#c2410c")}"></span><span class="ch-row-main"><span class="ch-row-name">${chEsc(name)}</span><span class="ch-row-where">${CH_SEAT_NAME(p.seat)}</span></span><span class="ch-row-online"><i class="ch-live-dot" aria-hidden="true"></i>Online</span></li>`;
+    const mood = CH_MOODS.find((m) => m.id === p.mood);
+    const waited = !me && chWaveWait(id);
+    const candle = p.candle ? ' <span class="ch-row-candle" aria-label="candle lit">🕯</span>' : "";
+    const where = CH_SEAT_NAME(p.seat) + (mood ? " · " + mood.emoji + " " + mood.label : "");
+    const wave = me ? "" : `<button class="ch-wave-btn" type="button" data-wave="${chEsc(id)}"${waited ? " disabled" : ""}>${waited ? "Waved" : "Wave"}</button>`;
+    return `<li class="ch-row${me ? " me" : ""}"><span class="ch-face" style="--pc:${chEsc(p.color || "#c2410c")}"></span><span class="ch-row-main"><span class="ch-row-name">${chEsc(name)}${candle}</span><span class="ch-row-where">${chEsc(where)}</span></span><span class="ch-row-online${p.away ? " away" : ""}"><i class="ch-live-dot" aria-hidden="true"></i>${p.away ? "Away" : "Online"}</span>${wave}</li>`;
   }).join("") || `<li class="ch-row-empty">Only you are here.</li>`;
+}
+const CH_SHEET = () => window.matchMedia("(max-width: 600px)").matches;
+function chSetPanel(el, on) {
+  clearTimeout(el._t);
+  if (on) { el.classList.remove("sheet-out"); el.hidden = false; return; }
+  if (el.hidden) return;
+  if (CH_SHEET()) {
+    el.classList.add("sheet-out");
+    el._t = setTimeout(() => { el.hidden = true; el.classList.remove("sheet-out"); }, 240);
+  } else el.hidden = true;
 }
 function chShowPanel(which) {
   if (!chRoot) return;
   chPanel = which;
-  chRoot.querySelector("#chRoster").hidden = which !== "who";
-  chRoot.querySelector("#chChat").hidden = which !== "chat";
+  chSetPanel(chRoot.querySelector("#chRoster"), which === "who");
+  chSetPanel(chRoot.querySelector("#chChat"), which === "chat");
   chRoot.querySelector("#chWhoBtn").setAttribute("aria-expanded", String(which === "who"));
   chRoot.querySelector("#chChatBtn").setAttribute("aria-expanded", String(which === "chat"));
   if (which === "chat") {
@@ -646,7 +718,7 @@ function chOnPresence(map) {
   chPeople = {};
   for (const [id, p] of Object.entries(map || {})) {
     if (!p) continue;
-    chPeople[id] = { name: p.name, color: p.color, seat: p.seat || null, away: false };
+    chPeople[id] = { name: p.name, color: p.color, seat: p.seat || null, away: !!p.away, mood: p.mood || "", candle: !!p.candle };
   }
   // Door sounds for others coming and going (quiet). Skip the first sync so opening the church is silent.
   if (chSynced) {
@@ -692,6 +764,20 @@ function openChurch({ me, api, boardEl, onLeave, boardId }) {
     chRoot.querySelector("#chChatBtn").addEventListener("click", () => chToggle("chat"));
     chRoot.querySelector("#chChatClose").addEventListener("click", () => chShowPanel(null));
     chRoot.querySelector("#chRosterClose").addEventListener("click", () => chShowPanel(null));
+    chRoot.querySelectorAll(".ch-mood").forEach((b) => b.addEventListener("click", () => chSetMood(b.dataset.mood)));
+    chRoot.querySelector("#chCandleBtn").addEventListener("click", () => chSetCandle(!chCandle));
+    chRoot.querySelector("#chRosterList").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-wave]"); if (b) chSendWave(b.dataset.wave);
+    });
+    chRoot.querySelectorAll(".ch-grab").forEach((g) => {
+      let y0 = null;
+      g.addEventListener("pointerdown", (e) => { y0 = e.clientY; try { g.setPointerCapture(e.pointerId); } catch { /* ok */ } });
+      g.addEventListener("pointerup", (e) => {
+        if (y0 === null) return;
+        const dy = e.clientY - y0; y0 = null;
+        if (dy > 30 || Math.abs(dy) < 10) chShowPanel(null); // swipe down or tap closes the sheet
+      });
+    });
     chRoot.querySelector("#chForm").addEventListener("submit", (e) => {
       e.preventDefault();
       const i = chRoot.querySelector("#chInput"); chSend(i.value); i.value = "";
@@ -705,7 +791,7 @@ function openChurch({ me, api, boardEl, onLeave, boardId }) {
     });
   }
   chOpen = true; chSynced = false; chPeople = {}; chSeat = null;
-  chMsgs = []; chUnread = 0; chShowPanel(null);
+  chMsgs = []; chUnread = 0; chShowPanel(null); chPaintMine();
   if (chBoardEl) chBoardEl.hidden = true;
   chRoot.hidden = false;
   chSetSeatLabels();
@@ -714,8 +800,14 @@ function openChurch({ me, api, boardEl, onLeave, boardId }) {
   chDoor(true);
   chRoot.classList.remove("closing"); chRoot.classList.add("opening");
   setTimeout(() => chRoot && chRoot.classList.remove("opening"), 1400);
-  chLive = chApi.church(chMe, { onPresence: chOnPresence, onChat: chOnChat }, chBoardId);
-  chLive.track({ name: chMe.name, color: chMe.color, seat: null });
+  chLive = chApi.church(chMe, { onPresence: chOnPresence, onChat: chOnChat, onPoke: chOnPoke }, chBoardId);
+  chLive.track({ name: chMe.name, color: chMe.color, seat: null, away: false, mood: chMood, candle: chCandle });
+  chLastAct = Date.now(); chIsAway = false;
+  ["pointerdown", "pointermove", "keydown"].forEach((t) => chRoot.addEventListener(t, chTouch, { passive: true }));
+  clearInterval(chIdleT);
+  chIdleT = setInterval(() => {
+    if (!chIsAway && chLive && Date.now() - chLastAct > CH_IDLE_MS) { chIsAway = true; chLive.track({ away: true }); }
+  }, 15000);
   if (chGet(CH_KEY.ambient, false) === true) chAmbientOn();
   if (chGet(CH_KEY.music, true) === true) chMusicStart(); else chMusicUi();
   chRoot.querySelector("#chBack").focus({ preventScroll: true });
@@ -733,8 +825,9 @@ function chLeave(fromUi) {
   chMusicStop();
   chCloseBible();
   try { if (chLive && chLive.close) chLive.close(); } catch { /* channel already closed */ }
-  chLive = null; chPeople = {}; chSeat = null;
+  chLive = null; chPeople = {}; chSeat = null; chCandle = false;
   chShowPanel(null); chMsgs = [];
+  clearInterval(chIdleT); chIdleT = 0; chIsAway = false;
   chRoot.hidden = true;
   if (chBoardEl) chBoardEl.hidden = false;
   chOnLeave();
