@@ -3,7 +3,7 @@
   Only menus, cards, buttons and text change. Game art (pieces, boards, sprites) keeps its own colors.
 
   Add to a game's <head> AFTER its own <style>:
-    <link rel="stylesheet" href="/game-theme.css">
+    <link rel="stylesheet" href="/assets/game-theme.css">
   and put one of these classes on <html>:
     nbb-card   games with start / game-over cards (.panel .card)
     nbb-page   simple page games (score row, status text, #again button)

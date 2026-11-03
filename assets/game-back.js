@@ -1,6 +1,6 @@
 /*
   game-back.js — adds a brass "Games" back button to a game page.
-  Add to any game:  <script src="/game-back.js" defer></script>
+  Add to any game:  <script src="/assets/game-back.js" defer></script>
   It takes you to the Pinned app's Games screen (/pinned/?games).
   If it covers the game's score, move it: data-pos="bl" (bottom-left), "br" or "tr".
   Inside the Pinned app the game runs in a frame that already has a Back button,
