@@ -138,6 +138,9 @@ function createSupabaseApi() {
         const r = await sb.auth.refreshSession();
         if (r.data && r.data.session) { session = r.data.session; return true; }
         if (r.error && !r.error.status) return true;
+        // the account is gone (deleted, or the sign-in was revoked): forget it on this device
+        manualSignOut = true;
+        try { await sb.auth.signOut({ scope: "local" }); } catch { /* already gone */ } finally { manualSignOut = false; }
         session = null;
         return false;
       } catch { return true; }
@@ -1520,7 +1523,10 @@ async function afterLogin() {
   lostSessionShown = false;
   try {
     state.me = await api.me();
-    if (!state.me) return showWelcome();
+    if (!state.me) {
+      if (!(await api.checkSession())) return onLostSession();   // account was deleted: sign in again
+      return showWelcome();
+    }
     state.me.muted = state.me.muted || [];
     await showMenu();
   } catch (e) {
@@ -1922,7 +1928,10 @@ async function onWelcome() {
   try {
     state.me = await api.signIn(name, welcomeColor);
     await showMenu();
-  } catch (e) { setError($("#welcomeError"), e.message); }
+  } catch (e) {
+    if (/profiles_id_fkey|foreign key/i.test(e.message || "") && !(await api.checkSession())) { busy(btn, false); return onLostSession(); }
+    setError($("#welcomeError"), e.message);
+  }
   busy(btn, false);
 }
 let pendingJoinCode = null;
