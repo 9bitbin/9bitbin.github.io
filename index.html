@@ -423,7 +423,7 @@
         </label>
         <label>Message<textarea name="message" rows="6" required maxlength="5000"></textarea></label>
         <!-- spam trap: real people leave this empty -->
-        <input type="text" name="_honey" class="cf-trap" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="text" name="_gotcha" class="cf-trap" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div class="cf-actions">
           <button class="btn" type="submit" id="cfSend">Send message</button>
           <span class="cf-status led" id="cfStatus" role="status"></span>
@@ -560,9 +560,9 @@
 
 
   // ===== contact form =====
-  // Sent through FormSubmit (formsubmit.co), which forwards it to the address below.
-  // The very first message triggers a one-time "activate this form" email from FormSubmit: click it once.
-  const CONTACT_TO = "coolhimal20@gmail.com";
+  // Sent through Formspree (formspree.io). Messages show up in the Formspree dashboard and your email.
+  const FORMSPREE_URL = "https://formspree.io/f/meaapddr";
+  const CONTACT_TO = "coolhimal20@gmail.com";   // only shown as a fallback if sending fails
   const form = document.getElementById("contactForm");
   const cfStatus = document.getElementById("cfStatus");
   const cfSend = document.getElementById("cfSend");
@@ -570,7 +570,7 @@
   form.addEventListener("submit", async e => {
     e.preventDefault();
     const d = Object.fromEntries(new FormData(form));
-    if (d._honey) return;                                   // bot
+    if (d._gotcha) return;                                  // bot filled the hidden field
     let bad = null;
     for (const k of ["name", "email", "message"]) {
       const f = form.elements[k];
@@ -581,21 +581,20 @@
     if (bad) { say(bad.name === "email" ? "Check your email address." : "Please fill in every field.", true); bad.focus(); return; }
     cfSend.disabled = true; say("SENDING...");
     try {
-      const r = await fetch("https://formsubmit.co/ajax/" + CONTACT_TO, {
+      const r = await fetch(FORMSPREE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
           name: d.name.trim(), email: d.email.trim(), topic: d.topic, message: d.message.trim(),
-          _subject: "9bitbin: " + d.topic + " from " + d.name.trim(), _replyto: d.email.trim(), _template: "table", _captcha: "false",
+          _subject: "9bitbin: " + d.topic + " from " + d.name.trim(),
         }),
       });
       const j = await r.json().catch(() => ({}));
-      if (!r.ok || j.success === false || j.success === "false") throw new Error(j.message || "Send failed");
+      if (!r.ok) throw new Error((j.errors || []).map(x => x.message).join(" ") || "Send failed");
       form.reset(); say("SENT. THANKS, I'LL GET BACK TO YOU.");
     } catch (err) {
-      // FormSubmit says "needs Activation" until the owner clicks the link in its first email
-      if (/activat/i.test(err.message)) say("Form not activated yet. Check " + CONTACT_TO + " for FormSubmit's 'Activate Form' email.", true);
-      else say("Couldn't send. Email me directly at " + CONTACT_TO + ".", true);
+      say("Couldn't send. Email me directly at " + CONTACT_TO + ".", true);
+      console.warn("Contact form:", err.message);
     } finally { cfSend.disabled = false; }
   });
   document.getElementById("year").textContent = new Date().getFullYear();
