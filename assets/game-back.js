@@ -1,14 +1,14 @@
 /*
   game-back.js — adds a brass "Games" back button to a game page.
   Add to any game:  <script src="/assets/game-back.js" defer></script>
-  It takes you to the Pinned app's Games screen (/pinned/?games).
+  It takes you to the Games tab on the main site (/#games).
   If it covers the game's score, move it: data-pos="bl" (bottom-left), "br" or "tr".
   Inside the Pinned app the game runs in a frame that already has a Back button,
   so this button only shows when the game is opened on its own.
 */
 (function () {
   if (window.self !== window.top) return;            // inside Pinned: it has its own Back
-  var HREF = "/pinned/?games";
+  var HREF = "/#games";
   var me = document.currentScript;
   var pos = (me && me.getAttribute("data-pos")) || "tl";
   var y = pos.charAt(0) === "b" ? "bottom:calc(env(safe-area-inset-bottom,0px) + 10px)" : "top:calc(env(safe-area-inset-top,0px) + 10px)";
@@ -34,7 +34,7 @@
     var a = document.createElement("a");
     a.id = "nbb-back";
     a.href = HREF;
-    a.setAttribute("aria-label", "Back to Pinned games");
+    a.setAttribute("aria-label", "Back to games");
     a.innerHTML = "<b aria-hidden='true'>‹</b>Games";
     // keep taps on the button from also counting as a game input (flap, jump, etc.)
     ["pointerdown", "mousedown", "touchstart", "keydown"].forEach(function (t) {
