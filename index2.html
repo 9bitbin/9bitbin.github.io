@@ -11,7 +11,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Himal Shrestha (test: readout v2)</title>
+<title>Himal Shrestha (old readout)</title>
 <meta name="robots" content="noindex">
 <meta name="description" content="Himal Shrestha — IT support and systems, games, apps, and music. Long Island, NY.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -124,56 +124,6 @@
   @keyframes blink2 { 50% { opacity: 0; } }
   @keyframes ring { 0%,40%,100% { transform: rotate(0); } 5%,15%,25% { transform: rotate(-14deg); } 10%,20%,30% { transform: rotate(14deg); } }
   @media (prefers-reduced-motion: reduce) { .interest .ico, .interest::after, .interest .txt::after { animation: none !important; } }
-  /* ===== readout v2 (test) ===== */
-  .ident { grid-template-columns: minmax(0, 1fr) minmax(0, 560px); gap: 32px; }
-  .rx { position: relative; padding: 14px; border-radius: 10px;
-    background: linear-gradient(160deg, #3A2D16, #1E170B 60%, #2C2210);
-    border: 1px solid #0B0904;
-    box-shadow: inset 0 1px 0 rgba(255,220,150,.35), inset 0 -2px 4px rgba(0,0,0,.6), 0 0 0 2px var(--brass-dk), 0 12px 28px rgba(0,0,0,.6); }
-  .rx-screw { position: absolute; width: 9px; height: 9px; border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #FFF1C8, #C49A4E 45%, #4A3414 90%); box-shadow: 0 1px 1px rgba(0,0,0,.7); }
-  .rx-screw::after { content: ""; position: absolute; left: 1px; right: 1px; top: 4px; height: 1px; background: #2A1E0A; transform: rotate(35deg); }
-  .rx-screw.s1 { left: 4px; top: 4px; } .rx-screw.s2 { right: 4px; top: 4px; } .rx-screw.s3 { left: 4px; bottom: 4px; } .rx-screw.s4 { right: 4px; bottom: 4px; }
-  .rx-screen { position: relative; overflow: hidden; border-radius: 6px; padding: 14px 20px 0;
-    background: radial-gradient(ellipse at 50% 40%, #0B140D 0%, #050805 70%, #020302 100%);
-    border: 1px solid #0F2A17;
-    box-shadow: inset 0 0 30px rgba(109,255,142,.12), inset 0 0 2px rgba(109,255,142,.4); }
-  .rx-screen::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
-    background: repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px); }
-  .rx-screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
-    background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%),
-      linear-gradient(180deg, rgba(109,255,142,.06), transparent 30%); }
-  .rx-head { display: flex; align-items: center; gap: 12px; padding-bottom: 10px; margin-bottom: 4px;
-    border-bottom: 1px dashed rgba(109,255,142,.22); font-family: "DotGothic16", monospace; font-size: 12px; letter-spacing: .14em; color: var(--led-dim); }
-  .rx-tag { color: #4FA866; }
-  .rx-sig { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
-  .rx-sig b { width: 3px; background: var(--led); box-shadow: 0 0 4px var(--led); animation: sig 1.6s ease-in-out infinite; }
-  .rx-sig b:nth-child(1) { height: 30%; } .rx-sig b:nth-child(2) { height: 50%; animation-delay: .15s; } .rx-sig b:nth-child(3) { height: 70%; animation-delay: .3s; }
-  .rx-sig b:nth-child(4) { height: 85%; animation-delay: .45s; } .rx-sig b:nth-child(5) { height: 100%; animation-delay: .6s; opacity: .35; }
-  @keyframes sig { 50% { opacity: .35; } }
-  .rx-clock { margin-left: auto; color: var(--led); text-shadow: var(--led-glow); }
-  .rx-row { display: grid; grid-template-columns: 112px 1fr 26px; align-items: center; gap: 14px; padding: 11px 0;
-    border-bottom: 1px solid rgba(109,255,142,.08); }
-  .rx-k { font-family: "DotGothic16", monospace; font-size: 13px; letter-spacing: .14em; color: #3F8A55; }
-  .rx-v { font-size: clamp(18px, 2vw, 25px); line-height: 1.1; white-space: nowrap; letter-spacing: .08em;
-    animation: flick 7s steps(1) infinite; }
-  .rx-row:nth-child(3) .rx-v { animation-delay: -2.3s; } .rx-row:nth-child(4) .rx-v { animation-delay: -4.9s; }
-  @keyframes flick { 0%, 96%, 100% { opacity: 1; } 97% { opacity: .55; } 98% { opacity: .9; } }
-  .rx .interest .ico { font-size: .95em; }
-  .rx-ind { justify-self: end; width: 12px; height: 12px; border-radius: 50%; background: var(--led-dim); }
-  .rx-ind.on { background: var(--led); box-shadow: var(--led-glow); }
-  .rx-ind.blink { background: var(--led); box-shadow: var(--led-glow); animation: blink 1.2s steps(1) infinite; }
-  .rx-dots { justify-self: end; display: grid; grid-template-columns: repeat(2, 5px); gap: 3px; }
-  .rx-dots i { width: 5px; height: 5px; border-radius: 1px; background: var(--led-dim); }
-  .rx-dots i.on { background: var(--led); box-shadow: 0 0 5px var(--led); }
-  .rx-ticker { position: relative; margin: 0 -20px; padding: 7px 0 8px; overflow: hidden; white-space: nowrap;
-    border-top: 1px solid rgba(109,255,142,.15); background: rgba(109,255,142,.04);
-    font-family: "DotGothic16", monospace; font-size: 12px; letter-spacing: .16em; color: #4FA866; }
-  .rx-ticker span { display: inline-block; animation: tick 40s linear infinite; }   /* text is written twice, so -50% loops seamlessly */
-  @keyframes tick { to { transform: translateX(-50%); } }
-  @media (max-width: 1100px) { .ident { grid-template-columns: 1fr; } .rx { max-width: 640px; } }
-  @media (max-width: 520px) { .rx-row { grid-template-columns: 84px 1fr 16px; gap: 10px; } .rx-screen { padding: 12px 14px 0; } .rx-ticker { margin: 0 -14px; } }
-  @media (prefers-reduced-motion: reduce) { .rx-sig b, .rx-v, .rx-ind.blink, .rx-ticker span { animation: none !important; } }
   .readout .k { color: var(--led-dim); font-family: "DotGothic16"; letter-spacing: .06em; }
 
   /* rail */
@@ -410,31 +360,10 @@
       <h1>Himal<span>Shrestha</span></h1>
       <p>IT support and systems by day. Games, apps, and songs the rest of the time.</p>
     </div>
-    <div class="rx" aria-label="Status readout">
-      <i class="rx-screw s1"></i><i class="rx-screw s2"></i><i class="rx-screw s3"></i><i class="rx-screw s4"></i>
-      <div class="rx-screen">
-        <div class="rx-head">
-          <span class="rx-tag">SYS·READOUT</span>
-          <span class="rx-sig" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span>
-          <span class="rx-clock" id="rxClock">--:--:--</span>
-        </div>
-        <div class="rx-row">
-          <span class="rx-k">LOC</span>
-          <span class="rx-v led">LONG ISLAND NY</span>
-          <span class="rx-ind on" aria-hidden="true"></span>
-        </div>
-        <div class="rx-row">
-          <span class="rx-k">INTEREST</span>
-          <span class="rx-v led interest" id="interest" aria-live="off"><span class="ico" aria-hidden="true">👾</span><span class="txt">GAMES</span></span>
-          <span class="rx-dots" id="rxDots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        </div>
-        <div class="rx-row">
-          <span class="rx-k">STATUS</span>
-          <span class="rx-v led">OPEN TO ROLES</span>
-          <span class="rx-ind blink" aria-hidden="true"></span>
-        </div>
-        <div class="rx-ticker" aria-hidden="true"><span>IT SUPPORT ◆ ACTIVE DIRECTORY ◆ ENTRA ID ◆ INTUNE ◆ POWERSHELL ◆ BROWSER GAMES ◆ SONGWRITING ◆ PINNED APP ◆ IT SUPPORT ◆ ACTIVE DIRECTORY ◆ ENTRA ID ◆ INTUNE ◆ POWERSHELL ◆ BROWSER GAMES ◆ SONGWRITING ◆ PINNED APP ◆&nbsp;</span></div>
-      </div>
+    <div class="readout">
+      <div><span class="k">LOC</span><span class="led">LONG ISLAND NY</span></div>
+      <div><span class="k">INTEREST</span><span class="led interest" id="interest" aria-live="off"><span class="ico" aria-hidden="true">👾</span><span class="txt">GAMES</span></span></div>
+      <div><span class="k">STATUS</span><span class="led">OPEN TO ROLES</span></div>
     </div>
   </div>
 
@@ -1017,17 +946,11 @@
   let intI = 0;
   const showInterest = () => {
     const it = INTERESTS[intI];
-    intEl.className = "rx-v led interest " + it.cls;   // keep the readout styling when it switches
+    intEl.className = "led interest " + it.cls;
     intEl.querySelector(".ico").textContent = it.ico;
     intEl.querySelector(".txt").textContent = it.txt;
   };
   showInterest();
-  // readout v2: clock with seconds, and dots showing which interest is up
-  const rxClock = document.getElementById("rxClock"), rxDots = [...document.querySelectorAll("#rxDots i")];
-  const rxTick = () => { rxClock.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }); };
-  rxTick(); setInterval(rxTick, 1000);
-  const rxSync = () => rxDots.forEach((d, k) => d.classList.toggle("on", k === intI));
-  rxSync(); new MutationObserver(rxSync).observe(intEl, { attributes: true, attributeFilter: ["class"] });
   setInterval(() => {
     intEl.classList.add("out");
     setTimeout(() => { intI = (intI + 1) % INTERESTS.length; showInterest(); }, 250);
