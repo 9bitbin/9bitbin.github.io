@@ -158,6 +158,12 @@
   .tile.feature::before { top: 30px; left: 14px; }
   .tile.feature .t { font-size: 22px; }
   .tile.pending { border-style: dashed; }
+  .tile.has-icon { padding-right: 136px; justify-content: center; }
+  .tile.has-icon .t i { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); }
+  .tile-icon { position: absolute; right: 52px; top: 50%; transform: translateY(-50%); width: 68px; height: 68px; border-radius: 14px;
+    border: 1px solid var(--brass-dk); box-shadow: 0 0 0 3px #0E100C, 0 0 0 4px var(--brass-dk), 0 6px 16px rgba(0,0,0,.5); }
+  .tile.has-icon:hover .tile-icon { border-color: var(--led); box-shadow: 0 0 0 3px #0E100C, 0 0 0 4px var(--led), 0 0 14px rgba(109,255,142,.35); }
+  @media (max-width: 520px) { .tile.has-icon { padding-right: 108px; } .tile-icon { width: 52px; height: 52px; right: 44px; } .tile.has-icon .t i { right: 16px; } }
   .sub { font-size: 15px; margin-top: 28px; }
   .sub + .grid { margin-top: 10px; }
 
@@ -407,7 +413,7 @@
       { title: "TPT Flappy", line: "Office-themed flappy bird.", url: "/TPTFlappy.html" },
     ],
     apps: [
-      { title: "Pinned", line: "Shared sticky-note board with chat, drawing, and mini-games. Installs from the browser.", url: "/pinned/", feature: true },
+      { title: "Pinned", line: "Shared sticky-note board with chat, drawing, and mini-games. Installs from the browser.", url: "/pinned/", feature: true, icon: "/pinned/icons/icon-192.png" },
       { title: "Pinned V2", line: "A directory of NYC rooms, clubs, meetups, and gamer groups.", url: "/pinned-v2/", pending: true },
     ],
     tools: [
@@ -425,6 +431,11 @@
       a.innerHTML = '<span class="t"><span></span><i aria-hidden="true">' + (m.pending ? "soon" : "↗") + '</i></span><span class="d"></span>';
       a.querySelector(".t span").textContent = m.title;
       a.querySelector(".d").textContent = m.line;
+      if (m.icon) {                       // optional app icon, sits just left of the arrow
+        const img = document.createElement("img");
+        img.className = "tile-icon"; img.src = m.icon; img.alt = ""; img.loading = "lazy";
+        a.classList.add("has-icon"); a.appendChild(img);
+      }
       grid.appendChild(a);
     });
   });
