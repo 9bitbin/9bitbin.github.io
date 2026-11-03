@@ -16,6 +16,7 @@ Each game lives in its own folder with an index.html. The header comment at the 
 | lantern-hop/ | Lantern Hop | Charge-and-hop game. (formerly Hop) |
 | neon-kestrel/ | Neon Kestrel | Endless one-button flyer. Largest game. |
 | parry-brawl/ | Parry Brawl | Platform fighter vs the CPU. Parry to stun and punish. |
+| help-desk-hero/ | Help Desk Hero | Help desk shift: pick the right tool for each ticket, spot phishing. Original. |
 
 ## Shared files (games/shared/)
 - solo.js: single-player stand-in for the old multiplayer bridge. Race is always off.

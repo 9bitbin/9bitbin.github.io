@@ -1,7 +1,7 @@
 import { haversine, bearing, compassOf, fmtDist, fmtAcc, buildMapModel } from "./map.js";
 // Pinned: shared sticky-note board for two
 import { CONFIG } from "./config.js";
-import { openChurch } from "./church.js?v=85.4";   // bump with index.html's ?v=
+import { openChurch } from "./church.js?v=85.5";   // bump with index.html's ?v=
 
 // ---------------------------------------------------------------- constants
 const BOARD_W = 420;                 // virtual board width (same on every phone)
@@ -3667,6 +3667,7 @@ function openSheet(name) { $("#" + name).hidden = false; $("#" + name + "Backdro
 
 // ---- Games: single-player games in games/<slug>/index.html, opened in a full-screen panel ----
 const GAMES = [
+  { slug: "help-desk-hero", icon: "🎧", name: "Help Desk Hero", blurb: "Close tickets before users lose it" },
   { slug: "quick-draw", icon: "🔫", name: "Quick Draw", blurb: "Shoot when it turns green" },
   { slug: "tower-tap", icon: "🏗️", name: "Tower Tap", blurb: "Stack blocks as high as you can" },
   { slug: "tetra-stack", icon: "🧱", name: "Tetra Stack", blurb: "Fill rows with falling blocks" },
