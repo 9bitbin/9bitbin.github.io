@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  ================================================================
+  Word Gallows
+  ================================================================
+   Word Gallows (formerly Hangman). Guess a hidden word one letter at a time.
+   Tap a letter to guess it. Each wrong guess draws another part of the stick figure.
+   After 6 wrong guesses the figure is complete and you lose the word.
+   Words are picked from the list in ../shared/lib/hangman.js.
+   Scoring: fewer wrong guesses score more. Solve the word, then press "New word" to play again.
+   Controls: tap letters on the on-screen keyboard.
+   Single player.
+  ================================================================
+-->
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Word Gallows</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #14201c; color: #eefaf4; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { display: flex; flex-direction: column; align-items: center; padding: 14px; gap: 14px; }
+  svg { width: min(70vw, 220px); height: auto; }
+  .stroke { stroke: #9be7c4; stroke-width: 4; stroke-linecap: round; fill: none; }
+  .word { font-size: clamp(22px, 6vw, 34px); letter-spacing: .25em; font-weight: 800; font-family: ui-monospace, Menlo, monospace; min-height: 1.4em; }
+  .info { font-size: 15px; color: #b7d9c9; text-align: center; min-height: 1.4em; }
+  .keys { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; width: min(96vw, 420px); }
+  .keys button { font: inherit; font-weight: 700; color: #14201c; background: #9be7c4; border: 0; border-radius: 10px; min-height: 40px; padding: 0; }
+  .keys button:disabled { opacity: .25; }
+  .keys button.hit { background: #ffd166; }
+  .keys button.miss { background: #ff8a8a; }
+  button.solo { font: inherit; font-weight: 700; color: #14201c; background: #ffd166; border: 0; border-radius: 14px; padding: 12px 18px; min-height: 44px; }
+  .hint { font-size: 13px; color: #7fa493; text-align: center; max-width: 420px; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 200 220" aria-hidden="true">
+  <line class="stroke" x1="20" y1="210" x2="180" y2="210"/>
+  <line class="stroke" x1="50" y1="210" x2="50" y2="20"/>
+  <line class="stroke" x1="50" y1="20" x2="130" y2="20"/>
+  <line class="stroke" x1="130" y1="20" x2="130" y2="50"/>
+  <circle class="stroke" id="p-head" cx="130" cy="70" r="20" style="display:none"/>
+  <line class="stroke" id="p-body" x1="130" y1="90" x2="130" y2="140" style="display:none"/>
+  <line class="stroke" id="p-arm1" x1="130" y1="105" x2="105" y2="125" style="display:none"/>
+  <line class="stroke" id="p-arm2" x1="130" y1="105" x2="155" y2="125" style="display:none"/>
+  <line class="stroke" id="p-leg1" x1="130" y1="140" x2="110" y2="180" style="display:none"/>
+  <line class="stroke" id="p-leg2" x1="130" y1="140" x2="150" y2="180" style="display:none"/>
+</svg>
+<div class="word" id="word" aria-live="polite"></div>
+<div class="info" id="info">Guess the word one letter at a time.</div>
+<div class="keys" id="keys"></div>
+<button class="solo" id="again">New word</button>
+<p class="hint">Six wrong guesses and the word is lost. Fewer wrong guesses score more.</p>
+<script type="module">
+import { MAX_WRONG, pickWord, guess, newState, scoreFor } from '../shared/lib/hangman.js';
+
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const parts = ['p-head', 'p-body', 'p-arm1', 'p-arm2', 'p-leg1', 'p-leg2'];
+let st, reported = false;
+
+function report(score) {
+  if (window.parent === window) return;
+  try { window.parent.postMessage({ pinned: 1, t: 'over', score }, location.origin); } catch (e) {}
+}
+
+function render() {
+  document.getElementById('word').textContent = [...st.word].map((c) => (st.guessed.includes(c) || st.over ? c : '_')).join(' ');
+  parts.forEach((id, i) => { document.getElementById(id).style.display = i < st.wrong ? '' : 'none'; });
+  const keys = document.getElementById('keys');
+  keys.innerHTML = '';
+  for (const L of LETTERS) {
+    const b = document.createElement('button');
+    b.textContent = L;
+    const used = st.guessed.includes(L);
+    b.disabled = used || st.over;
+    if (used) b.className = st.word.includes(L) ? 'hit' : 'miss';
+    b.onclick = () => press(L);
+    keys.appendChild(b);
+  }
+  const info = document.getElementById('info');
+  if (!st.over) info.textContent = `Wrong guesses: ${st.wrong} of ${MAX_WRONG}`;
+  else if (st.won) info.textContent = `Solved with ${st.wrong} wrong. Score ${scoreFor(st)}.`;
+  else info.textContent = `The word was ${st.word}.`;
+}
+
+function press(L) {
+  st = guess(st, L);
+  render();
+  if (st.over && !reported) { reported = true; report(scoreFor(st)); }
+}
+
+function newGame() { st = newState(pickWord()); reported = false; render(); }
+document.getElementById('again').onclick = newGame;
+newGame();
+</script>
+</body>
+</html>

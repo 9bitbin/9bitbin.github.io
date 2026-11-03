@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  ================================================================
+  Paper Glide
+  ================================================================
+   Paper Glide (formerly Paper Plane). A hold-to-climb flying game.
+   Hold the screen (or Space) to climb. Let go and the plane dives.
+   Slip through the gaps in the pin boards and grab the hearts for points.
+   Touching a pin board or the desk ends the flight.
+   Each board passed scores 1 point, each heart 1 point.
+   Controls: press and hold anywhere, or hold Space or the up arrow.
+   Single player. Best score is saved on this device.
+  ================================================================
+-->
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Paper Glide</title>
+<style>
+  :root { --ink: #2b3a55; --paper: #fffdf6; --blue: #3e63dd; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #cfe6ff; touch-action: none;
+    -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+    font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .panel { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; pointer-events: none; }
+  .card { pointer-events: auto; background: var(--paper); border-radius: 6px; padding: 22px 22px 18px; width: min(330px, 100%); text-align: center;
+    box-shadow: 0 14px 26px -10px rgba(20,40,80,.5); transform: rotate(1.2deg);
+    background-image: repeating-linear-gradient(transparent 0 27px, #dbe6ff 27px 28px); }
+  h1 { margin: 6px 0 4px; font-size: 30px; }
+  p { margin: 6px 0; line-height: 1.35; }
+  .big { font-size: 46px; font-weight: 900; margin: 4px 0; }
+  .muted { color: #6b7a96; font-size: 14px; }
+  button { font: inherit; font-weight: 800; font-size: 18px; border: 0; border-radius: 999px; padding: 12px 26px; margin-top: 12px;
+    background: var(--blue); color: #fff; box-shadow: 0 4px 0 #23409e; }
+  button:active { transform: translateY(2px); box-shadow: 0 2px 0 #23409e; }
+  [hidden] { display: none !important; }
+</style>
+<script src="../shared/solo.js"></script>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="panel" id="startPanel">
+  <div class="card">
+    <h1>✈️ Paper Glide</h1>
+    <p><b>Hold</b> anywhere to climb.<br><b>Let go</b> to dive.</p>
+    <p class="muted">Slip through the pin boards, grab hearts ❤️ for points. Don't touch a pin or the desk.</p>
+    <button id="startBtn">Start</button>
+  </div>
+</div>
+<div class="panel" id="overPanel" hidden>
+  <div class="card">
+    <h1 id="overTitle">Crash landing!</h1>
+    <div class="big" id="finalScore">0</div>
+    <p class="muted" id="finalSub"></p>
+    <button id="againBtn">Fly again</button>
+    <p class="muted" id="waitMsg" hidden>Waiting for everyone to finish…</p>
+  </div>
+</div>
+<script>
+(() => {
+  const PB = window.PB;
+  const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  const $ = (id) => document.getElementById(id);
+  const TAU = Math.PI * 2, clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, k) => a + (b - a) * k;
+  const H = 600, FLOOR = H - 34, CEIL = 14;
+  let W = 900, px = 1, k = 1;
+  function resize() {
+    px = Math.min(devicePixelRatio || 1, 2);
+    W = clamp(H * innerWidth / innerHeight, 340, 1100);
+    k = innerHeight / H;
+    if (W * k > innerWidth + 1) k = innerWidth / W;
+    cv.width = Math.round(innerWidth * px); cv.height = Math.round(innerHeight * px);
+  }
+  addEventListener("resize", resize); resize();
+  const PX = () => clamp(W * .26, 90, 260);
+
+  // ---- sound ----
+  let ac = null;
+  const beep = (f, d = .08, type = "triangle", v = .1, f2) => {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === "suspended") ac.resume();
+      const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+      o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+      g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + d + .02);
+    } catch (e) { /* no sound */ }
+  };
+
+  // ---- world (seeded: same boards and hearts for everyone in a race) ----
+  let rnd, cols, hearts, nextX, lastGy, count, flyT, dist, speed, passed, score, heartsGot;
+  let phase = "intro"; // intro | ready | fly | crash | done
+  const plane = { y: H * .45, vy: 0, rot: 0 };
+  let holding = false, crashT = 0, puffs = [];
+
+  function reset(seed) {
+    rnd = PB.rng(seed);
+    cols = []; hearts = []; nextX = 820; lastGy = H * .45; count = 0;
+    flyT = 0; dist = 0; speed = 230; passed = 0; score = 0; heartsGot = 0;
+    plane.y = H * .45; plane.vy = 0; plane.rot = 0; puffs = [];
+  }
+  const R = (a, b) => a + rnd() * (b - a);
+  function spawn() {
+    count++;
+    const D = 1 - Math.exp(-Math.max(0, count - 2) / 38);
+    const gap = Math.max(150, 235 - 80 * D + R(-10, 10));
+    const reach = 150 + 120 * (1 - D);
+    let gy = clamp(lastGy + R(-reach, reach), CEIL + 40 + gap / 2, FLOOR - 40 - gap / 2);
+    const moving = D > .25 && rnd() < .35 * D + .1;
+    const c = { x: nextX, w: 54, gy, gap, amp: moving ? R(25, 30 + 45 * D) : 0, f: R(.25, .45), ph: R(0, TAU), passed: false };
+    cols.push(c);
+    // hearts: a little arc through the gap, or one between boards
+    if (rnd() < .7) {
+      const n = rnd() < .5 ? 3 : 1;
+      for (let i = 0; i < n; i++) hearts.push({ x: c.x + c.w / 2 + (i - (n - 1) / 2) * 44, col: c, off: (n === 3 ? Math.abs(i - 1) * -10 : R(-.3, .3) * gap) , got: false });
+    } else {
+      hearts.push({ x: c.x - R(90, 130), y: clamp(lerp(lastGy, gy, .5) + R(-40, 40), CEIL + 40, FLOOR - 40), got: false });
+    }
+    lastGy = gy;
+    nextX += Math.max(235, 330 - 90 * D + R(-20, 20));
+  }
+  const colGy = (c) => c.gy + (c.amp ? Math.sin(flyT * c.f * TAU + c.ph) * c.amp : 0);
+  const heartY = (h) => h.col ? colGy(h.col) + h.off : h.y;
+
+  function start() {
+    reset(PB.race ? PB.seed : (Math.random() * 4294967296) >>> 0);
+    phase = "ready"; holding = false;
+    $("startPanel").hidden = true; $("overPanel").hidden = true;
+    PB.state({ d: 0, y: Math.round(plane.y), alive: true, score: 0 }, true);
+  }
+  function crash() {
+    if (phase !== "fly") return;
+    phase = "crash"; crashT = 0; beep(200, .3, "sawtooth", .08, 70);
+    for (let i = 0; i < 18; i++) puffs.push({ x: PX(), y: plane.y, vx: R(-200, 120), vy: R(-220, 160), life: R(.4, .8), r: R(3, 7) });
+    PB.state({ d: Math.round(dist), y: Math.round(plane.y), alive: false, score }, true);
+  }
+  function finish() {
+    phase = "done";
+    PB.send("over", { score, hearts: heartsGot });
+    const best = Math.max(score, +(localStorage.getItem("pinned.plane.best") || 0));
+    try { localStorage.setItem("pinned.plane.best", best); } catch (e) {}
+    $("finalScore").textContent = score;
+    $("finalSub").textContent = `${passed} boards · ${heartsGot} hearts` + (PB.race ? "" : ` · best ${best}`);
+    $("againBtn").hidden = PB.race; $("waitMsg").hidden = !PB.race;
+    $("overPanel").hidden = false;
+  }
+
+  // ---- input: hold to climb ----
+  const down = (e) => {
+    if (e.target.closest && e.target.closest("button")) return;
+    e.preventDefault(); holding = true;
+    if (phase === "ready") { phase = "fly"; beep(600, .06, "triangle", .06, 900); }
+  };
+  addEventListener("pointerdown", down, { passive: false });
+  addEventListener("pointerup", () => { holding = false; });
+  addEventListener("pointercancel", () => { holding = false; });
+  addEventListener("blur", () => { holding = false; });
+  addEventListener("keydown", (e) => { if (e.code === "Space" || e.code === "ArrowUp") { e.preventDefault(); if (!e.repeat) down(e); } });
+  addEventListener("keyup", (e) => { if (e.code === "Space" || e.code === "ArrowUp") holding = false; });
+  $("startBtn").onclick = () => start();
+  $("againBtn").onclick = () => start();
+  if (PB.race) { $("startPanel").hidden = true; PB.on("go", start); }
+  reset(PB.race ? PB.seed : 7);
+
+  // ---- simulation (fixed 120 steps a second, so everyone's run plays out the same) ----
+  function step(h) {
+    if (phase === "ready") { plane.y = H * .45 + Math.sin(performance.now() / 400) * 8; plane.rot = 0; scrollWorld(h * .6); return; }
+    if (phase === "crash") {
+      plane.vy += 1600 * h; plane.y = Math.min(FLOOR - 6, plane.y + plane.vy * h); plane.rot += h * 6;
+      speed *= Math.exp(-h * 3); crashT += h; if (crashT > 1.1) finish(); return;
+    }
+    if (phase !== "fly") return;
+    flyT += h;
+    plane.vy += (holding ? -1450 : 1050) * h;
+    plane.vy = clamp(plane.vy, -400, 470);
+    plane.y += plane.vy * h;
+    if (plane.y < CEIL + 8) { plane.y = CEIL + 8; plane.vy = Math.max(0, plane.vy); }
+    plane.rot = lerp(plane.rot, Math.atan2(plane.vy, speed) * .85, 1 - Math.exp(-h * 12));
+    const D = 1 - Math.exp(-passed / 30);
+    speed = lerp(speed, 230 + 150 * D, 1 - Math.exp(-h * 2));
+    dist += speed * h;
+    while (nextX < dist + W + 200) spawn();
+    // pass / collide (world x of the plane is dist + 0 at PX())
+    const wx = dist;
+    for (const c of cols) {
+      if (!c.passed && c.x + c.w < wx - 14) { c.passed = true; passed++; score++; beep(760, .05, "triangle", .05); }
+      if (wx + 22 > c.x && wx - 18 < c.x + c.w) {
+        const gy = colGy(c);
+        if (plane.y - 8 < gy - c.gap / 2 || plane.y + 8 > gy + c.gap / 2) { crash(); return; }
+      }
+    }
+    for (const ht of hearts) {
+      if (ht.got) continue;
+      const dx = ht.x - wx, dy = heartY(ht) - plane.y;
+      if (dx * dx + dy * dy < 26 * 26) { ht.got = true; heartsGot++; score++; beep(1040, .09, "sine", .09, 1560); for (let i = 0; i < 8; i++) puffs.push({ x: PX(), y: plane.y, vx: R(-120, 120), vy: R(-120, 120), life: .5, r: 3, heart: true }); }
+    }
+    cols = cols.filter((c) => c.x + c.w > dist - 400);
+    hearts = hearts.filter((ht) => ht.x > dist - 400);
+    if (plane.y > FLOOR - 8) { crash(); return; }
+    PB.state({ d: Math.round(dist), y: Math.round(plane.y), alive: true, score });
+  }
+  let decor = 0;
+  function scrollWorld(v) { decor += v * 230; }
+
+  // ---- drawing ----
+  function drawPlane(x, y, rot, color = "#ffffff", alpha = 1) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.globalAlpha = alpha;
+    ctx.fillStyle = "rgba(20,40,80,.18)"; ctx.beginPath(); ctx.moveTo(26, 8); ctx.lineTo(-22, 2); ctx.lineTo(-14, 18); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = color; ctx.strokeStyle = "#2b3a55"; ctx.lineWidth = 1.6; ctx.lineJoin = "round";
+    ctx.beginPath(); ctx.moveTo(26, 0); ctx.lineTo(-22, -12); ctx.lineTo(-12, 0); ctx.lineTo(-22, 10); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "rgba(0,0,0,.08)"; ctx.beginPath(); ctx.moveTo(26, 0); ctx.lineTo(-12, 0); ctx.lineTo(-22, 10); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(26, 0); ctx.lineTo(-12, 0); ctx.stroke();
+    ctx.restore();
+  }
+  function pinHead(x, y, dir, hue) {
+    ctx.strokeStyle = "#9aa3ad"; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + dir * 14, y); ctx.stroke();
+    const g = ctx.createRadialGradient(x - dir * 3 - 2, y - 3, 1, x - dir * 2, y, 9);
+    g.addColorStop(0, `hsl(${hue},90%,78%)`); g.addColorStop(.6, `hsl(${hue},75%,52%)`); g.addColorStop(1, `hsl(${hue},70%,32%)`);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x - dir * 2, y, 8, 0, TAU); ctx.fill();
+  }
+  function drawCol(c, sx) {
+    const gy = colGy(c), top = gy - c.gap / 2, bot = gy + c.gap / 2;
+    for (const [y0, y1] of [[-10, top], [bot, H + 10]]) {
+      if (y1 - y0 < 2) continue;
+      ctx.fillStyle = "rgba(20,40,80,.15)"; ctx.fillRect(sx + 6, y0 + 6, c.w, y1 - y0);
+      ctx.fillStyle = "#c39463"; ctx.fillRect(sx, y0, c.w, y1 - y0);
+      ctx.fillStyle = "rgba(90,55,25,.25)"; for (let yy = y0 + 6; yy < y1 - 4; yy += 9) ctx.fillRect(sx + ((yy * 7) % (c.w - 6)) + 2, yy, 2, 2);
+      ctx.strokeStyle = "#8a5f36"; ctx.lineWidth = 3; ctx.strokeRect(sx + 1.5, y0, c.w - 3, y1 - y0);
+    }
+    // pins sticking out of the board edges at the gap, and along the sides
+    const hue = (c.x * 0.37) % 360;
+    for (let i = 0; i < 2; i++) { pinHead(sx + 10 + i * 34, top - 6, 0, hue); pinHead(sx + 10 + i * 34, bot + 6, 0, hue); }
+    for (let yy = top - 40; yy > 0; yy -= 70) { pinHead(sx - 2, yy, -1, (hue + 60) % 360); pinHead(sx + c.w + 2, yy - 30, 1, (hue + 120) % 360); }
+    for (let yy = bot + 40; yy < H; yy += 70) { pinHead(sx - 2, yy, -1, (hue + 60) % 360); pinHead(sx + c.w + 2, yy + 30, 1, (hue + 120) % 360); }
+  }
+  function heart(x, y, s = 1) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+    ctx.fillStyle = "#e93d82"; ctx.beginPath();
+    ctx.moveTo(0, 6); ctx.bezierCurveTo(-14, -4, -8, -14, 0, -6); ctx.bezierCurveTo(8, -14, 14, -4, 0, 6); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.beginPath(); ctx.arc(-4, -6, 2, 0, TAU); ctx.fill();
+    ctx.restore();
+  }
+  function render(now) {
+    ctx.setTransform(px, 0, 0, px, 0, 0);
+    const ox = (innerWidth - W * k) / 2, oy = (innerHeight - H * k) / 2;
+    // fill any spare space above and below with sky and desk, so tall phones don't get bars
+    ctx.fillStyle = "#cfe6ff"; ctx.fillRect(0, 0, innerWidth, oy + 2);
+    ctx.fillStyle = "#a87a4b"; ctx.fillRect(0, oy + (FLOOR - 1) * k, innerWidth, innerHeight);
+    ctx.setTransform(px * k, 0, 0, px * k, px * ox, px * oy);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
+    // sky: notebook paper
+    const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#cfe6ff"); g.addColorStop(1, "#fdf6e6");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    const scroll = (phase === "ready" || phase === "intro") ? decor : dist;
+    ctx.strokeStyle = "rgba(62,99,221,.12)"; ctx.lineWidth = 1;
+    for (let y = 40; y < FLOOR; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    ctx.fillStyle = "rgba(255,255,255,.85)";
+    for (let i = 0; i < 6; i++) { const x = ((i * 260 - scroll * .25) % (W + 260) + W + 260) % (W + 260) - 130, y = 60 + (i * 83) % 220; ctx.beginPath(); ctx.ellipse(x, y, 46, 14, 0, 0, TAU); ctx.ellipse(x + 26, y - 8, 30, 14, 0, 0, TAU); ctx.fill(); }
+    const pxp = PX();
+    for (const c of cols) { const sx = pxp + (c.x - dist); if (sx > -80 && sx < W + 80) drawCol(c, sx); }
+    for (const ht of hearts) if (!ht.got) { const sx = pxp + (ht.x - dist); if (sx > -30 && sx < W + 30) heart(sx, heartY(ht) + Math.sin(now / 300 + ht.x) * 2, 1.15); }
+    // desk
+    ctx.fillStyle = "#a87a4b"; ctx.fillRect(0, FLOOR, W, H - FLOOR);
+    ctx.fillStyle = "#8a5f36"; for (let x = -((scroll) % 60); x < W; x += 60) ctx.fillRect(x, FLOOR + 10, 30, 3);
+    // ghosts
+    if (PB.ghosts.size && (phase === "fly" || phase === "crash")) {
+      ctx.font = "800 13px system-ui, sans-serif"; ctx.textAlign = "center";
+      for (const gh of PB.ghosts.values()) {
+        if (typeof gh.d !== "number") continue;
+        const x = pxp + (PB.ghostD(gh, now) - dist), y = PB.ghostY(gh);
+        if (x > W + 10) { ctx.globalAlpha = .9; ctx.fillStyle = gh.color; ctx.fillText(gh.name + " ▶", W - 44, clamp(y, 30, FLOOR - 20)); continue; }
+        if (x < -30) continue;
+        drawPlane(x, y, 0, gh.color, gh.alive ? .45 : .2);
+        ctx.globalAlpha = gh.alive ? .95 : .4; ctx.fillStyle = "#2b3a55"; ctx.fillText(gh.name, x, y - 20);
+      }
+      ctx.globalAlpha = 1;
+    }
+    // puffs
+    for (const p of puffs) { ctx.globalAlpha = clamp(p.life * 2, 0, 1); if (p.heart) heart(p.x, p.y, .5); else { ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, TAU); ctx.fill(); } }
+    ctx.globalAlpha = 1;
+    if (phase !== "intro" && phase !== "done") drawPlane(pxp, plane.y, plane.rot, PB.embed ? "#ffffff" : "#ffffff");
+    // HUD
+    ctx.fillStyle = "#2b3a55"; ctx.font = "900 34px system-ui, sans-serif"; ctx.textAlign = "center";
+    if (phase === "fly" || phase === "crash" || phase === "ready") { ctx.strokeStyle = "#fffdf6"; ctx.lineWidth = 6; ctx.strokeText(score, W / 2, 50); ctx.fillText(score, W / 2, 50); }
+    if (phase === "ready") { ctx.font = "800 20px system-ui, sans-serif"; ctx.fillText("Hold to climb ✈️", W / 2, H * .7); }
+    ctx.restore();
+  }
+
+  let last = performance.now(), acc = 0;
+  function loop(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    acc += dt;
+    while (acc >= 1 / 120) { step(1 / 120); acc -= 1 / 120; }
+    for (const p of puffs) { p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; }
+    puffs = puffs.filter((p) => p.life > 0);
+    if (phase === "intro") decor += dt * 60;
+    render(now);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

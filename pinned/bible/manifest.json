@@ -1,0 +1,104 @@
+{
+  "generated": "2026-10-23",
+  "note": "Include a translation only when status is included. Other statuses are hidden from the app.",
+  "translations": [
+    {
+      "id": "en/kjv",
+      "language": "English",
+      "name": "King James Version",
+      "year": 1611,
+      "licence": "Public domain (published 1611). Some UK printings carry Crown copyright; this text is the US/international public domain text.",
+      "source": "thiagobodruk/bible json/en_kjv.json (MIT repo; text itself is public domain)",
+      "status": "included",
+      "file": "bible/en/kjv.json.gz"
+    },
+    {
+      "id": "en/asv",
+      "language": "English",
+      "name": "American Standard Version",
+      "year": 1901,
+      "licence": "Public domain (published 1901).",
+      "source": "thiagobodruk/bible json/en_asv.json",
+      "status": "included",
+      "file": "bible/en/asv.json.gz"
+    },
+    {
+      "id": "en/web",
+      "language": "English",
+      "name": "World English Bible",
+      "year": 2000,
+      "licence": "Public domain (dedicated to the public domain by its editors).",
+      "source": "thiagobodruk/bible json/en_web.json",
+      "status": "included",
+      "file": "bible/en/web.json.gz"
+    },
+    {
+      "id": "en/darby",
+      "language": "English",
+      "name": "Darby Translation",
+      "year": 1890,
+      "licence": "Public domain (published 1890).",
+      "source": "thiagobodruk/bible json/en_darby.json",
+      "status": "included",
+      "file": "bible/en/darby.json.gz"
+    },
+    {
+      "id": "en/ylt",
+      "language": "English",
+      "name": "Young's Literal Translation",
+      "year": 1898,
+      "licence": "Public domain (published 1898).",
+      "source": "thiagobodruk/bible json/en_ylt98.json",
+      "status": "included",
+      "file": "bible/en/ylt.json.gz"
+    },
+    {
+      "id": "ru/synod",
+      "language": "Russian",
+      "name": "Russian Synodal Translation",
+      "year": 1876,
+      "licence": "Public domain (published 1876). Esther and Daniel are not included in this source (64 of 66 books).",
+      "source": "thiagobodruk/bible json/ru_synod.json",
+      "status": "included",
+      "file": "bible/ru/synod.json.gz"
+    },
+    {
+      "id": "ne/oncv",
+      "language": "Nepali",
+      "name": "Open Nepali Contemporary Version",
+      "year": 2024,
+      "licence": "Biblica, CC BY-SA 4.0 per publisher page (ebible.org/npioncb/copyright.htm). Identity of the repository file confirmed by Himal.",
+      "source": "thiagobodruk/bible json/ne_oncv.json; ebible.org/npioncb/copyright.htm",
+      "status": "included",
+      "file": "bible/ne/oncv.json.gz"
+    },
+    {
+      "id": "zh/cunpss-shen",
+      "language": "Chinese",
+      "name": "Chinese Union Version (New Punctuation, Shen Edition)",
+      "status": "excluded",
+      "reason": "Licence of this modern-punctuation edition not verified. The 1919 original is public domain; this edition needs a source check before inclusion."
+    },
+    {
+      "id": "es/rvr1960",
+      "language": "Spanish",
+      "name": "Reina Valera 1960",
+      "status": "excluded",
+      "reason": "Copyrighted revision (1960). Not public domain."
+    },
+    {
+      "id": "es/rvr1909",
+      "language": "Spanish",
+      "name": "Reina-Valera 1909",
+      "status": "not-built",
+      "reason": "Public domain. Project Gutenberg has only the New Testament (ebook 5881); a full Old and New Testament text still needs a source. Not built yet."
+    },
+    {
+      "id": "ne/ncv-easy",
+      "language": "Nepali",
+      "name": "Biblica Easy-to-Read (Nepali)",
+      "status": "excluded",
+      "reason": "Modern Biblica text; no open licence verified."
+    }
+  ]
+}

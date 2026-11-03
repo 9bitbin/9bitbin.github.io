@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notification Keys</title>
+<style>
+  :root { --bg:#fffaf2; --ink:#3b2a1a; --muted:#8b7560; --line:#ead9c3; --accent:#c2410c; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#16181d; --ink:#e7e9ee; --muted:#8a909e; --line:#2a2f3a; --accent:#f08a4b; } }
+  body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--ink); max-width: 640px; margin: 0 auto; padding: 24px 16px; line-height: 1.5; }
+  h1 { margin: 0 0 6px; } p { color: var(--muted); }
+  button { font: inherit; font-weight: 700; background: var(--accent); color: #fff; border: 0; border-radius: 12px; padding: 12px 18px; cursor: pointer; }
+  label { display: block; font-weight: 700; margin: 18px 0 6px; }
+  textarea { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 13px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: inherit; resize: none; }
+  .warn { border-left: 3px solid var(--accent); padding-left: 10px; color: var(--ink); }
+</style>
+</head>
+<body>
+  <h1>Notification keys</h1>
+  <p>Makes the key pair Pinned uses to send notifications. The keys are made right here in your browser and never leave this page.</p>
+  <button id="go">Generate keys</button>
+  <div id="out" hidden>
+    <label>VAPID_PUBLIC_KEY (goes in config.js and in Supabase secrets)</label>
+    <textarea id="pub" rows="3" readonly></textarea>
+    <label>VAPID_PRIVATE_KEY (Supabase secrets only, keep it private)</label>
+    <textarea id="priv" rows="2" readonly></textarea>
+    <p class="warn">Copy both now. If you generate again, you'll get a new pair and both phones will need to turn notifications off and on again.</p>
+  </div>
+<script>
+const b64u = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+document.getElementById("go").onclick = async () => {
+  const k = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+  document.getElementById("pub").value = b64u(await crypto.subtle.exportKey("raw", k.publicKey));
+  document.getElementById("priv").value = (await crypto.subtle.exportKey("jwk", k.privateKey)).d;
+  document.getElementById("out").hidden = false;
+};
+</script>
+</body>
+</html>

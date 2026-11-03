@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="en" data-theme="cork">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Pinned</title>
+  <meta name="description" content="A shared sticky-note board for you and your people.">
+  <meta name="theme-color" content="#8a5e36">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Pinned">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Login: email magic link -->
+  <section id="login" class="screen" hidden>
+    <div class="card intro">
+      <div class="logo" aria-hidden="true"><span>📌</span></div>
+      <h1>Pinned</h1>
+      <div id="loginForm">
+        <p class="muted">Sign in with your email. No password, just a link.</p>
+        <label class="field">
+          <span>Your email</span>
+          <input id="emailInput" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@example.com">
+        </label>
+        <button class="btn primary" id="sendLink">Email me a sign-in link</button>
+      </div>
+      <div id="loginWait" hidden>
+        <p class="wait-title">Check your email ✉️</p>
+        <p class="muted">We sent a link to <b id="waitEmail"></b>. Tap it, then come back to this app. You'll be signed in here automatically.</p>
+        <div class="waiting"><span></span><span></span><span></span></div>
+        <button class="btn" id="resendLink">Send it again</button>
+        <button class="btn plain" id="changeEmail">Use a different email</button>
+      </div>
+      <p class="error" id="loginError" hidden></p>
+    </div>
+  </section>
+
+  <!-- Shown in the browser tab the email link opens -->
+  <section id="linked" class="screen" hidden>
+    <div class="card intro">
+      <div class="logo" aria-hidden="true"><span>✅</span></div>
+      <h1>You're signed in</h1>
+      <p class="muted">Go back to the Pinned app. It'll finish signing in by itself in a few seconds. You can close this tab.</p>
+    </div>
+  </section>
+
+  <!-- Welcome: name + color -->
+  <section id="welcome" class="screen" hidden>
+    <div class="card intro">
+      <div class="logo" aria-hidden="true"><span>📌</span></div>
+      <h1>Pinned</h1>
+      <p class="muted">A little board just for the two of you.</p>
+      <label class="field">
+        <span>What should your notes say they're from?</span>
+        <input id="nameInput" maxlength="30" placeholder="Your name" autocomplete="nickname">
+      </label>
+      <div class="field">
+        <span>Pick your color</span>
+        <div class="swatches" id="profileSwatches"></div>
+      </div>
+      <button class="btn primary" id="welcomeGo">Continue</button>
+      <p class="error" id="welcomeError" hidden></p>
+    </div>
+  </section>
+
+  <!-- Pairing -->
+  <section id="pair" class="screen" hidden>
+    <button class="btn small pair-back" id="pairBack" hidden>← My rooms</button>
+    <div class="card intro">
+      <h1>Your board</h1>
+      <p class="muted">One of you starts the board, the other joins with the code.</p>
+      <button class="btn primary" id="createBoard">Start a new board</button>
+      <div class="divider"><span>or</span></div>
+      <label class="field">
+        <span>Got a code?</span>
+        <input id="codeInput" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters" autocomplete="off" spellcheck="false">
+      </label>
+      <button class="btn" id="joinBoard">Join board</button>
+      <p class="error" id="pairError" hidden></p>
+    </div>
+  </section>
+
+  <!-- Board -->
+  <section id="menu" class="screen menu-screen" hidden aria-label="Your rooms">
+    <canvas id="starCanvas" aria-hidden="true"></canvas>
+    <span class="orb o1" aria-hidden="true"></span><span class="orb o2" aria-hidden="true"></span><span class="orb o3" aria-hidden="true"></span>
+    <header class="menu-top">
+      <h1>Rooms</h1>
+      <div class="menu-actions">
+        <button class="chip-btn" id="menuMusic" aria-pressed="true" aria-label="Ambient music on or off">🎵</button>
+        <button class="chip-btn" id="menuEdit" aria-pressed="false">Edit</button>
+        <button class="chip-btn" id="menuNew" aria-label="Create or join a room">+ Room</button>
+      </div>
+    </header>
+    <p class="menu-hint" id="menuHint">Tap a room to jump straight in.</p>
+    <div class="room-grid" id="roomGrid"></div>
+    <div class="hidden-tray" id="hiddenTray" hidden>
+      <p class="menu-hint">Hidden on this device</p>
+      <div class="hidden-list" id="hiddenList"></div>
+    </div>
+  </section>
+    <div class="sheet-backdrop" id="roomPeekBackdrop" hidden></div>
+    <section class="sheet more room-sheet" id="roomPeek" hidden aria-label="Room">
+      <h2 id="peekName">Room</h2>
+      <p class="muted" id="peekCount"></p>
+      <p class="peek-lock" id="peekLock" hidden>🔒 Locked</p>
+      <p class="muted" id="peekNote"></p>
+      <p class="error" id="peekError" hidden></p>
+      <div class="sheet-actions">
+        <button class="btn primary" id="peekJoin">Join room</button>
+        <button class="btn danger" id="peekDelete" hidden>Delete room</button>
+        <button class="btn" id="peekClose">Close</button>
+      </div>
+    </section>
+  <section id="boardScreen" class="screen" hidden>
+    <button class="fun-toggle" id="funToggle" aria-expanded="false" aria-label="Fun tools" title="Fun tools">🎉</button>
+    <div class="fun-tray" role="toolbar" aria-label="Fun tools">
+      <button class="fun-btn" data-fx="pop" aria-pressed="false" aria-label="Party popper">🎉</button>
+      <button class="fun-btn" data-fx="boom" aria-pressed="false" aria-label="Explosion">💥</button>
+      <button class="fun-btn" data-fx="burst" aria-pressed="false" aria-label="Emoji burst">🥳</button>
+      <button class="fun-btn fun-mute" id="funMute" aria-pressed="false">🔊</button>
+    </div>
+    <header class="topbar">
+      <button class="who" id="memberChips" aria-label="Who's on the board"></button>
+      <button class="title room-head" id="roomHead" aria-label="Room name, photo and lock"><span class="rh-photo" id="rhPhoto" aria-hidden="true">🏠</span><span class="rh-name" id="rhName">Our room</span><i class="rh-lock" id="rhLock" hidden aria-label="Locked">🔒</i></button>
+      <div class="histbar" id="histBar" hidden>
+        <button id="histUndo" aria-label="Undo" title="Undo">↶</button>
+        <button id="histRedo" aria-label="Redo" title="Redo">↷</button>
+      </div>
+      <button class="iconbtn" id="openRooms" aria-label="Your rooms" title="Your rooms"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5.5"/><ellipse cx="12" cy="12" rx="10" ry="3.6" transform="rotate(-22 12 12)"/></svg></button>
+      <button class="iconbtn" id="openSettings" aria-label="Settings"><i class="gear-dot" id="gearDot" hidden></i>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </header>
+    <div class="banner wait" id="waitBanner" hidden>
+      <span>Waiting for your person. Share code <b id="waitCode"></b></span>
+      <span class="wait-btns"><button class="btn small" id="waitQrBtn">QR</button><button class="btn small" id="waitShare">Share invite</button></span>
+      <div class="wait-qr" id="waitQrWrap" hidden><canvas id="waitQR" width="170" height="170"></canvas><span class="muted small-note">Have your partner scan this, or tap Share invite to send a link.</span></div>
+    </div>
+    <div class="banner warn" id="demoBanner" hidden>Demo mode: notes stay on this device until Supabase is set up.</div>
+    <div class="banner conn" id="connBanner" hidden><span id="connText">Reconnecting…</span></div>
+    <main id="scroller">
+      <div id="bgLayer" aria-hidden="true"></div>
+      <div id="board">
+        <svg id="ink" width="1" height="1" aria-hidden="true"></svg>
+        <div id="sel" hidden>
+          <i class="h" data-h="rot" title="Drag to rotate"></i>
+          <i class="h" data-h="tl"></i><i class="h" data-h="tr"></i><i class="h" data-h="bl"></i><i class="h" data-h="br"></i>
+        </div>
+        <div id="cursors"></div>
+      </div>
+      <div class="empty" id="emptyState" hidden>
+        <div class="empty-note">Tap <b>+</b> to stick your first note</div>
+      </div>
+      <div id="boardSkeleton" aria-hidden="true" hidden>
+        <div class="sk-note" style="top:12%;left:14%;transform:rotate(-3deg)"></div>
+        <div class="sk-note" style="top:22%;left:52%;transform:rotate(2deg)"></div>
+        <div class="sk-note sk-sm" style="top:44%;left:24%;transform:rotate(-1deg)"></div>
+        <div class="sk-note" style="top:58%;left:56%;transform:rotate(3deg)"></div>
+        <div class="sk-note sk-sm" style="top:72%;left:18%;transform:rotate(-2deg)"></div>
+      </div>
+    </main>
+    <nav class="dock" aria-label="Main">
+      <button id="dockNotes" aria-label="Notes"  ><span class="ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11L12 4l8.5 7"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></span><span class="lb">Notes</span></button>
+      <button id="dockDoodle" aria-label="Draw together"><span class="ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M13.5 7.5l3 3"/></svg></span><span class="lb">Draw</span><i class="dot live" id="doodleDot" hidden></i></button>
+      <button id="dockChats" aria-label="Messages"><span class="ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.6-.8L3 20l1.1-4.2A8.4 8.4 0 1 1 21 11.5z"/></svg></span><span class="lb">Chat</span><i class="dot" id="chatDot" hidden></i></button>
+      <button id="dockGames" aria-label="Games"><span class="ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9h10a4 4 0 0 1 3.7 5.5l-1 2.3A2.5 2.5 0 0 1 17.4 18c-1 0-1.9-.6-2.3-1.5L14.6 15H9.4l-.5 1.5c-.4.9-1.3 1.5-2.3 1.5a2.5 2.5 0 0 1-2.3-3.2l-1-2.3A4 4 0 0 1 7 9z"/><path d="M8 11.5v2M7 12.5h2"/><path d="M15.5 12h.01M17.5 13.5h.01"/></svg></span><span class="lb">Games</span></button>
+      <button id="dockMore" aria-label="More"  ><span class="ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18.5" cy="12" r="1.6"/></svg></span><span class="lb">More</span><i class="dot" id="moreDot" hidden></i></button>
+    </nav>
+    <div id="dockProxies" hidden>
+      <button id="dockPing" aria-label="Check in"><span class="ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c.9 1.1 2.1 1.7 3.5 1.7s2.6-.6 3.5-1.7"/><path d="M9 9.5h.01M15 9.5h.01"/></svg></span><span class="lb">Check in</span><i class="dot" hidden></i></button>
+      <button id="dockQuestion" aria-label="Today's question"><span class="ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .9-1 1.5v.4"/><path d="M12 17h.01"/></svg></span><span class="lb">Today</span><i class="dot" id="qDot" hidden></i></button>
+    </div>
+    <div class="sheet-backdrop" id="moreBackdrop" hidden></div>
+    <div class="sheet-backdrop" id="noteMenuBackdrop" hidden></div>
+    <section class="sheet nm" id="noteMenu" hidden aria-label="Note actions">
+      <h2>Note</h2>
+      <div class="more-list" id="nmList"></div>
+      <div class="sheet-actions"><button class="btn" id="nmClose">Cancel</button></div>
+    </section>
+    <section class="games-screen" id="gamesScreen" hidden aria-label="Games">
+      <header class="gs-bar">
+        <button class="gs-back" id="gsBack">‹ Back</button>
+        <h2 id="gsTitle">Games</h2>
+        <span class="gs-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="gs-tabs" id="gsTabs"><button id="gsTabGames" class="on">Games</button><button id="gsTabScores">Scores</button></div>
+      <div class="gs-list" id="gsList"></div>
+      <div class="gs-scores" id="gsScores" hidden></div>
+      <div class="gs-play" id="gsPlay" hidden>
+        <iframe id="gsFrame" title="Game" allow="autoplay; fullscreen"></iframe>
+      </div>
+    </section>
+    <section class="sheet more" id="more" hidden aria-label="More">
+      <h2>More</h2>
+      <div class="more-list">
+        <button class="more-row" data-proxy="toolFind"><span>Find someone</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" data-proxy="toolHome"><span>Back to the newest notes</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" data-proxy="toolDraw"><span>Draw on the board</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" data-proxy="toolLoc"><span>Live location</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" data-proxy="toolChurch"><span>Church</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" data-proxy="dockGames"><span>Games</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" data-proxy="dockPing"><span>Check in</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" data-proxy="dockQuestion"><span>Today's question</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" data-proxy="openRooms"><span>Your rooms</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" data-proxy="openSettings"><span>Settings</span><i aria-hidden="true">›</i></button>
+      </div>
+      <div class="sheet-actions"><button class="btn" id="moreClose">Close</button></div>
+    </section>
+    <div class="sheet-backdrop" id="roomSheetBackdrop" hidden></div>
+    <section class="sheet more room-sheet" id="roomSheet" hidden aria-label="Room settings">
+      <h2>Room</h2>
+      <div class="room-sheet-top">
+        <button class="rs-photo" id="rsPhoto" aria-label="Change room photo">🏠</button>
+        <div class="rs-info"><b id="rsNameShow">Our room</b><small id="rsCode"></small></div>
+      </div>
+      <label class="rs-field">Room name
+        <span class="rs-row"><input id="rsName" maxlength="40" placeholder="Our room" autocomplete="off"><button class="btn small" id="rsSaveName">Save</button></span>
+      </label>
+      <div class="more-list">
+        <button class="more-row" id="rsPhotoBtn"><span>Change room photo</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" id="rsRemovePhoto" hidden><span>Remove room photo</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" id="rsLock"><span id="rsLockText">Lock room</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" id="rsListed" hidden><span id="rsListedText">Hide from the room map</span><i aria-hidden="true">›</i></button>
+        <button class="more-row" id="rsAdmin"><span id="rsAdminText">Take admin</span><i aria-hidden="true">›</i></button>
+      </div>
+      <input type="file" id="roomPhotoInput" accept="image/*" hidden>
+      <div class="sheet-actions"><button class="btn" id="roomSheetClose">Close</button></div>
+    </section>
+    <div class="boardtools" id="boardTools">
+      <button id="toolLoc" aria-label="Live location" title="Live location"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg><i class="dot live" id="locDot" hidden></i></button>
+      <button id="toolFind" aria-label="Find someone" title="Find someone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
+      <button id="toolHome" aria-label="Back to the newest notes" title="Home"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11L12 4l8.5 7"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></button>
+      <button id="toolChurch" aria-label="Church" title="Church"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v3"/><path d="M10.5 4h3"/><path d="M7 21v-7.5c0-3 2.2-5.5 5-5.5s5 2.5 5 5.5V21"/><path d="M5 21h14"/><path d="M12 11v4"/><path d="M10 13h4"/></svg></button>
+      <button id="toolDraw" aria-label="Draw on the board" title="Draw on the board"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M13.5 7.5l3 3"/></svg></button>
+      <button class="fab" id="fab" aria-label="Add a note" title="Add a note">+</button>
+    </div>
+    <div class="drawbar" id="drawBar" hidden>
+      <div class="pens" id="bPens"></div>
+      <div class="tools-row" role="toolbar" aria-label="Drawing tools">
+        <button class="tool" id="bBrushPen" aria-pressed="false" title="Pen" aria-label="Pen"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1 10-10-3.5-3.5-10 10z"/><path d="M14 6.5l3.5 3.5"/></svg></button>
+        <button class="tool" id="bBrushMarker" aria-pressed="false" title="Marker" aria-label="Marker"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-8 8H6v-6z"/><path d="M11 7l6 6"/></svg></button>
+        <button class="tool" id="bBrushHi" aria-pressed="false" title="Highlighter" aria-label="Highlighter"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="15" width="16" height="5" rx="1"/><path d="M8 15l6-9 3 2-5 8"/></svg></button>
+        <button class="tool" id="bShape" aria-pressed="false" title="Shapes" aria-label="Shapes"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="10" height="10" rx="2"/><circle cx="16" cy="16" r="4"/></svg></button>
+        <span class="sep"></span>
+        <button class="tool" id="bEyedrop" aria-pressed="false" title="Eyedropper: tap a line to copy its color" aria-label="Eyedropper: tap a line to copy its color"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5l5 5-9 9H5v-5z"/><path d="M12 7l5 5"/></svg></button>
+        <button class="tool" id="bFill" aria-pressed="false" title="Fill: tap inside a closed loop" aria-label="Fill: tap inside a closed loop"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l7-7 7 7-7 7z"/><path d="M19 15s-2 2.2-2 3.5a2 2 0 0 0 4 0c0-1.3-2-3.5-2-3.5z"/></svg></button>
+        <button class="tool" id="bText" aria-pressed="false" title="Text: tap, then type" aria-label="Text: tap, then type"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6V4h14v2"/><path d="M12 4v16"/><path d="M9 20h6"/></svg></button>
+        <span class="sep"></span>
+        <button class="tool" id="bZoomOut" title="Zoom out" aria-label="Zoom out"><span class="zoomtxt">−</span></button>
+        <button class="tool" id="bZoomIn" title="Zoom in" aria-label="Zoom in"><span class="zoomtxt">+</span></button>
+      </div>
+      <div class="shape-menu" id="shapeMenu" hidden>
+        <button type="button" data-shape="line" title="Line" aria-label="Line"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19L19 5"/></svg></button>
+        <button type="button" data-shape="arrow" title="Arrow" aria-label="Arrow"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19L19 5"/><path d="M10 5h9v9"/></svg></button>
+        <button type="button" data-shape="rect" title="Rectangle" aria-label="Rectangle"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="6" width="16" height="12"/></svg></button>
+        <button type="button" data-shape="round" title="Rounded rectangle" aria-label="Rounded rectangle"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="4"/></svg></button>
+        <button type="button" data-shape="oval" title="Oval" aria-label="Oval"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="12" rx="8" ry="6"/></svg></button>
+        <button type="button" data-shape="tri" title="Triangle" aria-label="Triangle"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5l8 14H4z"/></svg></button>
+        <button type="button" data-shape="rtri" title="Right triangle" aria-label="Right triangle"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5v14h14z"/></svg></button>
+        <button type="button" data-shape="diamond" title="Diamond" aria-label="Diamond"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l8 8-8 8-8-8z"/></svg></button>
+        <button type="button" data-shape="pent" title="Pentagon" aria-label="Pentagon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l8 6-3 9H7l-3-9z"/></svg></button>
+        <button type="button" data-shape="hex" title="Hexagon" aria-label="Hexagon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5h8l4 7-4 7H8l-4-7z"/></svg></button>
+        <button type="button" data-shape="star" title="Star" aria-label="Star"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></button>
+        <button type="button" data-shape="callout" title="Speech bubble" aria-label="Speech bubble"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H11l-4 3v-3H4z"/></svg></button>
+        <button type="button" data-shape="oval-callout" title="Oval speech bubble" aria-label="Oval speech bubble"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="10" rx="8" ry="6"/><path d="M8 15l-2 4 5-3"/></svg></button>
+        <button type="button" data-shape="cloud" title="Thought bubble" aria-label="Thought bubble"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.5-8 5.5 5.5 0 0 1 10.5-1.5A4.5 4.5 0 0 1 17.5 18z"/></svg></button>
+        <button type="button" data-shape="heart" title="Heart" aria-label="Heart"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+      </div>
+      <div class="pad-row">
+        <div class="sizes" id="bSizes"></div>
+        <button class="tool" id="bEraser" aria-pressed="false" title="Erase your lines"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H8l-5-5 10-10 8 8-6 6"/><path d="M6 11l7 7"/></svg></button>
+        <button class="tool" id="bUndo" title="Undo your last line"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg></button>
+        <button class="tool" id="bClear" hidden></button>
+        <button class="btn small primary" id="bDone">Done</button>
+      </div>
+      <p class="drawhint">One finger draws · two fingers move and zoom</p>
+    </div>
+    <div class="selbar" id="selBar" hidden>
+      <button id="sOpen" data-for="note">Open</button>
+      <button id="sEdit" data-for="note">Edit</button>
+      <button id="sRotL" data-for="both" aria-label="Rotate left">⟲</button>
+      <button id="sRotR" data-for="both" aria-label="Rotate right">⟳</button>
+      <button id="sFlipX" data-for="both" aria-label="Flip left-right">⇋</button>
+      <button id="sFlipY" data-for="both" aria-label="Flip upside down">⇵</button>
+      <button id="sReset" data-for="note">Reset</button>
+      <button id="sDelete" data-for="stroke" class="danger">Delete</button>
+      <button id="sDone" data-for="both" class="primary">Done</button>
+      <p class="selhint">Drag a corner to resize · top dot to rotate · two fingers to do both</p>
+    </div>
+  </section>
+
+  <!-- People panel -->
+  <div class="people-backdrop" id="peopleBackdrop" hidden></div>
+  <aside class="people" id="people" hidden aria-label="People on this board">
+    <div class="people-head"><b>On this board</b><span id="peopleCount"></span><button class="iconbtn" id="peopleClose" aria-label="Close">✕</button></div>
+    <ul id="peopleList"></ul>
+    <button class="btn small voice-join" id="voiceJoinBtn" hidden>🎙️ Start voice chat</button>
+    <button class="btn small" id="peopleInvite">Invite someone (code <span id="peopleCode"></span>)</button>
+  </aside>
+
+  <!-- Voice chat bar -->
+  <div class="voice-bar" id="voiceBar" hidden>
+    <button class="voice-mute" id="voiceMute" aria-label="Mute" aria-pressed="false">🎙️</button>
+    <div class="voice-who" id="voiceWho"></div>
+    <button class="voice-leave" id="voiceLeave" aria-label="Leave voice">Leave</button>
+  </div>
+
+  <!-- Live location (opt-in, both ways) -->
+  <div class="people-backdrop" id="locBackdrop" hidden></div>
+  <aside class="people loc" id="locPanel" hidden aria-label="Live location">
+    <div class="people-head"><b>📍 Live location</b><span id="locCount"></span><button class="iconbtn" id="locClose" aria-label="Close">✕</button></div>
+    <div class="loc-toggle">
+      <div>
+        <div class="lt-title">Share my live location</div>
+        <div class="lt-sub" id="locMyState">Off</div>
+      </div>
+      <button class="switch" id="locSwitch" type="button" role="switch" aria-checked="false" aria-label="Share my live location"></button>
+    </div>
+    <p class="loc-note" id="locHint">When it's on, everyone here can see where you are — and you see them. Works only while Pinned is open. Turn it off any time.</p>
+    <ul id="locList"></ul>
+    <button class="btn small loc-map" id="locMapBtn" type="button">Open live map</button>
+    <p class="loc-foot">Locations are live only. Nothing is saved.</p>
+  </aside>
+
+  <!-- live map (Batch C): opens from the location panel -->
+  <div class="sheet-backdrop" id="mapBackdrop" hidden></div>
+  <section class="sheet tall map-sheet" id="map" hidden aria-label="Live map">
+    <div class="grab"></div>
+    <div class="settings-head"><h2>Live map</h2></div>
+    <div class="map-box" id="mapBox" role="img" aria-label="Map of people sharing their location"></div>
+    <ul class="map-pairs" id="mapPairs"></ul>
+    <p class="loc-foot">Locations are live only. Nothing is saved. The map needs internet.</p>
+    <div class="sheet-actions"><button class="btn primary" id="mapClose" type="button">Done</button></div>
+  </section>
+
+  <!-- Composer -->
+  <div class="sheet-backdrop" id="composerBackdrop" hidden></div>
+  <section class="sheet" id="composer" hidden aria-label="New note">
+    <div class="grab"></div>
+    <nav class="tabs" id="composerTabs">
+      <button data-tab="text" class="active">Text</button>
+      <button data-tab="emoji">Emoji</button>
+      <button data-tab="image">Photo</button>
+      <button data-tab="drawing">Draw</button>
+      <button data-tab="voice">Voice</button>
+      <button data-tab="countdown">Countdown</button>
+      <button data-tab="list">List</button>
+      <button data-tab="link">Music</button>
+    </nav>
+
+    <div class="pane" data-pane="text">
+      <div class="preview-note" id="textPreview">
+        <textarea id="textInput" maxlength="500" placeholder="Write something sweet…"></textarea>
+      </div>
+      <div class="swatches small" id="textSwatches"></div>
+    </div>
+
+    <div class="pane" data-pane="emoji" hidden>
+      <div class="emoji-hero" id="emojiHero">❤️</div>
+      <input id="emojiCustom" class="emoji-input" maxlength="8" placeholder="Or type any emoji">
+      <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+
+    <div class="pane" data-pane="image" hidden>
+      <label class="photo-drop" id="photoDrop">
+        <input type="file" id="photoInput" accept="image/*" hidden>
+        <img id="photoPreview" alt="" hidden>
+        <span id="photoHint">Tap to choose a photo or image</span>
+      </label>
+      <input id="photoCaption" class="caption-input" maxlength="80" placeholder="Caption (optional)">
+    </div>
+
+    <div class="pane" data-pane="drawing" hidden>
+      <div class="pad-wrap" id="padWrap"><canvas id="pad" width="600" height="600"></canvas></div>
+      <div class="pad-tools">
+        <div class="pens" id="penColors"></div>
+        <div class="pad-row">
+          <div class="sizes" id="penSizes"></div>
+          <button class="tool" id="eraserBtn" aria-pressed="false" title="Eraser">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H8l-5-5 10-10 8 8-6 6"/><path d="M6 11l7 7"/></svg>
+          </button>
+          <button class="tool" id="undoBtn" title="Undo">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>
+          </button>
+          <button class="tool" id="clearBtn" title="Clear">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg>
+          </button>
+        </div>
+        <div class="paper-row"><span>Paper</span><div class="swatches small" id="padSwatches"></div></div>
+      </div>
+    </div>
+
+    <div class="pane" data-pane="voice" hidden>
+      <div class="rec-wrap">
+        <button class="rec" id="recBtn" type="button" aria-label="Record"><span></span></button>
+        <div class="rec-time" id="recTime">0:00</div>
+        <p class="muted" id="recHint">Tap to record. Up to 60 seconds.</p>
+        <div class="rec-preview" id="recPreview" hidden>
+          <button class="btn small" id="recPlay" type="button">▶ Play</button>
+          <button class="btn small" id="recRedo" type="button">Re-record</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" data-pane="countdown" hidden>
+      <div class="preview-note cd-preview" id="cdPreview">
+        <div class="cd-big" id="cdPrevBig">12</div>
+        <div class="cd-unit" id="cdPrevUnit">days until</div>
+        <div class="cd-title" id="cdPrevTitle">our trip ✈️</div>
+      </div>
+      <input id="cdTitle" class="caption-input" maxlength="60" placeholder="What are you counting down to?">
+      <div class="cd-row">
+        <label><span>Date</span><input type="date" id="cdDate"></label>
+        <label><span>Time (optional)</span><input type="time" id="cdTime"></label>
+      </div>
+      <div class="swatches small" id="cdSwatches"></div>
+    </div>
+
+    <div class="pane" data-pane="list" hidden>
+      <input id="listTitle" class="caption-input" maxlength="60" placeholder="Name it, like &quot;Date ideas&quot;">
+      <div class="cd-row">
+        <label><span>Type</span><select id="listMode"><option value="todo">To-do</option><option value="wish">Wish list</option></select></label>
+      </div>
+      <textarea id="listItems" class="caption-input" rows="5" maxlength="2000" placeholder="One item per line"></textarea>
+    </div>
+
+    <div class="pane" data-pane="link" hidden>
+      <input id="linkInput" class="caption-input" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Paste a Spotify, YouTube, Apple Music or SoundCloud link">
+      <p class="muted small-note">Any other link pins as a plain link card.</p>
+      <div class="link-preview" id="linkPreview"></div>
+    </div>
+
+    <div class="sched" id="schedBox">
+      <button class="chiptoggle" id="schedToggle" type="button" aria-pressed="false">⏰ Send later</button>
+      <div class="sched-row" id="schedRow" hidden>
+        <input type="datetime-local" id="schedAt">
+        <div class="quick">
+          <button type="button" data-q="morning">Tomorrow 7 AM</button>
+          <button type="button" data-q="tonight">Tonight 9 PM</button>
+          <button type="button" data-q="hour">In 1 hour</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-actions">
+      <button class="btn" id="composerCancel">Cancel</button>
+      <button class="btn primary" id="composerSend">Stick it</button>
+    </div>
+  </section>
+
+  <!-- Note detail -->
+  <div class="sheet-backdrop" id="detailBackdrop" hidden></div>
+  <section class="sheet" id="detail" hidden aria-label="Note">
+    <div class="grab"></div>
+    <div class="detail-body" id="detailBody"></div>
+    <p class="detail-meta" id="detailMeta"></p>
+    <div class="react-row" id="reactRow"></div>
+    <div class="replies" id="replyList"></div>
+    <div class="reply-box">
+      <input id="replyInput" maxlength="300" placeholder="Write a reply…" autocomplete="off">
+      <button class="btn small primary" id="replySend">Send</button>
+    </div>
+    <div class="sheet-actions wrap">
+      <button class="btn" id="detailEdit">Edit</button>
+      <button class="btn danger" id="detailRemove">Remove</button>
+      <button class="btn" id="detailPin">📌 Pin</button>
+      <button class="btn" id="detailFront">To front</button>
+      <button class="btn primary" id="detailClose">Close</button>
+    </div>
+  </section>
+
+  <!-- Settings -->
+  <div class="sheet-backdrop" id="settingsBackdrop" hidden></div>
+  <section class="sheet tall" id="settings" hidden aria-label="Settings">
+    <div class="grab"></div>
+    <div class="settings-head"><h2>Settings</h2></div>
+    <div class="grp">
+      <div class="grp-title">Profile</div>
+      <div class="grp-body">
+      <div class="you-row">
+        <button class="avatar-edit" id="avatarEdit" aria-label="Change your picture"><span id="avatarPreview" class="avatar-preview"></span><span class="avatar-cam">📷</span></button>
+        <input type="file" id="avatarInput" accept="image/*" hidden>
+        <div class="you-fields">
+          <div class="setting-row">
+            <input id="settingsName" maxlength="30" placeholder="Your name">
+            <button class="btn small" id="saveName">Save</button>
+          </div>
+          <div class="swatches small" id="settingsSwatches"></div>
+        </div>
+      </div>
+      <div class="bio-row">
+        <textarea id="settingsBio" maxlength="300" rows="2" placeholder="Add a short bio… (optional)"></textarea>
+        <div class="bio-foot"><span class="muted small-note" id="bioCount"></span><button class="btn small" id="saveBio">Save bio</button></div>
+      </div>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="grp-title">Appearance</div>
+      <div class="grp-body">
+        <div class="grp-sub">Theme</div>
+      <div class="themes" id="themePicker"></div>
+      <div class="setting-row theme-io">
+        <button class="btn small" id="themeExport" type="button">Export themes</button>
+        <label class="btn small" for="themeImport">Import themes</label>
+        <input type="file" id="themeImport" accept="application/json,.json" hidden>
+      </div>
+      <p class="muted small-note" id="themeSync"></p>
+        <div class="grp-sub">Background</div>
+      <div class="seg" id="bgMode" hidden>
+        <button type="button" data-mode="shared">Shared for everyone</button>
+        <button type="button" data-mode="personal">Each person picks</button>
+      </div>
+      <p class="muted small-note" id="bgInfo"></p>
+      <div class="bg-colors" id="bgColors"></div>
+      <div class="bg-actions">
+        <label class="btn small" for="bgFile" id="bgFileLbl">Upload image, GIF or video</label>
+        <input type="file" id="bgFile" hidden>
+        <button class="btn small" id="bgClear">Use the theme</button>
+      </div>
+      <div class="bg-requests" id="bgRequests"></div>
+        <div class="grp-sub">Feel</div>
+      <div class="setting-row" id="vibeRow">
+        <span>Vibrate on taps and sends</span>
+        <button class="switch" id="vibeSwitch" type="button" role="switch" aria-checked="true" aria-label="Vibration"></button>
+      </div>
+      <div class="setting-row">
+        <span>Calm motion (pauses animations)</span>
+        <button class="switch" id="calmSwitch" type="button" role="switch" aria-checked="false" aria-label="Calm motion"></button>
+      </div>
+      <div class="setting-row">
+        <span>Decorations (planets and stars)</span>
+        <button class="switch" id="decoSwitch" type="button" role="switch" aria-checked="true" aria-label="Decorations"></button>
+      </div>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="grp-title">Notifications</div>
+      <div class="grp-body">
+      <div class="setting-row">
+        <p class="muted" id="notifStatus">Off</p>
+        <span class="notif-btns"><button class="btn small" id="notifReset" hidden>Reset</button><button class="btn small" id="notifBtn">Turn on</button></span>
+      </div>
+      <p class="hint" id="notifHint" hidden></p>
+      <div class="mutes" id="muteList">
+        <p class="muted small-note">New notes always notify you. Choose the rest:</p>
+      </div>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="grp-title">Board</div>
+      <div class="grp-body">
+        <div class="grp-sub">Pairing code</div>
+      <div class="setting-row">
+        <span class="code" id="settingsCode"></span>
+        <button class="btn small" id="shareCode">Share</button>
+      </div>
+        <div class="grp-sub">Board</div>
+      <div class="board-actions">
+        <button class="btn small" id="switchBoardBtn">Join a different board</button>
+        <div class="setting-row" id="switchRow" hidden>
+          <input id="switchCode" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters" autocomplete="off" spellcheck="false">
+          <button class="btn small primary" id="switchGo">Join</button>
+        </div>
+        <button class="btn small" id="exportBoardBtn">Export this board (zip)</button>
+        <button class="btn small" id="leaveBoardBtn">Leave this board</button>
+        <button class="btn small danger" id="deleteBoardBtn">Delete board and start over</button>
+        <p class="hint" id="boardHint" hidden></p>
+      </div>
+        <div class="grp-sub">On this board</div>
+      <ul class="members" id="memberList"></ul>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="grp-title">Account</div>
+      <div class="grp-body">
+      <p class="muted" id="acctStatus"></p>
+      <div class="setting-row" id="acctLinkRow" hidden>
+        <input id="acctEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="you@example.com">
+        <button class="btn small" id="acctLinkBtn">Add email</button>
+      </div>
+      <div class="setting-row" id="acctChangeRow" hidden>
+        <input id="acctNewEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="new@example.com">
+        <button class="btn small" id="acctChangeBtn">Send link</button>
+      </div>
+      <button class="btn small" id="acctChangeOpen" hidden>Change email</button>
+      <button class="btn small" id="modOpen" hidden>Moderation</button>
+      <button class="btn small danger" id="logoutBtn" hidden>Log out of this phone</button>
+      <p class="small-note privacy-link"><a href="privacy.html">Privacy and your data</a></p>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="grp-title">About</div>
+      <div class="grp-body">
+      <p class="muted small-note version" id="appVersion"></p>
+      <div class="grp-sub">Update log</div>
+      <div class="updlog" id="updateLog"></div>
+      <div class="grp-sub">Credits</div>
+      <ul class="credits" id="creditsList"></ul>
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn primary" id="settingsClose">Done</button>
+    </div>
+  </section>
+
+  <!-- Check-in -->
+  <div class="sheet-backdrop" id="pingBackdrop" hidden></div>
+  <section class="sheet" id="ping" hidden aria-label="Check in">
+    <div class="grab"></div>
+    <h2>Check in</h2>
+    <p class="muted" id="pingLast"></p>
+    <h3>Send a feeling</h3>
+    <div class="ping-grid" id="pingFeelings"></div>
+    <h3>My mood right now</h3>
+    <div class="ping-grid" id="pingMoods"></div>
+    <div class="sheet-actions"><button class="btn primary" id="pingClose">Done</button></div>
+  </section>
+
+  <!-- Daily question -->
+  <div class="sheet-backdrop" id="questionBackdrop" hidden></div>
+  <section class="sheet tall" id="question" hidden aria-label="Today's question">
+    <div class="grab"></div>
+    <p class="q-date" id="qDate"></p>
+    <h2 class="q-text" id="qText"></h2>
+    <div id="qAnswerBox">
+      <textarea id="qInput" maxlength="500" placeholder="Your answer…"></textarea>
+      <button class="btn primary" id="qSend">Share my answer</button>
+      <p class="muted small-note" id="qHint">You'll see their answer once you've both answered.</p>
+    </div>
+    <div class="q-answers" id="qAnswers"></div>
+    <h3 id="qPastTitle" hidden>Earlier</h3>
+    <div class="q-past" id="qPast"></div>
+    <div class="sheet-actions"><button class="btn" id="qClose">Close</button></div>
+  </section>
+
+  <!-- Draw together -->
+  <div class="sheet-backdrop" id="togetherBackdrop" hidden></div>
+  <section class="sheet tall" id="together" hidden aria-label="Draw together">
+    <div class="grab"></div>
+    <div class="together-head">
+      <h2>Draw together</h2>
+      <span class="presence" id="togetherWho">Just you for now</span>
+    </div>
+    <div class="pad-wrap" id="tPadWrap"><canvas id="tPad" width="600" height="600"></canvas></div>
+    <div class="pad-tools">
+      <div class="pens" id="tPens"></div>
+      <div class="pad-row">
+        <div class="sizes" id="tSizes"></div>
+        <button class="tool" id="tEraser" aria-pressed="false" title="Eraser"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H8l-5-5 10-10 8 8-6 6"/><path d="M6 11l7 7"/></svg></button>
+        <button class="tool" id="tUndo" title="Undo my last line"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg></button>
+        <button class="tool" id="tClear" title="Clear for both"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg></button>
+      </div>
+    </div>
+    <div class="sheet-actions wrap">
+      <button class="btn" id="tInvite">Invite 💌</button>
+      <button class="btn" id="tClose">Close</button>
+      <button class="btn primary" id="tStick">Stick it</button>
+    </div>
+  </section>
+
+  <!-- Edit an item -->
+  <div class="sheet-backdrop" id="editBackdrop" hidden></div>
+  <section class="sheet" id="edit" hidden aria-label="Edit">
+    <div class="grab"></div>
+    <h2 id="editTitle">Edit</h2>
+    <div data-kinds="text"><textarea id="eText" class="edit-area" maxlength="500"></textarea></div>
+    <div data-kinds="emoji"><input id="eEmoji" class="emoji-input big" maxlength="8" placeholder="Type any emoji"></div>
+    <div data-kinds="image">
+      <input id="eCap" class="caption-input" maxlength="80" placeholder="Caption (optional)">
+      <label class="btn small" for="ePhoto">Swap photo</label> <span class="muted" id="ePhotoName"></span>
+      <input type="file" id="ePhoto" accept="image/*" hidden>
+    </div>
+    <div data-kinds="countdown">
+      <input id="eCdTitle" class="caption-input" maxlength="60" placeholder="What are you counting down to?">
+      <div class="cd-row">
+        <label><span>Date</span><input type="date" id="eCdDate"></label>
+        <label><span>Time (optional)</span><input type="time" id="eCdTime"></label>
+      </div>
+    </div>
+    <div data-kinds="text drawing voice countdown"><h3>Color</h3><div class="swatches small" id="eSwatches"></div></div>
+    <div class="sheet-actions">
+      <button class="btn" id="eCancel">Cancel</button>
+      <button class="btn primary" id="eSave">Save</button>
+    </div>
+  </section>
+
+  <!-- Messages -->
+  <div class="sheet-backdrop" id="chatsBackdrop" hidden></div>
+  <section class="sheet tall chats" id="chats" hidden aria-label="Messages">
+    <div class="grab"></div>
+    <div id="chatList">
+      <h2>Messages</h2>
+      <ul class="threads" id="threadList"></ul>
+    </div>
+    <div id="chatThread" hidden>
+      <div class="thread-head">
+        <button class="iconbtn" id="chatBack" aria-label="Back">‹</button>
+        <div><b id="threadName"></b><small id="threadSub"></small></div>
+      </div>
+      <div class="reply-bar" id="replyBar" hidden><span id="replyBarText"></span><button id="replyBarX" aria-label="Cancel reply">✕</button></div>
+      <div class="msgs" id="msgList"></div>
+      <p class="typing" id="threadTyping" hidden></p>
+      <div class="msg-box">
+        <label class="iconbtn" for="msgPhoto" aria-label="Send a photo">📷</label>
+        <input type="file" id="msgPhoto" accept="image/*" hidden>
+        <input id="msgInput" maxlength="2000" placeholder="Message…" autocomplete="off">
+        <button class="btn small primary" id="msgSend">Send</button>
+      </div>
+    </div>
+    <div id="feedbackView" hidden>
+      <div class="thread-head">
+        <button class="iconbtn" id="fbBack" aria-label="Back">‹</button>
+        <div><b id="fbTitle">Feedback cycle</b><small id="fbSub">All rooms</small></div>
+        <button class="btn small" id="fbExport">Export CSV</button>
+      </div>
+      <div class="fb-toolbar" id="fbToolbar">
+        <label>From <input type="date" id="fbFrom"></label>
+        <label>To <input type="date" id="fbTo"></label>
+      </div>
+      <div class="fb-list" id="fbList"></div>
+      <div class="fb-new" id="fbNew" hidden>
+        <input id="fbNewTitle" maxlength="80" placeholder="Title" autocomplete="off">
+        <textarea id="fbNewBody" maxlength="2000" rows="4" placeholder="What's on your mind?"></textarea>
+        <label class="fb-anon"><input type="checkbox" id="fbNewAnon"> Post anonymously</label>
+        <small class="fb-note">Anonymous hides your name from other users. The app still records who posted so posts can be removed if they break the rules.</small>
+        <div class="fb-actions"><button class="btn small" id="fbNewCancel">Cancel</button><button class="btn small primary" id="fbNewPost">Post</button></div>
+      </div>
+      <div class="fb-thread-wrap" id="fbThreadWrap" hidden>
+        <div class="fb-posts" id="fbPosts"></div>
+        <div class="reply-bar" id="fbReplyBar" hidden><span id="fbReplyText"></span><button id="fbReplyX" aria-label="Cancel reply">✕</button></div>
+        <div class="fb-composer">
+          <label class="fb-anon"><input type="checkbox" id="fbReplyAnon"> Post anonymously</label>
+          <div class="msg-box"><input id="fbReplyInput" maxlength="2000" placeholder="Reply…" autocomplete="off"><button class="btn small primary" id="fbReplySend">Send</button></div>
+        </div>
+      </div>
+      <div class="fb-foot"><button class="btn primary" id="fbNewBtn">New thread</button></div>
+    </div>
+    <div id="modView" hidden>
+      <div class="thread-head">
+        <button class="iconbtn" id="modBack" aria-label="Back">‹</button>
+        <div><b>Moderation</b><small id="modSub">Posts to review</small></div>
+      </div>
+      <div class="fb-list" id="modList"></div>
+    </div>
+    <div class="sheet-actions"><button class="btn" id="chatsClose">Close</button></div>
+  </section>
+
+  <div class="fx" id="fx" aria-hidden="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="app.js"></script>
+  <!-- theme builder lives at the top level so it stacks above Settings -->
+    <div class="sheet-backdrop" id="themeBuilderBackdrop" hidden></div>
+    <section class="sheet tall tb" id="themeBuilder" hidden aria-label="Theme builder">
+      <div class="grab"></div>
+      <div class="settings-head"><h2 id="tbTitle">Build a theme</h2></div>
+      <label class="field"><span>Name</span><input id="tbName" maxlength="40" placeholder="Our Sunday" autocomplete="off"></label>
+      <div class="tb-section-title">Start from</div>
+      <div class="tb-chips" id="tbStart"></div>
+      <div class="tb-preview" id="tbPreview" aria-label="Live preview">
+        <div class="tbp-card"><b>Sticky note</b><span class="tbp-muted">A little note for you both</span><button type="button" class="tbp-btn">Button</button></div>
+        <div class="tbp-notes"><i></i><i></i><i></i></div>
+      </div>
+      <div class="tb-section-title">Colours</div>
+      <div class="tb-group" id="tbColors"></div>
+      <div class="tb-section-title">Note colours</div>
+      <div class="tb-notes" id="tbNotes"></div>
+      <div class="tb-section-title">Grid and shape</div>
+      <div class="tb-group">
+        <label class="tb-range"><span>Grid size <b id="tbGridSizeV"></b></span><input type="range" id="tbGridSize" min="8" max="64" step="1"></label>
+        <label class="tb-range"><span>Grid strength <b id="tbGridOpV"></b></span><input type="range" id="tbGridOp" min="0" max="0.2" step="0.005"></label>
+      </div>
+      <div class="seg tb-radius" id="tbRadius"><button type="button" data-v="s">Small</button><button type="button" data-v="m">Medium</button><button type="button" data-v="l">Large</button></div>
+      <div class="tb-section-title">Readability</div>
+      <div class="tb-contrast" id="tbContrast"></div>
+      <p class="error" id="tbError" hidden></p>
+      <div class="tb-extra">
+        <button class="btn small" id="tbDuplicate" type="button">Duplicate</button>
+        <button class="btn small" id="tbExport" type="button">Export .json</button>
+      </div>
+      <div class="sheet-actions tb-actions">
+        <button class="btn danger" id="tbDelete" hidden>Delete</button>
+        <button class="btn" id="tbCancel">Cancel</button>
+        <button class="btn primary" id="tbSave">Save theme</button>
+      </div>
+    </section>
+</body>
+</html>

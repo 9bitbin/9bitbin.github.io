@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Admin SOP Creation Tool</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1e3a5f, #0f172a);
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #2563eb;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .logo p {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #047857, #065f46);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #b91c1c, #991b1b);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #475569, #334155);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #334155, #1e293b);
+            transform: translateY(-2px);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+        }
+
+        .btn-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border: 1px solid #334155;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #334155;
+            z-index: 0;
+        }
+
+        .progress-line-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #334155;
+            border: 2px solid #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .step-circle.active {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-color: #2563eb;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
+        }
+
+        .step-circle.completed {
+            background: linear-gradient(135deg, #059669, #047857);
+            border-color: #059669;
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-align: center;
+            max-width: 80px;
+        }
+
+        .step-label.active {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        /* Cards */
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+            transition: border-color 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #2563eb;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .card-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .card-header p {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        label span.required {
+            color: #ef4444;
+            margin-left: 3px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        select option {
+            background: #1e293b;
+        }
+
+        /* Steps Section */
+        .steps-container {
+            margin-top: 10px;
+        }
+
+        .step-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .step-item:hover {
+            border-color: #2563eb;
+        }
+
+        .step-item-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .step-number-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .step-item-title {
+            flex: 1;
+            font-weight: 600;
+            color: #60a5fa;
+            font-size: 15px;
+        }
+
+        .step-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .step-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .step-fields .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Warning/Note boxes */
+        .warning-box {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid #ca8a04;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #fbbf24;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .info-box {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid #2563eb;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #60a5fa;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        /* Tags */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .tag {
+            background: rgba(37, 99, 235, 0.2);
+            border: 1px solid #2563eb;
+            color: #60a5fa;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #334155;
+        }
+
+        /* Preview Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+
+        .modal {
+            background: #ffffff;
+            color: #1a1a1a;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* SOP Preview Styles */
+        .sop-preview {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .sop-header {
+            border-bottom: 3px solid #1e3a5f;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .sop-company {
+            font-size: 13px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sop-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #1e3a5f;
+            margin: 5px 0;
+        }
+
+        .sop-meta {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .sop-meta-item label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .sop-meta-item p {
+            font-size: 13px;
+            color: #1e293b;
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        .sop-section {
+            margin-bottom: 25px;
+        }
+
+        .sop-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e3a5f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 4px solid #2563eb;
+            padding-left: 10px;
+            margin-bottom: 12px;
+        }
+
+        .sop-section p, .sop-section li {
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.7;
+        }
+
+        .sop-step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .sop-step-num {
+            width: 30px;
+            height: 30px;
+            background: #1e3a5f;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .sop-step-content h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .sop-step-content p {
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .sop-step-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+        }
+
+        .sop-step-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .badge-responsible {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-duration {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .badge-critical {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .sop-warning-block {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #92400e;
+        }
+
+        .sop-footer {
+            border-top: 2px solid #1e3a5f;
+            padding-top: 15px;
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        /* Sections visibility */
+        .section-page {
+            display: none;
+        }
+
+        .section-page.active {
+            display: block;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 9999;
+            transform: translateX(200px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Severity select colors */
+        .severity-low { color: #22c55e; }
+        .severity-medium { color: #f59e0b; }
+        .severity-high { color: #ef4444; }
+        .severity-critical { color: #dc2626; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            .step-fields {
+                grid-template-columns: 1fr;
+            }
+            .progress-steps {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            .sop-meta {
+                grid-template-columns: 1fr 1fr;
+            }
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* Add step animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-item {
+            animation: slideIn 0.3s ease;
+        }
+
+        /* Checklist items */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-item input[type="text"] {
+            flex: 1;
+        }
+
+        /* Risk level indicator */
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .risk-low { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; }
+        .risk-medium { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+        .risk-high { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+        .risk-critical { background: rgba(220, 38, 38, 0.2); color: #dc2626; border: 1px solid #dc2626; }
+
+        .section-badge {
+            background: linear-gradient(135deg, #1e3a5f, #0f172a);
+            color: #60a5fa;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #2563eb;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div class="logo">
+        <div class="logo-icon">🖥️</div>
+        <div>
+            <h1>IT Admin SOP Builder</h1>
+            <p>Standard Operating Procedure Creation Tool</p>
+        </div>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-secondary" onclick="clearForm()">🗑️ Clear All</button>
+        <button class="btn btn-purple" onclick="previewSOP()">👁️ Preview</button>
+        <button class="btn btn-success" onclick="exportPDF()">📄 Export PDF</button>
+    </div>
+</header>
+
+<!-- Main Container -->
+<div class="container">
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-steps">
+            <div class="progress-line"><div class="progress-line-fill" id="progressFill"></div></div>
+
+            <div class="step-indicator" onclick="goToSection(0)">
+                <div class="step-circle active" id="sc0">1</div>
+                <div class="step-label active" id="sl0">General Info</div>
+            </div>
+            <div class="step-indicator" onclick="goToSection(1)">
+                <div class="step-circle" id="sc1">2</div>
+                <div class="step-label" id="sl1">Scope & Purpose</div>
+            </div>
+            <div class="step-indicator" onclick="goToSection(2)">
+                <div class="step-circle" id="sc2">3</div>
+                <div class="step-label" id="sl2">Responsibilities</div>
+            </div>
+            <div class="step-indicator" onclick="goToSection(3)">
+                <div class="step-circle" id="sc3">4</div>
+                <div class="step-label" id="sl3">Procedure Steps</div>
+            </div>
+            <div class="step-indicator" onclick="goToSection(4)">
+                <div class="step-circle" id="sc4">5</div>
+                <div class="step-label" id="sl4">Safety & Risks</div>
+            </div>
+            <div class="step-indicator" onclick="goToSection(5)">
+                <div class="step-circle" id="sc5">6</div>
+                <div class="step-label" id="sl5">Review & Export</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 1: General Info -->
+    <div class="section-page active" id="section0">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">📋</div>
+                <div>
+                    <h2>General Information</h2>
+                    <p>Basic SOP details and metadata</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>SOP Title <span class="required">*</span></label>
+                    <input type="text" id="sopTitle" placeholder="e.g., Server Backup and Recovery Procedure">
+                </div>
+                <div class="form-group">
+                    <label>SOP ID / Document Number</label>
+                    <input type="text" id="sopId" placeholder="e.g., IT-SOP-001">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Department / Team</label>
+                    <input type="text" id="department" placeholder="e.g., IT Infrastructure">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="category">
+                        <option value="">-- Select Category --</option>
+                        <option>Network Administration</option>
+                        <option>Server Management</option>
+                        <option>Security & Compliance</option>
+                        <option>Backup & Recovery</option>
+                        <option>User Account Management</option>
+                        <option>Software Deployment</option>
+                        <option>Hardware Maintenance</option>
+                        <option>Incident Response</option>
+                        <option>Change Management</option>
+                        <option>Cloud Infrastructure</option>
+                        <option>Database Administration</option>
+                        <option>Monitoring & Alerting</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label>Version</label>
+                    <input type="text" id="version" placeholder="e.g., 1.0">
+                </div>
+                <div class="form-group">
+                    <label>Effective Date</label>
+                    <input type="date" id="effectiveDate">
+                </div>
+                <div class="form-group">
+                    <label>Review Date</label>
+                    <input type="date" id="reviewDate">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Author / Created By</label>
+                    <input type="text" id="author" placeholder="e.g., John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Approved By</label>
+                    <input type="text" id="approvedBy" placeholder="e.g., IT Manager">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Organization / Company Name</label>
+                <input type="text" id="company" placeholder="e.g., Tech Corp IT Department">
+            </div>
+
+            <div class="form-group">
+                <label>Priority / Criticality</label>
+                <select id="priority">
+                    <option value="Low">🟢 Low</option>
+                    <option value="Medium" selected>🟡 Medium</option>
+                    <option value="High">🔴 High</option>
+                    <option value="Critical">🚨 Critical</option>
+                </select>
+            </div>
+
+            <div class="info-box">
+                ℹ️ <span>Fill in all required fields marked with <strong>*</strong>. The SOP ID helps track document versions.</span>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <div></div>
+            <button class="btn btn-primary" onclick="goToSection(1)">Next: Scope & Purpose →</button>
+        </div>
+    </div>
+
+    <!-- Section 2: Scope & Purpose -->
+    <div class="section-page" id="section1">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">🎯</div>
+                <div>
+                    <h2>Scope & Purpose</h2>
+                    <p>Define what this SOP covers and why it exists</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Purpose / Objective <span class="required">*</span></label>
+                <textarea id="purpose" rows="4" placeholder="Describe the purpose of this SOP. What problem does it solve or what process does it standardize?&#10;&#10;Example: This SOP defines the process for backing up all critical server data to ensure business continuity and data integrity in the event of system failure."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Scope - What's Included</label>
+                <textarea id="scopeIncluded" rows="3" placeholder="What systems, processes, or teams does this SOP cover?&#10;&#10;Example: All production servers, development servers, and database servers within the company network."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Scope - What's Excluded</label>
+                <textarea id="scopeExcluded" rows="3" placeholder="What is explicitly NOT covered by this SOP?&#10;&#10;Example: This SOP does not cover end-user workstation backups or cloud SaaS applications."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Prerequisites / Requirements</label>
+                <textarea id="prerequisites" rows="3" placeholder="What knowledge, access, or tools are needed before performing this procedure?&#10;&#10;Example: Administrator access to the backup server, VPN connection, and knowledge of Linux commands."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Tools & Resources Required</label>
+                <div id="toolsList"></div>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <input type="text" id="toolInput" placeholder="e.g., Veeam Backup, SSH Client, PowerShell">
+                    <button class="btn btn-primary" onclick="addTool()" style="white-space: nowrap;">+ Add Tool</button>
+                </div>
+                <div class="tags-container" id="toolsTags"></div>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="goToSection(0)">← Back</button>
+            <button class="btn btn-primary" onclick="goToSection(2)">Next: Responsibilities →</button>
+        </div>
+    </div>
+
+    <!-- Section 3: Responsibilities -->
+    <div class="section-page" id="section2">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #059669, #047857);">👥</div>
+                <div>
+                    <h2>Roles & Responsibilities</h2>
+                    <p>Define who is responsible for this procedure</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Primary Responsible (Owner)</label>
+                <input type="text" id="primaryOwner" placeholder="e.g., Senior IT Administrator">
+            </div>
+
+            <div class="form-group">
+                <label>Secondary / Backup Responsible</label>
+                <input type="text" id="secondaryOwner" placeholder="e.g., IT Support Technician">
+            </div>
+
+            <div class="form-group">
+                <label>Supervisor / Escalation Point</label>
+                <input type="text" id="supervisor" placeholder="e.g., IT Manager / CTO">
+            </div>
+
+            <div class="form-group">
+                <label>Additional Stakeholders / Notified Parties</label>
+                <textarea id="stakeholders" rows="3" placeholder="List any other teams or individuals who should be informed or involved.&#10;&#10;Example: Security Team, Operations Manager, Help Desk Team"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Minimum Qualifications Required</label>
+                <textarea id="qualifications" rows="3" placeholder="What certifications or experience should the person performing this SOP have?&#10;&#10;Example: CompTIA A+, MCSA, minimum 2 years IT experience, familiarity with Active Directory."></textarea>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="goToSection(1)">← Back</button>
+            <button class="btn btn-primary" onclick="goToSection(3)">Next: Procedure Steps →</button>
+        </div>
+    </div>
+
+    <!-- Section 4: Procedure Steps -->
+    <div class="section-page" id="section3">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">📝</div>
+                <div>
+                    <h2>Procedure Steps</h2>
+                    <p>Add detailed step-by-step instructions</p>
+                </div>
+                <button class="btn btn-primary" onclick="addStep()" style="margin-left: auto;">+ Add Step</button>
+            </div>
+
+            <div class="steps-container" id="stepsContainer">
+                <!-- Steps will be added here -->
+            </div>
+
+            <div id="noStepsMsg" style="text-align: center; padding: 40px; color: #475569;">
+                <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+                <p style="font-size: 16px; margin-bottom: 10px;">No steps added yet</p>
+                <p style="font-size: 13px;">Click "Add Step" to begin building your procedure</p>
+                <button class="btn btn-primary" onclick="addStep()" style="margin-top: 15px;">+ Add First Step</button>
+            </div>
+
+            <div class="warning-box" style="margin-top: 15px;">
+                ⚠️ <span>Be specific and clear with each step. Include commands, expected outcomes, and any warnings for critical steps.</span>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="goToSection(2)">← Back</button>
+            <button class="btn btn-primary" onclick="goToSection(4)">Next: Safety & Risks →</button>
+        </div>
+    </div>
+
+    <!-- Section 5: Safety & Risks -->
+    <div class="section-page" id="section4">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #d97706, #b45309);">⚠️</div>
+                <div>
+                    <h2>Safety, Risks & Compliance</h2>
+                    <p>Document risks, warnings, and compliance notes</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Risk Level</label>
+                <select id="riskLevel">
+                    <option value="Low">🟢 Low Risk</option>
+                    <option value="Medium" selected>🟡 Medium Risk</option>
+                    <option value="High">🔴 High Risk</option>
+                    <option value="Critical">🚨 Critical Risk</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Known Risks & Warnings</label>
+                <textarea id="risks" rows="4" placeholder="List all known risks associated with this procedure.&#10;&#10;Example:&#10;• Data loss may occur if backup verification is skipped&#10;• System downtime possible during maintenance window&#10;• Incorrect firewall rules may cause network outage"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Rollback / Recovery Plan</label>
+                <textarea id="rollback" rows="4" placeholder="What should be done if something goes wrong?&#10;&#10;Example: If the update fails, restore from the last known good backup created at the start of this procedure. Contact the on-call engineer immediately."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Compliance & Regulatory Notes</label>
+                <textarea id="compliance" rows="3" placeholder="Any compliance standards this SOP adheres to?&#10;&#10;Example: This procedure complies with ISO 27001, GDPR Article 32, and company Information Security Policy v2.3."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Post-Procedure Checklist</label>
+                <div id="checklistContainer"></div>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <input type="text" id="checklistInput" placeholder="e.g., Verify backup completed successfully">
+                    <button class="btn btn-primary" onclick="addChecklistItem()" style="white-space: nowrap;">+ Add Item</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>References & Related SOPs</label>
+                <textarea id="references" rows="3" placeholder="List any related documents, links, or SOPs.&#10;&#10;Example:&#10;• IT-SOP-002: Disaster Recovery Plan&#10;• Network Policy Document v1.4&#10;• NIST SP 800-53"></textarea>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="goToSection(3)">← Back</button>
+            <button class="btn btn-primary" onclick="goToSection(5)">Next: Review & Export →</button>
+        </div>
+    </div>
+
+    <!-- Section 6: Review & Export -->
+    <div class="section-page" id="section5">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #059669, #047857);">✅</div>
+                <div>
+                    <h2>Review & Export</h2>
+                    <p>Review your SOP and export to PDF</p>
+                </div>
+            </div>
+
+            <div id="summaryContainer"></div>
+
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px; flex-wrap: wrap;">
+                <button class="btn btn-purple" onclick="previewSOP()" style="padding: 14px 30px; font-size: 15px;">
+                    👁️ Full Preview
+                </button>
+                <button class="btn btn-success" onclick="exportPDF()" style="padding: 14px 30px; font-size: 15px;">
+                    📄 Export to PDF
+                </button>
+                <button class="btn btn-secondary" onclick="goToSection(0)" style="padding: 14px 30px; font-size: 15px;">
+                    ✏️ Edit SOP
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Preview Modal -->
+<div class="modal-overlay" id="previewModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closePreview()">✕ Close</button>
+        <div id="sopPreviewContent"></div>
+    </div>
+</div>
+
+<!-- Notification -->
+<div class="notification" id="notification">
+    <span>✅</span>
+    <span id="notificationText">Action completed!</span>
+</div>
+
+<script>
+    // State
+    let currentSection = 0;
+    let stepCount = 0;
+    let tools = [];
+    let checklistItems = [];
+
+    // Section Navigation
+    function goToSection(index) {
+        document.querySelectorAll('.section-page').forEach(s => s.classList.remove('active'));
+        document.getElementById('section' + index).classList.add('active');
+
+        // Update progress indicators
+        for (let i = 0; i < 6; i++) {
+            const circle = document.getElementById('sc' + i);
+            const label = document.getElementById('sl' + i);
+            circle.classList.remove('active', 'completed');
+            label.classList.remove('active');
+
+            if (i < index) {
+                circle.classList.add('completed');
+                circle.innerHTML = '✓';
+            } else if (i === index) {
+                circle.classList.add('active');
+                circle.innerHTML = (i + 1);
+                label.classList.add('active');
+            } else {
+                circle.innerHTML = (i + 1);
+            }
+        }
+
+        // Update progress line
+        const fill = (index / 5) * 100;
+        document.getElementById('progressFill').style.width = fill + '%';
+
+        currentSection = index;
+
+        if (index === 5) {
+            generateSummary();
+        }
+
+        window.scrollTo(0, 0);
+    }
+
+    // Add Step
+    function addStep() {
+        stepCount++;
+        const container = document.getElementById('stepsContainer');
+        const noMsg = document.getElementById('noStepsMsg');
+        noMsg.style.display = 'none';
+
+        const stepHtml = `
+            <div class="step-item" id="step${stepCount}">
+                <div class="step-item-header">
+                    <div class="step-number-badge">${stepCount}</div>
+                    <div class="step-item-title">Step ${stepCount}</div>
+                    <div class="step-actions">
+                        <button class="btn btn-warning" onclick="moveStep(${stepCount}, -1)">↑ Up</button>
+                        <button class="btn btn-warning" onclick="moveStep(${stepCount}, 1)">↓ Down</button>
+                        <button class="btn btn-danger" onclick="removeStep(${stepCount})">🗑️ Remove</button>
+                    </div>
+                </div>
+                <div class="step-fields">
+                    <div class="full-width form-group">
+                        <label>Step Title <span class="required">*</span></label>
+                        <input type="text" id="stepTitle${stepCount}" placeholder="e.g., Verify Backup Destination is Accessible"
+                            oninput="updateStepTitle(${stepCount}, this.value)">
+                    </div>
+                    <div class="full-width form-group">
+                        <label>Step Description / Instructions <span class="required">*</span></label>
+                        <textarea id="stepDesc${stepCount}" rows="4"
+                            placeholder="Provide detailed instructions for this step. Include specific commands if applicable.&#10;&#10;Example: Open Veeam Backup Console → Navigate to Backup Jobs → Right-click the job → Select 'Start'"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Responsible Role</label>
+                        <input type="text" id="stepRole${stepCount}" placeholder="e.g., IT Admin">
+                    </div>
+                    <div class="form-group">
+                        <label>Estimated Duration</label>
+                        <input type="text" id="stepDuration${stepCount}" placeholder="e.g., 5 minutes">
+                    </div>
+                    <div class="form-group">
+                        <label>Step Type</label>
+                        <select id="stepType${stepCount}">
+                            <option>Action</option>
+                            <option>Verification</option>
+                            <option>Decision</option>
+                            <option>Notification</option>
+                            <option>Documentation</option>
+                            <option>Command / Script</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Severity if Skipped</label>
+                        <select id="stepSeverity${stepCount}">
+                            <option value="Low">🟢 Low</option>
+                            <option value="Medium" selected>🟡 Medium</option>
+                            <option value="High">🔴 High</option>
+                            <option value="Critical">🚨 Critical</option>
+                        </select>
+                    </div>
+                    <div class="full-width form-group">
+                        <label>Warning / Note for this Step</label>
+                        <input type="text" id="stepWarning${stepCount}"
+                            placeholder="e.g., ⚠️ Ensure service window is active before proceeding. This step will cause brief downtime.">
+                    </div>
+                    <div class="full-width form-group">
+                        <label>Expected Outcome</label>
+                        <input type="text" id="stepOutcome${stepCount}"
+                            placeholder="e.g., Backup job starts and shows 'Running' status in console">
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', stepHtml);
+        showNotification(`Step ${stepCount} added!`);
+    }
+
+    function updateStepTitle(num, value) {
+        const titleEl = document.querySelector(`#step${num} .step-item-title`);
+        titleEl.textContent = value || `Step ${num}`;
+    }
+
+    function removeStep(num) {
+        const el = document.getElementById('step' + num);
+        if (el) {
+            el.style.opacity = '0';
+            el.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+                el.remove();
+                checkNoSteps();
+            }, 300);
+        }
+    }
+
+    function checkNoSteps() {
+        const container = document.getElementById('stepsContainer');
+        const noMsg = document.getElementById('noStepsMsg');
+        if (container.children.length === 0) {
+            noMsg.style.display = 'block';
+        }
+    }
+
+    function moveStep(num, direction) {
+        const el = document.getElementById('step' + num);
+        if (!el) return;
+        if (direction === -1 && el.previousElementSibling) {
+            el.parentNode.insertBefore(el, el.previousElementSibling);
+        } else if (direction === 1 && el.nextElementSibling) {
+            el.parentNode.insertBefore(el.nextElementSibling, el);
+        }
+        showNotification('Step moved!');
+    }
+
+    // Tools
+    function addTool() {
+        const input = document.getElementById('toolInput');
+        const val = input.value.trim();
+        if (!val) return;
+
+        tools.push(val);
+        renderTools();
+        input.value = '';
+    }
+
+    document.getElementById('toolInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addTool();
+    });
+
+    function renderTools() {
+        const container = document.getElementById('toolsTags');
+        container.innerHTML = tools.map((tool, i) => `
+            <div class="tag">
+                🔧 ${tool}
+                <span class="tag-remove" onclick="removeTool(${i})">×</span>
+            </div>
+        `).join('');
+    }
+
+    function removeTool(index) {
+        tools.splice(index, 1);
+        renderTools();
+    }
+
+    // Checklist
+    function addChecklistItem() {
+        const input = document.getElementById('checklistInput');
+        const val = input.value.trim();
+        if (!val) return;
+
+        checklistItems.push({ text: val, id: Date.now() });
+        renderChecklist();
+        input.value = '';
+    }
+
+    document.getElementById('checklistInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addChecklistItem();
+    });
+
+    function renderChecklist() {
+        const container = document.getElementById('checklistContainer');
+        container.innerHTML = checklistItems.map((item, i) => `
+            <div class="checklist-item">
+                <span>☐</span>
+                <input type="text" value="${item.text}" onchange="checklistItems[${i}].text = this.value">
+                <button class="btn btn-danger" onclick="removeChecklist(${i})">✕</button>
+            </div>
+        `).join('');
+    }
+
+    function removeChecklist(index) {
+        checklistItems.splice(index, 1);
+        renderChecklist();
+    }
+
+    // Collect all steps data
+    function collectSteps() {
+        const steps = [];
+        const stepEls = document.querySelectorAll('.step-item');
+        let num = 1;
+        stepEls.forEach(el => {
+            const id = el.id.replace('step', '');
+            steps.push({
+                number: num++,
+                title: document.getElementById('stepTitle' + id)?.value || '',
+                description: document.getElementById('stepDesc' + id)?.value || '',
+                role: document.getElementById('stepRole' + id)?.value || '',
+                duration: document.getElementById('stepDuration' + id)?.value || '',
+                type: document.getElementById('stepType' + id)?.value || '',
+                severity: document.getElementById('stepSeverity' + id)?.value || '',
+                warning: document.getElementById('stepWarning' + id)?.value || '',
+                outcome: document.getElementById('stepOutcome' + id)?.value || ''
+            });
+        });
+        return steps;
+    }
+
+    // Collect all form data
+    function collectData() {
+        return {
+            title: document.getElementById('sopTitle').value,
+            sopId: document.getElementById('sopId').value,
+            department: document.getElementById('department').value,
+            category: document.getElementById('category').value,
+            version: document.getElementById('version').value,
+            effectiveDate: document.getElementById('effectiveDate').value,
+            reviewDate: document.getElementById('reviewDate').value,
+            author: document.getElementById('author').value,
+            approvedBy: document.getElementById('approvedBy').value,
+            company: document.getElementById('company').value,
+            priority: document.getElementById('priority').value,
+            purpose: document.getElementById('purpose').value,
+            scopeIncluded: document.getElementById('scopeIncluded').value,
+            scopeExcluded: document.getElementById('scopeExcluded').value,
+            prerequisites: document.getElementById('prerequisites').value,
+            tools: tools,
+            primaryOwner: document.getElementById('primaryOwner').value,
+            secondaryOwner: document.getElementById('secondaryOwner').value,
+            supervisor: document.getElementById('supervisor').value,
+            stakeholders: document.getElementById('stakeholders').value,
+            qualifications: document.getElementById('qualifications').value,
+            riskLevel: document.getElementById('riskLevel').value,
+            risks: document.getElementById('risks').value,
+            rollback: document.getElementById('rollback').value,
+            compliance: document.getElementById('compliance').value,
+            checklist: checklistItems,
+            references: document.getElementById('references').value,
+            steps: collectSteps()
+        };
+    }
+
+    // Generate Summary
+    function generateSummary() {
+        const d = collectData();
+        const container = document.getElementById('summaryContainer');
+
+        const riskColors = {
+            Low: '#22c55e', Medium: '#f59e0b',
+            High: '#ef4444', Critical: '#dc2626'
+        };
+
+        container.innerHTML = `
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:15px; text-align:center;">
+                    <div style="font-size:28px; font-weight:800; color:#60a5fa;">${d.steps.length}</div>
+                    <div style="font-size:12px; color:#94a3b8;">Procedure Steps</div>
+                </div>
+                <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:15px; text-align:center;">
+                    <div style="font-size:28px; font-weight:800; color:#34d399;">${d.tools.length}</div>
+                    <div style="font-size:12px; color:#94a3b8;">Tools Listed</div>
+                </div>
+                <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:15px; text-align:center;">
+                    <div style="font-size:28px; font-weight:800; color:${riskColors[d.riskLevel] || '#f59e0b'};">${d.riskLevel}</div>
+                    <div style="font-size:12px; color:#94a3b8;">Risk Level</div>
+                </div>
+            </div>
+            <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:20px;">
+                <h3 style="color:#60a5fa; margin-bottom:15px;">📋 SOP Summary</h3>
+                <table style="width:100%; border-collapse:collapse;">
+                    ${summaryRow('📄 Title', d.title || 'Not set')}
+                    ${summaryRow('🔢 SOP ID', d.sopId || 'Not set')}
+                    ${summaryRow('🏢 Company', d.company || 'Not set')}
+                    ${summaryRow('📁 Category', d.category || 'Not set')}
+                    ${summaryRow('👤 Author', d.author || 'Not set')}
+                    ${summaryRow('✅ Approved By', d.approvedBy || 'Not set')}
+                    ${summaryRow('📅 Effective Date', d.effectiveDate || 'Not set')}
+                    ${summaryRow('🔄 Version', d.version || 'Not set')}
+                    ${summaryRow('🎯 Priority', d.priority)}
+                    ${summaryRow('👥 Primary Owner', d.primaryOwner || 'Not set')}
+                    ${summaryRow('📝 Steps Count', d.steps.length + ' steps')}
+                    ${summaryRow('☑️ Checklist Items', d.checklist.length + ' items')}
+                </table>
+            </div>
+        `;
+    }
+
+    function summaryRow(label, value) {
+        return `
+            <tr style="border-bottom: 1px solid #1e293b;">
+                <td style="padding: 8px; color: #94a3b8; font-size: 13px; width: 40%;">${label}</td>
+                <td style="padding: 8px; color: #e2e8f0; font-size: 13px; font-weight: 600;">${value}</td>
+            </tr>
+        `;
+    }
+
+    // Preview SOP
+    function previewSOP() {
+        const d = collectData();
+        const modal = document.getElementById('previewModal');
+        const content = document.getElementById('sopPreviewContent');
+
+        const stepsHTML = d.steps.map(step => `
+            <div class="sop-step">
+                <div class="sop-step-num">${step.number}</div>
+                <div class="sop-step-content" style="flex:1;">
+                    <h4>${step.title || 'Untitled Step'}</h4>
+                    <p>${(step.description || '').replace(/\n/g, '<br>')}</p>
+                    <div class="sop-step-meta">
+                        ${step.role ? `<span class="sop-step-badge badge-responsible">👤 ${step.role}</span>` : ''}
+                        ${step.duration ? `<span class="sop-step-badge badge-duration">⏱ ${step.duration}</span>` : ''}
+                        ${step.type ? `<span class="sop-step-badge" style="background:#f3e8ff;color:#7c3aed;">${step.type}</span>` : ''}
+                        ${step.severity === 'High' || step.severity === 'Critical' ?
+                            `<span class="sop-step-badge badge-critical">⚠ ${step.severity}</span>` : ''}
+                    </div>
+                    ${step.outcome ? `<p style="font-size:12px;color:#059669;margin-top:5px;">✓ Expected: ${step.outcome}</p>` : ''}
+                    ${step.warning ? `<div class="sop-warning-block">⚠️ ${step.warning}</div>` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        const checklistHTML = d.checklist.length > 0 ? d.checklist.map(item =>
+            `<li style="margin-bottom: 5px;">☐ ${item.text}</li>`
+        ).join('') : '<li style="color:#94a3b8;">No checklist items defined</li>';
+
+        const riskBadge = {
+            Low: 'risk-low', Medium: 'risk-medium',
+            High: 'risk-high', Critical: 'risk-critical'
+        };
+
+        content.innerHTML = `
+            <div class="sop-preview">
+                <div class="sop-header">
+                    <div class="sop-company">${d.company || 'Organization'} — IT Department</div>
+                    <div class="sop-title">${d.title || 'Untitled SOP'}</div>
+                    <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;">
+                        ${d.category ? `<span style="background:#dbeafe;color:#1d4ed8;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">${d.category}</span>` : ''}
+                        <span class="risk-badge ${riskBadge[d.riskLevel] || 'risk-medium'}">${d.riskLevel} Risk</span>
+                        <span style="background:#f0fdf4;color:#15803d;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">${d.priority} Priority</span>
+                    </div>
+                    <div class="sop-meta">
+                        <div class="sop-meta-item">
+                            <label>Document ID</label>
+                            <p>${d.sopId || 'N/A'}</p>
+                        </div>
+                        <div class="sop-meta-item">
+                            <label>Version</label>
+                            <p>${d.version || 'N/A'}</p>
+                        </div>
+                        <div class="sop-meta-item">
+                            <label>Effective Date</label>
+                            <p>${d.effectiveDate || 'N/A'}</p>
+                        </div>
+                        <div class="sop-meta-item">
+                            <label>Review Date</label>
+                            <p>${d.reviewDate || 'N/A'}</p>
+                        </div>
+                        <div class="sop-meta-item">
+                            <label>Author</label>
+                            <p>${d.author || 'N/A'}</p>
+                        </div>
+                        <div class="sop-meta-item">
+                            <label>Approved By</label>
+                            <p>${d.approvedBy || 'N/A'}</p>
+                        </div>
+                        <div class="sop-meta-item">
+                            <label>Department</label>
+                            <p>${d.department || 'N/A'}</p>
+                        </div>
+                        <div class="sop-meta-item">
+                            <label>Total Steps</label>
+                            <p>${d.steps.length} Steps</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sop-section">
+                    <div class="sop-section-title">1. Purpose & Objective</div>
+                    <p>${(d.purpose || 'Not defined.').replace(/\n/g, '<br>')}</p>
+                </div>
+
+                <div class="sop-section">
+                    <div class="sop-section-title">2. Scope</div>
+                    <p><strong>Included:</strong> ${(d.scopeIncluded || 'Not defined.').replace(/\n/g, '<br>')}</p>
+                    <br>
+                    <p><strong>Excluded:</strong> ${(d.scopeExcluded || 'Not defined.').replace(/\n/g, '<br>')}</p>
+                </div>
+
+                <div class="sop-section">
+                    <div class="sop-section-title">3. Prerequisites</div>
+                    <p>${(d.prerequisites || 'None specified.').replace(/\n/g, '<br>')}</p>
+                    ${d.tools.length > 0 ? `
+                    <div style="margin-top:10px;">
+                        <strong style="font-size:13px;">Tools Required:</strong>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+                            ${d.tools.map(t => `<span style="background:#dbeafe;color:#1d4ed8;padding:3px 10px;border-radius:12px;font-size:12px;">🔧 ${t}</span>`).join('')}
+                        </div>
+                    </div>` : ''}
+                </div>
+
+                <div class="sop-section">
+                    <div class="sop-section-title">4. Roles & Responsibilities</div>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <tr style="background:#f8fafc;">
+                            <th style="text-align:left;padding:8px;font-size:12px;color:#64748b;border-bottom:1px solid #e2e8f0;">Role</th>
+                            <th style="text-align:left;padding:8px;font-size:12px;color:#64748b;border-bottom:1px solid #e2e8f0;">Person/Title</th>
+                        </tr>
+                        <tr><td style="padding:8px;font-size:13px;border-bottom:1px solid #f1f5f9;">Primary Owner</td><td style="padding:8px;font-size:13px;font-weight:600;border-bottom:1px solid #f1f5f9;">${d.primaryOwner || 'N/A'}</td></tr>
+                        <tr><td style="padding:8px;font-size:13px;border-bottom:1px solid #f1f5f9;">Secondary Owner</td><td style="padding:8px;font-size:13px;font-weight:600;border-bottom:1px solid #f1f5f9;">${d.secondaryOwner || 'N/A'}</td></tr>
+                        <tr><td style="padding:8px;font-size:13px;border-bottom:1px solid #f1f5f9;">Supervisor</td><td style="padding:8px;font-size:13px;font-weight:600;border-bottom:1px solid #f1f5f9;">${d.supervisor || 'N/A'}</td></tr>
+                    </table>
+                    ${d.qualifications ? `<p style="margin-top:10px;font-size:13px;"><strong>Required Qualifications:</strong> ${d.qualifications}</p>` : ''}
+                </div>
+
+                <div class="sop-section">
+                    <div class="sop-section-title">5. Procedure Steps</div>
+                    ${d.steps.length > 0 ? stepsHTML : '<p style="color:#94a3b8;">No steps have been defined.</p>'}
+                </div>
+
+                <div class="sop-section">
+                    <div class="sop-section-title">6. Risks & Safety</div>
+                    <p><strong>Risk Level:</strong> <span class="risk-badge ${riskBadge[d.riskLevel]}">${d.riskLevel}</span></p>
+                    <br>
+                    <p>${(d.risks || 'No specific risks documented.').replace(/\n/g, '<br>')}</p>
+                    ${d.rollback ? `<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:12px;margin-top:12px;">
+                        <strong style="font-size:13px;">🔄 Rollback Plan:</strong><br>
+                        <span style="font-size:13px;">${d.rollback.replace(/\n/g, '<br>')}</span>
+                    </div>` : ''}
+                </div>
+
+                ${d.checklist.length > 0 ? `
+                <div class="sop-section">
+                    <div class="sop-section-title">7. Post-Procedure Checklist</div>
+                    <ul style="list-style:none;padding:0;">${checklistHTML}</ul>
+                </div>` : ''}
+
+                ${d.compliance ? `
+                <div class="sop-section">
+                    <div class="sop-section-title">8. Compliance & Regulatory Notes</div>
+                    <p>${d.compliance.replace(/\n/g, '<br>')}</p>
+                </div>` : ''}
+
+                ${d.references ? `
+                <div class="sop-section">
+                    <div class="sop-section-title">9. References</div>
+                    <p>${d.references.replace(/\n/g, '<br>')}</p>
+                </div>` : ''}
+
+                <div class="sop-section">
+                    <div class="sop-section-title">10. Approval & Signature</div>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <tr style="background:#f8fafc;">
+                            <th style="text-align:left;padding:10px;font-size:12px;color:#64748b;border:1px solid #e2e8f0;">Role</th>
+                            <th style="text-align:left;padding:10px;font-size:12px;color:#64748b;border:1px solid #e2e8f0;">Name</th>
+                            <th style="text-align:left;padding:10px;font-size:12px;color:#64748b;border:1px solid #e2e8f0;">Signature</th>
+                            <th style="text-align:left;padding:10px;font-size:12px;color:#64748b;border:1px solid #e2e8f0;">Date</th>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px;font-size:13px;border:1px solid #e2e8f0;">Author</td>
+                            <td style="padding:10px;font-size:13px;border:1px solid #e2e8f0;">${d.author || ''}</td>
+                            <td style="padding:10px;border:1px solid #e2e8f0;height:35px;"></td>
+                            <td style="padding:10px;border:1px solid #e2e8f0;"></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px;font-size:13px;border:1px solid #e2e8f0;">Approved By</td>
+                            <td style="padding:10px;font-size:13px;border:1px solid #e2e8f0;">${d.approvedBy || ''}</td>
+                            <td style="padding:10px;border:1px solid #e2e8f0;height:35px;"></td>
+                            <td style="padding:10px;border:1px solid #e2e8f0;"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="sop-footer">
+                    <span>${d.company || 'Organization'} — Confidential</span>
+                    <span>Doc: ${d.sopId || 'N/A'} | Ver: ${d.version || 'N/A'} | ${d.effectiveDate || ''}</span>
+                    <span>Page 1 of 1</span>
+                </div>
+            </div>
+        `;
+
+        modal.classList.add('active');
+    }
+
+    function closePreview() {
+        document.getElementById('previewModal').classList.remove('active');
+    }
+
+    // Export PDF
+    function exportPDF() {
+        const d = collectData();
+
+        if (!d.title) {
+            showNotification('⚠️ Please add a SOP title before exporting!', true);
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+        const pageW = 210;
+        const pageH = 297;
+        const margin = 15;
+        const contentW = pageW - margin * 2;
+        let y = margin;
+        let pageNum = 1;
+
+        const colors = {
+            dark: [15, 23, 42],
+            blue: [37, 99, 235],
+            lightBlue: [219, 234, 254],
+            green: [5, 150, 105],
+            red: [220, 38, 38],
+            yellow: [217, 119, 6],
+            gray: [100, 116, 139],
+            lightGray: [241, 245, 249],
+            white: [255, 255, 255],
+            border: [226, 232, 240]
+        };
+
+        function setColor(type, color) {
+            if (type === 'fill') doc.setFillColor(...color);
+            else if (type === 'text') doc.setTextColor(...color);
+            else if (type === 'draw') doc.setDrawColor(...color);
+        }
+
+        function checkPage(needed = 15) {
+            if (y + needed > pageH - margin) {
+                doc.addPage();
+                y = margin;
+                pageNum++;
+                addPageHeader();
+            }
+        }
+
+        function addPageHeader() {
+            setColor('fill', colors.dark);
+            doc.rect(0, 0, pageW, 10, 'F');
+            setColor('text', colors.white);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text(d.company || 'Organization', margin, 7);
+            doc.text(`${d.title || 'SOP'} | ${d.sopId || ''}`, pageW / 2, 7, { align: 'center' });
+            doc.text(`Page ${pageNum}`, pageW - margin, 7, { align: 'right' });
+            y = 15;
+        }
+
+        function sectionTitle(title) {
+            checkPage(12);
+            setColor('fill', colors.blue);
+            doc.rect(margin, y, 4, 7, 'F');
+            setColor('text', colors.dark);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text(title, margin + 7, y + 5);
+            y += 12;
+        }
+
+        function bodyText(text, indent = 0) {
+            if (!text) return;
+            setColor('text', [55, 65, 81]);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            const lines = doc.splitTextToSize(text, contentW - indent);
+            lines.forEach(line => {
+                checkPage(6);
+                doc.text(line, margin + indent, y);
+                y += 5;
+            });
+            y += 2;
+        }
+
+        function labelValue(label, value, indent = 0) {
+            if (!value) return;
+            checkPage(6);
+            setColor('text', colors.gray);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text(label + ':', margin + indent, y);
+            setColor('text', colors.dark);
+            doc.setFont('helvetica', 'normal');
+            const lines = doc.splitTextToSize(value, contentW - indent - 30);
+            doc.text(lines[0], margin + indent + 28, y);
+            y += 5;
+            for (let i = 1; i < lines.length; i++) {
+                checkPage(5);
+                doc.text(lines[i], margin + indent + 28, y);
+                y += 5;
+            }
+        }
+
+        // ─── COVER PAGE ───
+        setColor('fill', colors.dark);
+        doc.rect(0, 0, pageW, pageH, 'F');
+
+        setColor('fill', colors.blue);
+        doc.rect(0, 0, pageW, 60, 'F');
+
+        setColor('text', colors.white);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text('STANDARD OPERATING PROCEDURE', pageW / 2, 18, { align: 'center' });
+        doc.text('IT Administration', pageW / 2, 25, { align: 'center' });
+
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        const titleLines = doc.splitTextToSize(d.title || 'Untitled SOP', contentW);
+        let titleY = 38;
+        titleLines.forEach(line => {
+            doc.text(line, pageW / 2, titleY, { align: 'center' });
+            titleY += 9;
+        });
+
+        // Meta box
+        setColor('fill', [30, 41, 59]);
+        doc.roundedRect(margin, 75, contentW, 60, 3, 3, 'F');
+
+        const metaItems = [
+            ['Doc ID', d.sopId], ['Version', d.version],
+            ['Category', d.category], ['Priority', d.priority],
+            ['Author', d.author], ['Approved By', d.approvedBy],
+            ['Effective Date', d.effectiveDate], ['Review Date', d.reviewDate]
+        ];
+
+        let mx = margin + 5, my = 85;
+        metaItems.forEach((item, i) => {
+            if (i % 2 === 0 && i > 0) { mx = margin + 5; my += 13; }
+            else if (i % 2 === 1) mx = margin + contentW / 2;
+
+            setColor('text', [148, 163, 184]);
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'bold');
+            doc.text(item[0].toUpperCase(), mx, my);
+
+            setColor('text', colors.white);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text(item[1] || 'N/A', mx, my + 5);
+        });
+
+        // Risk level indicator
+        const riskC = { Low: [34, 197, 94], Medium: [245, 158, 11], High: [239, 68, 68], Critical: [220, 38, 38] };
+        const rc = riskC[d.riskLevel] || riskC.Medium;
+        setColor('fill', rc);
+        doc.roundedRect(margin, 145, 50, 20, 3, 3, 'F');
+        setColor('text', colors.white);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('RISK LEVEL', margin + 25, 153, { align: 'center' });
+        doc.setFontSize(11);
+        doc.text(d.riskLevel.toUpperCase(), margin + 25, 161, { align: 'center' });
+
+        setColor('fill', [37, 99, 235]);
+        doc.roundedRect(margin + 55, 145, 50, 20, 3, 3, 'F');
+        setColor('text', colors.white);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('TOTAL STEPS', margin + 80, 153, { align: 'center' });
+        doc.setFontSize(11);
+        doc.text(d.steps.length.toString(), margin + 80, 161, { align: 'center' });
+
+        setColor('fill', [124, 58, 237]);
+        doc.roundedRect(margin + 110, 145, 65, 20, 3, 3, 'F');
+        setColor('text', colors.white);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('DEPARTMENT', margin + 142, 153, { align: 'center' });
+        doc.setFontSize(9);
+        doc.text(d.department || 'IT', margin + 142, 161, { align: 'center' });
+
+        setColor('text', [148, 163, 184]);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageW / 2, 275, { align: 'center' });
+        doc.text(d.company || 'Organization', pageW / 2, 281, { align: 'center' });
+        doc.text('CONFIDENTIAL - IT USE ONLY', pageW / 2, 287, { align: 'center' });
+
+        // ─── CONTENT PAGES ───
+        doc.addPage();
+        pageNum = 2;
+        addPageHeader();
+        y += 3;
+
+        // 1. Purpose
+        sectionTitle('1. PURPOSE & OBJECTIVE');
+        bodyText(d.purpose || 'Not defined.');
+        y += 3;
+
+        // 2. Scope
+        sectionTitle('2. SCOPE');
+        if (d.scopeIncluded) {
+            checkPage(6);
+            setColor('text', colors.green);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('✓ Included:', margin, y);
+            y += 5;
+            bodyText(d.scopeIncluded, 5);
+        }
+        if (d.scopeExcluded) {
+            checkPage(6);
+            setColor('text', colors.red);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('✗ Excluded:', margin, y);
+            y += 5;
+            bodyText(d.scopeExcluded, 5);
+        }
+        y += 3;
+
+        // 3. Prerequisites
+        sectionTitle('3. PREREQUISITES & TOOLS');
+        bodyText(d.prerequisites || 'None specified.');
+        if (d.tools.length > 0) {
+            checkPage(10);
+            setColor('text', colors.gray);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Required Tools:', margin, y);
+            y += 5;
+            d.tools.forEach(tool => {
+                checkPage(6);
+                setColor('fill', colors.lightBlue);
+                doc.roundedRect(margin, y - 3, 50, 6, 2, 2, 'F');
+                setColor('text', colors.blue);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.text('🔧 ' + tool, margin + 2, y + 1);
+                y += 8;
+            });
+        }
+        y += 3;
+
+        // 4. Responsibilities
+        sectionTitle('4. ROLES & RESPONSIBILITIES');
+        checkPage(35);
+        setColor('fill', colors.lightBlue);
+        doc.rect(margin, y, contentW, 7, 'F');
+        setColor('text', colors.blue);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('ROLE', margin + 2, y + 5);
+        doc.text('PERSON / TITLE', margin + 65, y + 5);
+        y += 7;
+
+        const roles = [
+            ['Primary Owner', d.primaryOwner],
+            ['Secondary Owner', d.secondaryOwner],
+            ['Supervisor / Escalation', d.supervisor]
+        ];
+
+        roles.forEach((role, i) => {
+            checkPage(8);
+            if (i % 2 === 0) {
+                setColor('fill', colors.lightGray);
+                doc.rect(margin, y, contentW, 7, 'F');
+            }
+            setColor('text', colors.dark);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text(role[0], margin + 2, y + 5);
+            doc.setFont('helvetica', 'bold');
+            doc.text(role[1] || 'N/A', margin + 65, y + 5);
+            y += 7;
+        });
+
+        setColor('draw', colors.border);
+        doc.rect(margin, y - (roles.length * 7) - 7, contentW, (roles.length * 7) + 7);
+
+        if (d.qualifications) {
+            y += 5;
+            labelValue('Required Qualifications', d.qualifications);
+        }
+        if (d.stakeholders) {
+            labelValue('Stakeholders', d.stakeholders);
+        }
+        y += 3;
+
+        // 5. Procedure Steps
+        sectionTitle('5. PROCEDURE STEPS');
+
+        if (d.steps.length === 0) {
+            bodyText('No procedure steps have been defined.');
+        } else {
+            d.steps.forEach(step => {
+                checkPage(30);
+
+                // Step header
+                const stepSevColors = {
+                    Low: [34, 197, 94], Medium: [245, 158, 11],
+                    High: [239, 68, 68], Critical: [220, 38, 38]
+                };
+                const sc = stepSevColors[step.severity] || stepSevColors.Medium;
+
+                setColor('fill', [30, 41, 59]);
+                doc.roundedRect(margin, y, contentW, 8, 2, 2, 'F');
+
+                setColor('fill', colors.blue);
+                doc.circle(margin + 5, y + 4, 4, 'F');
+
+                setColor('text', colors.white);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'bold');
+                doc.text(step.number.toString(), margin + 5, y + 5, { align: 'center' });
+
+                doc.setFontSize(9);
+                doc.text(step.title || 'Untitled Step', margin + 12, y + 5.5);
+
+                if (step.severity) {
+                    setColor('fill', sc);
+                    doc.roundedRect(pageW - margin - 22, y + 1, 20, 6, 2, 2, 'F');
+                    setColor('text', colors.white);
+                    doc.setFontSize(7);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(step.severity, pageW - margin - 12, y + 5, { align: 'center' });
+                }
+                y += 10;
+
+                // Step body
+                setColor('fill', colors.lightGray);
+                const descLines = doc.splitTextToSize(step.description || 'No description.', contentW - 10);
+                const bodyH = descLines.length * 5 + 10;
+                checkPage(bodyH + 15);
+                doc.rect(margin, y, contentW, bodyH, 'F');
+
+                setColor('text', [55, 65, 81]);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                let dy = y + 5;
+                descLines.forEach(line => {
+                    doc.text(line, margin + 5, dy);
+                    dy += 5;
+                });
+                y += bodyH + 2;
+
+                // Step meta
+                const meta = [];
+                if (step.role) meta.push(['👤 Role', step.role]);
+                if (step.duration) meta.push(['⏱ Duration', step.duration]);
+                if (step.type) meta.push(['Type', step.type]);
+                if (step.outcome) meta.push(['✓ Expected', step.outcome]);
+
+                if (meta.length > 0) {
+                    checkPage(8);
+                    let mx2 = margin;
+                    meta.forEach(m => {
+                        setColor('text', colors.gray);
+                        doc.setFontSize(7);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(m[0] + ':', mx2, y);
+                        setColor('text', colors.dark);
+                        doc.setFont('helvetica', 'normal');
+                        doc.text(m[1], mx2 + 20, y);
+                        mx2 += 50;
+                        if (mx2 > pageW - margin - 30) { mx2 = margin; y += 5; }
+                    });
+                    y += 6;
+                }
+
+                if (step.warning) {
+                    checkPage(10);
+                    setColor('fill', [254, 243, 199]);
+                    const wLines = doc.splitTextToSize('⚠ ' + step.warning, contentW - 6);
+                    doc.roundedRect(margin, y, contentW, wLines.length * 5 + 4, 2, 2, 'F');
+                    setColor('text', [146, 64, 14]);
+                    doc.setFontSize(8);
+                    doc.setFont('helvetica', 'normal');
+                    wLines.forEach((line, i) => doc.text(line, margin + 3, y + 5 + i * 5));
+                    y += wLines.length * 5 + 8;
+                }
+
+                y += 5;
+            });
+        }
+
+        // 6. Risks & Safety
+        sectionTitle('6. RISKS & SAFETY');
+
+        checkPage(15);
+        const riskC2 = { Low: [34, 197, 94], Medium: [245, 158, 11], High: [239, 68, 68], Critical: [220, 38, 38] };
+        const rc2 = riskC2[d.riskLevel] || riskC2.Medium;
+        setColor('fill', rc2);
+        doc.roundedRect(margin, y, 45, 10, 3, 3, 'F');
+        setColor('text', colors.white);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${d.riskLevel} Risk`, margin + 22.5, y + 7, { align: 'center' });
+        y += 14;
+
+        bodyText(d.risks || 'No specific risks documented.');
+
+        if (d.rollback) {
+            checkPage(15);
+            setColor('fill', [254, 243, 199]);
+            doc.roundedRect(margin, y, contentW, 8, 2, 2, 'F');
+            setColor('text', [146, 64, 14]);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('🔄 Rollback Plan:', margin + 3, y + 5.5);
+            y += 10;
+            bodyText(d.rollback, 5);
+        }
+        y += 3;
+
+        // 7. Checklist
+        if (d.checklist.length > 0) {
+            sectionTitle('7. POST-PROCEDURE CHECKLIST');
+            d.checklist.forEach(item => {
+                checkPage(8);
+                setColor('draw', colors.blue);
+                doc.setLineWidth(0.5);
+                doc.rect(margin, y - 3, 5, 5);
+                setColor('text', colors.dark);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(item.text, margin + 8, y);
+                y += 7;
+            });
+            y += 3;
+        }
+
+        // 8. Compliance
+        if (d.compliance) {
+            sectionTitle('8. COMPLIANCE & REGULATORY NOTES');
+            bodyText(d.compliance);
+            y += 3;
+        }
+
+        // 9. References
+        if (d.references) {
+            sectionTitle('9. REFERENCES');
+            bodyText(d.references);
+            y += 3;
+        }
+
+        // 10. Signature Page
+        checkPage(60);
+        sectionTitle('10. APPROVAL & SIGNATURES');
+
+        checkPage(50);
+        setColor('fill', colors.lightBlue);
+        doc.rect(margin, y, contentW, 8, 'F');
+        setColor('text', colors.blue);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('ROLE', margin + 2, y + 5.5);
+        doc.text('NAME', margin + 50, y + 5.5);
+        doc.text('SIGNATURE', margin + 110, y + 5.5);
+        doc.text('DATE', margin + 155, y + 5.5);
+        y += 8;
+
+        const sigRows = [['Author', d.author], ['Approved By', d.approvedBy], ['IT Manager', '']];
+        sigRows.forEach((row, i) => {
+            checkPage(14);
+            if (i % 2 === 0) {
+                setColor('fill', colors.lightGray);
+                doc.rect(margin, y, contentW, 13, 'F');
+            }
+            setColor('text', colors.dark);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text(row[0], margin + 2, y + 8);
+            doc.text(row[1] || '', margin + 50, y + 8);
+            setColor('draw', colors.border);
+            doc.line(margin + 110, y + 11, margin + 150, y + 11);
+            doc.line(margin + 155, y + 11, contentW + margin, y + 11);
+            y += 13;
+        });
+
+        setColor('draw', colors.border);
+        doc.rect(margin, y - (sigRows.length * 13) - 8, contentW, sigRows.length * 13 + 8);
+
+        // Final footer
+        y += 10;
+        checkPage(20);
+        setColor('fill', colors.dark);
+        doc.rect(margin, y, contentW, 15, 'F');
+        setColor('text', [148, 163, 184]);
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.text(d.company || 'Organization', margin + 5, y + 6);
+        doc.text(`Document: ${d.sopId || 'N/A'} | Version: ${d.version || 'N/A'}`, pageW / 2, y + 6, { align: 'center' });
+        doc.text('CONFIDENTIAL - IT USE ONLY', pageW - margin - 5, y + 6, { align: 'right' });
+        doc.text(`Generated on ${new Date().toLocaleString()}`, pageW / 2, y + 12, { align: 'center' });
+
+        // Save
+        const filename = `SOP_${(d.sopId || 'IT').replace(/\s+/g, '_')}_${(d.title || 'Document').replace(/\s+/g, '_').substring(0, 30)}.pdf`;
+        doc.save(filename);
+        showNotification('✅ PDF exported successfully!');
+    }
+
+    // Clear Form
+    function clearForm() {
+        if (!confirm('Are you sure you want to clear all data? This cannot be undone.')) return;
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            if (el.tagName === 'SELECT') el.selectedIndex = 0;
+            else el.value = '';
+        });
+        tools = [];
+        checklistItems = [];
+        stepCount = 0;
+        renderTools();
+        renderChecklist();
+        document.getElementById('stepsContainer').innerHTML = '';
+        document.getElementById('noStepsMsg').style.display = 'block';
+        goToSection(0);
+        showNotification('🗑️ Form cleared!');
+    }
+
+    // Notification
+    function showNotification(msg, isError = false) {
+        const notif = document.getElementById('notification');
+        const text = document.getElementById('notificationText');
+        text.textContent = msg;
+        notif.style.background = isError
+            ? 'linear-gradient(135deg, #dc2626, #b91c1c)'
+            : 'linear-gradient(135deg, #059669, #047857)';
+        notif.classList.add('show');
+        setTimeout(() => notif.classList.remove('show'), 3000);
+    }
+
+    // Close modal on overlay click
+    document.getElementById('previewModal').addEventListener('click', function(e) {
+        if (e.target === this) closePreview();
+    });
+
+    // Set default dates
+    const today = new Date();
+    document.getElementById('effectiveDate').value = today.toISOString().split('T')[0];
+    const review = new Date(today);
+    review.setFullYear(review.getFullYear() + 1);
+    document.getElementById('reviewDate').value = review.toISOString().split('T')[0];
+
+    // Auto generate SOP ID
+    document.getElementById('sopTitle').addEventListener('input', function() {
+        if (!document.getElementById('sopId').value) {
+            const words = this.value.split(' ').slice(0, 3).map(w => w.substring(0, 3).toUpperCase());
+            document.getElementById('sopId').value = 'IT-SOP-' + words.join('');
+        }
+    });
+
+</script>
+</body>
+</html>

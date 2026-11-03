@@ -1,0 +1,253 @@
+<!doctype html>
+<!--
+  HOW TO ADD SONGS (about 2 minutes per song)
+  1. In your GitHub repo, make a folder called "audio" and upload your .mp3 files there.
+  2. Scroll down to "const TRACKS" in this file.
+  3. For each song, set src to "audio/your-file-name.mp3" and fill in the title and note.
+  4. section must be "voice", "songwriting" or "ambient".
+  5. tag must be "My vocals", "My lyrics" or "AI-assisted".
+  Songs with src: "" show as "Coming soon" until you add a file.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Himal — Music</title>
+<meta name="description" content="Himal Shrestha: baritenor vocals, songwriting, and ambient music for games.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fog: #E4E8EB;
+    --ink: #1F2C36;
+    --slate: #66757F;
+    --line: #C7CED4;
+    --lamp: #C9962B;
+    --row: #EDF0F2;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --fog: #18212A;
+      --ink: #DCE3E8;
+      --slate: #8C9AA5;
+      --line: #2E3A45;
+      --lamp: #E6BC5C;
+      --row: #1E2832;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --fog: #18212A; --ink: #DCE3E8; --slate: #8C9AA5;
+    --line: #2E3A45; --lamp: #E6BC5C; --row: #1E2832; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--fog);
+    color: var(--ink);
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 640px; margin: 0 auto; padding: 72px 20px 140px; }
+
+  header { margin-bottom: 64px; }
+  .name {
+    font-size: clamp(56px, 16vw, 104px);
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    line-height: 0.9;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.08em;
+  }
+  .lamp {
+    width: 0.16em; height: 0.16em; margin-top: 0.08em;
+    border-radius: 50%;
+    background: var(--line);
+    transition: background .4s, box-shadow .4s;
+  }
+  body.playing .lamp {
+    background: var(--lamp);
+    box-shadow: 0 0 0.25em var(--lamp);
+    animation: hum 2.6s ease-in-out infinite;
+  }
+  @keyframes hum { 50% { opacity: .55; } }
+  .bio { margin-top: 20px; max-width: 34ch; color: var(--slate); font-size: 19px; }
+
+  section { margin-top: 56px; }
+  h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .about { color: var(--slate); margin-top: 4px; font-size: 15px; }
+  ul { list-style: none; padding: 0; margin-top: 16px; border-top: 1px solid var(--line); }
+
+  .track {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .track.current { background: var(--row); margin: 0 -12px; padding: 14px 12px; border-radius: 6px; }
+  .play {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 1.5px solid var(--ink); background: none; color: var(--ink);
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .play:disabled { border-color: var(--line); color: var(--line); cursor: default; }
+  .play svg { width: 14px; height: 14px; fill: currentColor; }
+  .play:focus-visible, .bar:focus-visible, a:focus-visible { outline: 2px solid var(--lamp); outline-offset: 3px; }
+  .title { font-weight: 600; }
+  .note { font-size: 14px; color: var(--slate); }
+  .meta { text-align: right; font-size: 13px; color: var(--slate); white-space: nowrap; }
+  .tag { display: block; }
+
+  footer { margin-top: 72px; color: var(--slate); }
+  footer a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
+
+  .player {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: var(--fog); border-top: 1px solid var(--line);
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    transform: translateY(100%); transition: transform .3s ease;
+  }
+  .player.open { transform: none; }
+  .player-inner { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: center; }
+  .now { font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; gap: 12px; }
+  .now span:last-child { color: var(--slate); font-weight: 400; font-variant-numeric: tabular-nums; }
+  .bar { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; margin-top: 8px; background: var(--line); border-radius: 2px; cursor: pointer; }
+  .bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--lamp); }
+  .bar::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--lamp); }
+
+  @media (prefers-reduced-motion: reduce) {
+    body.playing .lamp { animation: none; }
+    .player { transition: none; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <p style="margin-bottom:32px"><a href="/" style="color:var(--slate);text-underline-offset:3px">← Back to the hub</a></p>
+  <header>
+    <h1 class="name">Himal<span class="lamp" aria-hidden="true"></span></h1>
+    <p class="bio">Baritenor singer and songwriter. Character-driven songs and ambient music for quiet, empty places.</p>
+  </header>
+
+  <section data-section="voice">
+    <h2>Voice</h2>
+    <p class="about">Recordings where I'm singing.</p>
+    <ul></ul>
+  </section>
+
+  <section data-section="songwriting">
+    <h2>Songwriting</h2>
+    <p class="about">Lyrics and songs I wrote, including demos.</p>
+    <ul></ul>
+  </section>
+
+  <section data-section="ambient">
+    <h2>Game &amp; ambient</h2>
+    <p class="about">Atmosphere for games and late nights.</p>
+    <ul></ul>
+  </section>
+
+  <footer>
+    <p>For singing, writing, or game music, email <a href="mailto:coolhimal20@gmail.com">coolhimal20@gmail.com</a></p>
+  </footer>
+</main>
+
+<div class="player" aria-label="Player">
+  <div class="player-inner">
+    <button class="play" id="pp" aria-label="Pause"></button>
+    <div>
+      <div class="now"><span id="nowTitle"></span><span id="nowTime">0:00</span></div>
+      <input class="bar" id="bar" type="range" min="0" max="1000" value="0" aria-label="Seek">
+    </div>
+  </div>
+</div>
+<audio id="audio" preload="none"></audio>
+
+<script>
+  // ADD YOUR SONGS HERE
+  const TRACKS = [
+    { section: "voice",       title: "Your best vocal take", note: "One line about the song.", tag: "My vocals",   src: "" },
+    { section: "voice",       title: "Second vocal track",   note: "A cover or an original.",  tag: "My vocals",   src: "" },
+    { section: "songwriting", title: "Workplace ensemble",   note: "Character voices, one office, one bad day.", tag: "My lyrics", src: "" },
+    { section: "ambient",     title: "2:13 AM",              note: "Ambient loop for an empty hallway.", tag: "AI-assisted", src: "" },
+  ];
+
+  const ICON_PLAY = '<svg viewBox="0 0 14 14"><path d="M3 1.5v11l9-5.5z"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 14 14"><path d="M3 1.5h3v11H3zM8 1.5h3v11H8z"/></svg>';
+  const audio = document.getElementById("audio");
+  const player = document.querySelector(".player");
+  const pp = document.getElementById("pp");
+  const bar = document.getElementById("bar");
+  const nowTitle = document.getElementById("nowTitle");
+  const nowTime = document.getElementById("nowTime");
+  let current = -1;
+  const rows = [];
+
+  const fmt = s => isFinite(s) ? Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0") : "0:00";
+
+  TRACKS.forEach((t, i) => {
+    const li = document.createElement("li");
+    li.className = "track";
+    const ready = Boolean(t.src);
+    li.innerHTML =
+      '<button class="play" ' + (ready ? '' : 'disabled') + ' aria-label="' + (ready ? 'Play ' : 'Coming soon: ') + t.title + '">' + ICON_PLAY + '</button>' +
+      '<div><div class="title"></div><div class="note"></div></div>' +
+      '<div class="meta"><span class="tag"></span><span class="len">' + (ready ? '' : 'Coming soon') + '</span></div>';
+    li.querySelector(".title").textContent = t.title;
+    li.querySelector(".note").textContent = t.note;
+    li.querySelector(".tag").textContent = t.tag;
+    if (ready) {
+      li.querySelector(".play").addEventListener("click", () => toggle(i));
+      const probe = new Audio();
+      probe.preload = "metadata";
+      probe.src = t.src;
+      probe.addEventListener("loadedmetadata", () => { li.querySelector(".len").textContent = fmt(probe.duration); });
+    }
+    document.querySelector('[data-section="' + t.section + '"] ul').appendChild(li);
+    rows[i] = li;
+  });
+
+  function toggle(i) {
+    if (i === current) { audio.paused ? audio.play() : audio.pause(); return; }
+    if (current > -1) rows[current].classList.remove("current");
+    current = i;
+    audio.src = TRACKS[i].src;
+    audio.play();
+    rows[i].classList.add("current");
+    nowTitle.textContent = TRACKS[i].title;
+    player.classList.add("open");
+  }
+
+  function sync() {
+    const on = !audio.paused;
+    document.body.classList.toggle("playing", on);
+    pp.innerHTML = on ? ICON_PAUSE : ICON_PLAY;
+    pp.setAttribute("aria-label", on ? "Pause" : "Play");
+    rows.forEach((r, i) => {
+      const b = r.querySelector(".play");
+      if (b.disabled) return;
+      const isOn = on && i === current;
+      b.innerHTML = isOn ? ICON_PAUSE : ICON_PLAY;
+      b.setAttribute("aria-label", (isOn ? "Pause " : "Play ") + TRACKS[i].title);
+    });
+  }
+
+  audio.addEventListener("play", sync);
+  audio.addEventListener("pause", sync);
+  audio.addEventListener("ended", sync);
+  audio.addEventListener("timeupdate", () => {
+    if (audio.duration) bar.value = (audio.currentTime / audio.duration) * 1000;
+    nowTime.textContent = fmt(audio.currentTime) + " / " + fmt(audio.duration);
+  });
+  bar.addEventListener("input", () => { if (audio.duration) audio.currentTime = (bar.value / 1000) * audio.duration; });
+  pp.addEventListener("click", () => { if (current > -1) toggle(current); });
+</script>
+</body>
+</html>

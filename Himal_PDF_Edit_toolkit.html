@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PDF Toolkit</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --bg: #f4f1ec;
+    --card: #ffffff;
+    --text: #2b2b2b;
+    --muted: #6b6b6b;
+    --border: rgba(0,0,0,0.08);
+    --accent: #c1662f;
+    --accent-soft: rgba(193,102,47,0.10);
+    --shadow: 0 20px 50px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
+    --ok: #2e8b57;
+    --err: #c41e3a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg: #16171a;
+      --card: #212227;
+      --text: #edecea;
+      --muted: #9a9a9f;
+      --border: rgba(255,255,255,0.09);
+      --accent: #e8975e;
+      --accent-soft: rgba(232,151,94,0.12);
+      --shadow: 0 20px 50px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.35);
+    }
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family: -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  body{ padding: 40px 16px 60px; }
+  .wrap{ max-width: 900px; margin: 0 auto; }
+  header{ text-align:center; margin-bottom: 32px; }
+  .eyebrow{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:6px; }
+  h1{ font-size: 26px; margin: 0 0 6px; }
+  .sub{ color: var(--muted); font-size: 14px; }
+  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 720px){ .grid{ grid-template-columns: 1fr; } }
+  .card{ background:var(--card); border:1px solid var(--border); border-radius:18px;
+    box-shadow: var(--shadow); padding: 24px; display:flex; flex-direction:column; }
+  .card h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .card .desc{ color:var(--muted); font-size:13px; margin:0 0 16px; line-height:1.5; }
+  .drop{ border:2px dashed var(--border); border-radius:14px; padding: 22px 14px; text-align:center;
+    cursor:pointer; font-size:13px; color:var(--muted); transition: border-color .15s, background .15s; }
+  .drop.drag{ border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+  .drop input, input[type=file]{ display:none; }
+  .filelist{ list-style:none; margin: 12px 0 0; padding:0; font-size:13px; }
+  .filelist li{ display:flex; justify-content:space-between; gap:8px; padding:6px 0;
+    border-bottom:1px solid var(--border); }
+  .filelist li:last-child{ border-bottom:none; }
+  .filelist button{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:13px; }
+  .filelist button:hover{ color: var(--err); }
+  .row{ display:flex; align-items:center; gap:10px; margin-top:12px; flex-wrap: wrap; }
+  label.field{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; flex:1; min-width: 110px; }
+  input[type=text], input[type=number]{ font-family:inherit; font-size:13px; padding:8px 10px;
+    border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text); }
+  input[type=range]{ width:100%; }
+  .spacer{ flex:1; }
+  .go{ margin-top: 18px; font-family:inherit; font-size:13px; font-weight:700; padding:10px 16px;
+    border-radius:999px; border:none; background:var(--accent); color:#fff; cursor:pointer; }
+  .go:disabled{ opacity:.5; cursor:default; }
+  .go:hover:not(:disabled){ filter:brightness(1.06); }
+  .status{ margin-top:10px; font-size:12px; min-height:16px; }
+  .status.ok{ color: var(--ok); }
+  .status.err{ color: var(--err); }
+  .sizes{ font-size:12px; color:var(--muted); margin-top:8px; }
+  footer{ text-align:center; margin-top: 36px; font-size:11px; color:var(--muted); }
+  footer a{ color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Cheerios</div>
+    <h1>PDF Toolkit</h1>
+    <div class="sub">Merge, split, watermark, and compress &mdash; entirely in your browser. Nothing is uploaded anywhere.</div>
+  </header>
+
+  <div class="grid">
+
+    <!-- MERGE -->
+    <div class="card">
+      <h2>🧩 Merge</h2>
+      <p class="desc">Combine two or more PDFs into one file, in the order you add them.</p>
+      <div class="drop" id="mergeDrop">Click or drop PDF files here (2+)</div>
+      <input type="file" id="mergeInput" accept="application/pdf" multiple />
+      <ul class="filelist" id="mergeList"></ul>
+      <div class="spacer"></div>
+      <button class="go" id="mergeGo" disabled>Merge &amp; download</button>
+      <div class="status" id="mergeStatus"></div>
+    </div>
+
+    <!-- SPLIT -->
+    <div class="card">
+      <h2>✂️ Split</h2>
+      <p class="desc">Break one PDF into smaller PDFs, delivered back as a .zip.</p>
+      <div class="drop" id="splitDrop">Click or drop one PDF here</div>
+      <input type="file" id="splitInput" accept="application/pdf" />
+      <ul class="filelist" id="splitList"></ul>
+      <div class="row">
+        <label class="field">Pages per file
+          <input type="number" id="splitSpan" min="1" value="1" />
+        </label>
+      </div>
+      <div class="spacer"></div>
+      <button class="go" id="splitGo" disabled>Split &amp; download .zip</button>
+      <div class="status" id="splitStatus"></div>
+    </div>
+
+    <!-- WATERMARK -->
+    <div class="card">
+      <h2>💧 Watermark</h2>
+      <p class="desc">Stamp text diagonally across every page.</p>
+      <div class="drop" id="wmDrop">Click or drop one PDF here</div>
+      <input type="file" id="wmInput" accept="application/pdf" />
+      <ul class="filelist" id="wmList"></ul>
+      <div class="row">
+        <label class="field" style="flex:2">Watermark text
+          <input type="text" id="wmText" value="CONFIDENTIAL" />
+        </label>
+      </div>
+      <div class="row">
+        <label class="field">Font size
+          <input type="number" id="wmPoints" min="6" max="200" value="36" />
+        </label>
+        <label class="field">Rotation (&deg;)
+          <input type="number" id="wmRotation" min="-180" max="180" value="45" />
+        </label>
+        <label class="field">Opacity
+          <input type="range" id="wmOpacity" min="0.05" max="1" step="0.05" value="0.3" />
+        </label>
+      </div>
+      <div class="spacer"></div>
+      <button class="go" id="wmGo" disabled>Watermark &amp; download</button>
+      <div class="status" id="wmStatus"></div>
+    </div>
+
+    <!-- COMPRESS -->
+    <div class="card">
+      <h2>🗜️ Compress</h2>
+      <p class="desc">Optimize a PDF's internal structure to shrink its file size.</p>
+      <div class="drop" id="cxDrop">Click or drop one PDF here</div>
+      <input type="file" id="cxInput" accept="application/pdf" />
+      <ul class="filelist" id="cxList"></ul>
+      <div class="spacer"></div>
+      <button class="go" id="cxGo" disabled>Compress &amp; download</button>
+      <div class="status" id="cxStatus"></div>
+      <div class="sizes" id="cxSizes"></div>
+    </div>
+
+  </div>
+
+  <footer>Runs locally in your browser only &middot; files never leave this device</footer>
+</div>
+
+<script>
+function bytesFmt(n){
+  if (n < 1024) return n + " B";
+  if (n < 1024*1024) return (n/1024).toFixed(1) + " KB";
+  return (n/1024/1024).toFixed(2) + " MB";
+}
+
+function setupDrop(dropEl, inputEl, multiple, onFiles){
+  dropEl.addEventListener("click", () => inputEl.click());
+  inputEl.addEventListener("change", () => onFiles(Array.from(inputEl.files)));
+  ["dragenter","dragover"].forEach(ev => dropEl.addEventListener(ev, e => {
+    e.preventDefault(); dropEl.classList.add("drag");
+  }));
+  ["dragleave","drop"].forEach(ev => dropEl.addEventListener(ev, e => {
+    e.preventDefault(); dropEl.classList.remove("drag");
+  }));
+  dropEl.addEventListener("drop", e => {
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
+    onFiles(multiple ? files : files.slice(0,1));
+  });
+}
+
+function renderList(ul, files, onRemove){
+  ul.innerHTML = "";
+  files.forEach((f, i) => {
+    const li = document.createElement("li");
+    const name = document.createElement("span");
+    name.textContent = f.name + " (" + bytesFmt(f.size) + ")";
+    const rm = document.createElement("button");
+    rm.textContent = "remove";
+    rm.addEventListener("click", () => onRemove(i));
+    li.appendChild(name); li.appendChild(rm);
+    ul.appendChild(li);
+  });
+}
+
+function saveBlob(blob, name){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function baseName(n){ return n.replace(/\.pdf$/i, ""); }
+async function loadPdf(file){
+  const bytes = await file.arrayBuffer();
+  try { return await PDFLib.PDFDocument.load(bytes); }
+  catch(e){
+    if (/encrypt/i.test(e.message)) throw new Error(file.name + " is password-protected. Remove the password first.");
+    throw new Error("Could not read " + file.name + " — it may be damaged or not a real PDF.");
+  }
+}
+function pdfBlob(bytes){ return new Blob([bytes], { type: "application/pdf" }); }
+
+function setStatus(el, msg, kind){
+  el.textContent = msg || "";
+  el.className = "status" + (kind ? " " + kind : "");
+}
+
+// ---- MERGE ----
+(function(){
+  let files = [];
+  const drop = document.getElementById("mergeDrop"), input = document.getElementById("mergeInput");
+  const list = document.getElementById("mergeList"), go = document.getElementById("mergeGo");
+  const status = document.getElementById("mergeStatus");
+  function refresh(){
+    renderList(list, files, i => { files.splice(i,1); refresh(); });
+    go.disabled = files.length < 2;
+  }
+  setupDrop(drop, input, true, added => { files = files.concat(added); refresh(); });
+  go.addEventListener("click", async () => {
+    go.disabled = true; setStatus(status, "Merging…");
+    try{
+      const out = await PDFLib.PDFDocument.create();
+      for (const f of files){
+        const doc = await loadPdf(f);
+        const pages = await out.copyPages(doc, doc.getPageIndices());
+        pages.forEach(p => out.addPage(p));
+      }
+      saveBlob(pdfBlob(await out.save()), "merged.pdf");
+      setStatus(status, "Done — check your downloads.", "ok");
+    }catch(e){ setStatus(status, e.message, "err"); }
+    go.disabled = files.length < 2;
+  });
+})();
+
+// ---- SPLIT ----
+(function(){
+  let file = null;
+  const drop = document.getElementById("splitDrop"), input = document.getElementById("splitInput");
+  const list = document.getElementById("splitList"), go = document.getElementById("splitGo");
+  const status = document.getElementById("splitStatus"), span = document.getElementById("splitSpan");
+  function refresh(){ renderList(list, file ? [file] : [], () => { file = null; refresh(); }); go.disabled = !file; }
+  setupDrop(drop, input, false, added => { file = added[0] || null; refresh(); });
+  go.addEventListener("click", async () => {
+    go.disabled = true; setStatus(status, "Splitting…");
+    try{
+      const n = Math.max(1, parseInt(span.value, 10) || 1);
+      const doc = await loadPdf(file);
+      const total = doc.getPageCount();
+      const zip = new JSZip(), base = baseName(file.name);
+      for (let start = 0; start < total; start += n){
+        const end = Math.min(start + n, total);
+        const part = await PDFLib.PDFDocument.create();
+        const idx = []; for (let k = start; k < end; k++) idx.push(k);
+        (await part.copyPages(doc, idx)).forEach(p => part.addPage(p));
+        const label = (end - start === 1) ? String(start+1) : (start+1) + "-" + end;
+        zip.file(base + "_" + label + ".pdf", await part.save());
+      }
+      saveBlob(await zip.generateAsync({ type: "blob" }), base + "_split.zip");
+      setStatus(status, "Done — check your downloads.", "ok");
+    }catch(e){ setStatus(status, e.message, "err"); }
+    go.disabled = !file;
+  });
+})();
+
+// ---- WATERMARK ----
+(function(){
+  let file = null;
+  const drop = document.getElementById("wmDrop"), input = document.getElementById("wmInput");
+  const list = document.getElementById("wmList"), go = document.getElementById("wmGo");
+  const status = document.getElementById("wmStatus");
+  const text = document.getElementById("wmText"), points = document.getElementById("wmPoints");
+  const rotation = document.getElementById("wmRotation"), opacity = document.getElementById("wmOpacity");
+  function refresh(){ renderList(list, file ? [file] : [], () => { file = null; refresh(); }); go.disabled = !file; }
+  setupDrop(drop, input, false, added => { file = added[0] || null; refresh(); });
+  go.addEventListener("click", async () => {
+    go.disabled = true; setStatus(status, "Stamping…");
+    try{
+      const doc = await loadPdf(file);
+      const font = await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+      const t = text.value || "WATERMARK";
+      const size = Math.min(200, Math.max(6, parseFloat(points.value) || 36));
+      const deg = parseFloat(rotation.value) || 0;
+      const op = parseFloat(opacity.value) || 0.3;
+      let w;
+      try { w = font.widthOfTextAtSize(t, size); }
+      catch(e){ throw new Error("The watermark text has characters this font can't draw. Try plain English letters and numbers."); }
+      const h = font.heightAtSize(size) * 0.7, r = deg * Math.PI / 180;
+      for (const page of doc.getPages()){
+        const { width, height } = page.getSize();
+        const cx = width/2, cy = height/2;
+        const x = cx - (w/2*Math.cos(r) - h/2*Math.sin(r));
+        const y = cy - (w/2*Math.sin(r) + h/2*Math.cos(r));
+        page.drawText(t, { x, y, size, font, rotate: PDFLib.degrees(deg), opacity: op, color: PDFLib.rgb(0.5, 0.5, 0.5) });
+      }
+      saveBlob(pdfBlob(await doc.save()), baseName(file.name) + "_watermarked.pdf");
+      setStatus(status, "Done — check your downloads.", "ok");
+    }catch(e){ setStatus(status, e.message, "err"); }
+    go.disabled = !file;
+  });
+})();
+
+// ---- COMPRESS ----
+(function(){
+  let file = null;
+  const drop = document.getElementById("cxDrop"), input = document.getElementById("cxInput");
+  const list = document.getElementById("cxList"), go = document.getElementById("cxGo");
+  const status = document.getElementById("cxStatus"), sizes = document.getElementById("cxSizes");
+  function refresh(){ renderList(list, file ? [file] : [], () => { file = null; refresh(); sizes.textContent=""; }); go.disabled = !file; }
+  setupDrop(drop, input, false, added => { file = added[0] || null; refresh(); });
+  go.addEventListener("click", async () => {
+    go.disabled = true; setStatus(status, "Compressing…"); sizes.textContent = "";
+    try{
+      const doc = await loadPdf(file);
+      let bytes = await doc.save({ useObjectStreams: true });
+      const before = file.size;
+      if (bytes.length >= before) bytes = new Uint8Array(await file.arrayBuffer());
+      const after = bytes.length;
+      saveBlob(pdfBlob(bytes), baseName(file.name) + "_compressed.pdf");
+      if (before && after){
+        const pct = Math.max(0, Math.round((1 - after/before)*100));
+        sizes.textContent = bytesFmt(before) + " → " + bytesFmt(after) + (pct>0 ? "  (" + pct + "% smaller)" : "  (already tightly packed)");
+      }
+      setStatus(status, "Done — check your downloads.", "ok");
+    }catch(e){ setStatus(status, e.message, "err"); }
+    go.disabled = !file;
+  });
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  ================================================================
+  Box Claim
+  ================================================================
+   Box Claim (formerly Dots and Boxes). Classic dots-and-boxes on a 3x3 grid of boxes.
+   You and the computer take turns drawing one line between two neighbouring dots.
+   When your line closes a box, you claim it and go again. Otherwise the turn passes.
+   The player with the most boxes at the end wins. The computer chooses lines using
+   ../shared/lib/dots.js.
+   Scoring: 10 points per box you claim, plus 50 if you win.
+   Controls: tap the gap between two dots.
+   Single player against the computer.
+  ================================================================
+-->
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Box Claim</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #101a24; color: #eef6ff; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { display: flex; flex-direction: column; align-items: center; padding: 12px; gap: 10px; }
+  .top { width: min(94vw, 420px); display: flex; justify-content: space-between; font-weight: 700; }
+  .status { min-height: 1.4em; font-size: 15px; color: #bcd3ea; text-align: center; }
+  svg { width: min(94vw, 420px); height: auto; touch-action: manipulation; }
+  .dot { fill: #eef6ff; }
+  .line { stroke: #2b3f55; stroke-width: 10; stroke-linecap: round; cursor: pointer; }
+  .line:hover { stroke: #4a6b8f; }
+  .line.P { stroke: #5ad1ff; }
+  .line.C { stroke: #ff8fb1; }
+  .box.P { fill: rgba(90,209,255,.35); }
+  .box.C { fill: rgba(255,143,177,.35); }
+  button { font: inherit; font-weight: 700; color: #101a24; background: #5ad1ff; border: 0; border-radius: 14px; padding: 12px 18px; min-height: 44px; }
+  .hint { font-size: 13px; color: #8ea6bf; text-align: center; max-width: 420px; }
+</style>
+</head>
+<body>
+<div class="top"><span>🔵 You: <b id="mine">0</b></span><span>Computer: <b id="theirs">0</b> 🩷</span></div>
+<div class="status" id="status"></div>
+<svg id="board" viewBox="0 0 400 400" role="img" aria-label="Dots and boxes board"></svg>
+<button id="again" hidden>New game</button>
+<p class="hint">Tap the gap between two dots to draw a line. Close a box to claim it and go again. Most boxes wins.</p>
+<script type="module">
+import { createGame, drawLine, countOf, chooseLine } from '../shared/lib/dots.js';
+
+const N = 3;                 // 3 x 3 boxes
+const PAD = 40, STEP = (400 - PAD * 2) / N;
+const svg = document.getElementById('board');
+let g, busy = false;
+
+function report(score) {
+  if (window.parent === window) return;
+  try { window.parent.postMessage({ pinned: 1, t: 'over', score }, location.origin); } catch (e) {}
+}
+const X = (c) => PAD + c * STEP, Y = (r) => PAD + r * STEP;
+
+function render() {
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+    const o = g.owner[r][c];
+    if (!o) continue;
+    const rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', X(c)); rect.setAttribute('y', Y(r));
+    rect.setAttribute('width', STEP); rect.setAttribute('height', STEP);
+    rect.setAttribute('class', 'box ' + o);
+    svg.appendChild(rect);
+  }
+  const addLine = (type, r, c, x1, y1, x2, y2) => {
+    const v = type === 'h' ? g.h[r][c] : g.v[r][c];
+    const l = document.createElementNS(ns, 'line');
+    l.setAttribute('x1', x1); l.setAttribute('y1', y1); l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+    l.setAttribute('class', 'line' + (v ? ' ' + v : ''));
+    if (!v) { l.style.stroke = ''; l.addEventListener('click', () => tap(type, r, c)); }
+    else l.style.cursor = 'default';
+    svg.appendChild(l);
+  };
+  for (let r = 0; r <= N; r++) for (let c = 0; c < N; c++) addLine('h', r, c, X(c), Y(r), X(c + 1), Y(r));
+  for (let r = 0; r < N; r++) for (let c = 0; c <= N; c++) addLine('v', r, c, X(c), Y(r), X(c), Y(r + 1));
+  for (let r = 0; r <= N; r++) for (let c = 0; c <= N; c++) {
+    const d = document.createElementNS(ns, 'circle');
+    d.setAttribute('cx', X(c)); d.setAttribute('cy', Y(r)); d.setAttribute('r', 7); d.setAttribute('class', 'dot');
+    svg.appendChild(d);
+  }
+  document.getElementById('mine').textContent = countOf(g, 'P');
+  document.getElementById('theirs').textContent = countOf(g, 'C');
+}
+
+function tap(type, r, c) {
+  if (busy || g.over || g.turn !== 'P') return;
+  const done = drawLine(g, type, r, c);
+  if (done < 0) return;
+  render();
+  after(done);
+}
+
+function after(done) {
+  if (g.over) return finish();
+  if (g.turn === 'C' && done === 0) {
+    busy = true;
+    document.getElementById('status').textContent = 'Computer is thinking…';
+    setTimeout(computerTurn, 500);
+  } else {
+    document.getElementById('status').textContent = done ? 'Box yours. Go again!' : 'Your turn.';
+  }
+}
+
+function computerTurn() {
+  const [t, r, c] = chooseLine(g);
+  const done = drawLine(g, t, r, c);
+  render();
+  busy = false;
+  if (g.over) return finish();
+  if (g.turn === 'C' && done > 0) return setTimeout(computerTurn, 450);
+  document.getElementById('status').textContent = 'Your turn.';
+}
+
+function finish() {
+  const mine = countOf(g, 'P'), theirs = countOf(g, 'C');
+  const won = mine > theirs;
+  document.getElementById('status').textContent = mine === theirs ? 'A tie!' : won ? 'You win! 🎉' : 'The computer wins this time.';
+  report(mine * 10 + (won ? 50 : 0));
+  document.getElementById('again').hidden = false;
+}
+
+function newGame() {
+  g = createGame(N); busy = false;
+  document.getElementById('again').hidden = true;
+  document.getElementById('status').textContent = 'Your turn.';
+  render();
+}
+document.getElementById('again').onclick = newGame;
+newGame();
+</script>
+</body>
+</html>

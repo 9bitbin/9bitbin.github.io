@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  ================================================================
+  Bullseye Drop
+  ================================================================
+   Bullseye Drop (formerly Pin Drop). A timing game.
+   A pin swings like a pendulum above a target board that slides from side to side.
+   Tap to drop the pin at the right moment so it lands on the bullseye.
+   You get 10 drops. Landing spots score:
+     bullseye (very centre) 10 points, ring 5, edge 2, miss 0.
+   Hitting bullseyes in a row builds a streak that gives a bonus.
+   The swing and the target get faster as you go.
+   Controls: tap, click or press Space.
+   Single player. Best score is saved on this device.
+  ================================================================
+-->
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Bullseye Drop</title>
+<style>
+  :root { --ink: #3b2a1a; --cork: #b98a5a; --paper: #fff8e7; --red: #d63a2f; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--cork); touch-action: none;
+    -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+    font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .panel { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; pointer-events: none; }
+  .card { pointer-events: auto; background: var(--paper); border-radius: 6px; padding: 22px 22px 18px; width: min(320px, 100%); text-align: center;
+    box-shadow: 0 14px 26px -10px rgba(40,20,0,.6); transform: rotate(-1.5deg); position: relative; }
+  .card::before { content: ""; position: absolute; top: -9px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ff8a80, var(--red) 60%, #8f1d16); box-shadow: 0 3px 4px rgba(0,0,0,.35); }
+  h1 { margin: 6px 0 4px; font-size: 30px; letter-spacing: .5px; }
+  p { margin: 6px 0; line-height: 1.35; }
+  .big { font-size: 46px; font-weight: 900; margin: 4px 0; }
+  .muted { color: #8b7560; font-size: 14px; }
+  button { font: inherit; font-weight: 800; font-size: 18px; border: 0; border-radius: 999px; padding: 12px 26px; margin-top: 12px;
+    background: var(--red); color: #fff; box-shadow: 0 4px 0 #8f1d16; }
+  button:active { transform: translateY(2px); box-shadow: 0 2px 0 #8f1d16; }
+  [hidden] { display: none !important; }
+</style>
+<script src="../shared/solo.js"></script>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="panel" id="startPanel">
+  <div class="card">
+    <h1>📌 Bullseye Drop</h1>
+    <p>The pin swings. The note slides.<br><b>Tap</b> to drop the pin on the bullseye.</p>
+    <p class="muted">10 drops · Bullseye 10 · Ring 5 · Edge 2<br>Bullseyes in a row earn a bonus.</p>
+    <button id="startBtn">Start</button>
+  </div>
+</div>
+<div class="panel" id="overPanel" hidden>
+  <div class="card">
+    <h1>Nice dropping!</h1>
+    <div class="big" id="finalScore">0</div>
+    <p class="muted" id="finalSub"></p>
+    <button id="againBtn">Play again</button>
+    <p class="muted" id="waitMsg" hidden>Waiting for everyone to finish…</p>
+  </div>
+</div>
+<script>
+(() => {
+  const PB = window.PB;
+  const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  const $ = (id) => document.getElementById(id);
+  let W = 400, H = 700, px = 1;
+  function resize() {
+    const vw = innerWidth, vh = innerHeight; px = Math.min(devicePixelRatio || 1, 2);
+    W = 400; H = Math.max(560, Math.min(900, W * vh / vw));
+    const k = Math.min(vw / W, vh / H);
+    cv.width = Math.round(vw * px); cv.height = Math.round(vh * px);
+    view = { k, ox: (vw - W * k) / 2, oy: (vh - H * k) / 2 };
+  }
+  let view = { k: 1, ox: 0, oy: 0 };
+  addEventListener("resize", resize); resize();
+
+  // ---- sound: tiny blips, no music ----
+  let ac = null;
+  const beep = (f, d = .08, type = "triangle", v = .12, f2) => {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === "suspended") ac.resume();
+      const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+      o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+      g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + d + .02);
+    } catch (e) { /* no sound */ }
+  };
+
+  // ---- the course: same for everyone in a race ----
+  const DROPS = 10;
+  let rnd, drops = [];
+  function makeCourse(seed) {
+    rnd = PB.rng(seed);
+    drops = [];
+    for (let i = 0; i < DROPS; i++) {
+      const k = i / (DROPS - 1);
+      drops.push({
+        tw: (1.1 + 1.6 * k) * (0.85 + rnd() * 0.3),     // target speed (radians per second)
+        tph: rnd() * Math.PI * 2,
+        tamp: 105 + rnd() * 40,
+        sw: (1.7 + 1.5 * k) * (0.85 + rnd() * 0.3),     // pin swing speed
+        sph: rnd() * Math.PI * 2,
+        samp: 0.5 + 0.35 * k,                          // swing angle
+        size: 74 - 26 * k + rnd() * 8,                  // note half-size
+      });
+    }
+  }
+
+  const PIVOT = { x: 200, y: 70 }, ROPE = 120, G = 2400;
+  let phase = "intro";   // intro | aim | fall | result | done
+  let di = 0, t = 0, rt = 0, score = 0, streak = 0, pin = null, popup = null, marks = [], shake = 0;
+
+  const targetY = () => H * 0.76;
+  const cur = () => drops[Math.min(di, DROPS - 1)];
+  const targetX = (d, tt) => 200 + Math.sin(tt * d.tw + d.tph) * d.tamp;
+  const swingA = (d, tt) => Math.sin(tt * d.sw + d.sph) * d.samp;
+
+  function start() {
+    makeCourse(PB.race ? PB.seed : (Math.random() * 4294967296) >>> 0);
+    di = 0; t = 0; score = 0; streak = 0; pin = null; popup = null; marks = []; phase = "aim";
+    $("startPanel").hidden = true; $("overPanel").hidden = true;
+    report(true);
+  }
+  function report(force) { PB.state({ d: di, y: 0, alive: phase !== "done", score }, force); }
+
+  function drop() {
+    if (phase !== "aim") return;
+    const d = cur(), a = swingA(d, t);
+    const x = PIVOT.x + Math.sin(a) * ROPE, y = PIVOT.y + Math.cos(a) * ROPE;
+    pin = { x, y, vx: 0, vy: 0, rot: a };
+    phase = "fall"; beep(520, .06, "square", .05, 260);
+  }
+
+  function land() {
+    const d = cur(), tx = targetX(d, t), off = Math.abs(pin.x - tx) / d.size;
+    let pts = 0, label = "Miss";
+    if (off < 0.18) { pts = 10; label = "BULLSEYE!"; }
+    else if (off < 0.55) { pts = 5; label = "Nice!"; }
+    else if (off <= 1) { pts = 2; label = "Close"; }
+    let bonus = 0;
+    if (pts === 10) { streak++; if (streak > 1) bonus = 5 * (streak - 1); } else streak = 0;
+    score += pts + bonus;
+    if (pts) { pin.stuck = pin.x - tx; marks.push({ dx: pin.x - tx, i: di }); beep(pts === 10 ? 880 : 660, .14, "triangle", .14, pts === 10 ? 1320 : 990); shake = pts === 10 ? 8 : 4; }
+    else { pin.miss = true; pin.vy = -380; pin.vx = (pin.x < tx ? -1 : 1) * 160; beep(180, .2, "sawtooth", .07, 90); }
+    popup = { text: label + (pts ? `  +${pts}` : "") + (bonus ? `  🔥+${bonus}` : ""), t: 0, good: pts === 10 };
+    phase = "result"; rt = 0;
+    report(true);
+  }
+
+  function next() {
+    di++;
+    if (di >= DROPS) { finish(); return; }
+    phase = "aim"; t = 0; pin = null; marks = [];
+  }
+
+  function finish() {
+    phase = "done";
+    report(true);
+    PB.send("over", { score });
+    $("finalScore").textContent = score;
+    const best = Math.max(score, +(localStorage.getItem("pinned.pindrop.best") || 0));
+    try { localStorage.setItem("pinned.pindrop.best", best); } catch (e) {}
+    $("finalSub").textContent = PB.race ? `out of ${DROPS} drops` : `Your best: ${best}`;
+    $("againBtn").hidden = PB.race; $("waitMsg").hidden = !PB.race;
+    $("overPanel").hidden = false;
+  }
+
+  // ---- input ----
+  addEventListener("pointerdown", (e) => {
+    if (e.target.closest("button")) return;
+    e.preventDefault();
+    if (phase === "aim") drop();
+  }, { passive: false });
+  addEventListener("keydown", (e) => { if (e.code === "Space" || e.code === "Enter") { e.preventDefault(); if (phase === "aim") drop(); } });
+  $("startBtn").onclick = () => { beep(660, .08); start(); };
+  $("againBtn").onclick = () => { beep(660, .08); start(); };
+  if (PB.race) { $("startPanel").hidden = true; PB.on("go", start); makeCourse(PB.seed); }
+  else makeCourse(1);
+
+  // ---- drawing ----
+  function cork() {
+    ctx.fillStyle = "#b98a5a"; ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = .18; ctx.fillStyle = "#5a3719";
+    for (let i = 0; i < 220; i++) { const x = (i * 97.3) % W, y = (i * 53.7 + (i % 7) * 31) % H; ctx.fillRect(x, y, 2, 2); }
+    ctx.globalAlpha = .12; ctx.fillStyle = "#fff0d0";
+    for (let i = 0; i < 140; i++) { const x = (i * 61.1 + 13) % W, y = (i * 89.9) % H; ctx.fillRect(x, y, 1.5, 1.5); }
+    ctx.globalAlpha = 1;
+  }
+  function drawPin(x, y, rot, s = 1) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
+    ctx.strokeStyle = "#9aa3ad"; ctx.lineWidth = 3; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(0, 6); ctx.lineTo(0, 34); ctx.stroke();
+    ctx.fillStyle = "#c42a20"; ctx.beginPath(); ctx.ellipse(0, 4, 13, 5, 0, 0, Math.PI * 2); ctx.fill();
+    const g = ctx.createRadialGradient(-5, -10, 2, 0, -6, 15); g.addColorStop(0, "#ff9c90"); g.addColorStop(.6, "#d63a2f"); g.addColorStop(1, "#8f1d16");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, -6, 12, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  function drawTarget(x, y, s) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(-0.03);
+    ctx.fillStyle = "rgba(40,20,0,.28)"; ctx.fillRect(-s + 4, -s * .62 + 8, s * 2, s * 1.24);
+    ctx.fillStyle = "#fff176"; ctx.fillRect(-s, -s * .62, s * 2, s * 1.24);
+    ctx.lineWidth = 3;
+    for (const [r, c] of [[1, "#ff8fb1"], [.55, "#7cc4ff"], [.18, "#e5484d"]]) {
+      ctx.strokeStyle = c; ctx.beginPath(); ctx.ellipse(0, 0, s * r, s * r * .5, 0, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.fillStyle = "#e5484d"; ctx.beginPath(); ctx.ellipse(0, 0, s * .1, s * .05, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  function render() {
+    ctx.setTransform(px, 0, 0, px, 0, 0);
+    ctx.fillStyle = "#a87a4b"; ctx.fillRect(0, 0, cv.width, cv.height);
+    const sh = shake > 0 ? (Math.random() - .5) * shake : 0;
+    ctx.setTransform(px * view.k, 0, 0, px * view.k, px * (view.ox + sh), px * view.oy);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
+    cork();
+    const d = cur(), ty = targetY();
+    const tx = phase === "intro" || phase === "done" ? 200 : targetX(d, t);
+    // rail
+    ctx.fillStyle = "rgba(60,35,15,.35)"; ctx.fillRect(40, ty + d.size * .62 + 10, 320, 6);
+    drawTarget(tx, ty, d.size);
+    for (const m of marks) if (m.i === di) drawPin(tx + m.dx, ty - 30, 0, .9);
+    // swinging pin
+    if (phase === "aim" || phase === "intro") {
+      const a = phase === "aim" ? swingA(d, t) : Math.sin(performance.now() / 600) * .4;
+      const x = PIVOT.x + Math.sin(a) * ROPE, y = PIVOT.y + Math.cos(a) * ROPE;
+      ctx.strokeStyle = "#f3e7d3"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(PIVOT.x, PIVOT.y); ctx.lineTo(x, y - 18); ctx.stroke();
+      ctx.fillStyle = "#6b4a2b"; ctx.beginPath(); ctx.arc(PIVOT.x, PIVOT.y, 5, 0, Math.PI * 2); ctx.fill();
+      drawPin(x, y, 0);
+      // drop guide
+      ctx.setLineDash([4, 8]); ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.beginPath(); ctx.moveTo(x, y + 36); ctx.lineTo(x, ty - 40); ctx.stroke(); ctx.setLineDash([]);
+    }
+    if (pin && (phase === "fall" || phase === "result") && !(pin.stuck != null && phase === "result")) drawPin(pin.x, pin.y, pin.miss ? pin.rot : 0);
+    // HUD
+    ctx.fillStyle = "rgba(40,20,0,.45)"; ctx.fillRect(0, 0, W, 40);
+    ctx.fillStyle = "#fff8e7"; ctx.font = "800 18px system-ui, sans-serif"; ctx.textBaseline = "middle";
+    ctx.textAlign = "left"; ctx.fillText(`Drop ${Math.min(di + 1, DROPS)}/${DROPS}`, 14, 20);
+    ctx.textAlign = "right"; ctx.fillText(`${score} pts${streak > 1 ? "  🔥" + streak : ""}`, W - 14, 20);
+    if (popup) {
+      const k = Math.min(1, popup.t * 4), a = Math.max(0, 1 - Math.max(0, popup.t - .7) * 2);
+      ctx.globalAlpha = a; ctx.textAlign = "center"; ctx.font = `900 ${popup.good ? 34 : 28}px system-ui, sans-serif`;
+      ctx.fillStyle = popup.good ? "#fff176" : "#fff8e7"; ctx.strokeStyle = "rgba(60,30,10,.7)"; ctx.lineWidth = 5;
+      const y = ty - 120 - k * 20; ctx.strokeText(popup.text, 200, y); ctx.fillText(popup.text, 200, y); ctx.globalAlpha = 1;
+    }
+    if (phase === "aim" && di === 0 && t < 2.5) {
+      ctx.globalAlpha = Math.max(0, 1 - t / 2.5); ctx.textAlign = "center"; ctx.font = "800 20px system-ui, sans-serif"; ctx.fillStyle = "#fff8e7";
+      ctx.fillText("Tap to drop!", 200, H * .5); ctx.globalAlpha = 1;
+    }
+    ctx.restore();
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    if (phase === "aim") t += dt;
+    if (phase === "fall") {
+      t += dt; pin.vy += G * dt; pin.x += pin.vx * dt; pin.y += pin.vy * dt;
+      if (pin.y + 34 >= targetY() - 4) { pin.y = targetY() - 38; land(); }
+    } else if (phase === "result") {
+      t += dt; rt += dt; if (popup) popup.t += dt;
+      if (pin.miss) { pin.vy += G * dt; pin.x += pin.vx * dt; pin.y += pin.vy * dt; pin.rot += dt * 8; }
+      if (rt > 1.1) { popup = null; next(); }
+    }
+    if (shake > 0) shake = Math.max(0, shake - dt * 30);
+    render();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

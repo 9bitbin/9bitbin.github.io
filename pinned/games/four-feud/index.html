@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  ================================================================
+  Four Feud
+  ================================================================
+   Four Feud (formerly Connect Four). Classic Connect Four against the computer.
+   You are red, the computer is yellow. Take turns dropping a disc into one of the 7 columns.
+   The first to line up 4 discs in a row (across, down or diagonally) wins.
+   The computer picks its moves using the rules in ../shared/lib/connect4.js.
+   Scoring: a win is worth 100, a draw 50, a loss 0. Scores add up across games in this session.
+   Controls: tap a column.
+   Single player against the computer.
+  ================================================================
+-->
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Four Feud</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #14121f; color: #f4eefc; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { display: flex; flex-direction: column; align-items: center; padding: 12px; gap: 10px; }
+  .top { width: min(92vw, 420px); display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+  .status { min-height: 1.4em; font-size: 15px; text-align: center; color: #d8cbee; }
+  .board { width: min(92vw, 420px); aspect-ratio: 7 / 6; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+    background: #2a2540; border-radius: 18px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+  .col { display: grid; grid-template-rows: repeat(6, 1fr); gap: 6px; cursor: pointer; border-radius: 12px; }
+  .col:hover { background: rgba(255,255,255,.04); }
+  .cell { border-radius: 50%; background: #0e0c18; }
+  .cell.R { background: radial-gradient(circle at 35% 30%, #ffb3b3, #e5484d 60%); }
+  .cell.Y { background: radial-gradient(circle at 35% 30%, #fff3a6, #f5c542 60%); }
+  .cell.win { box-shadow: 0 0 0 3px #fff, 0 0 14px #fff; }
+  button { font: inherit; font-weight: 700; color: #14121f; background: #c9b6ff; border: 0; border-radius: 14px; padding: 12px 18px; min-height: 44px; }
+  .hint { font-size: 13px; color: #a79cc2; text-align: center; max-width: 420px; }
+</style>
+</head>
+<body>
+<div class="top"><span>🔴 You</span><span id="score">Score 0</span><span>🟡 Computer</span></div>
+<div class="status" id="status">Your turn. Tap a column.</div>
+<div class="board" id="board"></div>
+<button id="again" hidden>New game</button>
+<p class="hint">Get four in a row before the computer does. A win is worth 100, a draw 50.</p>
+<script type="module">
+import { createBoard, drop, dropRow, winnerOf, chooseMove, legalCols } from '../shared/lib/connect4.js';
+
+let board, over, total = 0;
+const boardEl = document.getElementById('board');
+const statusEl = document.getElementById('status');
+const againBtn = document.getElementById('again');
+const scoreEl = document.getElementById('score');
+
+// Pinned: tell the board the score when a game ends (only when opened inside the app)
+function report(score) {
+  if (window.parent === window) return;
+  try { window.parent.postMessage({ pinned: 1, t: 'over', score }, location.origin); } catch (e) {}
+}
+
+function render(winCells = []) {
+  boardEl.innerHTML = '';
+  for (let c = 0; c < 7; c++) {
+    const col = document.createElement('div'); col.className = 'col';
+    col.setAttribute('role', 'button'); col.setAttribute('aria-label', `Drop in column ${c + 1}`);
+    col.onclick = () => play(c);
+    for (let r = 0; r < 6; r++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell' + (board[r][c] ? ' ' + board[r][c] : '') + (winCells.some(([wr, wc]) => wr === r && wc === c) ? ' win' : '');
+      col.appendChild(cell);
+    }
+    boardEl.appendChild(col);
+  }
+}
+
+function finish(result) {
+  over = true;
+  const score = result === 'R' ? 100 : result === 'draw' ? 50 : 0;
+  total += score;
+  scoreEl.textContent = `Score ${total}`;
+  statusEl.textContent = result === 'R' ? 'You win! 🎉' : result === 'draw' ? 'A draw.' : 'The computer wins this time.';
+  againBtn.hidden = false;
+  report(score);
+}
+
+function play(col) {
+  if (over || dropRow(board, col) < 0) return;
+  drop(board, col, 'R');
+  const res = winnerOf(board);
+  render();
+  if (res) return finish(res);
+  statusEl.textContent = 'Computer is thinking…';
+  setTimeout(() => {
+    const c = chooseMove(board, 'Y');
+    drop(board, c, 'Y');
+    const r2 = winnerOf(board);
+    render(r2 && r2 !== 'draw' ? winningCells() : []);
+    if (r2) return finish(r2);
+    statusEl.textContent = 'Your turn. Tap a column.';
+  }, 450);
+}
+
+// cells of the four-in-a-row the computer just made (for the highlight)
+function winningCells() {
+  const dirs = [[0, 1], [1, 0], [1, 1], [1, -1]];
+  for (let r = 0; r < 6; r++) for (let c = 0; c < 7; c++) {
+    const p = board[r][c]; if (!p) continue;
+    for (const [dr, dc] of dirs) {
+      const cells = [0, 1, 2, 3].map((k) => [r + dr * k, c + dc * k]);
+      if (cells.every(([rr, cc]) => rr >= 0 && rr < 6 && cc >= 0 && cc < 7 && board[rr][cc] === p)) return cells;
+    }
+  }
+  return [];
+}
+
+function newGame() {
+  board = createBoard(); over = false;
+  againBtn.hidden = true;
+  statusEl.textContent = 'Your turn. Tap a column.';
+  render();
+}
+againBtn.onclick = newGame;
+newGame();
+</script>
+</body>
+</html>

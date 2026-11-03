@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  ================================================================
+  Tower Tap
+  ================================================================
+   Tower Tap (formerly Stack 3D). A 3D stacking game built with Three.js.
+   A block slides back and forth above a tower. Tap (or press Space) to drop it.
+   If it lands on the block below, the overlap stays and the rest is cut off and falls away.
+   The tower gets narrower the more misses you cut. Each block placed adds 1 to your score.
+   The game ends when a block misses the tower completely or becomes too thin.
+   Controls: tap the screen or press Space.
+   Single player. Needs ../shared/vendor/three.module.js (the Three.js library).
+  ================================================================
+-->
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tower Tap</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0d1020; color: #fff; font-family: system-ui, -apple-system, sans-serif; }
+  canvas { display: block; touch-action: none; }
+  #score { position: fixed; top: 12px; left: 0; right: 0; text-align: center; font-size: 42px; font-weight: 800; pointer-events: none; text-shadow: 0 2px 8px #000; }
+  #msg { position: fixed; bottom: 22px; left: 0; right: 0; text-align: center; font-size: 16px; pointer-events: none; text-shadow: 0 2px 8px #000; }
+</style>
+<script type="importmap">{ "imports": { "three": "../shared/vendor/three.module.js" } }</script>
+</head>
+<body>
+<div id="score">0</div>
+<div id="msg">Tap or press space to drop the block. Land it on the stack.</div>
+<script type="module">
+import * as THREE from 'three';
+
+const W = 3.2, H = 0.4, SPEED0 = 2.2;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d1020);
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(6, 7, 9); camera.lookAt(0, 1.5, 0);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x223355, 1.1));
+const sun = new THREE.DirectionalLight(0xffffff, 0.9); sun.position.set(4, 10, 6); scene.add(sun);
+
+const palette = (i) => new THREE.Color().setHSL((i * 0.07) % 1, 0.7, 0.6);
+const mats = [];
+const colorOf = (i) => { if (!mats[i]) mats[i] = new THREE.MeshStandardMaterial({ color: palette(i), roughness: 0.4 }); return mats[i]; };
+const base = new THREE.Mesh(new THREE.BoxGeometry(W, H, W), colorOf(0));
+base.position.y = H / 2; scene.add(base);
+
+let stack = [];           // placed blocks: { mesh, x, z, w, d }
+let moving = null;        // current block
+let dir = 1, t = 0, over = false, reported = false;
+let fallers = [];
+const scoreEl = document.getElementById('score');
+const msgEl = document.getElementById('msg');
+let width = W, depth = W, top = H;
+let speed = SPEED0;
+
+function report(score) {
+  if (window.parent === window) return;
+  try { window.parent.postMessage({ pinned: 1, t: 'over', score }, location.origin); } catch (e) {}
+}
+
+function spawn() {
+  const axis = stack.length % 2 === 0 ? 'x' : 'z';
+  const size = axis === 'x' ? width : depth;
+  const geo = new THREE.BoxGeometry(axis === 'x' ? width : depth, H, axis === 'x' ? depth : width);
+  const mesh = new THREE.Mesh(geo, colorOf(stack.length + 1));
+  const offset = -3 * (1 + stack.length * 0.02);
+  mesh.position.set(axis === 'x' ? offset : (stack.at(-1)?.x ?? 0), top + H / 2, axis === 'z' ? offset : (stack.at(-1)?.z ?? 0));
+  scene.add(mesh);
+  moving = { mesh, axis, pos: offset };
+}
+
+function drop() {
+  if (over || !moving) return;
+  const prev = stack.at(-1);
+  const px = prev ? prev.x : 0, pz = prev ? prev.z : 0;
+  const { mesh, axis } = moving;
+  const cur = axis === 'x' ? mesh.position.x : mesh.position.z;
+  const ref = axis === 'x' ? px : pz;
+  const size = axis === 'x' ? width : depth;
+  const overlap = size - Math.abs(cur - ref);
+  if (overlap <= 0.05) { // missed completely
+    fallers.push(mesh);
+    return endGame();
+  }
+  const left = Math.max(cur, ref) - overlap / 2; // unused in the calc below, keep for clarity
+  const newCenter = (cur + ref) / 2;
+  if (axis === 'x') { mesh.position.x = newCenter; width = overlap; }
+  else { mesh.position.z = newCenter; depth = overlap; }
+  mesh.geometry.dispose();
+  mesh.geometry = new THREE.BoxGeometry(width, H, depth);
+  // leftover piece falls away
+  const leftover = size - overlap;
+  if (leftover > 0.02) {
+    const cut = new THREE.Mesh(new THREE.BoxGeometry(axis === 'x' ? leftover : width, H, axis === 'x' ? depth : leftover), mesh.material);
+    const side = cur > ref ? 1 : -1;
+    cut.position.copy(mesh.position);
+    if (axis === 'x') cut.position.x = newCenter + side * (overlap / 2 + leftover / 2);
+    else cut.position.z = newCenter + side * (overlap / 2 + leftover / 2);
+    scene.add(cut); fallers.push(cut);
+  }
+  stack.push({ x: mesh.position.x, z: mesh.position.z, mesh });
+  top += H; speed = SPEED0 + stack.length * 0.12;
+  scoreEl.textContent = stack.length;
+  if (width < 0.1 || depth < 0.1) return endGame();
+  // camera follows the tower
+  camTarget = top;
+  spawn();
+}
+
+let camTarget = 0;
+function endGame() {
+  over = true;
+  msgEl.textContent = `Stacked ${stack.length} blocks. Game over.`;
+  if (!reported) { reported = true; report(stack.length * 10); }
+}
+
+addEventListener('pointerdown', drop);
+addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); drop(); } });
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+let last = performance.now(), camY = 1.5;
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (moving && !over) {
+    moving.pos += dir * speed * dt;
+    if (Math.abs(moving.pos) > 3.2) dir = -dir;
+    if (moving.axis === 'x') moving.mesh.position.x = moving.pos; else moving.mesh.position.z = moving.pos;
+  }
+  fallers.forEach((f) => { f.position.y -= 6 * dt; f.rotation.x += dt; });
+  camY += ((camTarget + 2) - camY) * 0.05;
+  camera.position.y = camY + 5; camera.lookAt(0, camY - 1, 0);
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+spawn();
+</script>
+</body>
+</html>
