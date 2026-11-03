@@ -1605,8 +1605,7 @@ function placeOrbits(now) {
     const o = card._orbit; if (!o) continue;
     const E = keplerE(o.a0 + (t / o.period) * Math.PI * 2, o.e);
     const x = o.a * (Math.cos(E) - o.e), y = o.b * Math.sin(E) * ORBIT_SQUASH;   // the sun is at the focus
-    card.style.left = `calc(50% + var(--px, 0px) + ${x.toFixed(1)}px)`;
-    card.style.top = `calc(50% + var(--py, 0px) + ${y.toFixed(1)}px)`;
+    card.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;   // GPU-only move, no relayout
   }
 }
 function moveOrbits(now) {
@@ -1694,11 +1693,17 @@ function roomCard(r, i) {
   // swipe a room left past the threshold to hide it (same as Edit then ×)
   let sx = null, swiped = false;
   const reset = () => { c.style.translate = ""; c.style.opacity = ""; };
-  c.addEventListener("pointerdown", (e) => { if (roomsState.edit || !r.member) return; sx = e.clientX; swiped = false; try { c.setPointerCapture(e.pointerId); } catch {} });
+  c.addEventListener("pointerdown", (e) => {
+    swiped = false;
+    try { c.setPointerCapture(e.pointerId); } catch {}   // keep the tap on this planet even though it is moving
+    if (roomsState.edit || !r.member) return;
+    sx = e.clientX;
+  });
   c.addEventListener("pointermove", (e) => {
     if (sx == null) return;
     const dx = Math.min(0, e.clientX - sx);
-    if (dx < -8) swiped = true;
+    if (dx > -24) { c.style.translate = ""; c.style.opacity = ""; return; }   // finger wobble while tapping: still a tap
+    swiped = true;
     c.style.translate = `${dx}px 0`; c.style.opacity = String(Math.max(0.35, 1 + dx / 220));
   });
   c.addEventListener("pointerup", (e) => {
@@ -1722,8 +1727,8 @@ function hideRoom(id) {
 }
 function showRoom(id) { const v = roomsStore(); v.hidden = v.hidden.filter((x) => x !== id); roomsSave(v); renderRooms(); }
 async function openRoom(r) {
-  if (roomsState.busy) return;
-  roomsState.busy = true;
+  if (roomsState.busy && Date.now() - roomsState.busyAt < 12000) return;
+  roomsState.busy = true; roomsState.busyAt = Date.now();
   stopMenuMusic();
   try {
     if (state.board && state.board.id !== r.id) resetBoardState();
@@ -1732,6 +1737,7 @@ async function openRoom(r) {
   finally { roomsState.busy = false; }
 }
 function openRoomsFromBoard() {
+  roomsState.busy = false;              // back on the menu: planets must be tappable again
   if (state.board) resetBoardState();
   showMenu();
 }
