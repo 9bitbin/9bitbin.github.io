@@ -1,90 +1,47 @@
-# 🌟 9bitbin Portfolio
+# 9bitbin.github.io
 
-A modern, interactive personal portfolio website for 9bitbin - an IT Enthusiast, Developer & Problem Solver based in New York.
+Himal Shrestha's portfolio hub: IT support and systems, browser games, apps, and music.
+Live at **https://9bitbin.github.io**. Plain HTML, CSS and JavaScript, hosted on GitHub Pages. No build step.
 
-## 🎨 Features
+## What's on the site
 
-### Dark Theme (Default)
-- Modern dark purple gradient design
-- Clean, professional layout
-- Smooth animations and transitions
-- Fully responsive design
+| Address | What it is |
+|---|---|
+| `/` | Home page. Tabs: Music, Games, Apps, IT tools, Résumé, Contact (keys 1–6 switch tabs) |
+| `/#music` | Steampunk music player (gears, beat needle, live wave screen, steam) |
+| `/#resume` | Résumé. The PDF is embedded on big screens, text version on phones |
+| `/#contact` | Contact form (sent through Formspree) |
+| `/pinned/` | Pinned, a shared sticky-note board app (Supabase backend, installable) |
+| `/pinned/games/…` | Single-player browser games, also playable inside Pinned |
+| `/games/tpt-flappy/` | TPT Flappy |
+| `/tools/pdf-toolkit/` | Merge, split, watermark and compress PDFs in the browser |
+| `/tools/sop-creator/` | Builds IT standard operating procedures |
+| `/side/electronix/` | Electronix Setup price sheet |
+| `/404.html` | "Page not found" page (also points old addresses to their new homes) |
 
-### Terminal Mode Toggle
-- Classic terminal aesthetic with black background
-- Bright green text (#00ff00)
-- Monospace font (Courier New/Consolas/Monaco)
-- Stylized borders and glow effects
+## Folders
 
-### Retro Terminal Effects (Terminal Mode Only)
-- **Animated Scan Lines** - CRT monitor-style horizontal lines
-- **Screen Flicker** - Subtle flickering animation
-- **Text Glow** - Subtle pulsing green glow on headings and text
-- **Border Glow Animation** - Cards and sections pulse with soft green light
-- **Screen Brightness Animation** - Gentle brightness fluctuations
-- **Radial Vignette** - Darkened edges effect
+```
+/                index.html, 404.html, resume.pdf, favicon.ico
+/assets/         theme.css (shared look), game-theme.css (game menus), game-back.js (games' Back button),
+                 favicon + app icons, og-image.png (link preview card)
+/music/audio/    the songs (MP3). Add them to TRACKS in index.html
+/pinned/         the Pinned app. pinned/supabase/ holds its server functions (see the README there)
+/games/  /tools/  /side/
+/archive/        old site and unused files (nothing loads these)
+```
 
-### Theme Persistence
-- User preferences are saved to localStorage
-- Settings persist across all pages
-- Automatic theme restoration on page load
+## Common edits
 
-## 📁 Pages
+- **Homepage tiles:** `const MODULES` near the bottom of `index.html`.
+- **Songs:** put the MP3 in `music/audio/`, add a line to `const TRACKS` in `index.html`. Keep `src` relative (`music/audio/name.mp3`).
+- **Résumé PDF:** replace `resume.pdf` (keep the name).
+- **Readout text (LOC / INTEREST / STATUS):** the `rx` block near the top of `index.html`; the interests cycle from `const INTERESTS`.
+- **Game Back button:** `assets/game-back.js`. After changing it, bump `?v=` in each game's `<script src="/assets/game-back.js?v=…">`.
+- **Pinned updates:** bump `?v=` in `pinned/index.html` (app.js and styles.css) and in the `church.js` import in `pinned/app.js`, and change `CACHE` in `pinned/sw.js`.
 
-- **index.html** - Main portfolio page with about, skills, and projects
-- **contact.html** - Contact information and connection links
-- **styles.css** - Centralized styling for all pages
+## Notes
 
-## 🚀 Sections
-
-### About Me
-Personal introduction highlighting passion for technology, mobile development, IT support, and biomechanics.
-
-### Skills
-- **Mobile Development** - Kotlin, Jetpack Compose, Android
-- **IT Support** - Technical troubleshooting and infrastructure management
-- **Data & Web Development** - MySQL, PHP, JavaScript
-- **UI Development** - JavaFX, FXML, Scene Builder
-
-### Technical Skills
-Java, Kotlin, PHP, Python, HTML, CSS, JavaScript, MySQL, Firebase, Android Studio, IntelliJ, Git, AWS
-
-### Projects
-1. **Personal Finance Manager App** - Mobile app for financial management
-2. **Registration & Login App** - Modern auth system with Jetpack Compose
-3. **JavaFX UI Projects** - TipCalculator and ColorChooser applications
-4. **Minecraft SMP Server** - Gaming community server management
-
-## 🎮 How to Use the Theme Toggle
-
-1. Look for the toggle controls in the top right of the header
-2. **Terminal Mode Toggle** - Switch between dark purple theme and terminal theme
-3. **Retro FX Button** - Only appears when Terminal Mode is enabled
-   - Click to add retro CRT monitor effects (scan lines, flicker, glow)
-   - Button glows green when active
-
-## 💻 Technologies Used
-
-- **HTML5** - Semantic markup
-- **CSS3** - Advanced styling with animations and gradients
-- **JavaScript** - Theme toggle functionality and localStorage persistence
-- **Responsive Design** - Mobile-friendly layout
-
-## 🔗 Links
-
-- GitHub: https://github.com/9bitbin
-- Email: Shresthahimal12@yahoo.com
-
-## 📝 Recent Updates (February 28, 2026)
-
-- ✨ Created professional portfolio website
-- 🌙 Implemented dark theme with modern gradient design
-- 🎮 Added Terminal Mode toggle for retro green terminal aesthetic
-- 🖥️ Added Retro FX button with CRT monitor effects (scan lines, flicker, glow)
-- 💾 Implemented localStorage for theme persistence across pages
-- 📱 Made all pages responsive and mobile-friendly
-- 🔗 Added contact page with connection links
-
-## 📄 License
-
-© 2026 9bitbin. All rights reserved.
+- `REORGANIZE.md` lists where files moved in Nov 2026 and how to undo it.
+- `POLISH-STEPS.md` covers the link preview card, icons and 404 page.
+- `index2.html` is the previous homepage (old readout), kept as a backup.
