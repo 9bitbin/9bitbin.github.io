@@ -593,7 +593,9 @@
       if (!r.ok || j.success === false || j.success === "false") throw new Error(j.message || "Send failed");
       form.reset(); say("SENT. THANKS, I'LL GET BACK TO YOU.");
     } catch (err) {
-      say("Couldn't send. Email me directly at " + CONTACT_TO + ".", true);
+      // FormSubmit says "needs Activation" until the owner clicks the link in its first email
+      if (/activat/i.test(err.message)) say("Form not activated yet. Check " + CONTACT_TO + " for FormSubmit's 'Activate Form' email.", true);
+      else say("Couldn't send. Email me directly at " + CONTACT_TO + ".", true);
     } finally { cfSend.disabled = false; }
   });
   document.getElementById("year").textContent = new Date().getFullYear();
