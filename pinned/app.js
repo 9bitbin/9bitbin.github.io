@@ -1992,7 +1992,12 @@ async function joinPeek() {
     // open it the same way a room from your list opens (those carry my_bg and joined_at)
     await openRoom({ ...b, my_bg: null, joined_at: new Date().toISOString(), member: true });
     fxAnnounce("pop");
-  } catch (e) { console.error("join room failed", e); setError($("#peekError"), e.message || "Couldn't join that room"); toast(e.message || "Couldn't join that room", 4000); }
+  } catch (e) {
+    console.error("join room failed", e);
+    // "Sign in first" or a foreign-key error means this phone's sign-in points at an account that no longer exists
+    if (/sign in first|foreign key|_fkey/i.test(e.message || "") && !(await api.checkSession())) { busy(btn, false); closeSheet("roomPeek"); return onLostSession(); }
+    setError($("#peekError"), e.message || "Couldn't join that room"); toast(e.message || "Couldn't join that room", 4000);
+  }
   busy(btn, false);
 }
 // ---------------------------------------------------------------- fun tools
