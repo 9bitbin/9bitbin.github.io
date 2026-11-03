@@ -48,7 +48,7 @@ It also knows the **old addresses from the reorganize** and offers a button to t
 
 ## 4. README
 
-`README.md` now describes the current site (it used to describe the old purple site).
+`readme.md` now describes the current site (it used to describe the old purple site).
 
 ## 5. Things left as they are (your call)
 
