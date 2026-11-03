@@ -1,0 +1,96 @@
+<!doctype html>
+<!--
+  404 page. GitHub Pages shows this for any address that doesn't exist on the site.
+  Use absolute paths (starting with "/") here: this page can appear at any address.
+  MOVED (bottom of the file) points old addresses from the Nov 2026 reorganize to their new homes.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found · 9BITBIN</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="theme-color" content="#11130F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Barlow:wght@400;500;600&family=DotGothic16&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/theme.css">
+<style>
+  * { box-sizing: border-box; }
+  .wrap { min-height: calc(100vh - 60px); display: grid; place-items: center; padding: 32px 18px; }
+  .card { width: min(560px, 100%); padding: 36px 32px 30px; text-align: center; }
+  .gauge { width: 200px; max-width: 70%; margin: 0 auto; display: block; }
+  .gauge .face { fill: #0B0D09; stroke: var(--brass); stroke-width: 3; }
+  .gauge .tick { stroke: var(--led-dim); stroke-width: 2; }
+  .gauge .red { fill: none; stroke: var(--danger); stroke-width: 4; opacity: .85; }
+  .gauge .needle { stroke: var(--copper); stroke-width: 3; stroke-linecap: round; transform-origin: 75px 80px; animation: drop 2.4s cubic-bezier(.3,1.6,.5,1) both, shake 3s ease-in-out 2.4s infinite; }
+  .gauge .hub { fill: var(--brass); }
+  @keyframes drop { 0% { transform: rotate(60deg); } 100% { transform: rotate(-72deg); } }
+  @keyframes shake { 0%, 100% { transform: rotate(-72deg); } 50% { transform: rotate(-68deg); } }
+  .code { margin-top: 10px; font-family: var(--f-led); font-size: 15px; letter-spacing: .14em; color: var(--danger); text-shadow: 0 0 8px rgba(224,102,74,.6); }
+  h1 { margin: 10px 0 0; font-size: clamp(30px, 7vw, 44px); }
+  .lede { color: var(--dim); margin: 10px auto 0; max-width: 40ch; }
+  .addr { margin-top: 14px; font-family: var(--f-led); font-size: 13px; color: var(--led-dim); word-break: break-all; }
+  .moved { margin-top: 18px; padding: 14px 16px; background: var(--well); border: 1px solid var(--led); border-radius: 4px;
+    box-shadow: inset 0 0 18px rgba(109,255,142,.10); }
+  .moved p { margin: 0 0 10px; color: var(--paper); }
+  .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+  .pipe { margin-top: 26px; }
+  @media (prefers-reduced-motion: reduce) { .gauge .needle { animation: none; transform: rotate(-72deg); } }
+</style>
+</head>
+<body class="theme-page">
+<header class="site-bar"><a class="sig" href="/">‹ 9BITBIN</a><span class="here led">ERR 404</span></header>
+<main class="wrap">
+  <div class="card plate">
+    <svg class="gauge" viewBox="0 0 150 92" aria-hidden="true">
+      <path class="face" d="M10 80 A65 65 0 0 1 140 80 Z"/>
+      <path class="red" d="M17 72 A60 60 0 0 1 28 46"/>
+      <line class="tick" x1="20" y1="62" x2="29" y2="65"/><line class="tick" x1="40" y1="31" x2="46" y2="38"/>
+      <line class="tick" x1="75" y1="18" x2="75" y2="27"/><line class="tick" x1="110" y1="31" x2="104" y2="38"/>
+      <line class="tick" x1="130" y1="62" x2="121" y2="65"/>
+      <line class="needle" x1="75" y1="80" x2="75" y2="26"/>
+      <circle class="hub" cx="75" cy="80" r="6"/>
+    </svg>
+    <div class="code">PRESSURE LOST · 404</div>
+    <h1>This page isn't here</h1>
+    <p class="lede">The link might be old, or the page moved when the site got reorganized.</p>
+    <p class="addr" id="addr"></p>
+    <div class="moved" id="moved" hidden>
+      <p>Found it. This page has a new address:</p>
+      <a class="btn" id="movedLink" href="/">Go to the new page</a>
+    </div>
+    <div class="actions">
+      <a class="btn" href="/">Home</a>
+      <a class="btn ghost" href="/#games">Games</a>
+      <a class="btn ghost" href="/#music">Music</a>
+      <a class="btn ghost" href="/#contact">Contact</a>
+    </div>
+    <div class="pipe" aria-hidden="true"></div>
+  </div>
+</main>
+<script>
+  // Old addresses from the Nov 2026 reorganize (see REORGANIZE.md) and where they live now.
+  const MOVED = {
+    "/tptflappy.html": "/games/tpt-flappy/",
+    "/himal_pdf_edit_toolkit.html": "/tools/pdf-toolkit/",
+    "/sop_creator.html": "/tools/sop-creator/",
+    "/electronix-setup.html": "/side/electronix/",
+    "/contact.html": "/#contact",
+    "/old-index.html": "/archive/old-site/old-index.html",
+    "/music/index.html": "/#music",
+  };
+  const path = location.pathname.toLowerCase().replace(/\/+$/, "") || "/";
+  document.getElementById("addr").textContent = location.host + location.pathname;
+  const to = MOVED[path];
+  if (to) {
+    document.getElementById("movedLink").href = to;
+    document.getElementById("movedLink").textContent = "Go to " + to;
+    document.getElementById("moved").hidden = false;
+  }
+</script>
+</body>
+</html>
