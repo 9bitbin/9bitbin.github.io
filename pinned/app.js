@@ -1,7 +1,7 @@
 import { haversine, bearing, compassOf, fmtDist, fmtAcc, buildMapModel } from "./map.js";
 // Pinned: shared sticky-note board for two
 import { CONFIG } from "./config.js";
-import { openChurch } from "./church.js?v=85.5";   // bump with index.html's ?v=
+import { openChurch } from "./church.js?v=85.6";   // bump with index.html's ?v=
 
 // ---------------------------------------------------------------- constants
 const BOARD_W = 420;                 // virtual board width (same on every phone)
@@ -3675,7 +3675,7 @@ const GAMES = [
   { slug: "box-claim", icon: "📦", name: "Box Claim", blurb: "Claim boxes with lines" },
   { slug: "word-gallows", icon: "🔤", name: "Word Gallows", blurb: "Guess the hidden word" },
   { slug: "bullseye-drop", icon: "🎯", name: "Bullseye Drop", blurb: "Drop the pin on the bullseye" },
-  { slug: "matrix-flap", icon: "🐦", name: "Matrix Flap", blurb: "Flap through the green pipes" },
+  { slug: "flap-arcade", icon: "🐦", name: "Flap Arcade", blurb: "Flap through pipes: Classic, Matrix or TPT" },
   { slug: "paper-glide", icon: "✈️", name: "Paper Glide", blurb: "Glide through the pin boards" },
   { slug: "lantern-hop", icon: "🏮", name: "Lantern Hop", blurb: "Hop stone to stone" },
   { slug: "neon-kestrel", icon: "🌃", name: "Neon Kestrel", blurb: "Endless neon flyer" },
