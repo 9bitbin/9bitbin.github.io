@@ -1,6 +1,6 @@
 /*
   game-back.js — adds a brass "Games" back button to a game page.
-  Add to any game:  <script src="/assets/game-back.js" defer></script>
+  Add to any game:  <script src="/assets/game-back.js?v=3" defer></script>  (bump v= after changing this file so browsers fetch the new copy)
   It takes you to the Games tab on the main site (/#games).
   If it covers the game's score, move it: data-pos="bl" (bottom-left), "br" or "tr".
   Inside the Pinned app the game runs in a frame that already has a Back button,
@@ -8,7 +8,7 @@
 */
 (function () {
   if (window.self !== window.top) return;            // inside Pinned: it has its own Back
-  var HREF = "/#games";
+  var HREF = "https://9bitbin.github.io/#games";
   var me = document.currentScript;
   var pos = (me && me.getAttribute("data-pos")) || "tl";
   var y = pos.charAt(0) === "b" ? "bottom:calc(env(safe-area-inset-bottom,0px) + 10px)" : "top:calc(env(safe-area-inset-top,0px) + 10px)";
