@@ -6,16 +6,19 @@
 <title>TPT Flappy Bird</title>
 <style>
   html, body {
-    margin: 0; height: 100%;
+    margin: 0; height: 100%; height: 100dvh;
     background: #0a1630;
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
     font-family: "Trebuchet MS", sans-serif;
   }
   canvas {
-    height: 100vh; max-height: 100vh;
+    /* fit the screen and keep the 2:3 shape (as wide as possible without getting taller than the screen) */
+    width: min(100vw, calc(100vh * 2 / 3));
+    width: min(100vw, calc(100dvh * 2 / 3));
+    height: auto;
     aspect-ratio: 2 / 3;
-    max-width: 100vw;
+    display: block;
     background: #70c5ce;
     touch-action: none;
     user-select: none;
@@ -31,7 +34,11 @@
 (() => {
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+  const W = 400, H = 600;                       // the game is drawn in these units
+  // draw at the screen's real pixel density so it stays sharp on phones
+  const DPR = Math.min(window.devicePixelRatio || 1, 3);
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  ctx.scale(DPR, DPR);
 
   // ---------- Tunables ----------
   const GRAVITY       = 1500;
