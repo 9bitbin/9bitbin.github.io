@@ -18,7 +18,7 @@ notification and link preview, so that would delete the account of anyone who tr
 1. Supabase > Edge Functions > **Deploy a new function** (do NOT open notify).
 2. Name it exactly `delete-account`.
 3. Paste all of `delete-account/index.ts`, press **Deploy**.
-4. Opening `https://skmmwiozlggchzrfsjsn.supabase.co/functions/v1/delete-account` in a browser should say `"Not signed in"`. That's expected.
+4. Opening `https://skmmwiozlggchzrfsjsn.supabase.co/functions/v1/delete-account` in a browser should say `"Missing authorization header"` (or `"Not signed in"`). That is expected: only a signed-in user can run it.
 5. Re-check that `.../functions/v1/notify` still shows `"version":5`.
 
 ## Deploying notify (dashboard)
