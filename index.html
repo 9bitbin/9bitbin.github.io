@@ -184,11 +184,12 @@
   .sub + .grid { margin-top: 10px; }
 
   /* music deck */
-  .deck { margin-top: 22px; padding: 18px; background: #0B0D09; border: 2px solid var(--brass-dk); border-radius: 6px;
+  .deck { position: relative; margin-top: 22px; padding: 18px; background: #0B0D09; border: 2px solid var(--brass-dk); border-radius: 6px;
     box-shadow: inset 0 0 0 1px rgba(196,154,78,.2), inset 0 0 30px rgba(0,0,0,.7); }
   .deck-row { display: grid; grid-template-columns: 96px 1fr 72px; gap: 14px; align-items: center; }
-  .dgear { width: 100%; aspect-ratio: 1; overflow: visible; }
-  .dgear g { transform-box: fill-box; transform-origin: center; fill: rgba(168,100,58,.28); stroke: var(--copper); stroke-width: 2.4; }
+  .dgear { width: 100%; aspect-ratio: 1; overflow: visible; filter: drop-shadow(0 5px 6px rgba(0,0,0,.7)); }
+  .dgear .rot { transform-box: fill-box; transform-origin: center; will-change: transform; }
+  .steam { position: absolute; left: 0; right: 0; top: -110px; height: calc(100% + 110px); width: 100%; pointer-events: none; z-index: 2; }
   .dg2 { margin-top: 34px; }
   .screen { position: relative; height: 150px; background: #050705; border: 1px solid var(--led-dim); border-radius: 4px; overflow: hidden;
     box-shadow: inset 0 0 22px rgba(109,255,142,.10); transform: scale(calc(1 + var(--thump, 0) * .018)); }
@@ -204,13 +205,30 @@
   .vu-needle { stroke: var(--copper); stroke-width: 2.5; stroke-linecap: round; transform-origin: 60px 62px; transform: rotate(-60deg); }
   .vu-hub { fill: var(--brass); }
   .transport { display: flex; gap: 8px; }
-  .tbtn { width: 46px; height: 46px; padding: 0; font-size: 17px; border-radius: 50%; }
-  .tbtn.play { width: 58px; height: 58px; font-size: 22px; }
+  /* polished brass knobs */
+  .tbtn { position: relative; display: grid; place-items: center; width: 46px; height: 46px; padding: 0; border-radius: 50%; cursor: pointer;
+    border: 1px solid #2A1E0A;
+    background: radial-gradient(circle at 34% 28%, #FFF1C8 0, #F0D08A 10%, #D6AE62 28%, #B08440 52%, #7A5A26 78%, #4A3414 100%);
+    box-shadow: 0 0 0 3px #1A1408, 0 0 0 4px #9C7637, 0 0 0 5px #2A1E0A,
+      inset 0 2px 2px rgba(255,255,255,.55), inset 0 -4px 7px rgba(40,24,6,.55), 0 6px 12px rgba(0,0,0,.65);
+    transition: transform .08s, box-shadow .2s; }
+  .tbtn svg { width: 46%; height: 46%; fill: #24180A; filter: drop-shadow(0 1px 0 rgba(255,236,190,.55)); }
+  .tbtn.play { width: 62px; height: 62px; }
+  .tbtn.play svg { width: 42%; height: 42%; }
+  .tbtn:hover { filter: brightness(1.07); }
+  .tbtn:active { transform: translateY(1px) scale(.97); box-shadow: 0 0 0 3px #1A1408, 0 0 0 4px #9C7637, 0 0 0 5px #2A1E0A,
+      inset 0 3px 7px rgba(40,24,6,.7), 0 2px 5px rgba(0,0,0,.6); }
+  .tbtn.play.on { box-shadow: 0 0 0 3px #1A1408, 0 0 0 4px var(--led), 0 0 0 5px #0B2A14, 0 0 18px rgba(109,255,142,.55),
+      inset 0 2px 2px rgba(255,255,255,.55), inset 0 -4px 7px rgba(40,24,6,.55), 0 6px 12px rgba(0,0,0,.65); }
+  .tbtn:disabled { filter: brightness(.8); cursor: default; }
+  .vu-ticks line { stroke: var(--brass); stroke-width: 1.4; }
+  .vu-lbl { font: 8px "DotGothic16", monospace; fill: var(--led-dim); letter-spacing: .1em; }
   .sliders { display: grid; gap: 8px; }
   .sl { display: grid; grid-template-columns: 42px 1fr; align-items: center; gap: 10px; }
   .sl .k { font-family: "DotGothic16"; font-size: 12px; color: var(--led-dim); letter-spacing: .08em; }
   .sl input { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: #080A07; border: 1px solid var(--seam); border-radius: 4px; cursor: pointer; }
-  .sl input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; border: 1px solid #3B2B10; background: linear-gradient(180deg, #E2BE73, var(--brass-dk)); }
+  .sl input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; border: 1px solid #2A1E0A;
+    background: radial-gradient(circle at 35% 30%, #FFF1C8, #D6AE62 35%, #7A5A26 85%); box-shadow: 0 2px 4px rgba(0,0,0,.6); }
   .sl input::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #3B2B10; background: var(--brass); }
   .tracks { list-style: none; padding: 0; margin-top: 14px; display: grid; gap: 8px; counter-reset: trk; }
   .trk { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; width: 100%; text-align: left; cursor: pointer;
@@ -369,26 +387,29 @@
 
       <!-- steam-deck player: gears turn while playing, needle + screen react to the beat -->
       <div class="deck" id="deck">
+        <canvas class="steam" id="steam" aria-hidden="true"></canvas>
         <div class="deck-row">
-          <svg class="dgear dg1" aria-hidden="true"><g data-teeth="16" id="dg1"></g></svg>
+          <svg class="dgear dg1" aria-hidden="true" data-hd-gear="16" data-id="dg1"></svg>
           <div class="screen">
             <canvas id="viz" aria-hidden="true"></canvas>
             <div class="scr-title led" id="npTitle">NO TAPE LOADED</div>
             <div class="scr-time led" id="npTime">0:00 / 0:00</div>
           </div>
-          <svg class="dgear dg2" aria-hidden="true"><g data-teeth="11" id="dg2"></g></svg>
+          <svg class="dgear dg2" aria-hidden="true" data-hd-gear="11" data-id="dg2"></svg>
         </div>
         <div class="deck-ctl">
           <svg class="vu" viewBox="0 0 120 70" aria-hidden="true">
             <path class="vu-face" d="M8 62 A52 52 0 0 1 112 62 Z"/>
             <path class="vu-red" d="M93 25 A52 52 0 0 1 107 44" />
+            <g class="vu-ticks" id="vuTicks"></g>
+            <text class="vu-lbl" x="60" y="52" text-anchor="middle">BEAT</text>
             <line class="vu-needle" id="vuNeedle" x1="60" y1="62" x2="60" y2="18"/>
             <circle class="vu-hub" cx="60" cy="62" r="5"/>
           </svg>
           <div class="transport">
-            <button class="btn ghost tbtn" id="pPrev" aria-label="Previous track">&#9198;</button>
-            <button class="btn tbtn play" id="pPlay" aria-label="Play">&#9654;</button>
-            <button class="btn ghost tbtn" id="pNext" aria-label="Next track">&#9197;</button>
+            <button class="tbtn" id="pPrev" aria-label="Previous track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2.4v14H6z"/><path d="M19 5.6v12.8a.6.6 0 0 1-.9.5L9.2 12.5a.6.6 0 0 1 0-1l8.9-6.4a.6.6 0 0 1 .9.5z"/></svg></button>
+            <button class="tbtn play" id="pPlay" aria-label="Play"></button>
+            <button class="tbtn" id="pNext" aria-label="Next track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.6 5H18v14h-2.4z"/><path d="M5 5.6v12.8a.6.6 0 0 0 .9.5l8.9-6.4a.6.6 0 0 0 0-1L5.9 5.1a.6.6 0 0 0-.9.5z"/></svg></button>
           </div>
           <div class="sliders">
             <label class="sl"><span class="k">TIME</span><input type="range" id="pSeek" min="0" max="1000" value="0" aria-label="Seek"></label>
@@ -691,6 +712,59 @@
   });
   document.getElementById("year").textContent = new Date().getFullYear();
 
+  // ===== HD gears for the music deck =====
+  // Each gear: copper body with lighting, rust grain, spoke cut-outs and a brass hub with bolts.
+  // The shine sits outside the turning group so the light stays still while the gear spins.
+  document.querySelectorAll("[data-hd-gear]").forEach((svg, n) => {
+    const t = +svg.dataset.hdGear, u = svg.dataset.id, P = (r, a) => (50 + r * Math.cos(a)).toFixed(2) + "," + (50 + r * Math.sin(a)).toFixed(2);
+    const step = Math.PI * 2 / t, pts = [];
+    for (let i = 0; i < t; i++) {
+      const a = i * step;
+      pts.push(P(38.5, a), P(38.5, a + step * .14), P(46, a + step * .3), P(46, a + step * .52), P(38.5, a + step * .68));
+    }
+    let spokes = "";
+    const sp = 5, w = (Math.PI * 2 / sp) * .62;
+    for (let k = 0; k < sp; k++) {
+      const a0 = k * Math.PI * 2 / sp + .3, a1 = a0 + w, r0 = 13.5, r1 = 27.5;
+      spokes += "M" + P(r0, a0) + "L" + P(r1, a0) + "A" + r1 + "," + r1 + " 0 0 1 " + P(r1, a1) + "L" + P(r0, a1) + "A" + r0 + "," + r0 + " 0 0 0 " + P(r0, a0) + "Z";
+    }
+    let bolts = "";
+    for (let k = 0; k < 5; k++) { const a = k * Math.PI * 2 / 5; bolts += '<circle cx="' + (50 + 7.2 * Math.cos(a)).toFixed(2) + '" cy="' + (50 + 7.2 * Math.sin(a)).toFixed(2) + '" r="1.7" fill="url(#' + u + 'b)" stroke="#2A1E0A" stroke-width=".5"/>'; }
+    svg.setAttribute("viewBox", "-2 -2 104 104");
+    svg.innerHTML =
+      '<defs>' +
+        '<linearGradient id="' + u + 'm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0B27E"/><stop offset=".22" stop-color="#C9824B"/><stop offset=".5" stop-color="#94552B"/><stop offset=".78" stop-color="#5C2F15"/><stop offset="1" stop-color="#9A5A31"/></linearGradient>' +
+        '<radialGradient id="' + u + 'f" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#C98550"/><stop offset=".55" stop-color="#874821"/><stop offset="1" stop-color="#3E1D0B"/></radialGradient>' +
+        '<radialGradient id="' + u + 'h" cx=".36" cy=".32" r=".7"><stop offset="0" stop-color="#FFF1C8"/><stop offset=".3" stop-color="#E2BE73"/><stop offset=".7" stop-color="#9C7637"/><stop offset="1" stop-color="#4A3414"/></radialGradient>' +
+        '<radialGradient id="' + u + 'b" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFF1C8"/><stop offset="1" stop-color="#6E521F"/></radialGradient>' +
+        '<radialGradient id="' + u + 's" cx=".3" cy=".22" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>' +
+        '<filter id="' + u + 'r" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="' + (n * 7 + 3) + '" result="n"/>' +
+          '<feColorMatrix in="n" type="matrix" values="0 0 0 0 .42  0 0 0 0 .17  0 0 0 0 .05  0 0 0 -2.4 1.5" result="r"/>' +
+          '<feComposite in="r" in2="SourceGraphic" operator="in" result="rr"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="rr"/></feMerge></filter>' +
+      '</defs>' +
+      '<g class="rot" id="' + u + '">' +
+        '<g filter="url(#' + u + 'r)">' +
+          '<path d="M' + pts.join("L") + 'Z" fill="url(#' + u + 'm)" stroke="#2E1406" stroke-width="1.1" stroke-linejoin="round"/>' +
+          '<circle cx="50" cy="50" r="35" fill="none" stroke="#3E1D0B" stroke-width="1.6"/>' +
+          '<circle cx="50" cy="50" r="33.6" fill="url(#' + u + 'f)"/>' +
+          '<circle cx="50" cy="50" r="31" fill="none" stroke="rgba(255,200,150,.25)" stroke-width=".8"/>' +
+        '</g>' +
+        '<path d="' + spokes + '" fill="#090B08" stroke="#2E1406" stroke-width="1.2"/>' +
+        '<path d="' + spokes + '" fill="none" stroke="rgba(255,190,130,.18)" stroke-width=".6" transform="translate(.5 .7)"/>' +
+        '<circle cx="50" cy="50" r="12" fill="url(#' + u + 'h)" stroke="#2A1E0A" stroke-width=".9"/>' + bolts +
+        '<circle cx="50" cy="50" r="3.4" fill="#120D05" stroke="#9C7637" stroke-width=".8"/>' +
+      '</g>' +
+      '<circle cx="50" cy="50" r="46" fill="url(#' + u + 's)" pointer-events="none"/>';
+  });
+  (() => {   // gauge tick marks
+    const g = document.getElementById("vuTicks"); let h = "";
+    for (let k = 0; k <= 10; k++) {
+      const a = (-150 + k * 12) * Math.PI / 180, r1 = 50, r2 = k % 5 ? 45 : 41;
+      h += '<line x1="' + (60 + r1 * Math.cos(a)).toFixed(1) + '" y1="' + (62 + r1 * Math.sin(a)).toFixed(1) + '" x2="' + (60 + r2 * Math.cos(a)).toFixed(1) + '" y2="' + (62 + r2 * Math.sin(a)).toFixed(1) + '"/>';
+    }
+    g.innerHTML = h;
+  })();
+
   // ===== MUSIC PLAYER =====
   // ADD SONGS HERE: put the .mp3 files in the music/audio/ folder, then add a line for each one.
   const TRACKS = [
@@ -743,8 +817,16 @@
   $p("pNext").onclick = () => load(cur + 1, true);
   $p("pPrev").onclick = () => (audio.currentTime > 3 ? (audio.currentTime = 0) : load(cur - 1, true));
   audio.onended = () => load(cur + 1, true);
-  const syncBtn = () => { const on = !audio.paused; playBtn.innerHTML = on ? "&#10074;&#10074;" : "&#9654;"; playBtn.setAttribute("aria-label", on ? "Pause" : "Play"); };
-  audio.onplay = audio.onpause = syncBtn;
+  const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 4.8v14.4a.8.8 0 0 0 1.2.7l11.4-7.2a.8.8 0 0 0 0-1.4L8.7 4.1a.8.8 0 0 0-1.2.7z"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="4.5" width="4.6" height="15" rx="1"/><rect x="13.9" y="4.5" width="4.6" height="15" rx="1"/></svg>';
+  const syncBtn = () => {
+    const on = !audio.paused;
+    playBtn.innerHTML = on ? ICON_PAUSE : ICON_PLAY; playBtn.classList.toggle("on", on);
+    playBtn.setAttribute("aria-label", on ? "Pause" : "Play");
+  };
+  syncBtn();
+  audio.onplay = () => { syncBtn(); steamBurst(); };
+  audio.onpause = syncBtn;
   audio.ontimeupdate = () => {
     if (audio.duration) seek.value = audio.currentTime / audio.duration * 1000;
     $p("npTime").textContent = fmtT(audio.currentTime) + " / " + fmtT(audio.duration);
@@ -755,6 +837,25 @@
 
   // visuals: gears, needle, screen thump and the LED wave
   const cv = $p("viz"), g1 = $p("dg1"), g2 = $p("dg2"), needle = $p("vuNeedle"), screen = cv.parentElement;
+  const sc = $p("steam"), deck = $p("deck"), puffs = [];
+  let steamAcc = 0;
+  function steamVents() {     // where steam comes out: the top of each gear (or the screen corners on phones)
+    const d = deck.getBoundingClientRect(), out = [];
+    document.querySelectorAll(".dgear").forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.width) out.push({ x: r.left - d.left + r.width / 2, y: r.top - d.top + 110 + r.height * .2, s: r.width / 96 });
+    });
+    if (!out.length) { const r = screen.getBoundingClientRect(); out.push({ x: r.left - d.left + 16, y: r.top - d.top + 110, s: .6 }, { x: r.right - d.left - 16, y: r.top - d.top + 110, s: .6 }); }
+    return out;
+  }
+  function puff(v, power) {
+    puffs.push({ x: v.x + (Math.random() - .5) * 14 * v.s, y: v.y, vx: (Math.random() - .5) * 18, vy: -(28 + Math.random() * 30) * (0.7 + power),
+      r: (8 + Math.random() * 8) * v.s, gr: (26 + Math.random() * 22) * v.s, life: 0, max: 2.4 + Math.random() * 1.8, a: .3 + Math.random() * .22, rot: Math.random() * 6 });
+  }
+  function steamBurst() {     // the big whoosh when a song starts
+    if (calm) return;
+    steamVents().forEach(v => { for (let k = 0; k < 16; k++) puff(v, 1.2); });
+  }
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let a1 = 0, spin = 0, lvl = 0, last = performance.now();
   function frame(now) {
@@ -777,6 +878,28 @@
     lvl = want > lvl ? lvl + (want - lvl) * .5 : lvl - dt * .9; if (lvl < 0) lvl = 0;
     needle.style.transform = "rotate(" + (-60 + lvl * 120) + "deg)";
     if (!calm) screen.style.setProperty("--thump", playing ? Math.max(0, bass - .45) * 2 : 0);
+    // steam
+    if (!document.getElementById("music").hidden && !calm) {
+      if (playing) {
+        steamAcc += dt * (2.5 + bass * 22);
+        if (steamAcc > 1) { const vs = steamVents(); while (steamAcc > 1) { steamAcc--; puff(vs[Math.floor(Math.random() * vs.length)], bass); } }
+      }
+      const W = sc.clientWidth, H = sc.clientHeight, dpr = devicePixelRatio || 1;
+      if (sc.width !== Math.round(W * dpr) || sc.height !== Math.round(H * dpr)) { sc.width = Math.round(W * dpr); sc.height = Math.round(H * dpr); }
+      const c = sc.getContext("2d"); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+      for (let k = puffs.length - 1; k >= 0; k--) {
+        const q = puffs[k]; q.life += dt;
+        if (q.life > q.max) { puffs.splice(k, 1); continue; }
+        const f = q.life / q.max;
+        q.vy *= (1 - dt * .6); q.vx += Math.sin(q.life * 2 + q.rot) * dt * 10;
+        q.x += q.vx * dt; q.y += q.vy * dt;
+        const r = q.r + q.gr * f, al = q.a * Math.sin(Math.PI * Math.min(1, f * 1.6 + .05)) * (1 - f);
+        const g = c.createRadialGradient(q.x, q.y, 0, q.x, q.y, r);
+        g.addColorStop(0, "rgba(236,232,220," + al + ")"); g.addColorStop(.55, "rgba(210,205,192," + al * .55 + ")"); g.addColorStop(1, "rgba(200,195,180,0)");
+        c.fillStyle = g; c.beginPath(); c.arc(q.x, q.y, r, 0, Math.PI * 2); c.fill();
+      }
+      if (puffs.length > 260) puffs.splice(0, puffs.length - 260);
+    }
     // LED screen
     if (!document.getElementById("music").hidden) {
       const w = cv.clientWidth, h = cv.clientHeight, dpr = devicePixelRatio || 1;
