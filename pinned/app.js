@@ -89,6 +89,7 @@ const toLocalInput = (d) => `${localDateKey(d)}T${pad2(d.getHours())}:${pad2(d.g
 
 function createSupabaseApi() {
   let sb, session, channel, extras, liveCh, inkCh, chatCh;
+  let signedOutHook = null, manualSignOut = false;   // tell the app when the sign-in ends without the user asking
   const bucket = () => sb.storage.from("board-media");
   const urlCache = new Map();
   const must = ({ data, error }) => { if (error) throw new Error(error.message); return data; };
@@ -106,7 +107,10 @@ function createSupabaseApi() {
       const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
       sb = createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
       session = (await sb.auth.getSession()).data.session;
-      sb.auth.onAuthStateChange((_e, s) => { session = s; });
+      sb.auth.onAuthStateChange((ev, s) => {
+        session = s;
+        if (ev === "SIGNED_OUT" && !manualSignOut && signedOutHook) setTimeout(signedOutHook, 0);
+      });
       if (cameFromLink || handoff) history.replaceState(null, "", location.pathname);
 
       if (linkError) return { linkError: linkError.replace(/\+/g, " ") };
@@ -123,6 +127,21 @@ function createSupabaseApi() {
       return {};
     },
     hasSession: () => !!session,
+    onSignedOut(fn) { signedOutHook = fn; },
+    // Is the sign-in still good on the server? Tries one refresh before giving up.
+    // A network problem (offline) counts as "still signed in" so nobody gets kicked out for bad signal.
+    async checkSession() {
+      try {
+        const { data, error } = await sb.auth.getUser();
+        if (data && data.user) return true;
+        if (error && !error.status) return true;
+        const r = await sb.auth.refreshSession();
+        if (r.data && r.data.session) { session = r.data.session; return true; }
+        if (r.error && !r.error.status) return true;
+        session = null;
+        return false;
+      } catch { return true; }
+    },
     async sendLink(email, nonce) {
       const base = location.origin + location.pathname;
       const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: `${base}?handoff=${nonce}`, shouldCreateUser: true } });
@@ -151,7 +170,8 @@ function createSupabaseApi() {
         const sub = await reg?.pushManager?.getSubscription();
         if (sub) { await sb.from("push_subs").delete().eq("endpoint", sub.endpoint); await sub.unsubscribe(); }
       } catch { /* ignore */ }
-      await sb.auth.signOut({ scope: "local" });
+      manualSignOut = true;
+      try { await sb.auth.signOut({ scope: "local" }); } finally { manualSignOut = false; }
       session = null;
     },
     async me() {
@@ -471,6 +491,8 @@ function createDemoApi() {
     async account() { return { email: "demo@example.com", pending: null, anonymous: false }; },
     async linkEmail() {},
     async signOut() { localStorage.removeItem("soy-demo-me" + who); },
+    onSignedOut() {},
+    async checkSession() { return true; },
     async me() { return db().profiles[meId()] || null; },
     async signIn(name, color) { const d = db(); d.profiles[meId()] = { id: meId(), name, color, muted: [] }; save(d); return d.profiles[meId()]; },
     async listThemes() { return []; },          // demo mode keeps themes on this device only
@@ -1453,6 +1475,7 @@ async function boot() {
   document.documentElement.classList.toggle("no-deco", ls.get("pinned-deco", true) === false);
   if (api.hasSession()) setTimeout(() => syncThemes().catch(() => {}), 800);
   wireStatic();
+  api.onSignedOut(onLostSession);
   // /pinned/?games opens straight to the Games screen (the Back bar in each game links here)
   if (new URLSearchParams(location.search).has("games")) { history.replaceState(null, "", location.pathname); openGames(); }
   if (init.landing === "linked") return show("#linked");
@@ -1460,7 +1483,20 @@ async function boot() {
   await afterLogin();
 }
 
+// The sign-in ended (expired, or replaced on another device). Before this, the app kept going while
+// signed out, so every room looked "deleted" and nothing would open. Now it says so and asks to sign in.
+let lostSessionShown = false;
+function onLostSession() {
+  if (lostSessionShown) return;
+  lostSessionShown = true;
+  try { if (state.board) resetBoardState(); } catch { /* keep going */ }
+  state.me = null;
+  showLogin("You were signed out. Send yourself a new sign-in link to get back into your rooms.");
+  toast("Signed out. Sign in again to get back to your rooms.", 6000);
+}
+
 async function afterLogin() {
+  lostSessionShown = false;
   try {
     state.me = await api.me();
     if (!state.me) return showWelcome();
@@ -1551,6 +1587,8 @@ async function showMenu() {
   startStars();
   try { roomsState.list = await loadRooms(); }
   catch (e) { toast(e.message || "Couldn't load the rooms"); roomsState.list = roomsState.list || []; }
+  // no rooms at all can also mean the sign-in quietly ended: check before showing an empty map
+  if (!roomsState.list.length && !(await api.checkSession())) return onLostSession();
   if (pendingJoinCode) return showPair();   // opened from an invite link: go straight to the code
   renderRooms();
   if (menuMusicOn) menuMusicStart();   // starts on the first tap if the browser needs one
@@ -2246,11 +2284,17 @@ async function refreshMembers() {
   state.members = await api.members(state.board.id);
   await ensureAvatars(state.members);
   if (state.me && !state.members.some((m) => m.id === state.me.id)) {
-    // removed from the board, or it was deleted
     if (leaving) return;
-    resetBoardState();
-    toast("This board was deleted, or you were removed from it");
-    return showMenu();
+    // Not in the member list. First make sure we're still signed in: a signed-out app sees no members at all.
+    if (!(await api.checkSession())) return onLostSession();
+    state.members = await api.members(state.board.id);          // one retry, in case that was a hiccup
+    if (!state.members.some((m) => m.id === state.me.id)) {
+      // removed from the board, or it was deleted
+      resetBoardState();
+      toast("This board was deleted, or you were removed from it");
+      return showMenu();
+    }
+    await ensureAvatars(state.members);
   }
   renderChips();
   const waiting = state.members.length < 2;

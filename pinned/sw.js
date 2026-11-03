@@ -1,5 +1,5 @@
 // Pinned service worker: offline shell + push notifications
-const CACHE = "soy-v79";
+const CACHE = "soy-v80";
 const BIBLE = "soy-bible-v1";
 const SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./map.js", "./config.js", "./manifest.webmanifest", "./icons/icon-192.png"];
 
