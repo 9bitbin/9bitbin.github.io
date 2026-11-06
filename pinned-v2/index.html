@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="cyber">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pinned</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=VT323&family=Share+Tech+Mono&family=Archivo:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: a pinned-board directory. Top bar, filter row, grid of room cards. Four skins share one set of tokens. */
+:root{
+  /* Cozy Cork (light) is the base token set */
+  --paper:#f6f4ef;--surface:#ffffff;--ink:#1c2233;--muted:#5d6475;--line:#e3e0d8;--frame:var(--line);
+  --pin:#d6312f;--pin-ink:#ffffff;--accent2:var(--ink);--data:#1f8a4c;
+  --sticky:#ffe58a;--sticky-ink:#3b3112;--note2:#bfe3ff;--note2-ink:#0f2b40;--note3:#ffc9d6;--note3-ink:#45131f;
+  --ok:#1f8a4c;--warn:#b26a00;--soft:#efece4;
+  --shadow:0 1px 2px rgba(28,34,51,.06),0 4px 14px rgba(28,34,51,.07);
+  --display:"Bricolage Grotesque",system-ui,sans-serif;--body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r-lg:14px;--r:10px;--r-sm:7px;--pill:99px;--bw:1px;--glow:none;--case:none;--track:normal;--weight:800;
+  --board:repeating-linear-gradient(45deg,#f6efe2 0 12px,#f2e9d8 12px 24px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"])[data-skin="cork"]{
+    --paper:#141720;--surface:#1c202b;--ink:#eceae4;--muted:#a3a8b6;--line:#2c3140;
+    --pin:#ff5a52;--pin-ink:#1a0a0a;--sticky:#e9cf6a;--sticky-ink:#2a230b;--ok:#4cc781;--warn:#f0a43a;--soft:#232836;
+    --board:repeating-linear-gradient(45deg,#262a35 0 12px,#22262f 12px 24px);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.28);color-scheme:dark;
+  }
+  :root:not([data-theme="light"])[data-skin="mac"]{
+    --paper:#1e1e1e;--surface:#2a2a2c;--ink:#f5f5f7;--muted:#a1a1a6;--line:#3a3a3c;--soft:#3a3a3c;
+    --pin:#0a84ff;--pin-ink:#ffffff;--data:#30d158;--ok:#30d158;--warn:#ff9f0a;
+    --sticky:#4a4220;--sticky-ink:#fff3c4;--note2:#1f3550;--note2-ink:#d6e9ff;--note3:#4a2430;--note3-ink:#ffd9e2;
+    --board:#232325;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);color-scheme:dark;
+  }
+}
+:root[data-theme="dark"][data-skin="cork"]{
+  --paper:#141720;--surface:#1c202b;--ink:#eceae4;--muted:#a3a8b6;--line:#2c3140;
+  --pin:#ff5a52;--pin-ink:#1a0a0a;--sticky:#e9cf6a;--sticky-ink:#2a230b;--ok:#4cc781;--warn:#f0a43a;--soft:#232836;
+  --board:repeating-linear-gradient(45deg,#262a35 0 12px,#22262f 12px 24px);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.28);color-scheme:dark;
+}
+:root[data-theme="dark"][data-skin="mac"]{
+  --paper:#1e1e1e;--surface:#2a2a2c;--ink:#f5f5f7;--muted:#a1a1a6;--line:#3a3a3c;--soft:#3a3a3c;
+  --pin:#0a84ff;--pin-ink:#ffffff;--data:#30d158;--ok:#30d158;--warn:#ff9f0a;
+  --sticky:#4a4220;--sticky-ink:#fff3c4;--note2:#1f3550;--note2-ink:#d6e9ff;--note3:#4a2430;--note3-ink:#ffd9e2;
+  --board:#232325;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);color-scheme:dark;
+}
+/* Clean Minimal (macOS-like), light */
+:root[data-skin="mac"]{
+  --paper:#f5f5f7;--surface:#ffffff;--ink:#1d1d1f;--muted:#6e6e73;--line:#e5e5ea;--soft:#f0f0f3;
+  --pin:#007aff;--pin-ink:#ffffff;--accent2:var(--ink);--data:#28a745;--ok:#28a745;--warn:#c27c00;
+  --sticky:#fff4c2;--sticky-ink:#3d3200;--note2:#dcecff;--note2-ink:#0b2d55;--note3:#ffe1e8;--note3-ink:#4d1424;
+  --board:#fafafa;--shadow:0 1px 1px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.06);
+  --display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  --r-lg:12px;--r:8px;--r-sm:6px;--weight:700;
+}
+/* NYC After Dark: one dark world with subway-line colors */
+:root[data-skin="nyc"]{
+  --paper:#0e1220;--surface:#161b2e;--ink:#f2f3f7;--muted:#9aa3bd;--line:#262d47;--frame:#262d47;--soft:#1f2640;
+  --pin:#ff6319;--pin-ink:#140800;--accent2:#fccc0a;--data:#00b04f;--ok:#00b04f;--warn:#fccc0a;
+  --sticky:#fccc0a;--sticky-ink:#1d1600;--note2:#2850ad;--note2-ink:#ffffff;--note3:#ee352e;--note3-ink:#ffffff;
+  --board:linear-gradient(#11162a,#11162a);--shadow:0 0 0 1px #262d47,0 10px 30px rgba(0,0,0,.45);
+  --display:"Archivo",system-ui,sans-serif;--body:"Archivo",system-ui,sans-serif;
+  --r-lg:12px;--r:8px;--r-sm:6px;--weight:800;--track:-.01em;color-scheme:dark;
+}
+/* Retro-Futuristic Cyber-Glow: BBS terminal on a CRT */
+:root[data-skin="cyber"]{
+  --paper:#0b0c10;--surface:#0b0c10;--ink:#f4f6f0;--muted:#8d9688;--line:#2a2e26;--frame:#f3e600;--soft:#14170f;
+  --pin:#e53935;--pin-ink:#0b0c10;--accent2:#f3e600;--data:#1fe046;--ok:#1fe046;--warn:#f3e600;
+  --sticky:#0b0c10;--sticky-ink:#1fe046;--note2:#0b0c10;--note2-ink:#f3e600;--note3:#0b0c10;--note3-ink:#f4f6f0;
+  --board:repeating-linear-gradient(0deg,#0b0c10 0 3px,#10120c 3px 4px);
+  --shadow:none;--display:"VT323","Share Tech Mono",ui-monospace,monospace;--body:"Share Tech Mono",ui-monospace,"Consolas",monospace;
+  --r-lg:0;--r:0;--r-sm:0;--pill:0;--bw:2px;--glow:0 0 6px rgba(31,224,70,.55);--case:uppercase;--track:.12em;--weight:400;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0;text-transform:var(--case);letter-spacing:var(--track);font-weight:var(--weight)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pin);outline-offset:2px}
+a{color:var(--pin)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;height:60px}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:800;font-size:22px;background:none;border:0;cursor:pointer;padding:0}
+.logo .dot{width:14px;height:14px;border-radius:50%;background:var(--pin);box-shadow:inset -3px -3px 0 rgba(0,0,0,.18)}
+.logo small{font-family:var(--body);font-weight:600;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:var(--pill);padding:1px 7px}
+.nav{display:flex;gap:4px;margin-left:8px}
+.nav button{background:none;border:0;padding:8px 12px;border-radius:var(--r-sm);cursor:pointer;color:var(--muted);font-weight:600}
+.nav button[aria-current="page"]{color:var(--ink);background:var(--soft)}
+.spacer{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);padding:8px 14px;font-weight:600;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--pin);border-color:var(--pin);color:var(--pin-ink)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.ghost{border-color:transparent;background:none}
+.btn.small{padding:5px 10px;font-size:13px;border-radius:var(--r-sm)}
+.btn.danger{color:var(--pin)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex:none}
+.me-btn{display:flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;padding:4px;border-radius:var(--pill)}
+
+/* banner */
+.demo{background:var(--sticky);color:var(--sticky-ink);font-size:13px}
+.demo .wrap{padding-top:7px;padding-bottom:7px}
+
+/* directory */
+.hero{padding:28px 0 8px;display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap}
+.hero h1{font-size:34px}
+.hero p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.searchrow{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 12px}
+.search{flex:1 1 320px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:0 12px}
+.search input{border:0;background:none;outline:none;padding:11px 0;width:100%}
+select,.field input,.field textarea,.field select{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:var(--pill);padding:6px 12px;cursor:pointer;font-weight:600;font-size:13px;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.count{color:var(--muted);font-size:13px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;padding-bottom:40px}
+.card{position:relative;background:var(--surface);border:var(--bw) solid var(--frame);border-radius:var(--r-lg);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;cursor:pointer;text-align:left;padding:0}
+.card:hover{transform:translateY(-2px)}
+@media (prefers-reduced-motion:no-preference){.card{transition:transform .15s}}
+.cover{height:86px;position:relative}
+.cover .pinhead{position:absolute;top:10px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--pin);box-shadow:inset -3px -3px 0 rgba(0,0,0,.2),0 2px 3px rgba(0,0,0,.25)}
+.access{position:absolute;right:10px;top:10px;background:rgba(255,255,255,.92);color:#1c2233;font-size:12px;font-weight:700;border-radius:var(--pill);padding:3px 9px}
+.card .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.cat{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.card h3{font-size:18px}
+.card p{margin:0;color:var(--muted);font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:12px;background:var(--soft);border-radius:var(--r-sm);padding:2px 7px;color:var(--ink)}
+.meta{display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:13px;color:var(--muted);padding-top:6px;font-variant-numeric:tabular-nums}
+.state{font-weight:700;font-size:12px;border-radius:var(--pill);padding:2px 8px}
+.state.in{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.state.pending{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0}
+
+/* room page */
+.back{margin:20px 0 10px}
+.room-head{background:var(--surface);border:var(--bw) solid var(--frame);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+.room-head .cover{height:120px}
+.room-head .inner{padding:20px 22px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.room-head .info{flex:1 1 380px;display:flex;flex-direction:column;gap:8px}
+.room-head h1{font-size:30px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin:18px 0 40px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:var(--bw) solid var(--frame);border-radius:var(--r-lg);padding:18px}
+.panel h2{font-size:18px;margin-bottom:10px}
+.rules{margin:0;padding-left:20px;color:var(--muted)}
+.member{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.member:first-of-type{border-top:0}
+.member .who{flex:1;min-width:0}
+.member .who b{display:block}
+.member .who span{font-size:12px;color:var(--muted)}
+.role{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.board{background:var(--board);border-radius:var(--r);padding:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;min-height:220px}
+.note{background:var(--sticky);color:var(--sticky-ink);padding:14px 12px 10px;border-radius:var(--r-sm);box-shadow:0 3px 8px rgba(0,0,0,.15);font-size:14px;min-height:110px;display:flex;flex-direction:column;gap:8px}
+.note:nth-child(3n+1){transform:rotate(-1.5deg)}
+.note:nth-child(3n+2){transform:rotate(1.2deg);background:var(--note2);color:var(--note2-ink)}
+.note:nth-child(3n){background:var(--note3);color:var(--note3-ink)}
+.note .by{margin-top:auto;font-size:12px;opacity:.75}
+.locked{display:grid;place-items:center;text-align:center;color:var(--muted);min-height:220px;border:2px dashed var(--line);border-radius:var(--r);padding:20px}
+
+/* profile */
+.profile{display:grid;grid-template-columns:300px 1fr;gap:18px;margin:24px 0 40px}
+@media (max-width:820px){.profile{grid-template-columns:1fr}}
+.pcard{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+.pcard .avatar{width:84px;height:84px;font-size:28px}
+.form{display:grid;gap:14px}
+.field{display:grid;gap:5px}
+.field label,.field legend{font-weight:600;font-size:14px}
+.field .hint{font-size:12px;color:var(--muted)}
+.field textarea{min-height:80px;resize:vertical}
+fieldset{border:0;padding:0;margin:0}
+.checks{display:flex;gap:6px;flex-wrap:wrap}
+.checks label{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:var(--pill);padding:5px 11px;font-size:13px;cursor:pointer;font-weight:500}
+.checks input{accent-color:var(--pin)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.two{grid-template-columns:1fr}}
+.error{color:var(--pin);font-size:13px;font-weight:600;min-height:1em}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(10,12,20,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.scrim.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--r-lg);max-width:480px;width:100%;max-height:calc(100% - 32px);overflow:auto;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal h2{font-size:22px;margin-bottom:4px}
+.modal .sub{color:var(--muted);margin:0 0 16px;font-size:14px}
+.modal .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.radio{display:grid;gap:6px}
+.radio label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;cursor:pointer}
+.radio input{accent-color:var(--pin);margin-top:4px}
+.radio small{display:block;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:var(--r);font-weight:600;z-index:60;display:none;max-width:calc(100% - 32px)}
+.toast.show{display:block}
+.list-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.list-row:first-child{border-top:0}
+.muted{color:var(--muted)}
+@media (max-width:640px){.top .wrap{flex-wrap:wrap;height:auto;padding-top:8px;padding-bottom:4px;row-gap:4px}.nav{order:5;width:100%;margin:0;overflow-x:auto}.nav button{white-space:nowrap;padding:6px 10px}.logo small{display:none}.skinsel{max-width:118px}.me-btn>span:not(.avatar){display:none}.sfxlbl{display:none}.top .wrap{gap:8px}#authArea .btn{padding:6px 10px}.hero h1{font-size:27px}[data-skin="cyber"] .hero h1{font-size:34px}}
+/* skin picker */
+.skinpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.skin{border:var(--bw) solid var(--line);background:var(--surface);border-radius:var(--r);padding:8px;cursor:pointer;text-align:left;display:grid;gap:6px}
+.skin[aria-pressed="true"]{outline:2px solid var(--pin);outline-offset:1px}
+.skin .sw{height:54px;border-radius:var(--r-sm);display:flex;align-items:flex-end;gap:4px;padding:6px}
+.skin .sw i{display:block;width:16px;height:16px}
+.skin b{font-size:13px}
+.skinsel{background:var(--surface);border:var(--bw) solid var(--line);border-radius:var(--r);padding:6px 8px;font-size:13px}
+
+/* NYC After Dark extras: line-bullet chips and an orange underline */
+[data-skin="nyc"] .chip[aria-pressed="true"]{background:var(--accent2);border-color:var(--accent2);color:#1d1600}
+[data-skin="nyc"] .cat{color:var(--accent2)}
+[data-skin="nyc"] .hero h1{border-bottom:4px solid var(--pin);display:inline-block;padding-bottom:4px}
+[data-skin="nyc"] .cover .pinhead{background:var(--accent2)}
+[data-skin="nyc"] .demo{background:#fccc0a;color:#1d1600}
+
+/* Clean Minimal extras: frosted bar, no pins, no tilt */
+[data-skin="mac"] .top{background:color-mix(in srgb,var(--surface) 78%,transparent);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px)}
+[data-skin="mac"] .cover .pinhead,[data-skin="mac"] .logo .dot{box-shadow:none}
+[data-skin="mac"] .cover .pinhead{display:none}
+[data-skin="mac"] .note{transform:none!important;border-radius:var(--r)}
+[data-skin="mac"] .demo{background:var(--soft);color:var(--muted)}
+[data-skin="mac"] .cover{filter:saturate(.75)}
+
+/* Cyber-Glow extras */
+[data-skin="cyber"] body{font-size:14.5px}
+[data-skin="cyber"] h1,[data-skin="cyber"] h2,[data-skin="cyber"] h3{color:var(--accent2)}
+[data-skin="cyber"] h1::before,[data-skin="cyber"] h2::before{content:"["}
+[data-skin="cyber"] h1::after,[data-skin="cyber"] h2::after{content:"]"}
+[data-skin="cyber"] .hero h1{font-size:44px}
+[data-skin="cyber"] .card h3{font-size:24px}
+[data-skin="cyber"] .room-head h1{font-size:40px}
+[data-skin="cyber"] .panel h2{font-size:24px}
+[data-skin="cyber"] .modal h2{font-size:28px;color:var(--accent2)}
+[data-skin="cyber"] .top{border-bottom:var(--bw) solid var(--frame);background:var(--paper)}
+[data-skin="cyber"] .logo{font-family:"VT323",monospace;font-weight:400;font-size:30px;color:var(--data);text-shadow:var(--glow);letter-spacing:.08em}
+[data-skin="cyber"] .logo .dot{border-radius:0;background:var(--data);box-shadow:var(--glow)}
+[data-skin="cyber"] .logo small,[data-skin="cyber"] .nav button,[data-skin="cyber"] .btn,[data-skin="cyber"] .chip,[data-skin="cyber"] .cat,[data-skin="cyber"] .role,[data-skin="cyber"] .state,[data-skin="cyber"] .access{text-transform:uppercase;letter-spacing:.1em}
+[data-skin="cyber"] .nav button[aria-current="page"]{background:var(--data);color:#0b0c10}
+[data-skin="cyber"] .btn{border:var(--bw) solid var(--muted);box-shadow:inset -2px -2px 0 rgba(0,0,0,.6),inset 2px 2px 0 rgba(255,255,255,.12)}
+[data-skin="cyber"] .btn:hover{border-color:var(--data);color:var(--data)}
+[data-skin="cyber"] .btn:active{background:var(--data);color:#0b0c10;box-shadow:inset 2px 2px 0 rgba(0,0,0,.5)}
+[data-skin="cyber"] .btn.primary{background:var(--pin);border-color:var(--pin);color:#0b0c10;box-shadow:inset -3px -3px 0 rgba(0,0,0,.35),inset 3px 3px 0 rgba(255,255,255,.25)}
+[data-skin="cyber"] .btn.primary:hover{color:#0b0c10;filter:brightness(1.1)}
+[data-skin="cyber"] .btn.ghost{border-color:transparent;box-shadow:none}
+[data-skin="cyber"] .chip[aria-pressed="true"]{background:var(--data);color:#0b0c10;border-color:var(--data)}
+[data-skin="cyber"] .card:hover{transform:none;background:#11140b;outline:var(--bw) solid var(--data)}
+[data-skin="cyber"] .card,[data-skin="cyber"] .room-head,[data-skin="cyber"] .panel{box-shadow:inset 0 0 0 1px #0b0c10,inset 0 0 0 3px #2a2e26}
+[data-skin="cyber"] .cover,[data-skin="cyber"] .room-head .cover{background:repeating-linear-gradient(0deg,rgba(31,224,70,.10) 0 1px,transparent 1px 4px),linear-gradient(#0b0c10,#0b0c10)!important;border-bottom:var(--bw) solid var(--frame)}
+[data-skin="cyber"] .cover::after{content:attr(data-code);position:absolute;left:12px;right:12px;bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:"VT323",monospace;font-size:21px;color:var(--data);text-shadow:var(--glow);letter-spacing:.1em}
+[data-skin="cyber"] .cover .pinhead{border-radius:0;background:var(--data);box-shadow:var(--glow)}
+[data-skin="cyber"] .access{background:#0b0c10;color:var(--accent2);border:1px solid var(--accent2)}
+[data-skin="cyber"] .meta{color:var(--data);text-shadow:var(--glow)}
+[data-skin="cyber"] .tag{background:transparent;border:1px solid var(--line);color:var(--muted)}
+[data-skin="cyber"] .tag::before{content:"#"}
+[data-skin="cyber"] .count{color:var(--data);text-shadow:var(--glow)}
+[data-skin="cyber"] .state.in{background:var(--data);color:#0b0c10}
+[data-skin="cyber"] .state.pending{background:transparent;border:1px solid var(--pin);color:var(--pin)}
+[data-skin="cyber"] .search,[data-skin="cyber"] select,[data-skin="cyber"] .field input,[data-skin="cyber"] .field textarea,[data-skin="cyber"] .field select,[data-skin="cyber"] #noteText,[data-skin="cyber"] .skinsel{border:var(--bw) solid var(--line);background:#07080b;box-shadow:inset 2px 2px 0 rgba(0,0,0,.8)}
+[data-skin="cyber"] .search:focus-within,[data-skin="cyber"] input:focus{border-color:var(--data)}
+[data-skin="cyber"] input,[data-skin="cyber"] textarea{caret-color:var(--data)}
+[data-skin="cyber"] .note{transform:none!important;border:1px solid currentColor;box-shadow:0 0 8px rgba(31,224,70,.15);text-shadow:0 0 4px currentColor}
+[data-skin="cyber"] .note .by::before{content:"> "}
+[data-skin="cyber"] .avatar{border-radius:0;color:#0b0c10!important;background:var(--data)!important;font-family:"VT323",monospace;font-size:18px}
+[data-skin="cyber"] .demo{background:var(--accent2);color:#0b0c10;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
+[data-skin="cyber"] .toast{background:var(--data);color:#0b0c10;text-transform:uppercase;letter-spacing:.06em}
+[data-skin="cyber"] .toast::before{content:"> "}
+[data-skin="cyber"] .modal{border:var(--bw) solid var(--frame);box-shadow:0 0 0 4px #0b0c10,0 0 0 6px var(--pin)}
+[data-skin="cyber"] .error{color:var(--pin)}
+[data-skin="cyber"] .error:not(:empty)::before{content:"!! "}
+[data-skin="cyber"] .locked{border-color:var(--pin);color:var(--pin)}
+[data-skin="cyber"] .locked b{color:var(--pin)}
+[data-skin="cyber"] .member{border-top-style:dashed}
+[data-skin="cyber"] a{color:var(--data)}
+[data-skin="cyber"] :focus-visible{outline-color:var(--data)}
+@media (prefers-reduced-motion:no-preference){
+  [data-skin="cyber"] .logo .dot{animation:blink 1.1s steps(2) infinite}
+  @keyframes blink{50%{opacity:.2}}
+}
+
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <button class="logo" id="logo" type="button"><span class="dot"></span>Pinned <small>beta</small></button>
+    <nav class="nav" id="nav" aria-label="Main">
+      <button type="button" data-view="directory">Directory</button>
+      <button type="button" data-view="draws">Draw boards</button>
+      <button type="button" data-view="mine">My rooms</button>
+      <button type="button" data-view="profile">Profile</button>
+      <button type="button" data-view="settings">Settings</button>
+      <button type="button" data-view="reports" id="navReports" hidden>Reports</button>
+    </nav>
+    <div class="spacer"></div>
+    <label for="skinSel" style="position:absolute;left:-9999px">Theme</label><select id="skinSel" class="skinsel" aria-label="Theme"></select>
+    <button type="button" class="btn small" id="sfxBtn" aria-pressed="false"></button>
+    <div id="authArea"></div>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+
+<div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="supabase.js"></script>
+<script>
+(function(){
+"use strict";
+const BOROUGHS=["Manhattan","Brooklyn","Queens","Bronx","Staten Island","Long Island"];
+const CATS=["Draw boards","Clubs","Meetups","Gaming","Friends","Music","Creative","Couples","Other"];
+const INTERESTS=["Music","Gaming","Books","Fitness","Art","Food","Anime","Tech","Film","Language exchange","Outdoors","Board games"];
+const LOOKING=["Friends","Gaming group","Clubs","Events","Dating"];
+const ACCESS={public:"Open",approval:"Approval",password:"Locked",private:"Private"};
+const COLORS=["#d6312f","#2f6fd6","#1f8a4c","#8a3fd1","#c46a0a","#0f8a8a","#b02f7a","#4a5568"];
+const COVERS=["linear-gradient(135deg,#ff9a8b,#ff6a88)","linear-gradient(135deg,#7f7fd5,#86a8e7)","linear-gradient(135deg,#43cea2,#185a9d)","linear-gradient(135deg,#f7b733,#fc4a1a)","linear-gradient(135deg,#a18cd1,#fbc2eb)","linear-gradient(135deg,#2c3e50,#4ca1af)","linear-gradient(135deg,#f6d365,#fda085)","linear-gradient(135deg,#5ee7df,#b490ca)"];
+
+
+/* =====================================================================
+   SUPABASE CONNECTION
+   The anon key is public by design. Security comes from the database
+   rules in schema.sql, not from hiding this key.
+   ===================================================================== */
+const SUPABASE_URL="https://lcbzmlsowikajunifdjt.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjYnptbHNvd2lrYWp1bmlmZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1OTE4NDAsImV4cCI6MjEwOTE2Nzg0MH0.Bbc5Jndb9yj5Ar27MyYba5tIx3GL6zH99SoXkVAY630";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const SITE_URL=location.origin+location.pathname;
+
+let rooms=[];
+const people={};
+const S={
+  user:null,uid:null,email:"",loaded:false,
+  view:"directory",roomId:null,
+  q:"",cat:"All",borough:"Any",access:"Any",sort:"active",
+  joined:new Set(),pending:new Set(),blocked:new Set(),friends:new Set(),requested:new Set(),incoming:new Set(),
+  notes:{},roomReports:{},myReports:[],adminReports:[],invite:{}
+};
+const L=uid=>uid===S.uid?"me":uid;           // database id -> local id ("me" for you)
+const R=id=>id==="me"?S.uid:id;              // local id -> database id
+function person(id){
+  if(id==="me"&&S.user)return Object.assign({id:"me"},S.user);
+  return people[id]||{id,name:"Member",username:"hidden",borough:"",bio:"This profile is private.",interests:[],looking:[],color:"#7a7f8c",hidden:true};
+}
+function errText(e){
+  const m=(e&&(e.message||e.error_description))||String(e||"Something went wrong");
+  if(/Invalid login credentials/i.test(m))return "Wrong email or password.";
+  if(/Email not confirmed/i.test(m))return "Confirm your email first. Check your inbox for the link.";
+  if(/Database error saving new user/i.test(m))return "Couldn't create the account. Check your username and birthdate, then try again.";
+  if(/rate limit|too many requests/i.test(m))return "Too many tries. Wait a minute and try again.";
+  if(/Failed to fetch|NetworkError/i.test(m))return "Can't reach the server. Check your connection.";
+  return m.replace(/^PINNED_\w+:?/,"");
+}
+async function rpc(name,args){const {data,error}=await sb.rpc(name,args||{});if(error)throw error;return data}
+async function must(p){const {data,error}=await p;if(error)throw error;return data}
+function busy(btn,on){if(!btn)return;btn.disabled=on;if(on){btn.dataset.label=btn.textContent;btn.textContent="…"}else if(btn.dataset.label)btn.textContent=btn.dataset.label}
+function typing(){const a=document.activeElement;return a&&a.closest&&a.closest("#app")&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)}
+
+/* ---------- loading data ---------- */
+async function loadMe(){
+  const p=await must(sb.from("profiles").select("*").eq("id",S.uid).single());
+  S.user={name:p.display_name,username:p.username,email:S.email,bio:p.bio,interests:p.interests||[],looking:p.looking||[],borough:p.borough,
+    visibility:p.visibility,dm:p.dm_pref,friendReq:p.friend_req_pref,color:p.color,isAdmin:p.is_admin};
+}
+async function loadProfiles(ids){
+  ids=[...new Set(ids)].filter(id=>id&&id!==S.uid);
+  for(let i=0;i<ids.length;i+=150){
+    const rows=await must(sb.from("profiles").select("id,username,display_name,bio,borough,interests,looking,color").in("id",ids.slice(i,i+150)));
+    rows.forEach(p=>{people[p.id]={id:p.id,name:p.display_name,username:p.username,bio:p.bio,borough:p.borough,interests:p.interests||[],looking:p.looking||[],color:p.color}});
+  }
+}
+async function loadAll(){
+  if(!S.uid)return;
+  try{
+    const [rc,mem,reqs,blk,fr]=await Promise.all([
+      must(sb.from("room_cards").select("*").order("last_active",{ascending:false}).limit(500)),
+      must(sb.from("room_members").select("room_id,user_id,role").limit(10000)),
+      must(sb.from("join_requests").select("room_id,user_id")),
+      must(sb.from("blocks").select("blocked")),
+      must(sb.from("friendships").select("requester,addressee,status"))
+    ]);
+    const byRoom={};mem.forEach(m=>{(byRoom[m.room_id]=byRoom[m.room_id]||[]).push(m)});
+    const reqBy={};reqs.forEach(q=>{(reqBy[q.room_id]=reqBy[q.room_id]||[]).push(q.user_id)});
+    rooms=rc.map(r=>{const ms=byRoom[r.id]||[];return {id:r.id,kind:r.kind==="draw"?"draw":undefined,name:r.name,cat:r.category,access:r.access,borough:r.borough,tags:r.tags||[],desc:r.description,
+      owner:L(r.owner_id),mods:ms.filter(m=>m.role==="mod").map(m=>L(m.user_id)),members:ms.map(m=>L(m.user_id)),count:Number(r.member_count)||ms.length,
+      size:r.size_limit,activity:Date.parse(r.last_active),created:-Date.parse(r.created_at),rules:r.rules||[],requests:(reqBy[r.id]||[]).filter(u=>u!==S.uid).map(L)}});
+    rooms.forEach(roomIdx);
+    S.joined=new Set(rooms.filter(r=>r.members.includes("me")).map(r=>r.id));
+    S.pending=new Set(reqs.filter(q=>q.user_id===S.uid).map(q=>q.room_id));
+    S.blocked=new Set(blk.map(b=>b.blocked));
+    S.friends=new Set();S.requested=new Set();S.incoming=new Set();
+    fr.forEach(f=>{const other=f.requester===S.uid?f.addressee:f.requester;
+      if(f.status==="accepted")S.friends.add(other);else if(f.requester===S.uid)S.requested.add(other);else S.incoming.add(other)});
+    await loadProfiles([...mem.map(m=>m.user_id),...reqs.map(q=>q.user_id),...S.friends,...S.requested,...S.incoming,...S.blocked]);
+    S.loaded=true;
+  }catch(e){toast(errText(e))}
+  if(!typing()&&!DRAW.open)render();
+}
+
+/* ---------- auth ---------- */
+function ageOn(birth,today){const b=new Date(birth+"T00:00:00");let a=today.getFullYear()-b.getFullYear();const m=today.getMonth()-b.getMonth();if(m<0||(m===0&&today.getDate()<b.getDate()))a--;return a}
+function signUpModal(next){
+  openModal(`<h2 id="modalTitle">Create your account</h2><p class="sub">You need an account to browse and join rooms. Pinned is for adults 18 and older.</p>
+  <form class="form" id="suForm" novalidate>
+    <div class="two"><div class="field"><label for="suName">Display name</label><input id="suName" required maxlength="40" autocomplete="name"></div>
+    <div class="field"><label for="suUser">Username</label><input id="suUser" required maxlength="24" placeholder="letters, numbers, _ ."></div></div>
+    <div class="field"><label for="suEmail">Email</label><input id="suEmail" type="email" required autocomplete="email"></div>
+    <div class="field"><label for="suPw">Password</label><input id="suPw" type="password" required minlength="8" autocomplete="new-password"><span class="hint">At least 8 characters</span></div>
+    <div class="field"><label for="suBirth">Birthdate</label><input id="suBirth" type="date" required><span class="hint">Used only to check your age. Never shown on your profile.</span></div>
+    <label style="display:flex;gap:8px;align-items:flex-start;font-size:14px"><input type="checkbox" id="suAdult" style="margin-top:4px;accent-color:var(--pin)"> I confirm I'm 18 or older and agree to the Terms and Community Guidelines.</label>
+    <div class="error" id="suErr"></div>
+    <div class="foot" style="margin-top:0"><button type="button" class="btn ghost" id="toSignIn">I have an account</button><button class="btn primary" type="submit" id="suGo">Create account</button></div>
+  </form>`,m=>{
+    m.querySelector("#suBirth").max=new Date().toISOString().slice(0,10);
+    m.querySelector("#toSignIn").onclick=()=>signInModal(next);
+    m.querySelector("#suForm").onsubmit=async e=>{
+      e.preventDefault();
+      const v=id=>m.querySelector(id).value.trim();const err=m.querySelector("#suErr");err.textContent="";
+      const name=v("#suName"),user=v("#suUser").replace(/^@/,""),email=v("#suEmail"),pw=m.querySelector("#suPw").value,birth=v("#suBirth");
+      if(!name||!user||!email||!pw||!birth){err.textContent="Fill in every field.";return}
+      if(!/^[A-Za-z0-9_.]{3,24}$/.test(user)){err.textContent="Usernames are 3 to 24 letters, numbers, _ or . (no spaces).";return}
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){err.textContent="Enter a valid email address.";return}
+      if(pw.length<8){err.textContent="Password needs at least 8 characters.";return}
+      const today=new Date();
+      if(new Date(birth+"T00:00:00")>today){err.textContent="Birthdate can't be in the future.";return}
+      const age=ageOn(birth,today);
+      if(age<18){err.textContent="Sorry, you must be 18 or older to use Pinned.";return}
+      if(age>110){err.textContent="Check your birthdate.";return}
+      if(!m.querySelector("#suAdult").checked){err.textContent="Check the box to confirm you're 18+ and agree to the rules.";return}
+      const btn=m.querySelector("#suGo");busy(btn,true);
+      try{
+        const free=await rpc("username_available",{p_username:user});
+        if(!free){err.textContent="That username is taken. Try another.";busy(btn,false);return}
+        const {data,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:SITE_URL,data:{username:user,display_name:name,birthdate:birth,adult_confirmed:true}}});
+        if(error)throw error;
+        if(!data.session){
+          openModal(`<h2 id="modalTitle">Check your email</h2><p class="sub">We sent a confirmation link to <b>${esc(email)}</b>. Open it on this device to finish signing up.</p><div class="foot"><button class="btn primary" id="ok" type="button">OK</button></div>`,mm=>{mm.querySelector("#ok").onclick=closeModal});
+        }else{closeModal();toast("Account created. Add a few details to your profile.");if(next)next()}
+      }catch(ex){err.textContent=errText(ex);busy(btn,false)}
+    };
+  });
+}
+function signInModal(next){
+  openModal(`<h2 id="modalTitle">Sign in</h2>
+  <form class="form" id="siForm" novalidate>
+    <div class="field"><label for="siEmail">Email</label><input id="siEmail" type="email" autocomplete="email"></div>
+    <div class="field"><label for="siPw">Password</label><input id="siPw" type="password" autocomplete="current-password"></div>
+    <div class="error" id="siErr"></div>
+    <div class="foot" style="margin-top:0;flex-wrap:wrap"><button type="button" class="btn ghost" id="forgot">Forgot password?</button><span class="spacer"></span><button type="button" class="btn ghost" id="toSignUp">Create an account</button><button class="btn primary" type="submit" id="siGo">Sign in</button></div>
+  </form>`,m=>{
+    m.querySelector("#toSignUp").onclick=()=>signUpModal(next);
+    m.querySelector("#forgot").onclick=async()=>{const em=m.querySelector("#siEmail").value.trim();const err=m.querySelector("#siErr");
+      if(!em){err.textContent="Type your email above first.";return}
+      const {error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:SITE_URL});
+      if(error){err.textContent=errText(error);return}closeModal();toast("If that email has an account, a reset link is on its way.")};
+    m.querySelector("#siForm").onsubmit=async e=>{e.preventDefault();const em=m.querySelector("#siEmail").value.trim(),pw=m.querySelector("#siPw").value;const err=m.querySelector("#siErr");
+      if(!em||!pw){err.textContent="Enter your email and password.";return}
+      const btn=m.querySelector("#siGo");busy(btn,true);
+      const {error}=await sb.auth.signInWithPassword({email:em,password:pw});
+      if(error){err.textContent=errText(error);busy(btn,false);return}
+      closeModal();toast(T("signedIn"));if(next)setTimeout(next,600)};
+  });
+}
+function newPasswordModal(){
+  openModal(`<h2 id="modalTitle">Set a new password</h2><form class="form" id="npForm"><div class="field"><label for="np">New password</label><input id="np" type="password" minlength="8" autocomplete="new-password"></div><div class="error" id="npErr"></div><div class="foot" style="margin-top:0"><button class="btn primary" type="submit">Save password</button></div></form>`,m=>{
+    m.querySelector("#npForm").onsubmit=async e=>{e.preventDefault();const pw=m.querySelector("#np").value;if(pw.length<8){m.querySelector("#npErr").textContent="At least 8 characters.";return}
+      const {error}=await sb.auth.updateUser({password:pw});if(error){m.querySelector("#npErr").textContent=errText(error);return}closeModal();toast("Password updated.")}});
+}
+
+/* ---------- rendering ---------- */
+function go(view,roomId){
+  if(view!=="room"||roomId!==S.roomId){if(!DRAW.open)closeRoomChannel()}
+  S.view=view;S.roomId=roomId||null;render();window.scrollTo(0,0);
+  if(view==="room"&&roomId)loadRoomExtras(roomId);
+  if(view==="reports")loadAdminReports();
+  if(view==="settings")loadMyReports();
+}
+function renderTop(){
+  const sb_=$("#sfxBtn");sb_.setAttribute("aria-pressed",String(SFX.on));sb_.innerHTML=SFX.on?'<span aria-hidden="true">🔊</span><span class="sfxlbl"> Sound on</span>':'<span aria-hidden="true">🔇</span><span class="sfxlbl"> Sound off</span>';sb_.setAttribute("aria-label",SFX.on?"Turn sound off":"Turn sound on");
+  const rep=$("#navReports");if(rep)rep.hidden=!(S.user&&S.user.isAdmin);
+  document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.view===S.view?"page":"false"));
+  $("#authArea").innerHTML=S.user
+    ?`<button class="me-btn" id="meBtn" type="button" aria-label="Your profile">${av(person("me"))}<span style="font-weight:600">${esc(S.user.name)}</span></button>`
+    :`<div class="actions"><button class="btn ghost" id="siBtn" type="button">Sign in</button><button class="btn primary" id="suBtn" type="button">Sign up</button></div>`;
+  if(S.user)$("#meBtn").onclick=()=>go("profile");
+  else{$("#siBtn").onclick=()=>signInModal();$("#suBtn").onclick=()=>signUpModal()}
+}
+function roomState(r){if(S.joined.has(r.id))return "in";if(S.pending.has(r.id))return "pending";return ""}
+function visibleRooms(){return rooms.filter(r=>!S.blocked.has(r.owner))}
+function filtered(list){
+  const q=S.q.toLowerCase();
+  let out=list.filter(r=>(S.cat==="All"||r.cat===S.cat)&&(S.borough==="Any"||r.borough===S.borough)&&(S.access==="Any"||r.access===S.access)
+    &&(!q||(r.name+" "+r.desc+" "+r.tags.join(" ")).toLowerCase().includes(q)));
+  const k={active:r=>-r.activity,newest:r=>r.created,members:r=>-r.count}[S.sort];
+  return out.sort((a,b)=>k(a)-k(b));
+}
+function card(r){
+  const st=roomState(r);
+  const lock=r.access==="password"?"🔒 Locked":r.access==="approval"?"Approval":r.access==="private"?"Private":"Open";
+  return `<button class="card" type="button" data-room="${r.id}">
+    <div class="cover" data-code="ROOM ${String(roomIdx(r)+1).padStart(2,"0")} // ${esc(r.borough.toUpperCase()||"NYC")}" style="background:${COVERS[roomIdx(r)%COVERS.length]}"><span class="pinhead"></span><span class="access">${lock}</span></div>
+    <div class="body"><span class="cat">${r.kind==="draw"?"✏️ ":""}${esc(r.cat)}${r.borough?" · "+esc(r.borough):""}</span><h3>${esc(r.name)}</h3><p>${esc(r.desc)}</p>
+    <div class="tags">${r.tags.slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+    <div class="meta"><span>${r.count} / ${r.size} members</span>${st==="in"?'<span class="state in">Joined</span>':st==="pending"?'<span class="state pending">Requested</span>':""}</div></div></button>`;
+}
+function landing(title){
+  return `<section class="hero"><div><h1>${esc(title||T("hero"))}</h1><p>${T("heroSub")}</p></div></section>
+  <div class="panel" style="margin:20px 0 40px;max-width:560px"><h2>Sign in to see rooms</h2><p class="muted" style="margin:0 0 14px">Pinned is for adults 18 and older. Rooms are only visible to members of the site, to keep them away from scrapers and spam.</p>
+  <div class="actions"><button class="btn primary" id="lpSignUp" type="button">Create an account</button><button class="btn" id="lpSignIn" type="button">Sign in</button></div></div>`;
+}
+function loadingView(){return `<p class="muted" style="padding:40px 0">Loading…</p>`}
+function viewDirectory(){
+  if(!S.user)return landing();
+  if(!S.loaded)return loadingView();
+  const list=filtered(visibleRooms());
+  return `<section class="hero"><div><h1>${T("hero")}</h1><p>${T("heroSub")}</p></div><div class="spacer"></div>
+    <button class="btn primary" id="newRoom" type="button">${T("create")}</button></section>
+  <div class="searchrow">
+    <label class="search" for="q"><span aria-hidden="true">⌕</span><input id="q" type="search" placeholder="Search rooms, tags, games…" value="${esc(S.q)}"></label>
+    <select id="fBorough" aria-label="Borough">${["Any",...BOROUGHS].map(b=>`<option ${S.borough===b?"selected":""} value="${b}">${b==="Any"?"Any borough":b}</option>`).join("")}</select>
+    <select id="fAccess" aria-label="Access">${[["Any","Any access"],["public","Open"],["approval","Approval needed"],["password","Password locked"]].map(([v,l])=>`<option ${S.access===v?"selected":""} value="${v}">${l}</option>`).join("")}</select>
+    <select id="fSort" aria-label="Sort">${[["active","Most active"],["newest","Newest"],["members","Most members"]].map(([v,l])=>`<option ${S.sort===v?"selected":""} value="${v}">${l}</option>`).join("")}</select>
+    <button class="btn" id="invite" type="button">Have an invite?</button>
+  </div>
+  <div class="chips" role="group" aria-label="Category">${["All",...CATS].map(c=>`<button class="chip" type="button" data-cat="${c}" aria-pressed="${S.cat===c}">${c}</button>`).join("")}</div>
+  <div class="count">${list.length} room${list.length===1?"":"s"}</div>
+  <div class="grid">${list.length?list.map(card).join(""):`<div class="empty">${rooms.length?T("empty"):"No rooms yet. Be the first to start one."}</div>`}</div>`;
+}
+function bindDirectory(){
+  const q=$("#q");if(!q)return;q.oninput=()=>{S.q=q.value;const pos=q.selectionStart;render();const n=$("#q");n.focus();n.setSelectionRange(pos,pos)};
+  $("#fBorough").onchange=e=>{S.borough=e.target.value;render()};
+  $("#fAccess").onchange=e=>{S.access=e.target.value;render()};
+  $("#fSort").onchange=e=>{S.sort=e.target.value;render()};
+  document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{S.cat=b.dataset.cat;render()});
+  $("#newRoom").onclick=()=>createRoomModal();
+  $("#invite").onclick=inviteModal;
+}
+function bindCards(){document.querySelectorAll("[data-room]").forEach(c=>c.onclick=()=>go("room",c.dataset.room))}
+
+/* ---------- room page ---------- */
+async function loadRoomExtras(id){
+  const r=rooms.find(x=>x.id===id);if(!r||!S.joined.has(id))return;
+  const isMod=r.owner==="me"||r.mods.includes("me")||(S.user&&S.user.isAdmin);
+  try{
+    if(r.kind!=="draw"){
+      const n=await must(sb.from("notes").select("id,author_id,body,created_at").eq("room_id",id).order("created_at",{ascending:true}).limit(300));
+      S.notes[id]=n;await loadProfiles(n.map(x=>x.author_id));
+    }else{await loadStrokes(r)}
+    if(isMod){S.roomReports[id]=await must(sb.from("reports").select("*").eq("room_id",id).eq("routed_to","room").eq("status","open").order("created_at",{ascending:false}))}
+    openRoomChannel(r);
+  }catch(e){toast(errText(e))}
+  if(S.view==="room"&&S.roomId===id&&!typing())render();
+}
+function viewRoom(){
+  if(!S.user)return landing();
+  const r=rooms.find(x=>x.id===S.roomId);
+  if(!r)return `<p class="back"><button class="btn" data-go="directory" type="button">← Directory</button></p><p>${S.loaded?"This room isn't available. It may be private or deleted.":"Loading…"}</p>`;
+  const st=roomState(r), isOwner=r.owner==="me", isMod=isOwner||r.mods.includes("me")||S.user.isAdmin;
+  let action;
+  if(st==="in")action=isOwner?`<button class="btn" id="editRoom" type="button">Edit room</button>`:`<button class="btn" id="leave" type="button">${T("leave")}</button>`;
+  else if(st==="pending")action=`<button class="btn" id="cancelReq" type="button">Cancel request</button>`;
+  else if(r.count>=r.size)action=`<button class="btn" disabled type="button">Room is full</button>`;
+  else action={public:`<button class="btn primary" id="join" type="button">${T("join")}</button>`,approval:`<button class="btn primary" id="join" type="button">${T("request")}</button>`,password:`<button class="btn primary" id="join" type="button">${T("unlock")}</button>`,private:`<button class="btn primary" id="join" type="button">${T("invite")}</button>`}[r.access];
+  const owner=person(r.owner);
+  const memberRows=r.members.filter(id=>!S.blocked.has(id)).map(id=>{const p=person(id);const role=id===r.owner?"Owner":r.mods.includes(id)?"Mod":"";
+    return `<div class="member">${av(p)}<div class="who"><b>${esc(p.name)}</b><span>@${esc(p.username)}</span></div>${role?`<span class="role">${role}</span>`:""}${id!=="me"?`<button class="btn small" data-person="${id}" type="button">View</button>`:""}</div>`}).join("");
+  const notes=(S.notes[r.id]||[]).filter(n=>!S.blocked.has(n.author_id));
+  const board=r.kind==="draw"?(st==="in"
+    ?`<div class="dpreview"><canvas id="dPrev" aria-hidden="true"></canvas><button class="btn primary" id="openDraw" type="button">Open draw board</button></div><p class="muted" style="font-size:13px;margin:10px 0 0">Infinite canvas · live cursors · voice room on the side</p>`
+    :`<div class="locked"><div><b>${T("boardLocked")}</b><br>Join to draw, see live cursors and hop in the voice room.</div></div>`)
+    :st==="in"
+    ?`<div class="board">${notes.length?notes.map(n=>{const by=L(n.author_id);const mine=by==="me";return `<div class="note"><div>${esc(n.body)}</div><div class="by" style="display:flex;justify-content:space-between;gap:6px;align-items:center"><span>${esc(person(by).name)}</span><span style="display:flex;gap:8px">${!mine?`<button type="button" class="repnote" data-repnote="${n.id}" style="background:none;border:0;padding:0;font-size:12px;text-decoration:underline;cursor:pointer;color:inherit">Report</button>`:""}${mine||isMod?`<button type="button" data-delnote="${n.id}" style="background:none;border:0;padding:0;font-size:12px;text-decoration:underline;cursor:pointer;color:inherit">Delete</button>`:""}</span></div></div>`}).join(""):`<p class="muted" style="margin:0">No notes yet. Pin the first one.</p>`}</div>
+      <form id="noteForm" style="display:flex;gap:8px;margin-top:12px"><label for="noteText" style="position:absolute;left:-9999px">New note</label><input id="noteText" maxlength="120" placeholder="${T("notePh")}" style="flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px"><button class="btn primary" type="submit">${T("pin")}</button></form>`
+    :`<div class="locked"><div><b>${T("boardLocked")}</b><br>${r.access==="public"?"Join to see and post notes.":r.access==="approval"?"Request to join. The owner or a mod will approve you.":r.access==="password"?"Ask the owner for the password.":"You need an invite."}</div></div>`;
+  const reps=(S.roomReports[r.id]||[]);
+  return `<p class="back"><button class="btn" data-go="${r.kind==="draw"?"draws":"directory"}" type="button">← ${r.kind==="draw"?"Draw boards":"Directory"}</button></p>
+  <section class="room-head"><div class="cover" data-code="ROOM ${String(roomIdx(r)+1).padStart(2,"0")} // ${r.count} MEMBERS" style="background:${COVERS[roomIdx(r)%COVERS.length]}"></div>
+   <div class="inner"><div class="info"><span class="cat">${esc(r.cat)}${r.borough?" · "+esc(r.borough):""} · ${ACCESS[r.access]}</span><h1>${esc(r.name)}</h1><p style="margin:0">${esc(r.desc)}</p>
+     <div class="tags">${r.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+     <span class="muted" style="font-size:13px">${r.count} / ${r.size} members · Owner ${esc(owner.name)}${st==="pending"?' · <span class="state pending">Request sent</span>':""}</span></div>
+    <div class="actions">${action}${isMod&&st==="in"?`<button class="btn" id="showInvite" type="button">Invite code</button>`:""}${!isOwner?`<button class="btn ghost danger" id="reportRoom" type="button">Report room</button>`:""}</div></div></section>
+  <div class="cols"><div class="panel"><h2>${r.kind==="draw"?"Draw board":"Board"}</h2>${board}</div>
+   <div style="display:grid;gap:18px;align-content:start">
+    <div class="panel"><h2>Room rules</h2><ol class="rules">${r.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${r.cat==="Meetups"?'<p class="muted" style="font-size:13px;margin:10px 0 0">Safety: meet in public places and tell a friend where you\'re going.</p>':""}</div>
+    ${isMod&&r.requests.length?`<div class="panel"><h2>Join requests</h2>${r.requests.map(id=>`<div class="member">${av(person(id))}<div class="who"><b>${esc(person(id).name)}</b><span>@${esc(person(id).username)}</span></div><button class="btn small" data-approve="${id}" type="button">Approve</button><button class="btn small" data-decline="${id}" type="button">Decline</button></div>`).join("")}</div>`:""}
+    ${isMod&&reps.length?`<div class="panel"><h2>Reports to review</h2>${reps.map(x=>reportRow(x)).join("")}</div>`:""}
+    <div class="panel"><h2>Members</h2>${memberRows||'<p class="muted" style="margin:0">Members are hidden until you join.</p>'}</div>
+   </div></div>`;
+}
+function reportRow(x){
+  return `<div class="list-row" style="align-items:flex-start"><div style="flex:1;min-width:0"><b>${esc(x.target_label||x.target_type)}</b><div class="muted" style="font-size:13px">${esc(x.reason)}${x.urgent?' · <span style="color:var(--pin);font-weight:700">Urgent</span>':""} · ${new Date(x.created_at).toLocaleString()}</div>${x.details?`<div style="font-size:13px;margin-top:4px">${esc(x.details)}</div>`:""}</div>
+  <div class="actions" style="flex-direction:column"><button class="btn small" data-rep-act="${x.id}" type="button">Action taken</button><button class="btn small ghost" data-rep-dis="${x.id}" type="button">Dismiss</button></div></div>`;
+}
+function bindReportRows(after){
+  document.querySelectorAll("[data-rep-act],[data-rep-dis]").forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.repAct||b.dataset.repDis;const status=b.dataset.repAct?"actioned":"dismissed";
+    try{await must(sb.from("reports").update({status}).eq("id",id));toast(status==="actioned"?"Marked as handled.":"Report dismissed.");after()}catch(e){toast(errText(e))}});
+}
+function bindRoom(){
+  const r=rooms.find(x=>x.id===S.roomId);if(!r)return;
+  const j=$("#join");if(j)j.onclick=()=>joinFlow(r);
+  const l=$("#leave");if(l)l.onclick=async()=>{try{await must(sb.from("room_members").delete().match({room_id:r.id,user_id:S.uid}));closeRoomChannel();SFX.play("leave");toast(T("left",r.name));await loadAll()}catch(e){toast(errText(e))}};
+  const c=$("#cancelReq");if(c)c.onclick=async()=>{try{await must(sb.from("join_requests").delete().match({room_id:r.id,user_id:S.uid}));toast(T("requestCanceled"));await loadAll()}catch(e){toast(errText(e))}};
+  const ed=$("#editRoom");if(ed)ed.onclick=()=>createRoomModal(r);
+  const od=$("#openDraw");if(od){od.onclick=()=>openDraw(r);drawPreview(r)}
+  const rr=$("#reportRoom");if(rr)rr.onclick=()=>reportModal({kind:"room",id:r.id,label:r.name,room:null});
+  const si=$("#showInvite");if(si)si.onclick=()=>inviteCodeModal(r);
+  document.querySelectorAll("[data-person]").forEach(b=>b.onclick=()=>personModal(b.dataset.person,r));
+  const nf=$("#noteForm");if(nf)nf.onsubmit=async e=>{e.preventDefault();const inp=$("#noteText");const t=inp.value.trim();if(!t)return;inp.disabled=true;
+    try{const row=await must(sb.from("notes").insert({room_id:r.id,body:t}).select("id,author_id,body,created_at").single());
+      const list=S.notes[r.id]=S.notes[r.id]||[];if(!list.some(n=>n.id===row.id))list.push(row);SFX.play("note");render();toast(T("pinned"))}catch(ex){inp.disabled=false;toast(errText(ex))}};
+  document.querySelectorAll("[data-repnote]").forEach(b=>b.onclick=()=>{const n=(S.notes[r.id]||[]).find(x=>x.id===b.dataset.repnote);reportModal({kind:"note",id:b.dataset.repnote,label:`“${n?n.body:""}” in ${r.name}`,room:r})});
+  document.querySelectorAll("[data-delnote]").forEach(b=>b.onclick=async()=>{try{await must(sb.from("notes").delete().eq("id",b.dataset.delnote));S.notes[r.id]=(S.notes[r.id]||[]).filter(n=>n.id!==b.dataset.delnote);render()}catch(e){toast(errText(e))}});
+  document.querySelectorAll("[data-approve],[data-decline]").forEach(b=>b.onclick=async()=>{const who=b.dataset.approve||b.dataset.decline;
+    try{await rpc("decide_request",{p_room:r.id,p_user:R(who),p_approve:!!b.dataset.approve});toast(b.dataset.approve?"Approved.":"Declined.");await loadAll()}catch(e){toast(errText(e))}});
+  bindReportRows(()=>loadRoomExtras(r.id));
+}
+
+/* ---------- joining ---------- */
+function joinFlow(r){
+  if(S.joined.has(r.id))return;
+  if(r.access==="public"){openModal(`<h2 id="modalTitle">Join ${esc(r.name)}?</h2><p class="sub">By joining you agree to the room rules:</p><ol class="rules">${r.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol><div class="foot"><button class="btn" type="button" id="no">Cancel</button><button class="btn primary" type="button" id="yes">Join</button></div>`,m=>{
+    m.querySelector("#no").onclick=closeModal;m.querySelector("#yes").onclick=async e=>{busy(e.target,true);try{await rpc("join_room",{p_room:r.id,p_password:null});closeModal();afterJoin(r)}catch(ex){closeModal();toast(errText(ex))}}})}
+  else if(r.access==="approval"){rpc("join_room",{p_room:r.id,p_password:null}).then(async res=>{SFX.play("msg");toast(res==="requested"?T("requested"):T("joined",r.name));await loadAll()}).catch(e=>toast(errText(e)))}
+  else if(r.access==="password")passwordModal(r);
+  else inviteModal();
+}
+async function afterJoin(r){SFX.play("join");toast(T("joined",r.name));await loadAll();go("room",r.id)}
+function passwordModal(r){
+  openModal(`<h2 id="modalTitle">🔒 ${esc(r.name)}</h2><p class="sub">This room is password locked by its owner.</p><form class="form" id="pwForm"><div class="field"><label for="pw">Room password</label><input id="pw" type="password" autocomplete="off"></div><div class="error" id="pwErr"></div><div class="foot" style="margin-top:0"><button type="button" class="btn" id="no">Cancel</button><button class="btn primary" type="submit" id="pwGo">Unlock</button></div></form>`,m=>{
+    m.querySelector("#no").onclick=closeModal;
+    m.querySelector("#pwForm").onsubmit=async e=>{e.preventDefault();const btn=m.querySelector("#pwGo");busy(btn,true);
+      try{const res=String(await rpc("join_room",{p_room:r.id,p_password:m.querySelector("#pw").value}));busy(btn,false);
+        if(res==="joined"||res==="already"){closeModal();afterJoin(r);return}
+        if(res.startsWith("locked:")){closeModal();SFX.play("error");toast(T("wait",res.split(":")[1]));return}
+        if(res.startsWith("wrong:")){m.querySelector("#pwErr").textContent=T("wrongPw",Number(res.split(":")[1]));return}
+      }catch(ex){busy(btn,false);m.querySelector("#pwErr").textContent=errText(ex)}};
+  });
+}
+function inviteModal(){
+  if(!requireAuth(inviteModal))return;
+  openModal(`<h2 id="modalTitle">Join with an invite</h2><p class="sub">Private rooms aren't listed. Enter the code the owner sent you.</p><form class="form" id="invForm"><div class="field"><label for="inv">Invite code</label><input id="inv" autocomplete="off" placeholder="8 letters and numbers"></div><div class="error" id="invErr"></div><div class="foot" style="margin-top:0"><button type="button" class="btn" id="no">Cancel</button><button class="btn primary" type="submit" id="invGo">Join</button></div></form>`,m=>{
+    m.querySelector("#no").onclick=closeModal;
+    m.querySelector("#invForm").onsubmit=async e=>{e.preventDefault();const btn=m.querySelector("#invGo");busy(btn,true);
+      try{const id=await rpc("join_with_invite",{p_code:m.querySelector("#inv").value});closeModal();SFX.play("join");await loadAll();go("room",id);const r=rooms.find(x=>x.id===id);if(r)toast(T("joined",r.name))}
+      catch(ex){busy(btn,false);m.querySelector("#invErr").textContent=errText(ex)}};
+  });
+}
+function inviteCodeModal(r){
+  openModal(`<h2 id="modalTitle">Invite code</h2><p class="sub">Anyone with this code can join ${esc(r.name)}, even if it's private.</p><p id="codeOut" style="font-size:28px;font-weight:700;letter-spacing:.12em;margin:0 0 12px;font-variant-numeric:tabular-nums">…</p><div class="foot" style="justify-content:flex-start"><button class="btn" id="copy" type="button">Copy</button>${r.owner==="me"?'<button class="btn" id="reset" type="button">Make a new code</button>':""}<span class="spacer"></span><button class="btn primary" id="done" type="button">Done</button></div>`,async m=>{
+    m.querySelector("#done").onclick=closeModal;
+    try{m.querySelector("#codeOut").textContent=await rpc("get_invite_code",{p_room:r.id})}catch(e){m.querySelector("#codeOut").textContent="—";toast(errText(e))}
+    m.querySelector("#copy").onclick=async()=>{try{await navigator.clipboard.writeText(m.querySelector("#codeOut").textContent);toast("Copied.")}catch(e){toast("Couldn't copy. Select the code and copy it.")}};
+    const rs=m.querySelector("#reset");if(rs)rs.onclick=async()=>{try{m.querySelector("#codeOut").textContent=await rpc("reset_invite_code",{p_room:r.id});toast("New code made. The old one no longer works.")}catch(e){toast(errText(e))}};
+  });
+}
+
+/* ---------- create / edit rooms ---------- */
+function createRoomModal(existing,presetCat){
+  if(!requireAuth(()=>createRoomModal(existing,presetCat)))return;
+  const r=existing||{name:"",cat:presetCat||"Clubs",access:"public",borough:S.user.borough||"Manhattan",tags:[],desc:"",size:30,rules:[]};
+  openModal(`<h2 id="modalTitle">${existing?"Edit room":"Create a room"}</h2><p class="sub">Open, Approval and Locked rooms show in the directory. Private rooms don't.</p>
+  <form class="form" id="crForm" novalidate>
+   <div class="field"><label for="crName">Room name</label><input id="crName" maxlength="50" value="${esc(r.name)}"></div>
+   <div class="field"><label for="crDesc">Description</label><textarea id="crDesc" maxlength="240">${esc(r.desc)}</textarea></div>
+   <div class="two"><div class="field"><label for="crCat">Category</label><select id="crCat">${CATS.map(c=>`<option ${r.cat===c?"selected":""}>${c}</option>`).join("")}</select><span class="hint">Pick "Draw boards" for an infinite canvas with voice.</span></div>
+   <div class="field"><label for="crBor">Borough</label><select id="crBor">${BOROUGHS.map(c=>`<option ${r.borough===c?"selected":""}>${c}</option>`).join("")}</select></div></div>
+   <div class="two"><div class="field"><label for="crTags">Tags</label><input id="crTags" value="${esc(r.tags.join(", "))}" placeholder="comma separated"></div>
+   <div class="field"><label for="crSize">Member limit</label><input id="crSize" type="number" min="2" max="500" value="${r.size}"></div></div>
+   <fieldset class="field"><legend>Who can get in</legend><div class="radio">
+    ${[["public","Open","Listed. Anyone can join."],["approval","Approval","Listed. People request; you approve."],["password","Password locked","Listed with a lock. People need your password."],["private","Private","Not listed. Invite code only."]].map(([v,l,d])=>`<label><input type="radio" name="crAcc" value="${v}" ${r.access===v?"checked":""}><span><b>${l}</b><small>${d}</small></span></label>`).join("")}
+   </div></fieldset>
+   <div class="field" id="pwField" hidden><label for="crPw">Room password</label><input id="crPw" type="text" autocomplete="off" placeholder="${existing&&existing.access==="password"?"Leave blank to keep the current password":"At least 4 characters"}"></div>
+   <div class="field"><label for="crRules">Rules (one per line)</label><textarea id="crRules">${esc(r.rules.join("\n"))}</textarea></div>
+   <div class="error" id="crErr"></div>
+   <div class="foot" style="margin-top:0">${existing?'<button type="button" class="btn danger" id="del">Delete room</button><span class="spacer"></span>':""}<button type="button" class="btn" id="no">Cancel</button><button class="btn primary" type="submit" id="crGo">${existing?"Save":"Create room"}</button></div>
+  </form>`,m=>{
+    const pwF=m.querySelector("#pwField");
+    const sync=()=>{pwF.hidden=m.querySelector('input[name="crAcc"]:checked').value!=="password"};
+    m.querySelectorAll('input[name="crAcc"]').forEach(x=>x.onchange=sync);sync();
+    m.querySelector("#no").onclick=closeModal;
+    const del=m.querySelector("#del");
+    if(del)del.onclick=()=>openModal(`<h2 id="modalTitle">Delete ${esc(existing.name)}?</h2><p class="sub">This removes the room, its board and its members for everyone. It can't be undone.</p><div class="foot"><button class="btn" id="no2" type="button">Cancel</button><button class="btn primary" id="yes2" type="button">Delete room</button></div>`,mm=>{
+      mm.querySelector("#no2").onclick=closeModal;
+      mm.querySelector("#yes2").onclick=async()=>{try{await must(sb.from("rooms").delete().eq("id",existing.id));closeModal();closeRoomChannel();toast("Room deleted.");await loadAll();go("directory")}catch(e){toast(errText(e))}}});
+    m.querySelector("#crForm").onsubmit=async e=>{e.preventDefault();const g=id=>m.querySelector(id).value.trim();const err=m.querySelector("#crErr");err.textContent="";
+      const acc=m.querySelector('input[name="crAcc"]:checked').value,pw=g("#crPw");
+      if(!g("#crName")){err.textContent="Give your room a name.";return}
+      if(!g("#crDesc")){err.textContent="Add a short description so people know what it's about.";return}
+      const needPw=acc==="password"&&!(existing&&existing.access==="password");
+      if((needPw||pw)&&acc==="password"&&pw.length<4){err.textContent="Set a room password with at least 4 characters.";return}
+      const cat=g("#crCat");
+      const data={name:g("#crName"),description:g("#crDesc"),category:cat,kind:cat==="Draw boards"?"draw":"notes",borough:g("#crBor"),tags:g("#crTags").split(",").map(s=>s.trim()).filter(Boolean).slice(0,6),size_limit:Math.max(2,Math.min(500,parseInt(g("#crSize"),10)||30)),access:acc,rules:g("#crRules").split("\n").map(s=>s.trim()).filter(Boolean)};
+      if(!data.rules.length)data.rules=["Be kind"];
+      const btn=m.querySelector("#crGo");busy(btn,true);
+      try{
+        if(existing){
+          if(acc==="password"&&pw)await rpc("set_room_password",{p_room:existing.id,p_password:pw});
+          await must(sb.from("rooms").update(data).eq("id",existing.id));
+          closeModal();toast(T("saved"));await loadAll();return;
+        }
+        const id=await rpc("create_room",{p_name:data.name,p_description:data.description,p_category:data.category,p_kind:data.kind,p_borough:data.borough,p_tags:data.tags,p_access:acc,p_size_limit:data.size_limit,p_rules:data.rules,p_password:acc==="password"?pw:null});
+        closeModal();SFX.play("note");await loadAll();go("room",id);
+        toast(acc==="private"?"Room created. Tap Invite code to share it.":T("created"));
+      }catch(ex){busy(btn,false);err.textContent=errText(ex)}
+    };
+  });
+}
+
+/* ---------- people ---------- */
+function personModal(id,room){
+  const p=person(id);const fr=S.friends.has(id),rq=S.requested.has(id),inc=S.incoming.has(id);
+  const myRole=room?(room.owner==="me"?"owner":room.mods.includes("me")?"mod":S.user.isAdmin?"admin":""):"";
+  const theirRole=room?(room.owner===id?"owner":room.mods.includes(id)?"mod":"member"):"";
+  const canRemove=room&&theirRole!=="owner"&&(myRole==="owner"||myRole==="admin"||(myRole==="mod"&&theirRole==="member"));
+  openModal(`<div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">${av(p,56)}<div><h2 id="modalTitle">${esc(p.name)}</h2><span class="muted">@${esc(p.username)}${p.borough?" · "+esc(p.borough):""}</span></div></div>
+   <p style="margin:0 0 10px">${esc(p.bio||"")}</p>
+   <div class="tags" style="margin-bottom:8px">${(p.interests||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+   ${(p.looking||[]).length?`<p class="muted" style="font-size:13px;margin:0">Looking for: ${esc(p.looking.join(", "))}</p>`:""}
+   <div class="foot" style="flex-wrap:wrap;justify-content:flex-start">
+    ${inc?`<button class="btn primary" id="acc" type="button">Accept friend request</button>`:`<button class="btn primary" id="fr" type="button" ${fr||rq||p.hidden?"disabled":""}>${fr?"Friends":rq?"Request sent":"Add friend"}</button>`}
+    <button class="btn" id="dm" type="button">Message</button>
+    <span class="spacer"></span>
+    <button class="btn ghost danger" id="rep" type="button">Report</button>
+    <button class="btn ghost danger" id="blk" type="button">Block</button>
+   </div>
+   ${canRemove?`<div style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px"><p class="muted" style="font-size:12px;margin:0 0 8px">Room tools for ${esc(room.name)}</p><div class="actions">
+     ${myRole==="owner"||myRole==="admin"?`<button class="btn small" id="role" type="button">${theirRole==="mod"?"Remove mod":"Make mod"}</button><button class="btn small" id="own" type="button">Make owner</button>`:""}
+     <button class="btn small" id="kick" type="button">Remove from room</button><button class="btn small danger" id="ban" type="button">Ban</button></div></div>`:""}`,m=>{
+    const fb=m.querySelector("#fr");if(fb)fb.onclick=async()=>{try{await must(sb.from("friendships").insert({requester:S.uid,addressee:R(id)}));SFX.play("msg");closeModal();toast(T("friendSent",p.name));loadAll()}catch(e){toast(errText(e))}};
+    const ab=m.querySelector("#acc");if(ab)ab.onclick=async()=>{try{await must(sb.from("friendships").update({status:"accepted"}).match({requester:R(id),addressee:S.uid}));SFX.play("msg");closeModal();toast(`You and ${p.name} are friends now.`);loadAll()}catch(e){toast(errText(e))}};
+    m.querySelector("#dm").onclick=()=>{closeModal();toast("Direct messages are coming in the next update.")};
+    m.querySelector("#rep").onclick=()=>reportModal({kind:"profile",id:R(id),label:`${p.name} (@${p.username})`,room});
+    m.querySelector("#blk").onclick=()=>openModal(`<h2 id="modalTitle">Block ${esc(p.name)}?</h2><p class="sub">They won't be able to see your profile, message you, send friend requests or see your notes. Their rooms and notes will be hidden from you. They aren't told.</p><div class="foot"><button class="btn" id="no" type="button">Cancel</button><button class="btn primary" id="yes" type="button">Block</button></div>`,mm=>{
+      mm.querySelector("#no").onclick=closeModal;
+      mm.querySelector("#yes").onclick=async()=>{try{await must(sb.from("blocks").insert({blocker:S.uid,blocked:R(id)}));closeModal();toast(p.name+" is blocked. Undo in Settings.");await loadAll()}catch(e){toast(errText(e))}}});
+    const act=async(fn,msg)=>{try{await fn();closeModal();toast(msg);await loadAll()}catch(e){toast(errText(e))}};
+    const rb=m.querySelector("#role");if(rb)rb.onclick=()=>act(()=>rpc("set_member_role",{p_room:room.id,p_user:R(id),p_role:theirRole==="mod"?"member":"mod"}),theirRole==="mod"?"No longer a mod.":"Now a mod.");
+    const ob=m.querySelector("#own");if(ob)ob.onclick=()=>act(()=>rpc("transfer_ownership",{p_room:room.id,p_user:R(id)}),`${p.name} owns the room now. You're a mod.`);
+    const kb=m.querySelector("#kick");if(kb)kb.onclick=()=>act(()=>rpc("remove_member",{p_room:room.id,p_user:R(id),p_ban:false}),"Removed from the room.");
+    const bb=m.querySelector("#ban");if(bb)bb.onclick=()=>act(()=>rpc("remove_member",{p_room:room.id,p_user:R(id),p_ban:true}),"Banned from the room.");
+  });
+}
+function reportModal(t){
+  const reasons=["Spam or scam","Harassment or bullying","Hate speech","Threats or violence","Sexual content","Seems under 18","Fake account or impersonation","Something else"];
+  openModal(`<h2 id="modalTitle">Report ${t.kind==="voice"?"someone in voice":t.kind}</h2><p class="sub">${esc(t.label)}</p><form class="form" id="rpForm">
+   <fieldset class="field"><legend>What's wrong?</legend><div class="radio">${reasons.map((r,i)=>`<label><input type="radio" name="rr" value="${esc(r)}" ${i===0?"checked":""}><span>${r}</span></label>`).join("")}</div></fieldset>
+   <div class="field"><label for="rpDetails">Details (optional)</label><textarea id="rpDetails" maxlength="500"></textarea></div>
+   <div class="error" id="rpErr"></div>
+   <div class="foot" style="margin-top:0"><button type="button" class="btn" id="no">Cancel</button><button class="btn primary" type="submit" id="rpGo">Send report</button></div></form>`,m=>{
+    m.querySelector("#no").onclick=closeModal;
+    m.querySelector("#rpForm").onsubmit=async e=>{e.preventDefault();const btn=m.querySelector("#rpGo");busy(btn,true);
+      try{const row=await must(sb.from("reports").insert({target_type:t.kind,target_id:String(t.id),target_label:String(t.label).slice(0,200),room_id:t.room?t.room.id:null,
+          reason:m.querySelector('input[name="rr"]:checked').value,details:m.querySelector("#rpDetails").value.trim().slice(0,500)}).select("routed_to,urgent").single());
+        const to=row.urgent?"admin (urgent)":row.routed_to==="room"?"room owner and mods":"admin";
+        closeModal();SFX.play("msg");toast(T("report",to));
+      }catch(ex){busy(btn,false);m.querySelector("#rpErr").textContent=errText(ex)}};
+  });
+}
+
+/* ---------- other views ---------- */
+function viewDraws(){
+  if(!S.user)return landing("Draw boards");
+  if(!S.loaded)return loadingView();
+  const list=visibleRooms().filter(r=>r.kind==="draw").sort((a,b)=>b.activity-a.activity);
+  return `<section class="hero"><div><h1>Draw boards</h1><p>Endless shared canvases. Zoom in forever, see everyone's cursor, and talk in the voice room while you draw.</p></div><div class="spacer"></div><button class="btn primary" id="newDraw" type="button">+ New draw board</button></section>
+  <div class="count" style="margin-top:18px">${list.length} board${list.length===1?"":"s"}</div>
+  <div class="grid">${list.length?list.map(card).join(""):`<div class="empty">No draw boards yet. Start the first one.</div>`}</div>`;
+}
+function viewMine(){
+  if(!S.user)return landing("My rooms");
+  const mine=rooms.filter(r=>S.joined.has(r.id)), pend=rooms.filter(r=>S.pending.has(r.id));
+  return `<section class="hero"><div><h1>My rooms</h1><p>${mine.length} joined${pend.length?`, ${pend.length} waiting for approval`:""}.</p></div></section>
+  <div class="grid" style="margin-top:18px">${[...mine,...pend].map(card).join("")||'<div class="empty">You haven\'t joined any rooms yet. Browse the directory to find one.</div>'}</div>`;
+}
+function viewProfile(){
+  if(!S.user)return landing("Your profile");
+  const u=S.user;const me=person("me");
+  const friends=[...S.friends].filter(id=>!S.blocked.has(id)).map(person);
+  const inc=[...S.incoming].filter(id=>!S.blocked.has(id)).map(person), out=[...S.requested].map(person);
+  return `<div class="profile"><div style="display:grid;gap:18px;align-content:start"><div class="panel pcard">${av(me,84)}<h2>${esc(u.name)}</h2><span class="muted">@${esc(u.username)}${u.borough?" · "+esc(u.borough):""}</span><p style="margin:0">${esc(u.bio||"No bio yet.")}</p>
+    <div class="tags" style="justify-content:center">${u.interests.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+    <span class="muted" style="font-size:13px">${rooms.filter(r=>S.joined.has(r.id)&&r.access!=="private").length} rooms · ${friends.length} friends</span></div>
+    ${inc.length?`<div class="panel"><h2>Friend requests</h2>${inc.map(p=>`<div class="member">${av(p)}<div class="who"><b>${esc(p.name)}</b><span>@${esc(p.username)}</span></div><button class="btn small" data-fr-acc="${p.id}" type="button">Accept</button><button class="btn small ghost" data-fr-dec="${p.id}" type="button">Decline</button></div>`).join("")}</div>`:""}
+    <div class="panel"><h2>Friends</h2>${friends.length?friends.map(p=>`<div class="member">${av(p)}<div class="who"><b>${esc(p.name)}</b><span>@${esc(p.username)}</span></div><button class="btn small" data-unfriend="${p.id}" type="button">Remove</button></div>`).join(""):'<p class="muted" style="margin:0">No friends yet. Open someone\'s profile from a room member list to send a request.</p>'}
+    ${out.length?`<p class="muted" style="font-size:12px;margin:12px 0 4px">Requests you sent</p>${out.map(p=>`<div class="member">${av(p)}<div class="who"><b>${esc(p.name)}</b></div><button class="btn small ghost" data-fr-cancel="${p.id}" type="button">Cancel</button></div>`).join("")}`:""}</div></div>
+   <div class="panel"><h2>Edit profile</h2><form class="form" id="pfForm">
+    <div class="two"><div class="field"><label for="pfName">Display name</label><input id="pfName" maxlength="40" value="${esc(u.name)}"></div>
+    <div class="field"><label for="pfBor">Borough or area</label><select id="pfBor"><option value="">Not shown</option>${BOROUGHS.map(b=>`<option ${u.borough===b?"selected":""}>${b}</option>`).join("")}</select><span class="hint">Never an exact address</span></div></div>
+    <div class="field"><label for="pfBio">Bio</label><textarea id="pfBio" maxlength="200">${esc(u.bio)}</textarea><span class="hint">200 characters max</span></div>
+    <fieldset class="field"><legend>Interests</legend><div class="checks">${INTERESTS.map(i=>`<label><input type="checkbox" name="pfInt" value="${i}" ${u.interests.includes(i)?"checked":""}>${i}</label>`).join("")}</div></fieldset>
+    <fieldset class="field"><legend>Looking for</legend><div class="checks">${LOOKING.map(i=>`<label><input type="checkbox" name="pfLook" value="${i}" ${u.looking.includes(i)?"checked":""}>${i}</label>`).join("")}</div></fieldset>
+    <div class="field"><label for="pfVis">Who can see my profile</label><select id="pfVis">${[["everyone","Everyone"],["friends","Friends only"],["nobody","Only me"]].map(([v,l])=>`<option value="${v}" ${u.visibility===v?"selected":""}>${l}</option>`).join("")}</select></div>
+    <div class="foot" style="margin-top:0"><button class="btn primary" type="submit">Save profile</button></div></form></div></div>`;
+}
+function bindProfile(){
+  const f=$("#pfForm");if(!f)return;
+  f.onsubmit=async e=>{e.preventDefault();
+    const upd={display_name:$("#pfName").value.trim()||S.user.name,borough:$("#pfBor").value,bio:$("#pfBio").value.trim(),
+      interests:[...document.querySelectorAll('input[name="pfInt"]:checked')].map(x=>x.value),looking:[...document.querySelectorAll('input[name="pfLook"]:checked')].map(x=>x.value),visibility:$("#pfVis").value};
+    try{await must(sb.from("profiles").update(upd).eq("id",S.uid));await loadMe();render();toast(T("saved"))}catch(ex){toast(errText(ex))}};
+  const del=(m)=>must(sb.from("friendships").delete().match(m));
+  document.querySelectorAll("[data-unfriend]").forEach(b=>b.onclick=async()=>{const o=b.dataset.unfriend;try{await must(sb.from("friendships").delete().or(`and(requester.eq.${S.uid},addressee.eq.${o}),and(requester.eq.${o},addressee.eq.${S.uid})`));toast("Friend removed.");loadAll()}catch(e){toast(errText(e))}});
+  document.querySelectorAll("[data-fr-acc]").forEach(b=>b.onclick=async()=>{try{await must(sb.from("friendships").update({status:"accepted"}).match({requester:b.dataset.frAcc,addressee:S.uid}));SFX.play("msg");toast("Friend added.");loadAll()}catch(e){toast(errText(e))}});
+  document.querySelectorAll("[data-fr-dec]").forEach(b=>b.onclick=async()=>{try{await del({requester:b.dataset.frDec,addressee:S.uid});toast("Request declined.");loadAll()}catch(e){toast(errText(e))}});
+  document.querySelectorAll("[data-fr-cancel]").forEach(b=>b.onclick=async()=>{try{await del({requester:S.uid,addressee:b.dataset.frCancel});toast("Request canceled.");loadAll()}catch(e){toast(errText(e))}});
+}
+async function loadMyReports(){if(!S.uid)return;try{S.myReports=await must(sb.from("reports").select("*").eq("reporter",S.uid).order("created_at",{ascending:false}).limit(50))}catch(e){}if(S.view==="settings"&&!typing())render()}
+async function loadAdminReports(){if(!S.user||!S.user.isAdmin)return;try{S.adminReports=await must(sb.from("reports").select("*").eq("status","open").order("urgent",{ascending:false}).order("created_at",{ascending:true}).limit(200))}catch(e){toast(errText(e))}if(S.view==="reports")render()}
+function viewReports(){
+  if(!S.user||!S.user.isAdmin)return `<p class="muted" style="padding:40px 0">Only admins can see this page.</p>`;
+  const list=S.adminReports;
+  return `<section class="hero"><div><h1>Report queue</h1><p>All open reports, urgent first. Room reports land here too if a room's owner doesn't handle them in 48 hours (once the hourly job is on).</p></div></section>
+  <div class="panel" style="margin:18px 0 40px">${list.length?list.map(x=>reportRow(x)+`<div class="muted" style="font-size:12px;margin:-4px 0 8px">Sent to: ${x.routed_to==="room"?"room owner and mods":"admin"}${x.room_id?` · <button class="vmore" data-go-room="${x.room_id}" type="button">Open room</button>`:""}</div>`).join(""):'<p class="muted" style="margin:0">No open reports.</p>'}</div>`;
+}
+function viewSettings(){
+  const theme=`<div class="panel" style="margin-top:18px"><h2>Theme</h2>${skinPicker()}</div><div class="panel" style="margin-top:18px"><h2>Sound</h2><p class="muted" style="margin:0 0 12px">Sound effects match your theme. They stay off until you turn them on.</p><div class="actions"><button class="btn ${SFX.on?"primary":""}" id="sfxSet" type="button" aria-pressed="${SFX.on}">${SFX.on?"Sound is on. Turn off":"Turn sound on"}</button>${["click","join","note","msg","error"].map(k=>`<button class="btn small" type="button" data-sfx-test="${k}" ${SFX.on?"":"disabled"}>Test ${{click:"click",join:"join",note:"note",msg:"message",error:"error"}[k]}</button>`).join("")}</div></div>`;
+  if(!S.user)return `<section class="hero"><div><h1>Settings</h1><p>Pick a theme now. Sign in to change privacy and account settings.</p></div></section>${theme}<p style="margin:18px 0"><button class="btn primary" id="suInline" type="button">Sign up</button></p>`;
+  const u=S.user;const bl=[...S.blocked].map(person);
+  return `<section class="hero"><div><h1>Settings</h1><p>Privacy, safety and your account.</p></div></section>${theme}
+  <div class="cols" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+   <div class="panel"><h2>Privacy</h2><form class="form" id="stForm">
+    <div class="field"><label for="stDm">Who can message me</label><select id="stDm">${[["everyone","Everyone (non-friends go to Requests)"],["friends","Friends only"],["nobody","Nobody"]].map(([v,l])=>`<option value="${v}" ${u.dm===v?"selected":""}>${l}</option>`).join("")}</select></div>
+    <div class="field"><label for="stFr">Who can send me friend requests</label><select id="stFr">${[["everyone","Everyone"],["rooms","People in my rooms"],["nobody","Nobody"]].map(([v,l])=>`<option value="${v}" ${u.friendReq===v?"selected":""}>${l}</option>`).join("")}</select></div>
+    <div class="foot" style="margin-top:0"><button class="btn primary" type="submit">Save</button></div></form></div>
+   <div class="panel"><h2>Blocked people</h2>${bl.length?bl.map(p=>`<div class="list-row">${av(p)}<div style="flex:1"><b>${esc(p.name)}</b></div><button class="btn small" data-unblock="${p.id}" type="button">Unblock</button></div>`).join(""):'<p class="muted" style="margin:0">You haven\'t blocked anyone.</p>'}</div>
+   <div class="panel"><h2>Reports you sent</h2>${S.myReports.length?S.myReports.map(r=>`<div class="list-row"><div style="flex:1;min-width:0"><b>${esc(r.target_label||r.target_type)}</b><div class="muted" style="font-size:13px">${esc(r.reason)} · sent to ${r.routed_to==="room"?"room owner and mods":"admin"}</div></div><span class="state ${r.status==="open"?"pending":"in"}">${r.status==="open"?"Under review":r.status==="actioned"?"Action taken":"Closed"}</span></div>`).join(""):'<p class="muted" style="margin:0">No reports.</p>'}</div>
+   <div class="panel"><h2>Account</h2><p class="muted" style="margin:0 0 12px">Signed in as ${esc(S.email)}</p><div class="actions"><button class="btn" id="signOut" type="button">Sign out</button><button class="btn danger" id="delAcct" type="button">Delete my account</button></div></div>
+  </div>`;
+}
+function bindSettings(){
+  const f=$("#stForm");if(!f)return;
+  f.onsubmit=async e=>{e.preventDefault();try{await must(sb.from("profiles").update({dm_pref:$("#stDm").value,friend_req_pref:$("#stFr").value}).eq("id",S.uid));await loadMe();toast(T("saved"))}catch(ex){toast(errText(ex))}};
+  document.querySelectorAll("[data-unblock]").forEach(b=>b.onclick=async()=>{try{await must(sb.from("blocks").delete().match({blocker:S.uid,blocked:b.dataset.unblock}));toast("Unblocked.");loadAll()}catch(e){toast(errText(e))}});
+  $("#signOut").onclick=async()=>{await sb.auth.signOut();toast("Signed out.")};
+  $("#delAcct").onclick=()=>openModal(`<h2 id="modalTitle">Delete your account?</h2><p class="sub">This removes your profile, memberships, notes and drawings. Rooms you own pass to their oldest mod, or are deleted if no one else is in them. This can't be undone.</p><div class="foot"><button class="btn" id="no" type="button">Cancel</button><button class="btn primary" id="yes" type="button">Delete account</button></div>`,m=>{
+    m.querySelector("#no").onclick=closeModal;
+    m.querySelector("#yes").onclick=async e=>{busy(e.target,true);try{await rpc("delete_my_account");await sb.auth.signOut();closeModal();toast("Account deleted.")}catch(ex){busy(e.target,false);toast(errText(ex))}};
+  });
+}
+
+function render(){
+  renderTop();
+  const app=$("#app");
+  const v=S.view;
+  app.innerHTML=v==="draws"?viewDraws():v==="room"?viewRoom():v==="mine"?viewMine():v==="profile"?viewProfile():v==="settings"?viewSettings():v==="reports"?viewReports():viewDirectory();
+  if(v==="directory")bindDirectory();
+  if(v==="room")bindRoom();
+  if(v==="profile")bindProfile();
+  if(v==="settings"){bindSettings();bindSkinPicker()}
+  if(v==="reports"){bindReportRows(loadAdminReports);document.querySelectorAll("[data-go-room]").forEach(b=>b.onclick=()=>go("room",b.dataset.goRoom))}
+  if(v==="draws"){const nd=$("#newDraw");if(nd)nd.onclick=()=>createRoomModal(null,"Draw boards")}
+  bindCards();
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+  const si=$("#suInline");if(si)si.onclick=()=>signUpModal();
+  const a=$("#lpSignUp");if(a)a.onclick=()=>signUpModal();const b=$("#lpSignIn");if(b)b.onclick=()=>signInModal();
+}
+
+/* =====================================================================
+   LIVE ROOM CHANNEL: notes + strokes (database changes), cursors,
+   live ink, presence and voice signaling (broadcast). Members only.
+   ===================================================================== */
+const CH={ch:null,room:null,peers:new Map(),ready:false};
+function closeRoomChannel(){
+  if(CH.ch){try{sb.removeChannel(CH.ch)}catch(e){}}
+  CH.ch=null;CH.room=null;CH.peers.clear();CH.ready=false;DRAW.bots=[];
+}
+function openRoomChannel(r){
+  if(!S.joined.has(r.id))return;
+  if(CH.room===r.id&&CH.ch)return;
+  closeRoomChannel();
+  CH.room=r.id;
+  const ch=sb.channel("room:"+r.id,{config:{private:true,broadcast:{self:false},presence:{key:S.uid}}});
+  CH.ch=ch;
+  ch.on("postgres_changes",{event:"*",schema:"public",table:"notes",filter:"room_id=eq."+r.id},p=>{
+    const list=S.notes[r.id]=S.notes[r.id]||[];
+    if(p.eventType==="INSERT"){if(!list.some(n=>n.id===p.new.id)){list.push(p.new);if(p.new.author_id!==S.uid){SFX.play("note");loadProfiles([p.new.author_id]).then(()=>{if(S.view==="room"&&!typing())render()})}}}
+    if(p.eventType==="DELETE"){S.notes[r.id]=list.filter(n=>n.id!==(p.old&&p.old.id))}
+    if(S.view==="room"&&S.roomId===r.id&&!typing())render();
+  });
+  ch.on("postgres_changes",{event:"INSERT",schema:"public",table:"strokes",filter:"room_id=eq."+r.id},p=>onStrokeInsert(r.id,p.new));
+  ch.on("postgres_changes",{event:"DELETE",schema:"public",table:"strokes"},p=>onStrokeDelete(r.id,p.old&&p.old.id));
+  ch.on("broadcast",{event:"cursor"},({payload})=>{const pr=CH.peers.get(payload.uid);if(pr){if(pr.x==null){pr.x=payload.x;pr.y=payload.y}pr.tx=payload.x;pr.ty=payload.y;pr.seen=performance.now()}});
+  ch.on("broadcast",{event:"ink"},({payload})=>onInk(r.id,payload));
+  ch.on("broadcast",{event:"rtc"},({payload})=>{if(payload.to===S.uid)onRtc(payload)});
+  ch.on("broadcast",{event:"kick"},({payload})=>{if(payload.to===S.uid&&DRAW.voice.inVoice){leaveVoice(false);toast("A moderator removed you from voice.")}});
+  ch.on("presence",{event:"sync"},()=>onPresence(r));
+  ch.subscribe(async status=>{
+    if(status==="SUBSCRIBED"){CH.ready=true;await trackPresence()}
+    if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){CH.ready=false}
+  });
+}
+async function trackPresence(){
+  if(!CH.ch||!CH.ready||!S.user)return;
+  try{await CH.ch.track({uid:S.uid,name:S.user.name,color:S.user.color,drawing:DRAW.open,voice:DRAW.voice.inVoice,muted:DRAW.voice.muted})}catch(e){}
+}
+function onPresence(r){
+  const st=CH.ch.presenceState();const seen=new Set();
+  Object.values(st).forEach(arr=>{const m=arr[arr.length-1];if(!m||!m.uid||m.uid===S.uid)return;seen.add(m.uid);
+    let pr=CH.peers.get(m.uid);if(!pr){pr={id:m.uid,x:null,y:null,tx:0,ty:0,speaking:false};CH.peers.set(m.uid,pr)}
+    pr.name=m.name;pr.color=m.color;pr.drawing=!!m.drawing;pr.inVoice=!!m.voice;pr.muted=!!m.muted;
+    if(!people[m.uid])people[m.uid]={id:m.uid,name:m.name,username:"member",bio:"",borough:"",interests:[],looking:[],color:m.color};
+  });
+  for(const id of [...CH.peers.keys()])if(!seen.has(id)){closePeer(id);CH.peers.delete(id)}
+  DRAW.bots=[...CH.peers.values()].filter(p=>p.drawing);
+  syncVoicePeers();
+  if(DRAW.open){renderVoice();renderPresence()}
+}
+
+const SKINS=[
+  {id:"cyber",name:"Cyber-Glow",desc:"Late-night BBS terminal",sw:"#0b0c10",dots:["#1fe046","#f3e600","#e53935"]},
+  {id:"cork",name:"Cozy Cork",desc:"Paper, pins, sticky notes",sw:"#f6f4ef",dots:["#d6312f","#ffe58a","#bfe3ff"]},
+  {id:"nyc",name:"NYC After Dark",desc:"Night city, subway colors",sw:"#0e1220",dots:["#ff6319","#fccc0a","#2850ad"]},
+  {id:"mac",name:"Clean Minimal",desc:"Simple, macOS-like",sw:"#f5f5f7",dots:["#007aff","#e5e5ea","#1d1d1f"]}
+];
+function getSkin(){try{return localStorage.getItem("pinnedSkin")||"cyber"}catch(e){return "cyber"}}
+function setSkin(id){if(!SKINS.some(k=>k.id===id))id="cyber";document.documentElement.setAttribute("data-skin",id);try{localStorage.setItem("pinnedSkin",id)}catch(e){}const sel=document.getElementById("skinSel");if(sel)sel.value=id}
+function skinPicker(){const cur=document.documentElement.getAttribute("data-skin");
+  return `<div class="skinpick">${SKINS.map(k=>`<button type="button" class="skin" data-skin-pick="${k.id}" aria-pressed="${cur===k.id}"><span class="sw" style="background:${k.sw};border:1px solid rgba(128,128,128,.3)">${k.dots.map(d=>`<i style="background:${d}"></i>`).join("")}</span><b>${k.name}</b><span class="muted" style="font-size:12px">${k.desc}</span></button>`).join("")}</div>`}
+function bindSkinPicker(){const ss=document.getElementById("sfxSet");if(ss)ss.onclick=()=>{SFX.set(!SFX.on);render()};document.querySelectorAll("[data-sfx-test]").forEach(b=>b.onclick=()=>SFX.play(b.dataset.sfxTest));document.querySelectorAll("[data-skin-pick]").forEach(b=>b.onclick=()=>{setSkin(b.dataset.skinPick);render();SFX.play("note")})}
+
+/* ---------- voice per theme ----------
+   Safety text (age check, block, delete account, report reasons) stays plain in every theme. */
+const VOICE={
+ cork:{hero:"Find your people in NYC",heroSub:"Clubs, meetups, gamer groups and friend circles. Every room is listed here unless its owner made it private.",create:"+ Start a room",
+  join:"Join room",request:"Ask to join",unlock:"🔒 Enter password",invite:"Join with invite",leave:"Leave room",pin:"Pin it",notePh:"Write a note for the board…",
+  joined:n=>`You're in! Say hi on the board.`,left:n=>`You left ${n}. Come back anytime.`,requested:"Request sent! We'll let you know when the owner says yes.",approved:n=>`Good news! You're now in ${n}.`,
+  empty:"No rooms here yet. Why not start one?",wrongPw:k=>`That password didn't work. ${k} ${k===1?"try":"tries"} left.`,lockout:"Too many tries. Take a breather and try again in 60 seconds.",wait:x=>`Hang on. Try again in ${x} seconds.`,
+  report:to=>`Thanks for telling us. It went to the ${to}, who will take a look.`,pinned:"Pinned to the board!",created:"Your room is up in the directory!",friendSent:n=>`Friend request sent to ${n}.`,friendOk:n=>`${n} accepted your friend request!`,
+  boardLocked:"This board is for members.",saved:"Saved!",signedIn:"Welcome back!",requestCanceled:"Request canceled."},
+ nyc:{hero:"Find your people in NYC",heroSub:"Clubs, meetups, gamer groups and friend circles, all stops on one map. Every room is listed unless its owner made it private.",create:"+ Open a new line",
+  join:"Hop on",request:"Request a ride",unlock:"🔒 Swipe in",invite:"Use your pass",leave:"Get off here",pin:"Post it",notePh:"Post something on the platform board…",
+  joined:n=>`Now arriving: ${n}. Stand clear of the closing doors.`,left:n=>`You've exited ${n}. Watch the gap.`,requested:"Request sent. Waiting on the conductor's signal.",approved:n=>`Green signal. Now boarding ${n}.`,
+  empty:"No rooms on this line. Try another stop.",wrongPw:k=>`Wrong fare. ${k} ${k===1?"swipe":"swipes"} left.`,lockout:"Card locked. Try again in 60 seconds.",wait:x=>`Turnstile's locked. Try again in ${x} seconds.`,
+  report:to=>`Report received. Sent to the ${to}. They're on it.`,pinned:"Posted to the platform board.",created:"Your new line is running. It's on the map.",friendSent:n=>`Friend request sent to ${n}.`,friendOk:n=>`${n} accepted. You're riding together now.`,
+  boardLocked:"This platform is for members only.",saved:"Saved.",signedIn:"Welcome back to the city.",requestCanceled:"Request canceled."},
+ mac:{hero:"Find your people in NYC",heroSub:"Clubs, meetups, gamer groups and friend circles. Every room is listed here unless its owner made it private.",create:"+ Create room",
+  join:"Join room",request:"Request to join",unlock:"Enter password",invite:"Join with invite",leave:"Leave room",pin:"Add note",notePh:"Add a note…",
+  joined:n=>`Welcome to ${n}.`,left:n=>`You left ${n}.`,requested:"Request sent. You'll be notified when it's reviewed.",approved:n=>`You've been approved for ${n}.`,
+  empty:"Nothing here yet. Try a different filter.",wrongPw:k=>`That password didn't match. ${k} ${k===1?"try":"tries"} left.`,lockout:"Too many attempts. Try again in 60 seconds.",wait:x=>`Try again in ${x} seconds.`,
+  report:to=>`Thanks. The ${to} will review this.`,pinned:"Note added.",created:"Room created and listed.",friendSent:n=>`Friend request sent to ${n}.`,friendOk:n=>`${n} accepted your friend request.`,
+  boardLocked:"This board is for members.",saved:"Saved.",signedIn:"Signed in.",requestCanceled:"Request canceled."},
+ cyber:{hero:"Find your people in NYC",heroSub:"Clubs, meetups, gamer crews and friend circles on one board. Every room is listed unless its sysop locked it down.",create:"+ Spin up a room",
+  join:"Jack in",request:"Ping the sysop",unlock:"🔒 Enter key",invite:"Use access code",leave:"Disconnect",pin:"Transmit",notePh:"> type a note for the board_",
+  joined:n=>`You're in. Welcome to ${n}.`,left:n=>`Disconnected from ${n}.`,requested:"Ping sent. Waiting on the sysop.",approved:n=>`Access granted. You're in ${n}.`,
+  empty:"Nothing on this frequency. Try another channel.",wrongPw:k=>`Wrong key. ${k} ${k===1?"try":"tries"} left before lockout.`,lockout:"Lockout. Too many bad keys. Try again in 60 seconds.",wait:x=>`Still locked out. ${x} seconds to go.`,
+  report:to=>`Flag sent. The ${to==="room owner and mods"?"room's sysop and mods":to==="admin (urgent)"?"admin (urgent)":"admin"} will check it.`,pinned:"Transmitted to the board.",created:"Room is live on the board.",friendSent:n=>`Friend ping sent to ${n}.`,friendOk:n=>`${n} accepted. Link established.`,
+  boardLocked:"Board is members only.",saved:"Saved to memory.",signedIn:"Logged in. Welcome back.",requestCanceled:"Ping canceled."}
+};
+function T(key,...a){const v=(VOICE[document.documentElement.getAttribute("data-skin")]||VOICE.cork)[key];return typeof v==="function"?v(...a):v}
+
+/* ---------- sound effects (Web Audio synth, off by default) ---------- */
+const SFX={on:false,ctx:null,
+  init(){try{this.on=localStorage.getItem("pinnedSfx")==="on"}catch(e){}},
+  set(v){this.on=v;try{localStorage.setItem("pinnedSfx",v?"on":"off")}catch(e){}if(v)this.play("join")},
+  ac(){if(!this.ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;this.ctx=new C()}if(this.ctx.state==="suspended")this.ctx.resume();return this.ctx},
+  tone(f,d,o){const c=this.ac();if(!c)return;o=o||{};const t=c.currentTime+(o.at||0);const osc=c.createOscillator(),g=c.createGain();
+    osc.type=o.type||"sine";osc.frequency.setValueAtTime(f,t);if(o.to)osc.frequency.exponentialRampToValueAtTime(o.to,t+d);
+    const v=(o.vol||.18);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+(o.atk||.005));g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    osc.connect(g).connect(c.destination);osc.start(t);osc.stop(t+d+.02)},
+  noise(d,o){const c=this.ac();if(!c)return;o=o||{};const t=c.currentTime+(o.at||0);const n=Math.floor(c.sampleRate*d),buf=c.createBuffer(1,n,c.sampleRate),ch=buf.getChannelData(0);
+    for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);const src=c.createBufferSource();src.buffer=buf;
+    const fl=c.createBiquadFilter();fl.type=o.filter||"highpass";fl.frequency.value=o.freq||2000;const g=c.createGain();g.gain.value=o.vol||.15;
+    src.connect(fl).connect(g).connect(c.destination);src.start(t)},
+  play(kind){if(!this.on)return;const skin=document.documentElement.getAttribute("data-skin");const k=(SOUNDS[skin]||SOUNDS.cork)[kind];if(k)try{k(this)}catch(e){}}
+};
+const SOUNDS={
+  cyber:{ // dial-up beeps and 8-bit blips
+    click:a=>a.tone(1800,.03,{type:"square",vol:.06}),
+    join:a=>[523,659,784,1047].forEach((f,i)=>a.tone(f,.08,{type:"square",vol:.08,at:i*.07})),
+    leave:a=>a.tone(880,.35,{type:"square",to:110,vol:.07}),
+    note:a=>{a.tone(1200,.05,{type:"square",vol:.07});a.tone(1600,.06,{type:"square",vol:.07,at:.06})},
+    msg:a=>{a.tone(1000,.18,{type:"square",to:2400,vol:.05});a.noise(.12,{at:.18,freq:3000,vol:.05});a.tone(2100,.08,{type:"square",vol:.05,at:.3})},
+    error:a=>{a.tone(220,.12,{type:"square",vol:.09});a.tone(180,.16,{type:"square",vol:.09,at:.14})}
+  },
+  cork:{ // soft paper taps and a pin "tock"
+    click:a=>{a.noise(.03,{freq:3500,vol:.08});a.tone(180,.04,{vol:.05})},
+    join:a=>{a.tone(660,.35,{type:"triangle",vol:.12});a.tone(880,.45,{type:"triangle",vol:.12,at:.12})},
+    leave:a=>{a.tone(523,.3,{type:"triangle",vol:.1});a.tone(392,.4,{type:"triangle",vol:.1,at:.12})},
+    note:a=>{a.tone(950,.06,{type:"triangle",vol:.14});a.noise(.04,{freq:1500,vol:.08})},
+    msg:a=>{a.tone(988,.25,{type:"triangle",vol:.1});a.tone(1319,.3,{type:"triangle",vol:.1,at:.1})},
+    error:a=>{a.tone(330,.18,{type:"triangle",vol:.12});a.tone(262,.25,{type:"triangle",vol:.12,at:.15})}
+  },
+  nyc:{ // subway two-tone chime and turnstile clicks
+    click:a=>{a.noise(.02,{filter:"bandpass",freq:2200,vol:.12});a.tone(120,.03,{type:"square",vol:.04})},
+    join:a=>{a.tone(740,.5,{vol:.16,atk:.01});a.tone(587,.7,{vol:.16,atk:.01,at:.38})},
+    leave:a=>{a.tone(587,.4,{vol:.14});a.tone(740,.55,{vol:.14,at:.3})},
+    note:a=>a.tone(880,.4,{vol:.13}),
+    msg:a=>{a.tone(1047,.3,{vol:.12});a.tone(784,.4,{vol:.12,at:.18})},
+    error:a=>a.tone(140,.3,{type:"sawtooth",vol:.06})
+  },
+  mac:{ // quiet macOS-style pops
+    click:a=>a.tone(1400,.03,{vol:.06,atk:.002}),
+    join:a=>a.tone(880,.18,{to:1320,vol:.1}),
+    leave:a=>a.tone(880,.18,{to:660,vol:.08}),
+    note:a=>a.tone(1200,.08,{vol:.09,atk:.002}),
+    msg:a=>{a.tone(1568,.35,{type:"triangle",vol:.07});a.tone(2093,.45,{type:"triangle",vol:.05,at:.06})},
+    error:a=>{a.tone(300,.1,{vol:.1});a.tone(300,.12,{vol:.1,at:.13})}
+  }
+};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const initials=n=>n.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
+let nextCover=0;const roomIdx=r=>{if(r.ci===undefined)r.ci=nextCover++;return r.ci};
+function av(p,size){const s=size?`style="width:${size}px;height:${size}px;background:${p.color}"`:`style="background:${p.color}"`;return `<span class="avatar" ${s} aria-hidden="true">${esc(initials(p.name))}</span>`}
+let toastT;
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),3200)}
+
+/* ---------- modal ---------- */
+let lastFocus=null;
+function openModal(html,onMount){lastFocus=document.activeElement;$("#modal").innerHTML=html;$("#scrim").classList.add("open");if(onMount)onMount($("#modal"));const f=$("#modal").querySelector("input,select,textarea,button");if(f)f.focus()}
+function closeModal(){$("#scrim").classList.remove("open");$("#modal").innerHTML="";if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+$("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#scrim").classList.contains("open"))closeModal()});
+
+function requireAuth(next){if(S.user)return true;signInModal(next);return false}
+/* =====================================================================
+   DRAW BOARDS: infinite canvas, live cursors, voice side room
+   Strokes are saved in the database and arrive live; cursors, live ink,
+   presence and voice signals go over the room's private Realtime channel.
+   ===================================================================== */
+const DRAW={open:false,room:null,cam:{x:0,y:0,s:1},tool:"pen",color:null,size:4,strokes:{},bots:[],voice:{inVoice:false,muted:false,me:false,stream:null,an:null,ptt:false},
+  pointers:new Map(),cur:null,pinch:null,panStart:null,space:false,raf:0,last:0,cursorMe:null};
+const PEN_COLORS=["ink","#e53935","#ff6319","#f3e600","#1fe046","#2f6fd6","#8a3fd1","#ffffff"];
+
+function drawCSS(){return `
+.draw{position:fixed;inset:0;z-index:40;background:var(--paper);display:grid;grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr);touch-action:none}
+.draw[hidden]{display:none}
+.dtop{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-bottom:var(--bw) solid var(--frame);min-height:52px}
+.dtop h2{font-size:17px;flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.presence{display:flex;gap:4px;align-items:center;flex:1;justify-content:flex-end}
+.presence button{padding:0;border:2px solid transparent;border-radius:50%;background:none;cursor:pointer}
+[data-skin="cyber"] .presence button{border-radius:0}
+.presence .avatar{width:28px;height:28px;font-size:11px}
+.dstage{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) auto}
+.dcanvas-wrap{position:relative;overflow:hidden}
+#dcanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;display:block}
+#dcanvas.pan{cursor:grab}#dcanvas.panning{cursor:grabbing}
+.dtools{position:absolute;left:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;background:var(--surface);border:var(--bw) solid var(--frame);border-radius:var(--r-lg);padding:8px;box-shadow:var(--shadow)}
+.dtools .sep{height:1px;background:var(--line);margin:2px 0}
+.tbtn{width:40px;height:40px;display:grid;place-items:center;border:1px solid transparent;background:none;border-radius:var(--r);cursor:pointer;font-size:17px;color:var(--ink)}
+.tbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+[data-skin="cyber"] .tbtn[aria-pressed="true"]{background:var(--data);color:#0b0c10}
+.swatch{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);cursor:pointer;margin:0 auto;padding:0}
+[data-skin="cyber"] .swatch{border-radius:0}
+.swatch[aria-pressed="true"]{outline:2px solid var(--pin);outline-offset:2px}
+.dzoom{position:absolute;right:12px;bottom:12px;display:flex;align-items:center;gap:4px;background:var(--surface);border:var(--bw) solid var(--frame);border-radius:var(--r);padding:4px;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+.dzoom output{min-width:84px;text-align:center;font-size:13px;font-weight:600}
+.dhint{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:var(--surface);border:1px solid var(--line);border-radius:var(--pill);padding:5px 12px;font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none}
+.voice{width:270px;background:var(--surface);border-left:var(--bw) solid var(--frame);display:flex;flex-direction:column;min-height:0}
+.voice header{padding:14px 14px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.voice header h3{font-size:16px}
+.vlist{flex:1;overflow:auto;padding:4px 10px}
+.vuser{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:var(--r)}
+.vuser .avatar{width:38px;height:38px;transition:box-shadow .12s}
+.vuser.speaking .avatar{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ok),0 0 16px 4px color-mix(in srgb,var(--ok) 60%,transparent)}
+.vuser .nm{flex:1;min-width:0}.vuser .nm b{display:block;font-size:14px}.vuser .nm span{font-size:12px;color:var(--muted)}
+.vuser.speaking .nm span{color:var(--ok);font-weight:700}
+.bars{display:flex;gap:2px;align-items:flex-end;height:14px}.bars i{width:3px;background:var(--ok);height:3px;border-radius:1px}
+.vuser.speaking .bars i{animation:bar .5s infinite alternate}.vuser.speaking .bars i:nth-child(2){animation-delay:.15s}.vuser.speaking .bars i:nth-child(3){animation-delay:.3s}
+@keyframes bar{to{height:14px}}
+@media (prefers-reduced-motion:reduce){.vuser.speaking .bars i{animation:none;height:10px}}
+.vmore{background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;text-decoration:underline;padding:2px}
+.vfoot{padding:10px;border-top:1px solid var(--line);display:grid;gap:8px}
+.vfoot .row{display:flex;gap:6px}.vfoot .row .btn{flex:1}
+.vnote{font-size:11px;color:var(--muted);margin:0}
+.ptt{user-select:none;-webkit-user-select:none;touch-action:none}
+.ptt[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#0b0c10}
+.vbtn-mobile{display:none}
+@media (max-width:760px){
+  .dstage{grid-template-columns:minmax(0,1fr)}
+  .voice{position:absolute;left:0;right:0;bottom:0;width:auto;max-height:62%;border-left:0;border-top:var(--bw) solid var(--frame);transform:translateY(100%);transition:transform .2s;z-index:3;box-shadow:0 -10px 30px rgba(0,0,0,.25)}
+  .voice.show{transform:none}
+  .vbtn-mobile{display:inline-flex}
+  .dtools{left:50%;top:auto;bottom:10px;transform:translateX(-50%);flex-direction:row;flex-wrap:wrap;justify-content:center;width:min(calc(100% - 20px),330px);padding:6px;gap:4px}
+  .dtools .sep{display:none}
+  .tbtn{width:38px;height:38px}
+  .swatch{width:28px;height:28px;margin:3px}
+  .dzoom{bottom:auto;top:10px;right:10px}
+  .dzoom output{min-width:60px}
+  .dtop{gap:6px;padding:6px 8px}
+  #dBack{white-space:nowrap}
+  .presence{overflow:hidden;flex:0 0 auto;max-width:84px;justify-content:flex-start}
+  .dtop h2{flex:1 1 0;min-width:0}
+  .presence .avatar{width:24px;height:24px;font-size:10px}
+  .dhint{display:none}
+  .dtop h2{font-size:15px}
+}
+.dpreview{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);height:220px;background:var(--paper)}
+.dpreview canvas{width:100%;height:100%;display:block}
+.dpreview .btn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+`}
+
+function drawMarkup(){return `<div class="draw" id="draw" hidden role="dialog" aria-label="Draw board">
+ <div class="dtop">
+  <button class="btn small" id="dBack" type="button">← Back</button>
+  <h2 id="dTitle"></h2>
+  <div class="presence" id="dPresence" aria-label="People on this board"></div>
+  <button class="btn small vbtn-mobile" id="dVoiceToggle" type="button">🎙 Voice</button>
+ </div>
+ <div class="dstage">
+  <div class="dcanvas-wrap" id="dWrap">
+   <canvas id="dcanvas" aria-label="Shared drawing canvas"></canvas>
+   <div class="dhint" id="dHint">Scroll to move · Ctrl + scroll or pinch to zoom · Space + drag to pan</div>
+   <div class="dtools" role="toolbar" aria-label="Drawing tools">
+    <button class="tbtn" data-tool="pen" type="button" title="Pen (P)" aria-label="Pen">✏️</button>
+    <button class="tbtn" data-tool="eraser" type="button" title="Eraser (E). Erases your strokes; owners and mods can erase any." aria-label="Eraser">🧽</button>
+    <button class="tbtn" data-tool="hand" type="button" title="Move (H)" aria-label="Move">✋</button>
+    <button class="tbtn" id="dUndo" type="button" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
+    <div class="sep"></div>
+    <div id="dSwatches" style="display:contents"></div>
+    <div class="sep"></div>
+    <button class="tbtn" id="dSize" type="button" title="Pen size" aria-label="Pen size">●</button>
+   </div>
+   <div class="dzoom">
+    <button class="btn small ghost" id="dOut" type="button" aria-label="Zoom out">−</button>
+    <output id="dZoom">100%</output>
+    <button class="btn small ghost" id="dIn" type="button" aria-label="Zoom in">+</button>
+    <button class="btn small ghost" id="dHome" type="button" aria-label="Back to start">⌂</button>
+   </div>
+  </div>
+  <aside class="voice" id="dVoice" aria-label="Voice room">
+   <header><h3>🎙 Voice room</h3><span class="muted" id="dVCount" style="font-size:12px"></span></header>
+   <div class="vlist" id="dVList"></div>
+   <div class="vfoot" id="dVFoot"></div>
+  </aside>
+ </div>
+</div>`}
+
+/* ---------- camera math ---------- */
+function w2s(x,y){const c=DRAW.cam;return [(x-c.x)*c.s,(y-c.y)*c.s]}
+function s2w(x,y){const c=DRAW.cam;return [x/c.s+c.x,y/c.s+c.y]}
+function zoomAt(sx,sy,f){const c=DRAW.cam;const [wx,wy]=s2w(sx,sy);c.s=Math.min(1e7,Math.max(1e-7,c.s*f));c.x=wx-sx/c.s;c.y=wy-sy/c.s;updZoom()}
+function fmtZoom(s){const p=s*100;if(p>=1e9)return (p/1e9).toFixed(0)+"B%";if(p>=1e6)return (p/1e6).toFixed(p>=1e7?0:1)+"M%";if(p>=1e4)return Math.round(p/1e3)+"K%";if(p>=10)return Math.round(p)+"%";if(p>=0.01)return p.toFixed(2).replace(/\.?0+$/,"")+"%";return p.toFixed(Math.min(12,Math.ceil(-Math.log10(p))+1)).replace(/0+$/,"")+"%"}
+function updZoom(){const o=document.getElementById("dZoom");if(o)o.textContent=fmtZoom(DRAW.cam.s)}
+function canvasSize(){const cv=document.getElementById("dcanvas");return [cv.clientWidth,cv.clientHeight]}
+function inkColor(){return getComputedStyle(document.documentElement).getPropertyValue("--ink").trim()||"#111"}
+function resolveColor(c){return c==="ink"?inkColor():c}
+
+/* ---------- render ---------- */
+function drawFrame(t){
+  if(!DRAW.open)return;
+  DRAW.raf=requestAnimationFrame(drawFrame);
+  const dt=Math.min(.05,(t-(DRAW.last||t))/1000);DRAW.last=t;
+  tickBots(dt,t);tickVoice(t);
+  const cv=document.getElementById("dcanvas");const dpr=Math.min(2,window.devicePixelRatio||1);
+  const W=cv.clientWidth,H=cv.clientHeight;
+  if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}
+  const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const cs=getComputedStyle(document.documentElement);
+  ctx.fillStyle=cs.getPropertyValue("--paper").trim();ctx.fillRect(0,0,W,H);
+  // adaptive dot grid: two levels that fade so zoom feels endless
+  const c=DRAW.cam;const lineCol=cs.getPropertyValue("--muted").trim();
+  const base=Math.pow(4,Math.ceil(Math.log(24/c.s)/Math.log(4)));
+  [[base,1],[base*4,0]].forEach(([step,lvl])=>{
+    const px=step*c.s;const fade=lvl?1:Math.min(1,(px-24)/48);if(px<6)return;
+    ctx.globalAlpha=(lvl?.35:.25*fade);ctx.fillStyle=lineCol;
+    const x0=Math.floor(c.x/step)*step,y0=Math.floor(c.y/step)*step;
+    for(let x=x0;x<c.x+W/c.s+step;x+=step)for(let y=y0;y<c.y+H/c.s+step;y+=step){const [sx,sy]=w2s(x,y);ctx.fillRect(sx-1,sy-1,lvl?2.2:1.6,lvl?2.2:1.6)}
+  });
+  ctx.globalAlpha=1;
+  // strokes
+  const list=DRAW.strokes[DRAW.room.id];ctx.lineCap="round";ctx.lineJoin="round";
+  const vx0=c.x,vy0=c.y,vx1=c.x+W/c.s,vy1=c.y+H/c.s;
+  for(const st of list){
+    if(st.by&&S.blocked.has(st.by))continue;
+    if(st.text){const fs=st.size*c.s;if(fs<2||fs>4000)continue;const [sx,sy]=w2s(st.x,st.y);if(sx>W||sy<-fs||sy>H+fs)continue;ctx.fillStyle=st.color;ctx.font=`${fs}px ${cs.getPropertyValue("--body")}`;ctx.fillText(st.text,sx,sy);continue}
+    if(!st.bb)bbox(st);
+    const b=st.bb;if(b[2]+st.w<vx0||b[0]-st.w>vx1||b[3]+st.w<vy0||b[1]-st.w>vy1)continue;
+    if((b[2]-b[0]+st.w)*c.s<0.6&&(b[3]-b[1]+st.w)*c.s<0.6)continue;
+    ctx.strokeStyle=resolveColor(st.color);ctx.lineWidth=Math.max(.6,st.w*c.s);
+    ctx.beginPath();const p0=w2s(st.pts[0].x,st.pts[0].y);ctx.moveTo(p0[0],p0[1]);
+    if(st.pts.length===1)ctx.lineTo(p0[0]+.01,p0[1]);
+    for(let i=1;i<st.pts.length;i++){const p=w2s(st.pts[i].x,st.pts[i].y);ctx.lineTo(p[0],p[1])}
+    ctx.stroke();
+  }
+  // other people's cursors
+  for(const b of DRAW.bots){if(S.blocked.has(b.id)||b.x==null)continue;const [sx,sy]=w2s(b.x,b.y);
+    const off=sx<-10||sy<-10||sx>W+10||sy>H+10;
+    if(off){ // edge marker pointing to them
+      const cx=Math.min(W-14,Math.max(14,sx)),cy=Math.min(H-14,Math.max(14,sy));ctx.fillStyle=b.color;ctx.globalAlpha=.85;ctx.beginPath();ctx.arc(cx,cy,6,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;continue}
+    ctx.fillStyle=b.color;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+3,sy+17);ctx.lineTo(sx+7.5,sy+12);ctx.lineTo(sx+14,sy+12);ctx.closePath();ctx.fill();
+    ctx.strokeStyle="#fff";ctx.lineWidth=1.2;ctx.stroke();
+    ctx.font=`600 12px ${cs.getPropertyValue("--body")}`;const label=b.name+(b.speaking&&b.inVoice?" 🔊":"");const tw=ctx.measureText(label).width;
+    ctx.fillRect(sx+12,sy+16,tw+12,19);ctx.fillStyle="#fff";ctx.fillText(label,sx+18,sy+29.5);
+  }
+}
+function bbox(st){let a=1/0,b=1/0,c=-1/0,d=-1/0;for(const p of st.pts){if(p.x<a)a=p.x;if(p.y<b)b=p.y;if(p.x>c)c=p.x;if(p.y>d)d=p.y}st.bb=[a,b,c,d]}
+
+/* ---------- simulated people ---------- */
+/* ---------- voice ---------- */
+/* ---------- tools ---------- */
+function setTool(t){DRAW.tool=t;document.querySelectorAll("[data-tool]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===t)));const cv=document.getElementById("dcanvas");cv.classList.toggle("pan",t==="hand"||DRAW.space)}
+function renderSwatches(){const el=document.getElementById("dSwatches");
+  el.innerHTML=PEN_COLORS.map(c=>`<button type="button" class="swatch" data-color="${c}" aria-label="Color ${c==="ink"?"default":c}" aria-pressed="${DRAW.color===c}" style="background:${resolveColor(c)}"></button>`).join("");
+  el.querySelectorAll("[data-color]").forEach(b=>b.onclick=()=>{DRAW.color=b.dataset.color;if(DRAW.tool!=="pen")setTool("pen");renderSwatches()})}
+const SIZES=[2,4,8,16,32];
+function updSize(){const b=document.getElementById("dSize");b.style.fontSize=(8+SIZES.indexOf(DRAW.size)*4)+"px";b.setAttribute("aria-label","Pen size "+DRAW.size)}
+/* ---------- input: mouse, pen, touch (pinch) ---------- */
+function bindCanvas(){
+  const cv=document.getElementById("dcanvas");
+  const pos=e=>{const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]};
+  cv.addEventListener("pointerdown",e=>{
+    cv.setPointerCapture(e.pointerId);DRAW.pointers.set(e.pointerId,pos(e));document.getElementById("dHint").style.display="none";
+    if(DRAW.pointers.size===2){ // start pinch, cancel any stroke in progress
+      if(DRAW.cur){const list=DRAW.strokes[DRAW.room.id];if(DRAW.cur.pts.length<4)list.splice(list.indexOf(DRAW.cur),1);DRAW.cur=null}
+      const [a,b]=[...DRAW.pointers.values()];DRAW.pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),m:[(a[0]+b[0])/2,(a[1]+b[1])/2],s:DRAW.cam.s,w:s2w((a[0]+b[0])/2,(a[1]+b[1])/2)};DRAW.panStart=null;return}
+    if(DRAW.pointers.size>2)return;
+    const [x,y]=pos(e);
+    if(DRAW.tool==="hand"||DRAW.space||e.button===1||e.button===2){DRAW.panStart={x,y,cx:DRAW.cam.x,cy:DRAW.cam.y};cv.classList.add("panning");return}
+    if(DRAW.tool==="eraser"){eraseAt(x,y);DRAW.erasing=true;return}
+    const [wx,wy]=s2w(x,y);DRAW.cur={pts:[{x:wx,y:wy}],color:DRAW.color,w:DRAW.size/DRAW.cam.s,by:"me",sid:Math.random().toString(36).slice(2),sent:0};DRAW.strokes[DRAW.room.id].push(DRAW.cur);
+  });
+  cv.addEventListener("pointermove",e=>{
+    if(!DRAW.pointers.has(e.pointerId))return;
+    DRAW.pointers.set(e.pointerId,pos(e));
+    if(DRAW.pinch&&DRAW.pointers.size>=2){const [a,b]=[...DRAW.pointers.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+      const c=DRAW.cam;c.s=Math.min(1e7,Math.max(1e-7,DRAW.pinch.s*d/Math.max(1,DRAW.pinch.d)));c.x=DRAW.pinch.w[0]-m[0]/c.s;c.y=DRAW.pinch.w[1]-m[1]/c.s;updZoom();return}
+    const [x,y]=pos(e);
+    if(DRAW.panStart){DRAW.cam.x=DRAW.panStart.cx-(x-DRAW.panStart.x)/DRAW.cam.s;DRAW.cam.y=DRAW.panStart.cy-(y-DRAW.panStart.y)/DRAW.cam.s;return}
+    if(DRAW.erasing){eraseAt(x,y);return}
+    if(DRAW.cur){const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];const r=cv.getBoundingClientRect();
+      for(const ev of evs){const [wx,wy]=s2w(ev.clientX-r.left,ev.clientY-r.top);const l=DRAW.cur.pts[DRAW.cur.pts.length-1];if(Math.hypot(wx-l.x,wy-l.y)*DRAW.cam.s>1)DRAW.cur.pts.push({x:wx,y:wy})}DRAW.cur.bb=null;sendInk(false)}
+  });
+  const end=e=>{DRAW.pointers.delete(e.pointerId);if(DRAW.pointers.size<2)DRAW.pinch=null;
+    if(DRAW.pointers.size===0){if(DRAW.cur){DRAW.cur.bb=null;commitStroke(DRAW.cur)}DRAW.cur=null;DRAW.panStart=null;DRAW.erasing=false;cv.classList.remove("panning")}};
+  cv.addEventListener("pointermove",e=>{const r=cv.getBoundingClientRect();const [wx,wy]=s2w(e.clientX-r.left,e.clientY-r.top);sendCursor(wx,wy)});
+  cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);
+  cv.addEventListener("contextmenu",e=>e.preventDefault());
+  cv.addEventListener("wheel",e=>{e.preventDefault();const [x,y]=pos(e);
+    if(e.ctrlKey||e.metaKey){zoomAt(x,y,Math.exp(-e.deltaY*(e.deltaMode?0.05:0.01)))}
+    else{const k=e.deltaMode?16:1;DRAW.cam.x+=(e.shiftKey?e.deltaY:e.deltaX)*k/DRAW.cam.s;DRAW.cam.y+=(e.shiftKey?0:e.deltaY)*k/DRAW.cam.s}},{passive:false});
+  // Safari trackpad pinch
+  let gs=1;cv.addEventListener("gesturestart",e=>{e.preventDefault();gs=1});
+  cv.addEventListener("gesturechange",e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,e.scale/gs);gs=e.scale});
+}
+function drawKeys(e){
+  if(!DRAW.open||e.target.closest("input,textarea,select"))return;
+  const k=e.key.toLowerCase();
+  if(e.type==="keydown"){
+    if(k===" "){e.preventDefault();DRAW.space=true;setTool(DRAW.tool);return}
+    if((e.ctrlKey||e.metaKey)&&k==="z"){e.preventDefault();undo();return}
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    if(k==="p")setTool("pen");else if(k==="e")setTool("eraser");else if(k==="h")setTool("hand");
+    else if(k==="+"||k==="="){const [w,h]=canvasSize();zoomAt(w/2,h/2,1.5)}else if(k==="-"){const [w,h]=canvasSize();zoomAt(w/2,h/2,1/1.5)}
+    else if(k==="0")homeView();
+    else if(k==="t"&&DRAW.voice.inVoice&&!DRAW.voice.an)DRAW.voice.ptt=true;
+    else if(k==="escape"&&!document.getElementById("scrim").classList.contains("open"))closeDraw();
+  }else{if(k===" "){DRAW.space=false;setTool(DRAW.tool)}if(k==="t")DRAW.voice.ptt=false}
+}
+document.addEventListener("keydown",drawKeys);document.addEventListener("keyup",drawKeys);
+/* ---------- open / close ---------- */
+function initDraw(){
+  const st=document.createElement("style");st.textContent=drawCSS();document.head.appendChild(st);
+  document.body.insertAdjacentHTML("beforeend",drawMarkup());
+  // keep modals and toasts above the board
+  document.getElementById("scrim").style.zIndex=60;document.getElementById("toast").style.zIndex=70;
+  bindCanvas();
+  document.getElementById("dBack").onclick=closeDraw;
+  document.querySelectorAll("[data-tool]").forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+  document.getElementById("dUndo").onclick=undo;
+  document.getElementById("dSize").onclick=()=>{DRAW.size=SIZES[(SIZES.indexOf(DRAW.size)+1)%SIZES.length];updSize()};
+  const z=f=>{const [w,h]=canvasSize();zoomAt(w/2,h/2,f)};
+  document.getElementById("dIn").onclick=()=>z(2);document.getElementById("dOut").onclick=()=>z(.5);document.getElementById("dHome").onclick=homeView;
+  document.getElementById("dVoiceToggle").onclick=()=>document.getElementById("dVoice").classList.toggle("show");
+}
+/* small static preview on the room page */
+
+function renderPresence(){
+  const el=document.getElementById("dPresence");if(!el)return;
+  const ppl=[{id:"me",p:person("me"),sp:DRAW.voice.me&&DRAW.voice.inVoice},...DRAW.bots.filter(b=>!S.blocked.has(b.id)).map(b=>({id:b.id,p:person(b.id),sp:b.speaking&&b.inVoice}))];
+  const extra=ppl.length>5?ppl.length-4:0;const shown=extra?ppl.slice(0,4):ppl;
+  el.innerHTML=shown.map(x=>`<button type="button" data-follow="${x.id}" title="${x.id==="me"?"You":"Go to "+esc(x.p.name)}" aria-label="${x.id==="me"?"You":"Go to "+esc(x.p.name)+"'s cursor"}" style="${x.sp?"border-color:var(--ok)":""}">${av(x.p)}</button>`).join("")+(extra?`<span class="muted" style="font-size:12px">+${extra}</span>`:"");
+  el.querySelectorAll("[data-follow]").forEach(b=>b.onclick=()=>{const bot=DRAW.bots.find(x=>x.id===b.dataset.follow);if(!bot||bot.x==null)return;const [w,h]=canvasSize();DRAW.cam.x=bot.x-w/2/DRAW.cam.s;DRAW.cam.y=bot.y-h/2/DRAW.cam.s});
+}
+
+
+/* ---------- strokes: load, save, live updates ---------- */
+function toStroke(row){
+  const pts=(row.points||[]).map(p=>({x:p[0],y:p[1]}));
+  return {id:row.id,pts,color:row.color,w:row.width,by:L(row.author_id)};
+}
+async function loadStrokes(r){
+  const rows=await must(sb.from("strokes").select("id,author_id,color,width,points").eq("room_id",r.id).order("id",{ascending:true}).limit(5000));
+  DRAW.strokes[r.id]=rows.map(toStroke);
+  return DRAW.strokes[r.id];
+}
+function onStrokeInsert(roomId,row){
+  const list=DRAW.strokes[roomId];if(!list)return;
+  if(list.some(s=>s.id===row.id))return;
+  if(row.author_id===S.uid){ // my own stroke echoing back: match the local copy
+    const local=list.find(s=>s.by==="me"&&!s.id&&s.pts.length===(row.points||[]).length);
+    if(local){local.id=row.id;return}
+  }else{ // drop their live "ink" preview now that the real stroke arrived
+    for(let i=list.length-1;i>=0;i--)if(list[i].temp&&list[i].by===row.author_id)list.splice(i,1);
+  }
+  list.push(toStroke(row));
+}
+function onStrokeDelete(roomId,id){
+  const list=DRAW.strokes[roomId];if(!list||id==null)return;
+  const i=list.findIndex(s=>s.id===id);if(i>=0)list.splice(i,1);
+}
+function onInk(roomId,p){ // someone else's stroke while they're still drawing it
+  const list=DRAW.strokes[roomId];if(!list||S.blocked.has(p.uid))return;
+  let st=list.find(s=>s.temp&&s.sid===p.sid);
+  if(!st){st={temp:true,sid:p.sid,by:p.uid,color:p.color,w:p.w,pts:[]};list.push(st)}
+  p.pts.forEach(([x,y])=>st.pts.push({x,y}));st.bb=null;
+  const pr=CH.peers.get(p.uid);if(pr&&p.pts.length){const l=p.pts[p.pts.length-1];pr.tx=l[0];pr.ty=l[1];if(pr.x==null){pr.x=l[0];pr.y=l[1]}}
+}
+let inkT=0,curT=0;
+function sendInk(force){
+  const st=DRAW.cur;if(!st||!CH.ch||!CH.ready)return;
+  const now=performance.now();if(!force&&now-inkT<70)return;inkT=now;
+  const from=st.sent||0;if(from>=st.pts.length)return;
+  const pts=st.pts.slice(from).map(p=>[p.x,p.y]);st.sent=st.pts.length;
+  CH.ch.send({type:"broadcast",event:"ink",payload:{uid:S.uid,sid:st.sid,color:st.color,w:st.w,pts}});
+}
+function sendCursor(wx,wy){
+  if(!CH.ch||!CH.ready)return;const now=performance.now();if(now-curT<60)return;curT=now;
+  CH.ch.send({type:"broadcast",event:"cursor",payload:{uid:S.uid,x:wx,y:wy}});
+}
+async function commitStroke(st){
+  sendInk(true);
+  if(st.pts.length===1)st.pts.push({x:st.pts[0].x+0.01/DRAW.cam.s,y:st.pts[0].y});
+  if(st.pts.length>4000){const k=Math.ceil(st.pts.length/4000);st.pts=st.pts.filter((p,i)=>i%k===0||i===st.pts.length-1);st.bb=null}
+  try{
+    const row=await must(sb.from("strokes").insert({room_id:DRAW.room.id,color:st.color,width:st.w,points:st.pts.map(p=>[p.x,p.y])}).select("id").single());
+    if(!st.id)st.id=row.id;
+    SFX.play("note");
+  }catch(e){const list=DRAW.strokes[DRAW.room.id];const i=list.indexOf(st);if(i>=0)list.splice(i,1);toast(errText(e))}
+}
+function canEraseAll(){const r=DRAW.room;return r&&(r.owner==="me"||r.mods.includes("me")||(S.user&&S.user.isAdmin))}
+function eraseAt(sx,sy){
+  const [wx,wy]=s2w(sx,sy);const rad=10/DRAW.cam.s;const list=DRAW.strokes[DRAW.room.id];const all=canEraseAll();
+  for(let i=list.length-1;i>=0;i--){const st=list[i];if(!st.pts||st.temp||!st.id)continue;if(st.by!=="me"&&!all)continue;
+    if(st.pts.some(p=>Math.hypot(p.x-wx,p.y-wy)<rad+st.w/2)){list.splice(i,1);SFX.play("click");
+      sb.from("strokes").delete().eq("id",st.id).then(({error})=>{if(error){list.push(st);toast(errText(error))}})}}
+}
+function undo(){
+  const list=DRAW.strokes[DRAW.room.id];
+  for(let i=list.length-1;i>=0;i--)if(list[i].by==="me"&&list[i].id){const st=list.splice(i,1)[0];
+    sb.from("strokes").delete().eq("id",st.id).then(({error})=>{if(error){list.push(st);toast(errText(error))}});return}
+}
+
+/* ---------- people on the board ---------- */
+function tickBots(dt){
+  const now=performance.now();
+  for(const b of DRAW.bots){if(b.x==null)continue;b.x+=(b.tx-b.x)*Math.min(1,dt*10);b.y+=(b.ty-b.y)*Math.min(1,dt*10)}
+}
+
+/* ---------- voice: peer-to-peer audio (up to 6), signaled over the room channel ---------- */
+const VOICE_MAX=6;
+const ICE={iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]};
+const PCS=new Map(); // uid -> {pc,audio,an,queue}
+function level(an){const a=new Uint8Array(an.fftSize);an.getByteTimeDomainData(a);let m=0;for(const x of a)m=Math.max(m,Math.abs(x-128));return m}
+function tickVoice(){
+  const v=DRAW.voice;let changed=false;
+  const me=v.inVoice&&!v.muted&&(v.an?level(v.an)>12:v.ptt);
+  if(me!==v.me){v.me=me;changed=true}
+  for(const b of DRAW.bots){const c=PCS.get(b.id);const sp=!!(b.inVoice&&!b.muted&&c&&c.an&&level(c.an)>12);if(sp!==b.speaking){b.speaking=sp;changed=true}}
+  if(changed)updVoiceUI();
+}
+function voicePeers(){return [...CH.peers.values()].filter(p=>p.inVoice&&!S.blocked.has(p.id))}
+function voiceUsers(){const v=DRAW.voice;const arr=voicePeers().map(b=>({id:b.id,name:b.name,p:person(b.id),speaking:b.speaking,muted:b.muted,linked:PCS.has(b.id)&&PCS.get(b.id).connected}));
+  if(v.inVoice)arr.unshift({id:"me",name:S.user.name+" (you)",p:person("me"),speaking:v.me,muted:v.muted,linked:true});return arr}
+function renderVoice(){
+  if(!DRAW.open)return;
+  const v=DRAW.voice;const isMod=canEraseAll();
+  const us=voiceUsers();
+  document.getElementById("dVCount").textContent=us.length+" in voice";
+  document.getElementById("dVList").innerHTML=us.length?us.map(u=>`<div class="vuser${u.speaking?" speaking":""}" data-vuser="${u.id}">${av(u.p)}<div class="nm"><b>${esc(u.name)}</b><span>${u.muted?"Muted":u.speaking?"Speaking":v.inVoice&&!u.linked?"Connecting…":"Listening"}</span></div><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>${u.id!=="me"?`<button class="vmore" type="button" data-vrep="${u.id}">Report</button>${isMod?`<button class="vmore" type="button" data-vkick="${u.id}">Remove</button>`:""}`:""}</div>`).join(""):'<p class="muted" style="padding:8px 6px;margin:0;font-size:13px">No one is talking yet. Join to start.</p>';
+  document.getElementById("dVFoot").innerHTML=v.inVoice
+    ?`<div class="row"><button class="btn" id="vMute" type="button" aria-pressed="${v.muted}">${v.muted?"🔇 Unmute":"🎙 Mute"}</button><button class="btn danger" id="vLeave" type="button">Leave voice</button></div><p class="vnote">Voice connects people directly. On some strict networks (like some work Wi-Fi) it may not connect.</p>`
+    :`<button class="btn primary" id="vJoin" type="button">Join voice</button><p class="vnote">You can listen and draw at the same time. Up to ${VOICE_MAX} people per voice room.</p>`;
+  bindVoice();
+}
+function updVoiceUI(){
+  const us=voiceUsers();const list=document.getElementById("dVList");if(!list)return;
+  if(list.querySelectorAll("[data-vuser]").length!==us.length){renderVoice();return}
+  us.forEach(u=>{const el=list.querySelector(`[data-vuser="${u.id}"]`);if(!el)return;el.classList.toggle("speaking",!!u.speaking);el.querySelector(".nm span").textContent=u.muted?"Muted":u.speaking?"Speaking":DRAW.voice.inVoice&&!u.linked?"Connecting…":"Listening"});
+  renderPresence();
+}
+function bindVoice(){
+  const v=DRAW.voice;
+  const j=document.getElementById("vJoin");if(j)j.onclick=async()=>{
+    if(voicePeers().length>=VOICE_MAX){toast(`The voice room is full (${VOICE_MAX} max).`);return}
+    if(!CH.ready){toast("Still connecting to the room. Try again in a second.");return}
+    try{
+      const s=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+      v.stream=s;const ac=SFX.ac();if(ac){const src=ac.createMediaStreamSource(s);const an=ac.createAnalyser();an.fftSize=512;src.connect(an);v.an=an}
+    }catch(e){toast("Allow microphone access to join voice. Check your browser's site settings.");return}
+    v.inVoice=true;v.muted=false;SFX.play("join");await trackPresence();renderVoice();renderPresence();syncVoicePeers();toast("You joined the voice room.");
+  };
+  const l=document.getElementById("vLeave");if(l)l.onclick=()=>leaveVoice(true);
+  const m=document.getElementById("vMute");if(m)m.onclick=async()=>{v.muted=!v.muted;if(v.stream)v.stream.getAudioTracks().forEach(t=>t.enabled=!v.muted);await trackPresence();renderVoice()};
+  document.querySelectorAll("[data-vrep]").forEach(b=>b.onclick=()=>reportModal({kind:"voice",id:b.dataset.vrep,label:person(b.dataset.vrep).name+" in voice",room:DRAW.room}));
+  document.querySelectorAll("[data-vkick]").forEach(b=>b.onclick=()=>{if(CH.ch)CH.ch.send({type:"broadcast",event:"kick",payload:{to:b.dataset.vkick}});toast("Removed from voice. To keep them out, remove them from the room too.")});
+}
+function leaveVoice(sound){
+  const v=DRAW.voice;for(const id of [...PCS.keys()])closePeer(id);
+  if(v.stream)v.stream.getTracks().forEach(t=>t.stop());
+  v.stream=null;v.an=null;v.inVoice=false;v.me=false;v.ptt=false;v.muted=false;
+  trackPresence();
+  if(sound){SFX.play("leave");toast("You left the voice room.")}
+  if(DRAW.open){renderVoice();renderPresence()}
+}
+function closePeer(id){const c=PCS.get(id);if(!c)return;try{c.pc.close()}catch(e){}if(c.audio){c.audio.srcObject=null;c.audio.remove()}PCS.delete(id)}
+function rtcSend(to,kind,data){if(CH.ch)CH.ch.send({type:"broadcast",event:"rtc",payload:{from:S.uid,to,kind,data}})}
+function makePeer(id){
+  const pc=new RTCPeerConnection(ICE);const c={pc,audio:null,an:null,queue:[],connected:false};PCS.set(id,c);
+  DRAW.voice.stream.getTracks().forEach(t=>pc.addTrack(t,DRAW.voice.stream));
+  pc.onicecandidate=e=>{if(e.candidate)rtcSend(id,"ice",e.candidate.toJSON())};
+  pc.onconnectionstatechange=()=>{c.connected=pc.connectionState==="connected";if(pc.connectionState==="failed"){closePeer(id);setTimeout(syncVoicePeers,1500)}updVoiceUI()};
+  pc.ontrack=e=>{const stream=e.streams[0];if(!c.audio){c.audio=document.createElement("audio");c.audio.autoplay=true;c.audio.playsInline=true;document.body.appendChild(c.audio)}
+    c.audio.srcObject=stream;c.audio.play().catch(()=>{});
+    const ac=SFX.ac();if(ac){try{const src=ac.createMediaStreamSource(stream);const an=ac.createAnalyser();an.fftSize=512;src.connect(an);c.an=an}catch(err){}}};
+  return c;
+}
+async function syncVoicePeers(){
+  const v=DRAW.voice;
+  for(const id of [...PCS.keys()]){const p=CH.peers.get(id);if(!v.inVoice||!p||!p.inVoice||S.blocked.has(id))closePeer(id)}
+  if(!v.inVoice||!v.stream)return;
+  for(const p of voicePeers()){
+    if(PCS.has(p.id))continue;
+    if(S.uid<p.id){ // the person with the smaller id starts the call, so both sides don't call at once
+      const c=makePeer(p.id);
+      try{const offer=await c.pc.createOffer();await c.pc.setLocalDescription(offer);rtcSend(p.id,"offer",c.pc.localDescription.toJSON())}catch(e){closePeer(p.id)}
+    }
+  }
+}
+async function onRtc(m){
+  const v=DRAW.voice;if(!v.inVoice||!v.stream||S.blocked.has(m.from))return;
+  try{
+    if(m.kind==="offer"){
+      if(PCS.has(m.from))closePeer(m.from);
+      const c=makePeer(m.from);await c.pc.setRemoteDescription(m.data);
+      const ans=await c.pc.createAnswer();await c.pc.setLocalDescription(ans);rtcSend(m.from,"answer",c.pc.localDescription.toJSON());
+      for(const q of c.queue)await c.pc.addIceCandidate(q);c.queue=[];
+    }else if(m.kind==="answer"){
+      const c=PCS.get(m.from);if(!c)return;await c.pc.setRemoteDescription(m.data);for(const q of c.queue)await c.pc.addIceCandidate(q);c.queue=[];
+    }else if(m.kind==="ice"){
+      const c=PCS.get(m.from);if(!c)return;if(c.pc.remoteDescription)await c.pc.addIceCandidate(m.data);else c.queue.push(m.data);
+    }
+  }catch(e){console.warn("voice",e)}
+}
+
+/* ---------- open / close the board ---------- */
+async function openDraw(r){
+  DRAW.room=r;DRAW.open=true;if(!DRAW.color)DRAW.color="ink";
+  if(!DRAW.strokes[r.id])DRAW.strokes[r.id]=[];
+  const d=document.getElementById("draw");d.hidden=false;document.body.style.overflow="hidden";
+  document.getElementById("dTitle").textContent=r.name;
+  setTool("pen");renderSwatches();updSize();
+  openRoomChannel(r);DRAW.bots=[...CH.peers.values()].filter(p=>p.drawing);
+  renderVoice();renderPresence();
+  requestAnimationFrame(()=>{homeView();DRAW.last=0;cancelAnimationFrame(DRAW.raf);DRAW.raf=requestAnimationFrame(drawFrame)});
+  SFX.play("join");trackPresence();
+  try{await loadStrokes(r)}catch(e){toast(errText(e))}
+}
+function closeDraw(){
+  if(!DRAW.open)return;leaveVoice(false);DRAW.open=false;trackPresence();
+  cancelAnimationFrame(DRAW.raf);document.getElementById("draw").hidden=true;document.body.style.overflow="";DRAW.pointers.clear();
+  render();if(DRAW.room)drawPreview(DRAW.room);
+}
+function homeView(){const [w,h]=canvasSize();const list=(DRAW.room&&DRAW.strokes[DRAW.room.id])||[];
+  DRAW.cam.s=1;
+  if(list.length){const last=list[list.length-1];if(!last.bb)bbox(last);DRAW.cam.x=(last.bb[0]+last.bb[2])/2-w/2;DRAW.cam.y=(last.bb[1]+last.bb[3])/2-h/2}
+  else{DRAW.cam.x=-w/2;DRAW.cam.y=-h/2}updZoom()}
+function drawPreview(r){const cv=document.getElementById("dPrev");if(!cv)return;
+  const paint=list=>{const W=cv.clientWidth,H=cv.clientHeight,dpr=Math.min(2,window.devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;
+    const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineCap="round";ctx.lineJoin="round";
+    const strokes=list.filter(st=>st.pts&&st.pts.length&&!S.blocked.has(st.by)).slice(-400);
+    if(!strokes.length){ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--muted");ctx.font="14px sans-serif";ctx.textAlign="center";ctx.fillText("Empty canvas. Be the first to draw.",W/2,H/2+40);return}
+    let a=1/0,b=1/0,c=-1/0,d=-1/0;strokes.forEach(st=>{if(!st.bb)bbox(st);a=Math.min(a,st.bb[0]);b=Math.min(b,st.bb[1]);c=Math.max(c,st.bb[2]);d=Math.max(d,st.bb[3])});
+    const s=Math.min(W/Math.max(1e-9,c-a),H/Math.max(1e-9,d-b))*0.85,ox=W/2-(a+c)/2*s,oy=H/2-(b+d)/2*s;
+    for(const st of strokes){ctx.strokeStyle=resolveColor(st.color);ctx.lineWidth=Math.max(.5,st.w*s);ctx.beginPath();st.pts.forEach((p,i)=>i?ctx.lineTo(ox+p.x*s,oy+p.y*s):ctx.moveTo(ox+p.x*s,oy+p.y*s));ctx.stroke()}};
+  if(DRAW.strokes[r.id])paint(DRAW.strokes[r.id]);else loadStrokes(r).then(paint).catch(()=>{});
+}
+
+
+initDraw();
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.view));
+$("#logo").onclick=()=>go("directory");
+$("#skinSel").innerHTML=SKINS.map(k=>`<option value="${k.id}">${k.name}</option>`).join("");
+$("#skinSel").onchange=e=>{setSkin(e.target.value);render()};
+setSkin(getSkin());
+SFX.init();
+$("#sfxBtn").onclick=e=>{SFX.set(!SFX.on);render()};
+document.addEventListener("click",e=>{const b=e.target.closest("button,.chip,.skin");if(b&&b.id!=="sfxBtn"&&!b.disabled&&!b.dataset.sfxTest&&!b.dataset.skinPick)SFX.play("click")},true);
+document.addEventListener("change",e=>{if(e.target.id==="skinSel")SFX.play("note")});
+new MutationObserver(ms=>{for(const m of ms){const el=m.target.nodeType===1?m.target:m.target.parentElement;const er=el&&el.closest&&el.closest(".error");if(er&&er.textContent.trim()){SFX.play("error");break}}}).observe($("#modal"),{childList:true,subtree:true,characterData:true});
+
+/* ---------- start: session, then data ---------- */
+async function onAuth(session){
+  const uid=session&&session.user?session.user.id:null;
+  if(uid===S.uid)return;
+  if(DRAW.open)closeDraw();closeRoomChannel();
+  S.uid=uid;S.email=session&&session.user?session.user.email:"";S.user=null;S.loaded=false;rooms=[];
+  if(uid){try{await loadMe()}catch(e){toast(errText(e))}render();await loadAll();if(S.view==="room"&&S.roomId)loadRoomExtras(S.roomId)}
+  else{S.view=S.view==="settings"?"settings":"directory";render()}
+}
+sb.auth.onAuthStateChange((event,session)=>{
+  if(event==="PASSWORD_RECOVERY")setTimeout(newPasswordModal,300);
+  setTimeout(()=>onAuth(session),0); // don't call the database inside the auth callback
+});
+render();
+setInterval(()=>{if(document.visibilityState==="visible"&&S.uid&&!$("#scrim").classList.contains("open"))loadAll()},30000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&S.uid)loadAll()});
+
+})();
+</script>
+</body>
+</html>
