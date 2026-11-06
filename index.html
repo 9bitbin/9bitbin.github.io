@@ -250,7 +250,7 @@
   .tile .t { font-family: "Chakra Petch"; font-weight: 600; font-size: 17px; display: flex; justify-content: space-between; gap: 8px; }
   .tile .t i { font-style: normal; color: var(--brass); }
   .tile .d { color: var(--dim); font-size: 14px; }
-  .tile.feature { grid-column: 1 / -1; padding: 22px 22px 22px 34px; border-color: var(--brass-dk); }
+  .tile.feature { grid-column: 1 / -1; padding: 22px 22px 22px 34px; border-color: var(--brass-dk); min-height: 114px; justify-content: center; }
   .tile.feature::before { top: 30px; left: 14px; }
   .tile.feature .t { font-size: 22px; }
   .tile.pending { border-style: dashed; }
@@ -690,7 +690,7 @@
     ],
     apps: [
       { title: "Pinned", line: "Shared sticky-note board with chat, drawing, and mini-games. Installs from the browser.", url: "/pinned/", feature: true, icon: "/pinned/icons/icon-192.png" },
-      { title: "Pinned V2", line: "A directory of NYC rooms, clubs, meetups, and gamer groups.", url: "/pinned-v2/", pending: true },
+      { title: "Pinned V2", line: "A directory of NYC rooms, clubs, meetups, and gamer groups.", url: "/pinned-v2/", feature: true },
     ],
     tools: [
       { title: "PDF Toolkit", line: "Merge, split, and edit PDFs in the browser. Nothing uploads.", url: "/tools/pdf-toolkit/" },
