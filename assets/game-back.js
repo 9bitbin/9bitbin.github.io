@@ -1,8 +1,3 @@
-/**
- * File: assets/game-back.js
- * Author: Himal Shrestha
- * Description: Shared "Games" back button that every standalone game page loads.
- */
 /*
   game-back.js — adds a brass "Games" back button to a game page.
   Add to any game:  <script src="/assets/game-back.js?v=3" defer></script>  (bump v= after changing this file so browsers fetch the new copy)
@@ -19,7 +14,6 @@
   var y = pos.charAt(0) === "b" ? "bottom:calc(env(safe-area-inset-bottom,0px) + 10px)" : "top:calc(env(safe-area-inset-top,0px) + 10px)";
   var x = pos.charAt(1) === "r" ? "right:calc(env(safe-area-inset-right,0px) + 10px)" : "left:calc(env(safe-area-inset-left,0px) + 10px)";
 
-  // Inject the button's styles and the button itself (only once per page).
   function add() {
     if (document.getElementById("nbb-back")) return;
     var css = document.createElement("style");

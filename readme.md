@@ -1,8 +1,3 @@
-<!--
-  File: readme.md
-  Author: Himal Shrestha
-  Description: Repository readme for 9bitbin.github.io.
--->
 # 9bitbin.github.io
 
 Himal Shrestha's portfolio hub: IT support and systems, browser games, apps, and music.

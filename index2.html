@@ -1,10 +1,5 @@
 <!doctype html>
 <!--
-  File: index2.html
-  Author: Himal Shrestha
-  Description: Earlier version of the home page (kept as a backup/test copy of index.html).
--->
-<!--
   HIMAL SHRESTHA — PORTFOLIO HUB
   Goes in the 9bitbin.github.io repo as index.html (rename the old one to old-index.html first).
 
@@ -22,7 +17,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Barlow:wght@400;500;600&family=DotGothic16&display=swap" rel="stylesheet">
-<!-- Page styles: brass/LED design tokens, layout, gears, rail, panels, music deck, résumé, contact form and boot screen. -->
 <style>
   :root {
     --soot: #11130F;
@@ -342,18 +336,15 @@
   }
 </style>
 </head>
-<!-- Page body starts here. -->
 <body>
 
 <div class="gears" aria-hidden="true"><svg class="gear big solid" style="width:520px;height:520px;right:-140px;top:60px"><g class="spin" data-teeth="22"></g></svg><svg class="gear big" style="width:300px;height:300px;right:250px;top:330px"><g class="spin rev" data-teeth="14"></g></svg><svg class="gear" style="width:380px;height:380px;left:-170px;bottom:-120px"><g class="spin" data-teeth="18"></g></svg></div>
 
-<!-- Boot screen: short "system start" text shown once per visit (Skip button closes it). -->
 <div class="boot" id="boot" aria-hidden="true">
   <div class="boot-inner"><svg viewBox="0 0 100 100"><g class="spin fast" data-teeth="12"></g></svg><pre id="bootText"></pre></div>
   <button class="btn ghost skip" id="skip">Skip</button>
 </div>
 
-<!-- Top bar: logo, gears, status readout, gauge and clock. -->
 <header class="bar">
   <div class="sig"><svg viewBox="0 0 100 100"><g class="spin fast" data-teeth="10" data-fill="1"></g></svg>9BITBIN</div>
   <div class="status">
@@ -376,7 +367,6 @@
     </div>
   </div>
 
-  <!-- Side rail: one tab per section (also keys 1-6). -->
   <nav class="rail plate" role="tablist" aria-label="Sections">
     <div class="gauge" aria-hidden="true"><svg viewBox="0 0 150 92"><path class="face" d="M10 80 A65 65 0 0 1 140 80 Z"/><g id="ticks"></g><line class="needle" id="needle" x1="75" y1="80" x2="75" y2="26"/><circle class="hub" cx="75" cy="80" r="6"/></svg><div class="gauge-label led" id="gaugeLabel">MUSIC</div></div>
     <button class="mod" role="tab" data-view="music"><kbd>1</kbd>Music</button>
@@ -388,11 +378,9 @@
     <p class="hint">Press 1–6 to switch.</p>
   </nav>
 
-  <!-- Main panel: one <section> per tab; only the active one is shown. -->
   <main class="panel plate" id="panel">
     <div class="scan"></div>
 
-    <!-- Music section: tape-deck player with animated gears, steam and an LED visualizer. -->
     <section class="view" id="music" role="tabpanel">
       <h2>Music</h2>
       <p class="lede">Baritenor vocals, character-driven songwriting, and ambient pieces for games.</p>
@@ -434,7 +422,6 @@
       <p class="tracks-empty" id="tracksEmpty" hidden>Tracks are on the way. Check back soon.</p>
     </section>
 
-    <!-- Games section: tiles are filled in from MODULES in the script below. -->
     <section class="view" id="games" role="tabpanel" hidden>
       <h2>Games</h2>
       <p class="lede">Browser games I built. All of them run on your phone or computer, no install.</p>
@@ -444,7 +431,6 @@
       <div class="grid" data-list="games"></div>
     </section>
 
-    <!-- Apps section: tiles are filled in from MODULES in the script below. -->
     <section class="view" id="apps" role="tabpanel" hidden>
       <h2>Apps</h2>
       <p class="lede">Social apps for getting people in the same room, online or off.</p>
@@ -452,7 +438,6 @@
       <div class="grid" data-list="apps"></div>
     </section>
 
-    <!-- Tools section: tiles are filled in from MODULES in the script below. -->
     <section class="view" id="tools" role="tabpanel" hidden>
       <h2>IT tools</h2>
       <p class="lede">Small utilities I made to cut repetitive work.</p>
@@ -460,7 +445,6 @@
       <div class="grid" data-list="tools"></div>
     </section>
 
-    <!-- Résumé section. -->
     <section class="view cv" id="resume" role="tabpanel" hidden>
       <h2>Himal Shrestha</h2>
       <p class="lede">IT Support · Long Island, NY · <a href="mailto:coolhimal20@gmail.com">coolhimal20@gmail.com</a></p>
@@ -535,7 +519,6 @@
       </div>
     </section>
 
-    <!-- Contact section: form that sends through Formspree. -->
     <section class="view" id="contact" role="tabpanel" hidden>
       <h2>Contact</h2>
       <p class="lede">Hiring, a project, or just saying hi. Send a message and it lands in my inbox. I usually reply within a day or two.</p>
@@ -567,7 +550,6 @@
     </section>
   </main>
 
-  <!-- Footer: links to other profiles and the copyright year. -->
   <footer class="plate">
     <div class="ft-brand">
       <b>Himal Shrestha</b>
@@ -583,7 +565,6 @@
   </footer>
 </div>
 
-<!-- Page script: tiles, gears, gauge, tab switching, contact form, music player, readouts, clock and boot sequence. -->
 <script>
   // ===== EDIT YOUR LINKS HERE =====
   // pending: true shows a dashed tile for something not live yet.
@@ -617,7 +598,6 @@
   };
 
   // ===== render tiles =====
-  // Build the tile cards for every grid marked with data-list from the MODULES data.
   document.querySelectorAll("[data-list]").forEach(grid => {
     (MODULES[grid.dataset.list] || []).forEach(m => {
       const a = document.createElement(m.pending ? "div" : "a");
@@ -637,7 +617,6 @@
 
 
   // ===== gears =====
-  // Build an SVG path for a gear with the given number of teeth.
   function gearPath(teeth, r = 44, depth = 7) {
     const pts = [], n = teeth * 4;
     for (let i = 0; i < n; i++) {
@@ -646,7 +625,6 @@
     }
     return "M" + pts.join("L") + "Z";
   }
-  // Draw every simple gear marked with data-teeth.
   document.querySelectorAll("[data-teeth]").forEach(g => {
     const t = Number(g.dataset.teeth);
     const svg = g.ownerSVGElement; if (!svg.getAttribute("viewBox")) svg.setAttribute("viewBox", "0 0 100 100");
@@ -658,12 +636,10 @@
   // ===== gauge =====
   const ticksEl = document.getElementById("ticks");
   const angles = [-75, -45, -15, 15, 45, 75];
-  // Draw the gauge tick marks, one per section.
   angles.forEach(a => {
     const r1 = 58, r2 = 48, rad = (a - 90) * Math.PI / 180;
     ticksEl.innerHTML += '<line class="tick" x1="' + (75 + r2*Math.cos(rad)) + '" y1="' + (80 + r2*Math.sin(rad)) + '" x2="' + (75 + r1*Math.cos(rad)) + '" y2="' + (80 + r1*Math.sin(rad)) + '"/>';
   });
-  // Point the gauge needle at the active section and update its label.
   function setGauge(id) {
     const i = Math.max(0, tabs.findIndex(t => t.dataset.view === id));
     document.getElementById("needle").style.transform = "rotate(" + angles[i] + "deg)";
@@ -676,7 +652,6 @@
   const views = [...document.querySelectorAll(".view")];
   const panel = document.getElementById("panel");
 
-  // Show one section (tab), hide the others and optionally update the URL hash.
   function show(id, push) {
     if (!views.some(v => v.id === id)) id = "music";
     views.forEach(v => v.hidden = v.id !== id);
@@ -686,17 +661,14 @@
     if (push) history.replaceState(null, "", "#" + id);
   }
   tabs.forEach(t => t.addEventListener("click", () => show(t.dataset.view, true)));
-  // Links with data-go switch to that section.
   document.querySelectorAll("[data-go]").forEach(a => a.addEventListener("click", e => {
     e.preventDefault(); show(a.dataset.go, true); panel.scrollIntoView({ block: "start" });
   }));
-  // Number keys 1-6 jump to a section.
   document.addEventListener("keydown", e => {
     if (e.target.closest("input, textarea, select") || e.metaKey || e.ctrlKey || e.altKey) return;
     const i = Number(e.key) - 1;
     if (tabs[i]) { show(tabs[i].dataset.view, true); tabs[i].focus(); }
   });
-  // Back/forward buttons: show the section named in the URL hash.
   window.addEventListener("hashchange", () => show(location.hash.slice(1)));
   show(location.hash.slice(1) || "music");
 
@@ -708,9 +680,7 @@
   const form = document.getElementById("contactForm");
   const cfStatus = document.getElementById("cfStatus");
   const cfSend = document.getElementById("cfSend");
-  // Show a status message under the contact form (red when bad is true).
   const say = (msg, bad) => { cfStatus.textContent = msg; cfStatus.classList.toggle("err", !!bad); };
-  // Contact form submit: validate the fields, then send them to Formspree.
   form.addEventListener("submit", async e => {
     e.preventDefault();
     const d = Object.fromEntries(new FormData(form));
@@ -741,13 +711,11 @@
       console.warn("Contact form:", err.message);
     } finally { cfSend.disabled = false; }
   });
-  // Put the current year in the footer.
   document.getElementById("year").textContent = new Date().getFullYear();
 
   // ===== HD gears for the music deck =====
   // Each gear: copper body with lighting, rust grain, spoke cut-outs and a brass hub with bolts.
   // The shine sits outside the turning group so the light stays still while the gear spins.
-  // Build the detailed copper gears for the music deck.
   document.querySelectorAll("[data-hd-gear]").forEach((svg, n) => {
     const t = +svg.dataset.hdGear, u = svg.dataset.id, P = (r, a) => (50 + r * Math.cos(a)).toFixed(2) + "," + (50 + r * Math.sin(a)).toFixed(2);
     const step = Math.PI * 2 / t, pts = [];
@@ -810,14 +778,11 @@
   ];
   const audio = new Audio();
   audio.preload = "metadata";
-  // Shortcut for document.getElementById (music player).
   const $p = id => document.getElementById(id);
   const list = $p("trackList"), playBtn = $p("pPlay"), seek = $p("pSeek"), vol = $p("pVol");
-  // Format seconds as m:ss.
   const fmtT = s => isFinite(s) ? Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0") : "0:00";
   let cur = -1, actx = null, analyser = null, freq = null, wave = null;
 
-  // Add one row to the track list for each song (and read its length).
   TRACKS.forEach((t, i) => {
     const li = document.createElement("li");
     li.innerHTML = '<button class="trk"><span class="n">' + String(i + 1).padStart(2, "0") + '</span><span><b></b><small></small></span><span class="len">--:--</span></button>';
@@ -831,7 +796,6 @@
   $p("tracksEmpty").hidden = TRACKS.length > 0;
   [playBtn, $p("pPrev"), $p("pNext")].forEach(b => b.disabled = !TRACKS.length);
 
-  // Create the Web Audio analyser the first time a song plays (it drives the visuals).
   function setupAudio() {          // Web Audio lets the visuals "hear" the song
     if (actx) return;
     try {
@@ -842,7 +806,6 @@
       freq = new Uint8Array(analyser.frequencyBinCount); wave = new Uint8Array(analyser.fftSize);
     } catch (e) { actx = null; }
   }
-  // Load track i (wrapping around the list) and optionally start playing.
   function load(i, play) {
     cur = (i + TRACKS.length) % TRACKS.length;
     audio.src = TRACKS[cur].src;
@@ -850,13 +813,11 @@
     [...list.querySelectorAll(".trk")].forEach((b, k) => b.classList.toggle("on", k === cur));
     if (play) start();
   }
-  // Play the current track, or the first one if none is loaded.
   function start() {
     if (cur < 0) return load(0, true);
     setupAudio(); if (actx && actx.state === "suspended") actx.resume();
     audio.play().catch(() => {});
   }
-  // Play/pause toggle.
   function toggle() { audio.paused ? start() : audio.pause(); }
   playBtn.onclick = toggle;
   $p("pNext").onclick = () => load(cur + 1, true);
@@ -869,7 +830,6 @@
   };
   const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 4.8v14.4a.8.8 0 0 0 1.2.7l11.4-7.2a.8.8 0 0 0 0-1.4L8.7 4.1a.8.8 0 0 0-1.2.7z"/></svg>';
   const ICON_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="4.5" width="4.6" height="15" rx="1"/><rect x="13.9" y="4.5" width="4.6" height="15" rx="1"/></svg>';
-  // Switch the play button icon and deck state between playing and paused.
   const syncBtn = () => {
     const on = !audio.paused;
     playBtn.innerHTML = on ? ICON_PAUSE : ICON_PLAY; playBtn.classList.toggle("on", on);
@@ -890,7 +850,6 @@
   const cv = $p("viz"), g1 = $p("dg1"), g2 = $p("dg2"), needle = $p("vuNeedle"), screen = cv.parentElement;
   const sc = $p("steam"), deck = $p("deck"), puffs = [];
   let steamAcc = 0;
-  // Find where steam should come out: the top of each gear (or the screen corners on phones).
   function steamVents() {     // where steam comes out: the top of each gear (or the screen corners on phones)
     const d = deck.getBoundingClientRect(), out = [];
     document.querySelectorAll(".dgear").forEach(el => {
@@ -900,19 +859,16 @@
     if (!out.length) { const r = screen.getBoundingClientRect(); out.push({ x: r.left - d.left + 16, y: r.top - d.top + 110, s: .6 }, { x: r.right - d.left - 16, y: r.top - d.top + 110, s: .6 }); }
     return out;
   }
-  // Add one puff of steam at a vent.
   function puff(v, power) {
     puffs.push({ x: v.x + (Math.random() - .5) * 14 * v.s, y: v.y, vx: (Math.random() - .5) * 18, vy: -(28 + Math.random() * 30) * (0.7 + power),
       r: (8 + Math.random() * 8) * v.s, gr: (26 + Math.random() * 22) * v.s, life: 0, max: 2.4 + Math.random() * 1.8, a: .3 + Math.random() * .22, rot: Math.random() * 6 });
   }
-  // Big burst of steam when a song starts.
   function steamBurst() {     // the big whoosh when a song starts
     if (calm) return;
     steamVents().forEach(v => { for (let k = 0; k < 16; k++) puff(v, 1.2); });
   }
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let a1 = 0, spin = 0, lvl = 0, last = performance.now();
-  // Animation loop: spin gears, move the VU needle, draw steam and the LED wave.
   function frame(now) {
     const dt = Math.min(.05, (now - last) / 1000); last = now;
     const playing = !audio.paused;
@@ -988,7 +944,6 @@
   ];
   const intEl = document.getElementById("interest");
   let intI = 0;
-  // Show the current interest in the readout with its animation.
   const showInterest = () => {
     const it = INTERESTS[intI];
     intEl.className = "led interest " + it.cls;
@@ -1003,7 +958,6 @@
 
   // ===== clock =====
   const clock = document.getElementById("clock");
-  // Update the top-bar clock.
   const tick = () => clock.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   tick(); setInterval(tick, 15000);
 
@@ -1013,7 +967,6 @@
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let seen = false;
   try { seen = sessionStorage.getItem("booted") === "1"; } catch (e) {}
-  // Hide the boot screen and remember it was seen this visit.
   const finish = () => { boot.classList.add("done"); try { sessionStorage.setItem("booted", "1"); } catch (e) {} };
   document.getElementById("skip").addEventListener("click", finish);
 
@@ -1022,7 +975,6 @@
   } else {
     const lines = ["PRESSURE ........ NOMINAL", "GEARS ........... ENGAGED", "MODULES ......... 6 ONLINE", "", "<b>HIMAL SHRESTHA</b>"];
     let i = 0;
-    // Type the next boot line, then close the boot screen after the last one.
     const step = () => {
       if (i >= lines.length) { setTimeout(finish, 650); return; }
       out.innerHTML += lines[i++] + "\n";

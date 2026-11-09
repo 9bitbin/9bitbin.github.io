@@ -1,16 +1,10 @@
 <!doctype html>
-<!--
-  File: Larry-the-Cat-v3.5.1.html
-  Author: Himal Shrestha
-  Description: Larry the Cat (v3.5.1): single-file first-person horror game (Three.js) set in an apartment building, with a stalking cat AI, items, puzzles, VHS tapes, cutscenes and procedural audio.
--->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Larry the Cat</title>
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=VT323&family=Caveat:wght@500&display=swap" rel="stylesheet">
-<!-- Page styles: VHS-night horror look, HUD, menus, panels, overlays and cutscenes. -->
 <style>
 /* Single dark look: VHS-night horror. Layout: full-screen game canvas with stacked overlays. */
 :root{color-scheme:dark;--bg:#030202;--ink:#d9cfb8;--dim:#8a7f68;--red:#c3261b;--amber:#e8b64a;--paper:#e9e1cb;--paperInk:#2a2420;
@@ -217,26 +211,20 @@ canvas{display:block}
 </style>
 
 </head>
-<!-- Page body: game canvas, HUD, overlays, menu, cutscene layer and settings/pause panels. -->
 <body>
 <canvas id="gl"></canvas>
 <canvas id="grain" width="240" height="135"></canvas>
 <div id="vig"></div><div id="redvig"></div><div id="white"></div>
 
-<!-- In-game HUD: objective, crosshair, prompts, subtitles, stamina, tools and flashlight battery. -->
 <div id="hud" class="layer">
   <div id="obj"></div><div id="dot"></div><div id="prompt"></div><div id="msg"></div><div id="subs"></div><div id="ach"></div>
   <div id="stam"><div id="stamF"></div></div><div id="wind"><div id="windF"></div></div>
   <div id="handHint"></div><div id="tools"></div><div id="flashHud"><img id="batIcon" alt=""><div id="batTxt"></div></div><div id="inv"></div><div id="slits"></div>
 </div>
-<!-- Photo developing preview. -->
 <div id="photo"><canvas id="photoCv" width="320" height="240"></canvas><span id="photoCap"></span></div>
-<!-- Vignette (cinematic bars and caption). -->
 <div id="vg" class="layer"><div class="bar top"></div><div class="bar bot"></div><div id="vgCap"></div><div class="skip">hold SPACE to skip <div class="skipRing" id="vgRing"></div></div></div>
-<!-- Security camera monitor view. -->
 <div id="mon" class="layer"><div class="scan"></div><div class="bezel"></div><div class="lbl" id="monLbl">CAM 07 — BACK ROOMS</div><div class="rec">● REC</div><div class="ts" id="monTs">03:31:07</div><div class="help" id="monHelp"></div></div>
 
-<!-- Main menu. -->
 <div id="menu" class="layer">
   <canvas id="menuCv"></canvas>
   <div id="menuUI">
@@ -253,10 +241,8 @@ canvas{display:block}
   <div id="hint">Headphones. Lights off. Don't look at him for too long.</div>
 </div>
 
-<!-- Cutscene layer. -->
 <div id="cs" class="layer"><canvas id="csCv"></canvas><div id="cap"></div><div class="skip">hold SPACE to skip <div class="skipRing" id="skipRing"></div></div></div>
 
-<!-- Settings panel. -->
 <div id="settingsP" class="panel"><div class="box">
   <h2>SETTINGS</h2>
   <h4 class="sec">LARRY</h4>
@@ -282,7 +268,6 @@ canvas{display:block}
   <button class="btn" id="setBack">Back</button>
 </div></div>
 
-<!-- Controls panel. -->
 <div id="controlsP" class="panel"><div class="box">
   <h2>CONTROLS</h2>
   <div class="keys">
@@ -294,7 +279,6 @@ canvas{display:block}
   <button class="btn" id="ctlBack">Back</button>
 </div></div>
 
-<!-- Pause panel. -->
 <div id="pauseP" class="panel"><div class="box">
   <h2>PAUSED</h2>
   <button class="mi" data-p="resume">Resume</button>
@@ -305,9 +289,7 @@ canvas{display:block}
   <button class="mi" data-p="menu">Quit to menu</button>
 </div></div>
 
-<!-- Paper/note reading overlay. -->
 <div id="paperOv" class="ov"><div class="paper" id="paper"></div></div>
-<!-- Breaker box overlay (choose which circuits get power). -->
 <div id="breakerOv" class="ov"><div class="panelUI">
   <h3>MAIN BREAKER — HAWTHORNE CT.</h3><p id="brkNote">Load limit: 3 circuits. Pick what stays live.</p>
   <div id="circs"></div><div class="cap" id="brkCap"></div>
@@ -353,17 +335,13 @@ const MAPS=[["########################################", "#;;;;;;#H...#::::#....
 
 'use strict';
 if(!window.THREE){document.getElementById('err').style.display='flex';document.getElementById('err').textContent='Could not load the 3D engine. Check your connection and reload.';}
-// Shortcut for document.getElementById.
 const $=id=>document.getElementById(id);
-// Math helpers: clamp, lerp, random range and random pick.
 const clamp=(v,a,b)=>v<a?a:v>b?b:v, lerp=(a,b,t)=>a+(b-a)*t, rnd=(a,b)=>a+Math.random()*(b-a), pick=a=>a[Math.floor(Math.random()*a.length)];
-// Small seeded random generator.
 let seed=1313;const srand=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
 
 /* ================= SETTINGS ================= */
 const S={face:'wide',fried:'match',master:.85,music:.55,intensity:.6,dissonance:.45,pitch:0,mode:'dynamic',amb:.7,sfx:.9,voice:.9,sens:1,bright:1,res:.75,grain:'1',invert:'0'};
 try{Object.assign(S,JSON.parse(localStorage.getItem('larry_settings')||'{}'));}catch(e){}
-// Save settings to this device.
 function saveS(){try{localStorage.setItem('larry_settings',JSON.stringify(S));}catch(e){}}
 document.querySelectorAll('[data-s]').forEach(el=>{
   const k=el.dataset.s; el.value=S[k];
@@ -387,22 +365,16 @@ const FACE_IDS=['wide','stare','grin','classic'];
 const FRIEDS={classic:[imFried,IMG_FRIED],wide:[imFriedWide,IMG_FRIEDWIDE],stare:[imFriedStare,IMG_FRIEDSTARE],grin:[imFriedGrin,IMG_FRIEDGRIN]};
 let cutFace=null,faceCard=null,activeFace='wide',runFace=null,friedPick='wide';
 const faceDeps=[];
-// Pick Larry's face image for this run (fixed or random).
 function pickFace(){return S.face==='random'?(runFace||(runFace=pick(FACE_IDS))):(FACES[S.face]?S.face:'wide');}
-// Pick the "fried" death-screen image.
 function rollFried(){const f=S.fried;friedPick=f==='match'?activeFace:f==='random'?pick(FACE_IDS):(FRIEDS[f]?f:activeFace);
   if(typeof TEX!=='undefined'&&TEX.friedT){TEX.friedT.image=friedImg();TEX.friedT.needsUpdate=true;}}
-// The fried image and its source URL.
 const friedImg=()=>FRIEDS[friedPick][0], friedSrc=()=>FRIEDS[friedPick][1];
-// Draw an image covering a canvas (like CSS cover).
 function drawCover(c,img,w,h){const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;if(!iw)return;const s=Math.max(w/iw,h/ih);c.drawImage(img,(w-iw*s)/2,(h-ih*s)/2,iw*s,ih*s);}
-// Apply the chosen face and refresh the textures that use it.
 function applyFace(){
   activeFace=pickFace();makeCutout();rollFried();
   if(typeof TEX!=='undefined'&&TEX.cutT){TEX.cutT.image=cutFace;TEX.cutT.needsUpdate=true;TEX.faceT.image=faceCard;TEX.faceT.needsUpdate=true;
     if(typeof repositionEyes==='function')repositionEyes();faceDeps.forEach(f=>f());}
 }
-// Draw the face previews in settings.
 function drawFacePreview(){
   const a=$('facePrev'),b=$('friedPrev');if(!a||!cutFace)return;const x=a.getContext('2d');x.fillStyle='#050403';x.fillRect(0,0,a.width,a.height);
   const g=x.createRadialGradient(a.width/2,a.height*.4,10,a.width/2,a.height/2,a.width);g.addColorStop(0,'#2a2018');g.addColorStop(1,'#050403');x.fillStyle=g;x.fillRect(0,0,a.width,a.height);
@@ -415,12 +387,10 @@ function drawFacePreview(){
 }
 /* transparent cut-out for any face id, cached (used for the creepy cutscene shots) */
 const cutCache={};
-// Get (and cache) the cut-out version of a face.
 function cutOf(id){if(cutCache[id])return cutCache[id];const F=FACES[id];const c=document.createElement('canvas');c.width=420;c.height=511;const x=c.getContext('2d');x.drawImage(F.img,0,0,420,511);
   x.globalCompositeOperation='destination-in';const g=x.createLinearGradient(0,0,0,511);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(.84,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,420,511);return cutCache[id]=c;}
 /* creepy shots: always a clean cut-out on black — the chosen face, or wide eyes if you picked the classic photo */
 const creepyCut=()=>cutOf(FACES[activeFace].mask?'wide':activeFace);
-// Cut the face out of its photo for use on Larry.
 function makeCutout(){
   const F=FACES[activeFace];
   const c=document.createElement('canvas');c.width=420;c.height=511;const x=c.getContext('2d');
@@ -446,7 +416,6 @@ let EYES=FACES.classic.eyes;
 
 /* ================= AUDIO ================= */
 let ac=null,master,musicBus,sfxBus,ambBus,voiceBus,revIn,noiseBuf;
-// Create the audio graph (master, music, sfx, reverb) on first use.
 function initAudio(){
   if(ac)return;ac=new (window.AudioContext||window.webkitAudioContext)();
   master=ac.createGain();master.connect(ac.destination);
@@ -459,29 +428,22 @@ function initAudio(){
   noiseBuf=ac.createBuffer(1,ac.sampleRate*3,ac.sampleRate);const nd=noiseBuf.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
   applySettings();initMusic();initAmbience();
 }
-// Apply volume and other settings.
 function applySettings(){
   if(ac){const t=ac.currentTime;master.gain.setTargetAtTime(S.master,t,.05);sfxBus.gain.setTargetAtTime(S.sfx,t,.05);ambBus.gain.setTargetAtTime(S.amb,t,.05);voiceBus.gain.setTargetAtTime(S.voice,t,.05);
     musicBus.gain.setTargetAtTime(S.mode==='off'?0:S.music,t,.1);}
   $('grain').style.display=S.grain==='1'?'block':'none';
   if(typeof renderer!=='undefined'&&renderer){renderer.toneMappingExposure=S.bright;resize();}
 }
-// White-noise source.
 function noiseSrc(loop=true){const s=ac.createBufferSource();s.buffer=noiseBuf;s.loop=loop;s.loopStart=Math.random();return s;}
-// Distortion curve.
 function shaper(amount){const n=1024,c=new Float32Array(n);for(let i=0;i<n;i++){const x=i/n*2-1;c[i]=(1+amount)*x/(1+amount*Math.abs(x));}const w=ac.createWaveShaper();w.curve=c;w.oversample='2x';return w;}
-// 3D (HRTF) panner for positional sound.
 function panner(pos){const p=ac.createPanner();p.panningModel='HRTF';p.distanceModel='inverse';p.refDistance=2.2;p.maxDistance=80;p.rolloffFactor=1.15;if(pos)setPan(p,pos);return p;}
-// Move a panner to a position.
 function setPan(p,v){if(p.positionX){p.positionX.value=v.x;p.positionY.value=v.y;p.positionZ.value=v.z;}else p.setPosition(v.x,v.y,v.z);}
-// Route a sound to the output with position, reverb and muffling.
 function out(node,pos,rev=.35,muffle=false,bus){
   let n=node;
   if(muffle){const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=600;n.connect(lp);n=lp;}
   if(pos){const p=panner(pos);n.connect(p);n=p;}
   n.connect(bus||sfxBus);if(rev){const g=ac.createGain();g.gain.value=rev;n.connect(g);g.connect(revIn);}
 }
-// Attack/decay volume envelope.
 function env(g,t,a,peak,d){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(peak,0.0002),t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+d);}
 
 const SFX={
@@ -559,7 +521,6 @@ const SFX={
 
 /* ---- babble voice (for intercom, voicemail, people) ---- */
 const VOICE={ada:{f:205,rad:true},delgado:{f:118,rad:false},gerald:{f:102,rad:true},mgmt:{f:150,rad:true,mono:true},mari:{f:220,rad:true},walt:{f:110,rad:true}};
-// Gibberish voice "babble" for a character (or Larry's purr).
 function babble(who,secs,purr=false){
   if(!ac)return;const v=VOICE[who]||{f:150};const t0=ac.currentTime+.05;const n=Math.max(2,Math.floor(secs*4.2));
   const out2=ac.createGain();out2.gain.value=.5;let tail=out2;
@@ -599,7 +560,6 @@ function makePurr(distort,flat){
 /* ---- Music engine ---- */
 const MUS={tension:0,chase:0,chaseT:0,mbox:null,silent:false};
 let musNodes=null;
-// Set up the background music nodes.
 function initMusic(){
   const out=ac.createGain();out.connect(musicBus);const r=ac.createGain();r.gain.value=.55;out.connect(r);r.connect(revIn);
   const droneLP=ac.createBiquadFilter();droneLP.type='lowpass';droneLP.frequency.value=280;droneLP.Q.value=4;const droneG=ac.createGain();droneG.gain.value=0;droneLP.connect(droneG);droneG.connect(out);
@@ -617,7 +577,6 @@ function initMusic(){
   musNodes={droneG,d1,d2,d3,d4,padG,p1,p2,p3,tg,tenG,t1,t2,chG,c1,c2,out,nextPulse:0,nextBox:0};
   setInterval(musicTick,50);
 }
-// Update the music for the current tension.
 function musicTick(){
   if(!ac||!musNodes)return;const n=musNodes,t=ac.currentTime;
   const base=55*Math.pow(2,S.pitch/12),dis=S.dissonance,mode=S.mode;
@@ -639,7 +598,6 @@ function musicTick(){
   if(MUS.mbox&&t>n.nextBox){const m=MUS.mbox;const note=m.seq[m.i%m.seq.length];m.i++;n.nextBox=t+m.step*(m.slow||1);
     if(note!=null)musicBoxNote(note,m.detune||0,m.vol||.12,t+.02,m.pos,m.bus);}
 }
-// Play one music-box note.
 function musicBoxNote(semi,detune,vol,t,pos,bus){
   const f=523.25*Math.pow(2,(semi+S.pitch)/12)*(1+(Math.random()-.5)*detune*.06);
   [1,2.01,3.98].forEach((h,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f*h;if(detune>.3){o.frequency.setValueAtTime(f*h,t);o.frequency.linearRampToValueAtTime(f*h*(1-detune*.05),t+1.4);}
@@ -649,7 +607,6 @@ const HAPPY=[0,4,7,4,5,9,7,null,4,5,7,12,11,7,9,null,7,4,5,2,4,0,2,null,0,4,7,9,
 
 /* ---- ambience ---- */
 let amb=null;
-// Start the building ambience (room tone, hum and static).
 function initAmbience(){
   const tone=noiseSrc(true),lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=180;const tg=ac.createGain();tg.gain.value=.12;tone.connect(lp);lp.connect(tg);tg.connect(ambBus);tone.start();
   const hum=ac.createOscillator();hum.type='sawtooth';hum.frequency.value=120;const hbp=ac.createBiquadFilter();hbp.type='bandpass';hbp.frequency.value=240;hbp.Q.value=6;const hg=ac.createGain();hg.gain.value=0;hum.connect(hbp);hbp.connect(hg);hg.connect(ambBus);hum.start();
@@ -657,53 +614,36 @@ function initAmbience(){
   const dr=ac.createOscillator();dr.type='sawtooth';dr.frequency.value=72;const dbp=ac.createBiquadFilter();dbp.type='bandpass';dbp.frequency.value=180;const dg=ac.createGain();dg.gain.value=0;const dl=ac.createOscillator(),dlg=ac.createGain();dl.frequency.value=11;dlg.gain.value=.5;dl.connect(dlg);dr.connect(dbp);dbp.connect(dg);dg.connect(ambBus);dr.start();dl.start();
   amb={tg,hg,sg,dg};
 }
-// Set the ambience mix for the current room.
 function ambSet(room,hum,stat,dryer=0){if(!amb)return;const t=ac.currentTime;amb.tg.gain.setTargetAtTime(room,t,.5);amb.hg.gain.setTargetAtTime(hum,t,.2);amb.sg.gain.setTargetAtTime(stat,t,.2);amb.dg.gain.setTargetAtTime(dryer,t,.3);}
 
 /* ================= WORLD ================= */
 let renderer,scene,camera,secCam;
 const CELL=2,CEIL=3,FH=3.6,MW=40,MH=26;
-// Height of a floor's base.
 const base=f=>f*FH;
-// Map character at a cell ("#" outside the map).
 const ch=(f,x,y)=>(x<0||y<0||x>=MW||y>=MH)?'#':MAPS[f][y][x];
 const DOORCH='LKSEOGRX';
 const FLOORCH='.,:;_=~g|n^';
 const doors={};
-// Key for a door at a cell.
 const dkey=(f,x,y)=>f+','+x+','+y;
-// Is the door at this cell open?
 function doorOpen(f,x,y){const d=doors[dkey(f,x,y)];return d?d.open:false;}
-// Is this cell solid (wall or closed door)?
 function solid(f,x,y,larry){const c=ch(f,x,y);if(c==='#'||c==='H')return true;if(c==='^')return !larry;if(DOORCH.includes(c))return !doorOpen(f,x,y);return false;}
-// Is this map character a floor?
 const isFloorC=c=>FLOORCH.includes(c);
 const ZONE={'.':'back',',':'apt',':':'conc',';':'office','_':'lobby','=':'hall2','~':'nest','g':'lair','|':'elev','^':'conc','n':'nest'};
-// Which zone a cell belongs to.
 function zoneAt(f,x,y){const c=ch(f,x,y);if(isFloorC(c))return ZONE[c];
   for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){const n=ch(f,x+dx,y+dy);if(isFloorC(n))return ZONE[n];}return 'conc';}
-// World x/z of a cell's center.
 const cx=x=>(x+.5)*CELL, cz=y=>(y+.5)*CELL;
-// Cell that a world position is in.
 const cellOf=v=>[Math.floor(v.x/CELL),Math.floor(v.z/CELL)];
-// World position of a cell on a floor.
 const wp=(f,x,y,h=0)=>new THREE.Vector3(cx(x),base(f)+h,cz(y));
 const DIRS={n:[0,-1],s:[0,1],e:[1,0],w:[-1,0]};
-// Position on a wall face of a cell.
 function wallSpot(f,x,y,side,h,off=.03){const [dx,dy]=DIRS[side];const p=new THREE.Vector3(cx(x)+dx*(CELL/2-off),base(f)+h,cz(y)+dy*(CELL/2-off));return {p,ry:Math.atan2(-dx,-dy)};}
 
 /* ---- textures ---- */
 function ctex(w,h,fn,rep=[1,1]){const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1]);t.anisotropy=4;t.encoding=THREE.sRGBEncoding;t.userData={canvas:c};return t;}
-// Canvas texture that redraws when the face changes.
 function ctexLive(w,h,fn){const t=ctex(w,h,fn);faceDeps.push(()=>{const c=t.userData.canvas,x=c.getContext('2d');x.clearRect(0,0,w,h);x.globalAlpha=1;fn(x,w,h);t.needsUpdate=true;});return t;}
-// Paint random speckles on a texture.
 function speckle(x,w,h,n,cols,a=[.05,.2],sz=[1,3]){for(let i=0;i<n;i++){x.fillStyle=cols[i%cols.length];x.globalAlpha=rnd(a[0],a[1]);const s=rnd(sz[0],sz[1]);x.fillRect(Math.random()*w,Math.random()*h,s,s);}x.globalAlpha=1;}
-// Paint stains on a texture.
 function stains(x,w,h,n,col){for(let i=0;i<n;i++){const r=rnd(10,60),px=Math.random()*w,py=Math.random()*h;const g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,col);g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(px-r,py-r,r*2,r*2);}}
-// Texture with text lines on it.
 function textTex(w,h,bg,lines,opt={}){return ctex(w,h,(x)=>{if(bg){x.fillStyle=bg;x.fillRect(0,0,w,h);}x.textAlign=opt.align||'center';lines.forEach(l=>{x.fillStyle=l.c||'#000';x.font=l.f;x.fillText(l.t,l.x??w/2,l.y);});if(opt.after)opt.after(x,w,h);});}
 let TEX={};
-// Build all the procedural textures (walls, floors, posters, signs ...).
 function buildTextures(){
   TEX.backWall=ctex(256,256,(x,w,h)=>{x.fillStyle='#b9a65f';x.fillRect(0,0,w,h);for(let i=0;i<w;i+=16){x.fillStyle=i%32?'rgba(120,100,40,.16)':'rgba(255,240,170,.08)';x.fillRect(i,0,7,h);}
     for(let y=8;y<h;y+=32)for(let i=8;i<w;i+=32){x.fillStyle='rgba(110,90,30,.18)';x.beginPath();x.arc(i,y,3,0,7);x.fill();}stains(x,w,h,6,'rgba(90,70,20,.25)');speckle(x,w,h,900,['#6b5a28','#d8c98c']);x.fillStyle='rgba(60,45,15,.45)';x.fillRect(0,h-14,w,14);});
@@ -759,7 +699,6 @@ function buildTextures(){
     x.fillStyle='#222';x.font='20px monospace';x.fillText('PROPERTY OF LARRY — DO NOT FEED',w/2,138);if(cutFace){x.drawImage(cutFace,6,24,90,110);x.drawImage(cutFace,w-96,24,90,110);}});
   TEX.lease=ctex(64,80,(x,w,h)=>{x.fillStyle='#ece4cf';x.fillRect(0,0,w,h);x.fillStyle='#555';for(let i=0;i<10;i++)x.fillRect(8,10+i*6,rnd(30,48),2);x.fillStyle='#a22';x.fillRect(8,70,30,3);});
 }
-// Draw the view outside a window (sometimes with Larry).
 function drawWindowView(x,w,h,larry){
   const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#0b1020');g.addColorStop(1,'#020305');x.fillStyle=g;x.fillRect(0,0,w,h);
   x.fillStyle='#14161a';x.fillRect(10,20,w-20,h);
@@ -768,7 +707,6 @@ function drawWindowView(x,w,h,larry){
     if(larry&&r===1&&c===3){x.fillStyle='#000';x.fillRect(wx-1,wy-1,26,28);x.drawImage(creepyCut(),40,40,340,420,wx,wy,24,26);x.fillStyle='rgba(220,240,90,.95)';x.fillRect(wx+5,wy+8,3,3);x.fillRect(wx+15,wy+7,3,3);}}
   x.strokeStyle='#2a2a26';x.lineWidth=8;x.strokeRect(0,0,w,h);x.lineWidth=5;x.beginPath();x.moveTo(w/2,0);x.lineTo(w/2,h);x.moveTo(0,h/2);x.lineTo(w,h/2);x.stroke();
 }
-// Missing-cat poster texture.
 function posterTex(name,unit,since,big){
   return ctexLive(192,256,(x,w,h)=>{x.fillStyle='#ece6d4';x.fillRect(0,0,w,h);x.fillStyle='#b01a10';x.font='bold 34px Arial';x.textAlign='center';x.fillText('MISSING',w/2,40);
     x.fillStyle='#2a2a2a';x.fillRect(26,54,140,110);x.fillStyle='#55504a';x.fillRect(26,54,140,110);
@@ -776,31 +714,24 @@ function posterTex(name,unit,since,big){
     x.fillStyle='#1a1614';x.beginPath();x.arc(86,96,18,0,7);x.fill();x.fillRect(64,114,44,50);
     x.fillStyle='#111';x.font='bold 17px Arial';x.fillText(name,w/2,190);x.font='14px Arial';x.fillText(unit,w/2,210);x.fillText('Last seen '+since,w/2,230);speckle(x,w,h,300,['#887','#ccb']);stains(x,w,h,2,'rgba(120,90,40,.3)');});
 }
-// Corkboard texture with notes.
 function corkTex(notes){
   return ctex(256,192,(x,w,h)=>{x.fillStyle='#8a5a34';x.fillRect(0,0,w,h);speckle(x,w,h,600,['#5a3a20','#b0805a'],[.2,.5]);x.strokeStyle='#4a2e18';x.lineWidth=8;x.strokeRect(0,0,w,h);
     notes.forEach((n,i)=>{x.save();x.translate(46+i*82,96+((i%2)?14:-10));x.rotate((i-1)*.08);x.fillStyle=n.c||'#f3eaa0';x.fillRect(-36,-46,72,92);x.fillStyle=n.ink||'#2a2a3a';x.font='15px "Special Elite",monospace';x.textAlign='center';
       n.t.split('\n').forEach((l,j)=>x.fillText(l,0,-16+j*18));x.fillStyle='#c22';x.beginPath();x.arc(0,-40,4,0,7);x.fill();x.restore();});});
 }
-// TV texture showing one code digit.
 function tvCodeTex(pos,digit){return ctex(128,96,(x,w,h)=>{x.fillStyle='#04060a';x.fillRect(0,0,w,h);x.fillStyle='#e8f0ff';x.font='bold 54px monospace';x.textAlign='center';x.fillText(String(digit),w/2,58);
   x.font='bold 22px monospace';const s=[0,1,2,3].map(i=>i===pos?'#':'_').join(' ');x.fillText(s,w/2,86);});}
 
 /* ---- level geometry ---- */
 const fixtures=[],tvs=[],items=[],props=[],propBoxes=[],lockers=[],decor={};
 let MAT={},lightPool=[],flashlight,fillLight,ambientL,larryMesh,larryEyes=[],phantom,monitorScreen;
-// Materials for a zone.
 function matsFor(z){
   return {back:[TEX.backWall,TEX.backFloor,TEX.tiles],apt:[TEX.aptWall,TEX.wood,TEX.plain],conc:[TEX.conc,TEX.concFloor,TEX.concFloor],office:[TEX.office,TEX.officeFloor,TEX.tiles],
     lobby:[TEX.lobbyWall,TEX.lobbyFloor,TEX.plain],hall2:[TEX.hall2Wall,TEX.hall2Floor,TEX.plain],nest:[TEX.nestWall,TEX.nestFloor,TEX.concFloor],lair:[TEX.lairWall,TEX.lairFloor,TEX.lairFloor],elev:[TEX.elev,TEX.concFloor,TEX.elev]}[z];
 }
-// Build one floor's walls, floors and ceilings as merged geometry.
 function buildFloor(f){
-  // Geometry buckets per material.
   const geo={};const get=k=>geo[k]||(geo[k]={p:[],n:[],u:[]});const B=base(f);
-  // Add a quad to a bucket.
   const quad=(k,a,b,c,d,nrm,uw,vh)=>{const g=get(k);g.p.push(...a,...b,...c,...a,...c,...d);for(let i=0;i<6;i++)g.n.push(...nrm);g.u.push(0,0,uw,0,uw,vh,0,0,uw,vh,0,vh);};
-  // Does this character count as floor for building?
   const fl=c=>isFloorC(c)||'LKSEOGR'.includes(c);
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
     const c=ch(f,x,y);if(!fl(c))continue;const z=zoneAt(f,x,y);
@@ -835,12 +766,9 @@ function buildFloor(f){
     doors[dkey(f,x,y)]=d;
   }
 }
-// Add a box to the scene.
 function addBox(f,x,y,z,w,h,d,col,tex,noCol){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial(tex?{map:tex}:{color:col}));m.position.set(x,base(f)+y,z);scene.add(m);props.push(m);
   if(!noCol&&y-h/2<.5)propBoxes.push({f,minx:x-w/2,maxx:x+w/2,minz:z-d/2,maxz:z+d/2});return m;}
-// Add a plane on a wall.
 function wallPlane(f,x,y,side,h,w,hh,mat,off){const s=wallSpot(f,x,y,side,h,off);const m=new THREE.Mesh(new THREE.PlaneGeometry(w,hh),mat);m.position.copy(s.p);m.rotation.y=s.ry;scene.add(m);return m;}
-// Add a TV (optionally on, showing a code digit).
 function addTV(f,x,y,side,on,code){
   const [dx,dy]=DIRS[side]; // side = wall the TV stands against
   const fx=-dx,fz=-dy; // facing into room
@@ -851,7 +779,6 @@ function addTV(f,x,y,side,on,code){
   const scr=new THREE.Mesh(new THREE.PlaneGeometry(.68,.5),MAT.tvOff);scr.position.set(px+fx*.28,B+1.02,pz+fz*.28);scr.rotation.y=ry;scene.add(scr);
   const t={scr,f,x:px+fx*.5,z:pz+fz*.5,startOn:!!on,mode:'off',code:code??null,cell:[x,y]};tvs.push(t);return t;
 }
-// Build the decorations for both floors.
 function buildDecor(){
   // ---------- FLOOR 1 ----------
   decor.win1=wallPlane(0,21,15,'n',1.65,1.5,1.1,new THREE.MeshBasicMaterial({map:TEX.windowNight,fog:false}));
@@ -954,7 +881,6 @@ function buildDecor(){
   addTV(1,27,6,'e',0); addTV(1,38,20,'e',0); addTV(1,10,20,'w',0); addTV(1,1,8,'w',0);
   decor.vhsTV1=addTV(0,7,10,'e',0); decor.vhsTV2=tvs.find(t=>t.f===1&&t.cell[0]===10&&t.cell[1]===20);
 }
-// Build the light fixtures.
 function buildFixtures(){
   const emerg=new Set(['0:3,15','0:15,15','0:24,15','0:15,18','0:30,21','0:35,9','0:6,18','0:35,3','0:21,9','1:3,15','1:15,15','1:27,15','1:33,9','1:30,12','1:3,9']);
   const dead=new Set(['0:12,6','0:21,3','0:6,15','0:18,21','1:6,6','1:24,15','1:33,21']);
@@ -969,7 +895,6 @@ function buildFixtures(){
     fx.mesh=new THREE.Mesh(new THREE.BoxGeometry(.6,.04,.6),MAT.fixOff);fx.mesh.position.set(fx.x,base(f)+CEIL-.03,fx.z);scene.add(fx.mesh);fixtures.push(fx);});
   for(const t of tvs)fixtures.push({tv:t,f:t.f,x:t.x,z:t.z,cur:0,mode:'tv',base:1});
 }
-// Build the hiding lockers.
 function buildLockers(){
   for(let f=0;f<2;f++)for(let y=0;y<MH;y++)for(let x=0;x<MW;x++)if(ch(f,x,y)==='H'){
     for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){if(isFloorC(ch(f,x+dx,y+dy))){
@@ -978,10 +903,8 @@ function buildLockers(){
 
 /* ---- items ---- */
 const ITEM_LABEL={flashlight:'flashlight',musicbox:'music box',fuse:'fuse',camera:'polaroid camera',film:'film pack',tuna:'tuna cans',wheel:'valve wheel',laser:'laser pointer',keyring:"Gerald's keyring",collar:'leather collar',bottle:'bottle'};
-// Build the 3D model for an item type.
 function makeItemMesh(kind){
   let m;const col={flashlight:0x30302c,musicbox:0x7a4a2a,fuse:0xc9a43a,camera:0x2a2a2a,film:0xddddcc,tuna:0xb8b8c0,wheel:0x2a50c8,laser:0xc02020,keyring:0xc9a43a,collar:0x6a3a1a,bottle:0x2f6a3a}[kind];
-  // Lambert material helper.
   const lm=c=>new THREE.MeshLambertMaterial({color:c,emissive:0x0c0905});
   if(kind==='bottle')m=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,.32,8),new THREE.MeshLambertMaterial({color:col,emissive:0x081208}));
   else if(kind==='flashlight'||kind==='laser'){m=new THREE.Mesh(new THREE.CylinderGeometry(.04,.06,kind==='laser'?.16:.3,8),lm(col));m.rotation.z=Math.PI/2;}
@@ -995,14 +918,12 @@ function makeItemMesh(kind){
   else m=new THREE.Mesh(new THREE.BoxGeometry(.12,.04,.2),lm(col));
   return m;
 }
-// Add an item to the world.
 function addItem(kind,f,x,y,opt={}){
   const m=makeItemMesh(kind);
   const px=cx(x)+(opt.ox||0),pz=cz(y)+(opt.oz||0),py=base(f)+(opt.y??.9);m.position.set(px,py,pz);scene.add(m);
   let glint=null;if(kind!=='bottle'){glint=new THREE.Sprite(new THREE.SpriteMaterial({map:TEX.glint,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.6}));glint.scale.set(.5,.5,.5);glint.position.set(px,py+.1,pz);scene.add(glint);}
   const it={tape:opt.tape,kind,f,mesh:m,glint,pos:new THREE.Vector3(px,py,pz),taken:false,gone:false,id:opt.id||kind,lore:opt.lore,count:kind==='tuna'?3:kind==='flashlight'?1:null,home:{f,pos:new THREE.Vector3(px,py,pz)}};items.push(it);return it;
 }
-// Place all items.
 function placeItems(){
   addItem('flashlight',0,3,24,{y:.64,ox:-.75,oz:0});
   addItem('musicbox',0,3,24,{y:.66,ox:-.4,oz:.1});
@@ -1113,7 +1034,6 @@ const CORK=[
 const LORE_ORDER=['lease','log1','log2','log3','log4','log5','letter','vm4a','vm2d','vm2f','vhs1','vhs2','vhs3','cork','posterReyes','posterVoss','posterKow','posterAda','posterHalloran','posterDomino','collar','keyring'];
 const LORE_TITLES={vm4a:'Voicemail — 4A, Mari to Danny',vm2d:'Voicemail — 2D, management',vm2f:'Voicemail — 2F, Gerald to Ada',vhs1:'VHS — Grand Opening, May 1971',vhs3:'VHS — Storage Hall CAM 02, Aug 2026',posterDomino:'Missing cat: Teddy',vhs2:'VHS — Holiday Party, Dec 1988',cork:'Lobby corkboard (it keeps changing)',
   posterReyes:'Missing: Daniel Reyes, 4A',posterVoss:'Missing: Gerald Voss, superintendent',posterKow:'Missing: the Kowalskis, 3B',posterAda:'Missing: Ada Okafor, 2F (1994)',posterHalloran:'Missing: Edith Halloran, 2A (1971)'};
-// Title of a lore entry.
 const ALL_LORE_TITLE=k=>LORE_TITLES[k]||(LORE[k]?LORE[k].title:k);
 const DEATH_LINES=['Larry would like you to stop running.','Larry is not a good boy.','There is no Larry. There is only Larry.','You were very loud. Larry appreciated it.','Larry has chosen unit 4B.','Somewhere, a purr. Somewhere closer, another.','Section 14(c). He chose you.'];
 const PEENOR_LINE='Larry stole ur peenor.';
@@ -1121,7 +1041,6 @@ const PEENOR_LINE='Larry stole ur peenor.';
 /* ================= STATE ================= */
 let G=null; // everything a checkpoint needs
 const P={pos:new THREE.Vector3(),floor:0,yaw:0,pitch:0,vel:new THREE.Vector3(),stam:100,exhausted:false,crouch:0,light:false,hidden:null,stepT:0,bob:0,dead:false,sprinting:false};
-// Fresh game state for a new run.
 function freshState(){
   const perm=[0,1,2].sort(()=>Math.random()-.5);
   return {F:{},circ:{lights:false,locks:false,cams:false,elev:false},
@@ -1135,7 +1054,6 @@ let now=0,state='gate',gameT=0,checkpoint=null,shake=0,lastT=performance.now();
 const STAIR=[[11,11],[11,11]];
 const CAR=[{f:0,x:7,y:13,dx:7,dy:14},{f:1,x:21,y:12,dx:21,dy:13}];
 
-// Push a position out of walls.
 function collide(pos,r,f,larry){
   const [gx,gz]=cellOf(pos);
   for(let y=gz-1;y<=gz+1;y++)for(let x=gx-1;x<=gx+1;x++){
@@ -1148,19 +1066,13 @@ function collide(pos,r,f,larry){
     const nx=clamp(pos.x,b.minx,b.maxx),nz=clamp(pos.z,b.minz,b.maxz);const dx=pos.x-nx,dz=pos.z-nz;const d2=dx*dx+dz*dz;
     if(d2<r*r&&d2>0){const d=Math.sqrt(d2);pos.x=nx+dx/d*r;pos.z=nz+dz/d*r;}}
 }
-// Line of sight between two points.
 function los(f,a,b,step=.25){const dx=b.x-a.x,dz=b.z-a.z;const n=Math.ceil(Math.hypot(dx,dz)/step);
   for(let i=1;i<n;i++){const t=i/n;if(solid(f,Math.floor((a.x+dx*t)/CELL),Math.floor((a.z+dz*t)/CELL),true))return false;}return true;}
 let noiseEvents=[];
-// Make a noise Larry can hear.
 function emitNoise(f,pos,r,thrown){noiseEvents.push({f,pos:pos.clone(),r,t:now,thrown});}
-// Is the camera looking at a point?
 function lookingAt(p,th){const f=new THREE.Vector3();camera.getWorldDirection(f);const v=p.clone().sub(camera.position).normalize();return f.dot(v)>th;}
-// Is the building power on?
 const powerAlive=()=>!!G.F.power&&(!G.F.blackout||!!G.F.generator);
-// Is a circuit powered?
 const circOn=c=>powerAlive()&&!!G.circ[c];
-// Is the elevator powered?
 const elevPowered=()=>circOn('elev')&&!!G.F.boiler;
 
 /* ================= LARRY ================= */
@@ -1168,42 +1080,32 @@ const L={pos:new THREE.Vector3(),disp:new THREE.Vector3(),floor:0,state:'INACTIV
   speed:0,chaseStart:0,windup:0,cornerSlow:0,stepT:0,searchPts:[],searchT:0,dispT:0,silentEp:false,silentRoll:false,purr:null,lastDir:new THREE.Vector3(),
   farT:0,sniffT:0,sniffed:false,scale:1,size:1,hidden:true,wanderTarget:null,wanderArrived:false,seenEnter:false,maxSp:6.0,crossT:0,crossDelay:40,climbT:0,
   stunT:0,listenT:0,eatT:0,bowl:null,trail:0,lastTrail:new THREE.Vector3(),prev:null,noisePos:new THREE.Vector3()};
-// Larry can't enter the apartments while the power is off.
 function larryBlocked(f,x,y){return f===0&&!G.F.power&&zoneAt(f,x,y)==='apt';}
-// Can Larry walk on this cell?
 function walkL(f,x,y){return !solid(f,x,y,true)&&!larryBlocked(f,x,y);}
-// Shortest path for Larry (breadth-first search).
 function bfs(f,from,to){
-  // BFS setup.
   const [sx,sy]=from,[tx,ty]=to;if(!walkL(f,tx,ty))return null;const key=(x,y)=>y*MW+x;const prev=new Int32Array(MW*MH).fill(-2);prev[key(sx,sy)]=-1;const q=[[sx,sy]];let qi=0;
   while(qi<q.length){const [x,y]=q[qi++];if(x===tx&&y===ty){const p=[];let k=key(x,y);while(k!==-1){p.push([k%MW,Math.floor(k/MW)]);k=prev[k];}return p.reverse();}
     for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=MW||ny>=MH)continue;const k=key(nx,ny);if(prev[k]!==-2||!walkL(f,nx,ny))continue;prev[k]=key(x,y);q.push([nx,ny]);}}
   return null;
 }
-// Distance from a cell to every other cell.
 function bfsDist(f,from){const d=new Int16Array(MW*MH).fill(-1);const [sx,sy]=from;d[sy*MW+sx]=0;const q=[[sx,sy]];let qi=0;
   while(qi<q.length){const [x,y]=q[qi++];for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=MW||ny>=MH)continue;const k=ny*MW+nx;if(d[k]!==-1||!walkL(f,nx,ny))continue;d[k]=d[y*MW+x]+1;q.push([nx,ny]);}}return d;}
-// Change Larry's state (wander, stalk, chase ...).
 function larrySetState(s){if(L.state===s)return;L.prev=L.state;L.state=s;L.path=[];L.pathT=0;
   if(s==='CHASE'){L.chaseStart=now;L.windup=.75;L.speed=0;SFX.meow(lpos(1.8),1.4,.85,!los(L.floor,L.pos,P.pos));MUS.chaseT=1;}
   if(s==='SEARCH'){L.searchT=now+rnd(10,14);L.searchPts=[];const [gx,gy]=cellOf(L.lastSeen);for(let i=0;i<4;i++){const x=gx+Math.round(rnd(-5,5)),y=gy+Math.round(rnd(-5,5));if(walkL(L.floor,x,y))L.searchPts.push([x,y]);}L.searchPts.unshift(cellOf(L.lastSeen));L.sniffed=false;}
   if(s==='WANDER')L.wanderTarget=null;
 }
-// Larry's position at a height.
 const lpos=(h=0)=>new THREE.Vector3(L.pos.x,base(L.floor)+h,L.pos.z);
-// Pick a wander target.
 function pickWander(){
   if(L.floor!==P.floor){const c=[];for(let i=0;i<40;i++){const x=Math.floor(rnd(1,MW-1)),y=Math.floor(rnd(1,MH-1));if(walkL(L.floor,x,y))return [x,y];}return cellOf(L.pos);}
   const d=bfsDist(L.floor,cellOf(P.pos));const c=[];for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const v=d[y*MW+x];if(v>=6&&v<=16)c.push([x,y]);}
   return c.length?pick(c):cellOf(L.pos);
 }
-// Teleport Larry a set distance from the player.
 function teleportLarry(minC=9,maxC=14,f=P.floor){
   const d=bfsDist(f,cellOf(P.pos));const c=[];
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const v=d[y*MW+x];if(v>=minC&&v<=maxC){const w=new THREE.Vector3(cx(x),0,cz(y));if(!los(f,w,P.pos)&&w.distanceTo(P.pos.clone().setY(0))>12)c.push(w);}}
   if(c.length){const w=pick(c);L.floor=f;L.pos.set(w.x,0,w.z);L.disp.copy(L.pos);return true;}return false;
 }
-// Move Larry along a path toward a cell.
 function moveAlong(targetCell,speed,dt,directPos){
   let goal=null;const f=L.floor;
   if(directPos&&los(f,L.pos,directPos)&&clearCorridor(f,L.pos,directPos)){goal=directPos;L.path=[];}
@@ -1222,24 +1124,19 @@ function moveAlong(targetCell,speed,dt,directPos){
   if(L.pos.distanceTo(L.lastTrail)>1.8){L.lastTrail.copy(L.pos);addPaw();}
   return false;
 }
-// Is the corridor between two points clear?
 function clearCorridor(f,a,b){const off=new THREE.Vector3(-(b.z-a.z),0,b.x-a.x).normalize().multiplyScalar(.45);return los(f,a.clone().add(off),b.clone().add(off),.4)&&los(f,a.clone().sub(off),b.clone().sub(off),.4);}
 const paws=[];
-// Leave a paw print.
 function addPaw(){if(!TEX.paw)return;let m;if(paws.length<70){m=new THREE.Mesh(new THREE.PlaneGeometry(.55,.55),new THREE.MeshBasicMaterial({map:TEX.paw,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;m.layers.set(1);scene.add(m);paws.push(m);}else{m=paws.shift();paws.push(m);}
   m.position.set(L.pos.x+rnd(-.2,.2),base(L.floor)+.02,L.pos.z+rnd(-.2,.2));m.rotation.z=Math.atan2(L.lastDir.x,L.lastDir.z);}
-// Can Larry see the player?
 function playerVisible(){
   if(P.hidden||P.floor!==L.floor)return false;const d=L.pos.distanceTo(P.pos.clone().setY(0));
   const lit=P.lit||nearLitFixture(P.pos,P.floor)<3.5;let range=lit?26:(P.crouch>.5?6.5:11);
   if(d>range)return false;return los(L.floor,L.pos,P.pos);
 }
-// Can Larry see Delgado?
 function delgadoVisible(){
   if(!D.mesh||D.state==='taken'||D.state==='saved'||D.state==='closet'||D.hidden||D.f!==L.floor)return false;
   const d=L.pos.distanceTo(D.pos.clone().setY(0));if(d>(D.state==='wait'?5:12))return false;return los(L.floor,L.pos,D.pos);
 }
-// Larry's AI: hearing, seeing, stalking, chasing and scripted moments.
 function updateLarry(dt){
   if(L.state==='INACTIVE'||L.state==='SCRIPT'){noiseEvents=[];updateLarryVisual(dt);return;}
   if(P.dead){updateLarryVisual(dt);return;}
@@ -1327,13 +1224,11 @@ function updateLarry(dt){
   }
   updateLarryVisual(dt);
 }
-// Larry finished eating from a bowl (grows bigger and faster).
 function finishFeed(b){
   removeBowl(b);G.feeds++;L.size=Math.min(1.6,L.size*1.1);L.maxSp+=.3;
   if(L.purr)L.purr.setVol(1.4,.5);if(G.feeds===1)showMsg('He ate. He looks bigger now.',3.5);else showMsg('Larry grew again.',2.5);
   larrySetState('WANDER');
 }
-// Animate Larry's model for his state.
 function updateLarryVisual(dt){
   if(!larryMesh)return;const st=L.state;const stop=['WANDER','STALK','SEARCH','INVESTIGATE','TRAVEL'].includes(st);
   if(stop){if(now>L.dispT){L.dispT=now+1/(st==='STALK'?5:7);L.disp.copy(L.pos);}}else L.disp.lerp(L.pos,clamp(dt*20,0,1));
@@ -1354,7 +1249,6 @@ function updateLarryVisual(dt){
 
 /* ================= MR. DELGADO ================= */
 const D={state:'closet',f:1,pos:new THREE.Vector3(),mesh:null,hidden:null,coughT:8,path:[],pathT:0};
-// Update Delgado (the companion character).
 function updateDelgado(dt){
   if(!D.mesh)return;const show=D.state!=='taken'&&D.state!=='saved'&&!D.hidden&&D.state!=='closet';
   D.mesh.visible=show||D.state==='closet';
@@ -1372,11 +1266,9 @@ function updateDelgado(dt){
     if(dir.length()<.4){D.hidden=D.goLocker;SFX.creak(new THREE.Vector3(D.pos.x,base(D.f)+1,D.pos.z),.4);}else{dir.normalize();D.pos.addScaledVector(dir,2.6*dt);collide(D.pos,.28,D.f,false);}}
   D.coughT-=dt;if(D.coughT<=0){D.coughT=rnd(10,18);const p=new THREE.Vector3(D.pos.x,base(D.f)+1.5,D.pos.z);SFX.cough(p,.5,!!D.hidden);emitNoise(D.f,D.pos.clone().setY(0),D.hidden?3:9);}
 }
-// Shortest path for Delgado.
 function bfsP(f,from,to){const [sx,sy]=from,[tx,ty]=to;const key=(x,y)=>y*MW+x;const prev=new Int32Array(MW*MH).fill(-2);prev[key(sx,sy)]=-1;const q=[[sx,sy]];let qi=0;
   while(qi<q.length){const [x,y]=q[qi++];if(x===tx&&y===ty){const p=[];let k=key(x,y);while(k!==-1){p.push([k%MW,Math.floor(k/MW)]);k=prev[k];}return p.reverse();}
     for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;const k=key(nx,ny);if(nx<0||ny<0||nx>=MW||ny>=MH||prev[k]!==-2||solid(f,nx,ny,false))continue;prev[k]=key(x,y);q.push([nx,ny]);}}return null;}
-// Tell Delgado to hide or follow.
 function toggleDelgadoHide(){
   if(!(D.state==='follow'||D.state==='hiding'||D.state==='wait'))return;
   if(D.state==='follow'){
@@ -1385,7 +1277,6 @@ function toggleDelgadoHide(){
     else{D.state='wait';say([{who:'delgado',n:'Mr. Delgado',t:"Nowhere to hide. I'll stay low.",d:1.8}]);}
   } else {D.state='follow';if(D.hidden){D.pos.copy(D.hidden.frontW).setY(0);}D.hidden=null;D.goLocker=null;say([{who:'delgado',n:'Mr. Delgado',t:"I'm coming. Don't run.",d:1.4}]);}
 }
-// Larry takes Delgado.
 function takeDelgado(){
   D.state='taken';D.hidden=null;SFX.scream();G.F.delgadoTaken=true;
   vignette({dur:3.2,caps:[[.2,'Mr. Delgado has been adopted.']],onEnd:()=>{larrySetState('SEARCH');}});
@@ -1396,9 +1287,7 @@ const box={wind:0,winding:false,playing:false,t:0};
 const laser={on:false,f:0,pos:new THREE.Vector3(),last:null,sprite:null};
 const bowls=[];
 let useHeld=false;
-// Start the music box.
 function startBox(){box.playing=true;box.t=box.wind*14;box.wind=0;G.boxUses++;MUS.mbox={seq:HAPPY,i:0,step:.3,detune:.15+G.boxUses*.08,vol:.2,pos:camera.position.clone(),bus:sfxBus};renderHotbar();}
-// Update tools (music box, camera flash ...).
 function updateTools(dt){
   if(box.winding){box.wind=Math.min(1,box.wind+dt/2.4);if(Math.random()<dt*8)SFX.click(.05);}
   $('wind').style.display=box.winding||box.playing?'block':'none';$('windF').style.width=((box.winding?box.wind:box.t/14)*100)+'%';
@@ -1415,7 +1304,6 @@ function updateTools(dt){
   } else if(laser.on){laser.on=false;laser.sprite.visible=false;}
 }
 let photoPending=false;
-// Take a photo with the camera.
 function takePhoto(){
   if(G.inv.film<=0){SFX.click(.15);showMsg('Out of film.',1.6);return;}
   G.inv.film--;renderHotbar();SFX.shutter();const w=$('white');w.style.transition='none';w.style.opacity=.95;requestAnimationFrame(()=>{w.style.transition='opacity .35s';w.style.opacity=0;});
@@ -1424,19 +1312,16 @@ function takePhoto(){
     const lp=lpos(1.5);if(lp.distanceTo(camera.position)<14&&lookingAt(lp,.82)&&los(L.floor,L.pos,P.pos)){larrySetState('STUNNED');L.stunT=2;SFX.meow(lp,1,1.25);}}
   photoPending=true;
 }
-// Develop the photo (reveal hidden things).
 function developPhoto(){
   photoPending=false;camera.layers.enable(1);renderer.render(scene,camera);const pc=$('photoCv').getContext('2d');const src=renderer.domElement;
   const sw=src.width,sh=src.height,s=Math.min(sw/320,sh/240);pc.drawImage(src,(sw-320*s)/2,(sh-240*s)/2,320*s,240*s,0,0,320,240);camera.layers.disable(1);
   let found=null;
-  // Check if a hidden object shows up in the photo.
   const check=(m,key,cb)=>{if(!m)return;const p=m.getWorldPosition(new THREE.Vector3());if(Math.abs(p.y-base(P.floor)-1.5)>2)return;if(p.distanceTo(camera.position)<10&&lookingAt(p,.55)){found=key;cb&&cb();}};
   check(decor.order,'order',()=>{if(!G.F.orderKnown){G.F.orderKnown=true;showMsg('Something is written on the wall in the photo.',3.5);}});
   check(decor.chose,'chose');check(decor.f2ghost,'ghost');
   $('photoCap').textContent=found==='order'?'the order':found==='chose'?'4B':found==='ghost'?'??':'3:'+(13+Math.floor(gameT/60))+' a.m.';
   $('photo').style.display='block';clearTimeout(developPhoto.t);developPhoto.t=setTimeout(()=>$('photo').style.display='none',found?5000:2600);
 }
-// Put down a tuna bowl to distract Larry.
 function placeBowl(){
   if(tunaCount()<=0){showMsg('No tuna left.',1.5);return;}
   const f=new THREE.Vector3(Math.sin(P.yaw),0,Math.cos(P.yaw));const p=P.pos.clone().setY(0).addScaledVector(f,1.3);
@@ -1445,19 +1330,16 @@ function placeBowl(){
   m.position.set(p.x,base(P.floor)+.05,p.z);scene.add(m);bowls.push({f:P.floor,pos:p.clone(),mesh:m});SFX.clunk(m.position,.3);
   if(!G.F.toldFeed){G.F.toldFeed=true;showMsg('DON\'T FEED LARRY. You opened the can anyway.',3.5);}
 }
-// Remove a bowl.
 function removeBowl(b){scene.remove(b.mesh);const i=bowls.indexOf(b);if(i>=0)bowls.splice(i,1);}
 
 /* ---- bottles ---- */
 const thrown=[];
-// Throw a bottle to make a distracting noise.
 function throwBottle(){
   if(P.hidden||state!=='play')return;const be=entryOf('bottle');if(!be){showMsg('No bottles to throw.',1.4);return;}
   {const i=be.ids.pop();items[i].gone=true;items[i].taken=true;if(!be.ids.length)removeEntry(be);renderHotbar();}
   const f=new THREE.Vector3();camera.getWorldDirection(f);const m=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,.3,6),new THREE.MeshLambertMaterial({color:0x2f6a3a}));
   m.position.copy(camera.position).addScaledVector(f,.5);scene.add(m);thrown.push({m,f:P.floor,v:f.clone().multiplyScalar(13).add(new THREE.Vector3(0,3,0))});SFX.breath(.15);
 }
-// Update thrown bottles.
 function updateThrown(dt){
   for(let i=thrown.length-1;i>=0;i--){const t=thrown[i];t.v.y-=14*dt;const np=t.m.position.clone().addScaledVector(t.v,dt);t.m.rotation.x+=dt*12;
     let hit=false;if(solid(t.f,Math.floor(np.x/CELL),Math.floor(np.z/CELL),true)){hit=true;np.copy(t.m.position);}const B=base(t.f);if(np.y<B+.1||np.y>B+CEIL-.1)hit=true;
@@ -1468,11 +1350,8 @@ function updateThrown(dt){
 
 /* ================= ELEVATOR ================= */
 const EL={arriveT:0,calling:-1,gearT:0,closing:0};
-// Center of the elevator car on a floor.
 function carCenter(f){const c=CAR[f];return new THREE.Vector3(cx(c.x),base(f),cz(c.y));}
-// Is the player inside the elevator?
 function inCar(){const c=CAR[P.floor];const [x,y]=cellOf(P.pos);return x===c.x&&y===c.y;}
-// Call the elevator.
 function callElevator(f){
   if(!G.F.power){showMsg('Nothing. No power.',2);return;}
   if(!G.F.boiler){SFX.beep(220,.15,.4);showMsg('A red light: LOCKOUT — BOILER PRESSURE.',3);if(!G.F.sawLockout){G.F.sawLockout=true;setObjective();}return;}
@@ -1481,9 +1360,7 @@ function callElevator(f){
   if(EL.calling>=0)return;
   EL.calling=f;EL.arriveT=now+(G.F.calledOnce?15:40);G.F.calledOnce=true;SFX.beep(660,.12,.15);showMsg(G.F.calledOnce&&EL.arriveT-now<20?'The car groans into motion.':'Somewhere above, the car groans into motion. Slowly.',3);
 }
-// Open or close the elevator doors.
 function openCar(v){G.el.open=v;applyDoors(true);if(v)SFX.chime(carCenter(G.el.floor).setY(base(G.el.floor)+2));}
-// Update the elevator.
 function updateElevator(dt){
   if(EL.calling>=0){const left=EL.arriveT-now;EL.gearT-=dt;
     if(EL.gearT<=0){EL.gearT=5;const p=carCenter(EL.calling).setY(base(EL.calling)+2);SFX.gears(p,3,.4);emitNoise(EL.calling,carCenter(EL.calling).setY(0),15);}
@@ -1491,7 +1368,6 @@ function updateElevator(dt){
   for(const k in doors){const d=doors[k];if(d.type==='E'&&d.slab){d.slide=lerp(d.slide,d.open?1:0,clamp(dt*3,0,1));
     if(d.horiz)d.slab.position.x=d.home.x+d.slide*1.85;else d.slab.position.z=d.home.z+d.slide*1.85;}}
 }
-// Ride the elevator to the other floor.
 function rideElevator(){
   if(!elevPowered()){SFX.beep(220,.15,.4);showMsg('The panel is dark.',2);return;}
   const from=P.floor,to=1-from;const dNear=(D.state==='follow'||D.state==='wait')&&D.f===from&&D.pos.distanceTo(carCenter(from).setY(0))<3;
@@ -1510,23 +1386,18 @@ function rideElevator(){
 
 /* ================= POWER / BREAKER ================= */
 let brkSel=null;
-// Open the breaker box.
 function openBreaker(){
   state='ui';exitLock();brkSel={...G.circ};renderBreaker();$('breakerOv').classList.add('show');
 }
 const CIRCS=[['lights','Hall & room lights'],['locks','Door locks — offices'],['cams','Security cameras'],['elev','Elevator']];
-// How many circuits can be on at once.
 function cap(){return G.F.generator?4:3;}
-// Draw the breaker box.
 function renderBreaker(){
   $('brkNote').textContent=G.F.generator?'Generator online. Every circuit can stay live.':'Load limit: 3 circuits. Pick what stays live.';
   $('circs').innerHTML=CIRCS.map(([k,l],i)=>`<button class="circ${brkSel[k]?' on':''}" data-c="${k}"><span>${i+1}. ${l}</span><span class="lamp"></span></button>`).join('');
   const n=Object.values(brkSel).filter(Boolean).length;$('brkCap').textContent=`Live: ${n} / ${cap()}`;
   $('circs').querySelectorAll('.circ').forEach(b=>b.onclick=()=>toggleCirc(b.dataset.c));
 }
-// Toggle a circuit (up to the limit).
 function toggleCirc(k){const n=Object.values(brkSel).filter(Boolean).length;if(!brkSel[k]&&n>=cap()){SFX.beep(180,.15,.3);return;}brkSel[k]=!brkSel[k];SFX.clunk(null,.4);renderBreaker();}
-// Close the breaker box and apply changes.
 function closeBreaker(){
   $('breakerOv').classList.remove('show');const changed=JSON.stringify(brkSel)!==JSON.stringify(G.circ);G.circ={...brkSel};
   if(G.circ.locks)G.F.locksEver=true;
@@ -1537,18 +1408,15 @@ $('brkDone').onclick=closeBreaker;
 
 /* ================= KEYPAD ================= */
 let kpBuf='';
-// Open the keypad.
 function openKeypad(){state='ui';exitLock();kpBuf='';$('kpDisp').textContent='____';$('keypadOv').classList.add('show');
   $('kpGrid').innerHTML=[1,2,3,4,5,6,7,8,9,'⌫',0,'↵'].map(k=>`<button data-k="${k}">${k}</button>`).join('');
   $('kpGrid').querySelectorAll('button').forEach(b=>b.onclick=()=>kpKey(b.dataset.k));}
-// Handle a keypad key.
 function kpKey(k){
   if(k==='⌫'||k==='Backspace'){kpBuf=kpBuf.slice(0,-1);}
   else if(k==='↵'||k==='Enter'){if(kpBuf.length<4)return;if(kpBuf===G.code.join('')){SFX.beep(1320,.15,.2);G.F.storage=true;closeKeypad();setFlag('storage');showMsg('The lock clicks.',2);}else{SFX.beep(150,.2,.5);emitNoise(0,P.pos,12);kpBuf='';$('kpDisp').textContent='DENIED';return;}}
   else if(/^[0-9]$/.test(k)&&kpBuf.length<4){kpBuf+=k;SFX.beep(900,.06,.05);}
   $('kpDisp').textContent=(kpBuf+'____').slice(0,4);
 }
-// Close the keypad.
 function closeKeypad(){$('keypadOv').classList.remove('show');state='play';lockPointer();}
 $('kpDone').onclick=closeKeypad;
 
@@ -1559,9 +1427,7 @@ const CAMS=[
   {lbl:'CAM 07 — BACK ROOMS, ROW 7',pos:[0,27,7,2.6],look:[0,8,7,1.2]},
   {lbl:'CAM 09 — MAINTENANCE',pos:[0,35,20,2.6],look:[0,35,4,1]}];
 let monitor={on:false,scripted:false,cam:2,t:0,frozen:false};let monPurr=null;
-// Switch the security camera.
 function setCam(i){monitor.cam=(i+CAMS.length)%CAMS.length;const c=CAMS[monitor.cam];secCam.position.copy(wp(c.pos[0],c.pos[1],c.pos[2],c.pos[3]));secCam.lookAt(wp(c.look[0],c.look[1],c.look[2],c.look[3]));$('monLbl').textContent=c.lbl;SFX.static(.15,.2);}
-// Start using the security monitor.
 function startMonitor(){
   if(!circOn('cams')){showMsg('The screen is dark. No power to the cameras.',2.5);return;}
   const scripted=!G.F.monitor;monitor={on:true,scripted,cam:2,t:now,frozen:false};state='monitor';
@@ -1572,7 +1438,6 @@ function startMonitor(){
     L.state='SCRIPT';L.hidden=false;L.floor=0;L.pos.set(cx(11),0,cz(7));L.disp.copy(L.pos);L.scale=1;
     monPurr=makePurr(true);monPurr.setPos(monitorScreen.position);monPurr.setVol(.7,.4);if(L.purr)L.purr.setVol(0,.05);MUS.silent=true;SFX.static(.6,.3);}
 }
-// Update the monitor view.
 function updateMonitor(dt){
   const t=now-monitor.t;
   if(!monitor.scripted){const s=Math.floor(gameClock()+t);$('monTs').textContent='03:'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0');return;}
@@ -1588,14 +1453,12 @@ function updateMonitor(dt){
     if(ft>6.2)endMonitor();
   }
 }
-// Stop using the monitor.
 function endMonitor(){
   const was=monitor.scripted;monitor.on=false;state='play';$('mon').classList.remove('show');$('hud').classList.add('show');$('gl').style.filter='';
   monitorScreen.material.color.set(0x111111);if(monPurr){monPurr.kill();monPurr=null;}ambientL.intensity=.32;scene.fog.density=.075;
   if(was){P.pitch=-.05;scare.behind={t:now};setFlag('monitor');MUS.silent=false;showMsg('',.1);}
   lockPointer();
 }
-// Update the "something behind you" scare.
 function updateBehind(){
   if(!scare.behind||scare.behind.done)return;const t=now-scare.behind.t;
   if(lookingAt(lpos(1.5),.6)||t>5.5){scare.behind.done=1;L.state='CHASE';L.chaseStart=now+.2;L.windup=.45;L.lastSeen.copy(P.pos).setY(0);L.lastSeenT=now;L.maxSp=Math.max(L.maxSp,6.2);
@@ -1611,13 +1474,10 @@ function turnValve(i){
     const w=$('white');w.style.transition='none';w.style.opacity=.6;requestAnimationFrame(()=>{w.style.transition='opacity 1.6s';w.style.opacity=0;});showMsg('Steam blasts out. The pressure slams back. Wrong order.',3.5);}
 }
 let dryer={t:0,noiseT:0,pos:null};
-// Start the dryer (noise distraction).
 function startDryer(){dryer.t=18;dryer.noiseT=0;dryer.pos=decor.dryers[1].position.clone();SFX.clunk(dryer.pos,.6);showMsg('The dryer thumps to life. Loud.',2.5);}
-// Update the running dryer.
 function updateDryer(dt){if(dryer.t<=0){return 0;}dryer.t-=dt;dryer.noiseT-=dt;if(dryer.noiseT<=0){dryer.noiseT=3;SFX.thud(dryer.pos,.35);emitNoise(0,dryer.pos.clone().setY(0),24);}
   decor.dryers[1].position.x=dryer.pos.x+Math.sin(now*40)*.01;if(P.floor!==0)return 0;return clamp(.08*(1-dryer.pos.distanceTo(camera.position)/16),0,.08);}
 const tvCodeMats=[];
-// Update the TV code digits.
 function updateTVCode(){
   if(!G.F.monitor)return;
   for(const t of tvs){if(t.code==null)continue;const ph=(now+t.code*1.25)%5;t.flash=ph<.8;
@@ -1627,22 +1487,17 @@ function updateTVCode(){
 
 /* ================= INTERCOM / SUBTITLES ================= */
 let subQ=[],subT=0;
-// Queue subtitle lines.
 function say(lines){subQ.push(...lines);}
-// Show subtitles one by one.
 function updateSubs(dt){
   if(subT>0){subT-=dt;if(subT<=0)$('subs').innerHTML='';return;}
   if(subQ.length){const l=subQ.shift();$('subs').innerHTML=(l.n?`<b>${l.n}</b> `:'')+l.t;subT=l.d||Math.max(2,l.t.length/14);if(l.who)babble(l.who,subT*.9,!!l.purr);if(l.cb)l.cb();}
 }
 const intercom={ringing:null,ringT:0};
-// Ring an intercom.
 function ringIntercom(id){intercom.ringing=id;intercom.ringT=0;}
-// Update the ringing intercom.
 function updateIntercom(dt){
   if(!intercom.ringing)return;intercom.ringT-=dt;
   if(intercom.ringT<=0){intercom.ringT=1.8;const m=intercom.ringing===1?decor.intercom1:decor.intercom2;SFX.buzz(m.position,.35);const f=intercom.ringing===1?0:1;emitNoise(f,m.position.clone().setY(0),9);}
 }
-// Answer the intercom.
 function answerIntercom(){
   const id=intercom.ringing;intercom.ringing=null;SFX.click(.3);G.calls[id]=true;
   if(id===1)say(CALLS.c1);if(id===2)say(CALLS.c2);setObjective();
@@ -1653,13 +1508,10 @@ function readLore(key,fromInv){
   const l=LORE[key];if(!l)return;G.lore[key]=true;state='ui';exitLock();invReturn=!!fromInv;if(fromInv)$('journalOv').classList.remove('show');
   $('paper').innerHTML=`<h3>${l.title}</h3>${l.body}<p class="foot">${fromInv?'[E] or click to go back to your inventory':'[E] or click to put it away — it stays in your bag (Tab)'}</p>`;$('paperOv').classList.add('show');SFX.click(.15);
 }
-// Close the paper overlay.
 function closePaper(){$('paperOv').classList.remove('show');if(invReturn){invReturn=false;openInventory();return;}state='play';lockPointer();if(closePaper.after){const a=closePaper.after;closePaper.after=null;a();}}
 $('paperOv').addEventListener('click',()=>{if(state==='ui')closePaper();});
-// Play a voicemail.
 function playVoicemail(key){const v=VOICEMAIL[key];G.lore[key]=true;SFX.beep(1000,.1,.1);setTimeout(()=>say(v.lines),400);showMsg('The answering machine clicks. One saved message.',2.4);}
 const posters=[];
-// Mark posters as read when looked at.
 function updateLoreLooks(){
   for(const p of posters){if(G.lore[p.key]||p.f!==P.floor)continue;if(p.pos.distanceTo(camera.position)<3.2&&lookingAt(p.pos,.85)){G.lore[p.key]=true;showMsg('Journal updated. (Tab)',1.8);}}
   // corkboard: notes change every time you come back to the lobby
@@ -1671,7 +1523,6 @@ function updateLoreLooks(){
 
 /* ================= OBJECTIVES / WORLD STATE ================= */
 let objFadeT=0,msgT=0,scare={},finale={stage:0};
-// Set the current objective text.
 function setObjective(){
   const F=G.F;let o;
   if(!F.flashlight)o='Find a light.';
@@ -1693,11 +1544,8 @@ function setObjective(){
   else o=(!has('keyring')?"Find Gerald's keys again — you dropped them. ":'')+'Get out. Front door (elevator down), or the roof (roof access, south hall).'+((D.state==='follow'||D.state==='wait'||D.state==='hiding')?' Bring Mr. Delgado.':'');
   if($('obj').dataset.o!==o){$('obj').dataset.o=o;$('obj').innerHTML='<small>3:'+String(13+Math.floor(gameT/60)).padStart(2,'0')+' A.M.</small>'+o;$('obj').style.opacity=1;objFadeT=now+7;}
 }
-// Show a message.
 function showMsg(t,dur=3){$('msg').textContent=t;$('msg').style.opacity=t?1:0;msgT=now+dur;}
-// Set a story flag, update the world and save a checkpoint.
 function setFlag(k){G.F[k]=true;applyWorld(true);setObjective();saveCheckpoint();}
-// Open or close doors based on story flags.
 function applyDoors(anim){
   const F=G.F;const want={L:!!F.locksEver,K:!!F.storage,S:!!F.fuse,O:!!F.power,G:!!F.lairOpen,R:!!F.roofOpen};
   for(const k in doors){const d=doors[k];
@@ -1707,7 +1555,6 @@ function applyDoors(anim){
     const o=!!want[d.type];if(o!==d.open){d.open=o;d.target=o?-1.6:0;if(!anim)d.ang=d.target;}}
   if(decor.chains)decor.chains.visible=!F.exitOpen;
 }
-// Update the world to match story flags.
 function applyWorld(anim){
   applyDoors(anim);const F=G.F;
   const f1=circOn('lights'),f2=powerAlive()&&(G.circ.lights||!!F.generator);
@@ -1719,7 +1566,6 @@ function applyWorld(anim){
   items.forEach(it=>{it.mesh.visible=!it.taken;if(it.glint)it.glint.visible=!it.taken;});
   decor.valves.forEach((v,i)=>v.wheel.visible=i!==G.missingValve||!!F.wheelFitted);
 }
-// Save a checkpoint.
 function saveCheckpoint(){checkpoint={G:JSON.parse(JSON.stringify(G)),pos:P.pos.clone(),floor:P.floor,yaw:P.yaw,
   D:{state:D.state,f:D.f,pos:D.pos.clone()},items:itemState(),scare:JSON.parse(JSON.stringify(scare)),Lsize:L.size,LmaxSp:L.maxSp};}
 
@@ -1755,7 +1601,6 @@ function updateScares(dt){
   // nest discovery
   if(P.floor===1&&!scare.nest&&zoneAt(1,pc[0],pc[1])==='nest'&&pc[1]<=11){scare.nest=1;nestVignette();}
 }
-// Blackout event.
 function doBlackout(){
   applyWorld(true);const lights=fixtures.filter(f=>!f.tv);lights.forEach(f=>f.forceOn=true);
   vignette({dur:5,caps:[[.4,'The lights die. All of them, on both floors.'],[2.8,'Somewhere below, something is chewing through a cable.']],onStart(){
@@ -1765,14 +1610,12 @@ function doBlackout(){
       setTimeout(()=>SFX.scrape(new THREE.Vector3(cx(7),.5,cz(14)),.8,true),3400);},
     onEnd(){L.floor=0;L.pos.set(cx(7),0,cz(15));L.disp.copy(L.pos);L.hidden=false;L.state='WANDER';L.crossT=0;L.crossDelay=48;saveCheckpoint();setTimeout(()=>{if(!G.calls[2])ringIntercom(2);setObjective();},5000);setObjective();}});
 }
-// Nest vignette.
 function nestVignette(){
   const B=base(1);
   vignette({dur:6.5,caps:[[.4,'Shoes. Keys. Glasses.'],[2.6,'Everything anybody here ever lost.'],[4.6,'And an old bed nobody has slept in since 1971.']],
     cam:{from:new THREE.Vector3(cx(5),B+1.7,cz(11)),to:new THREE.Vector3(cx(4),B+1.9,cz(8)),lookFrom:new THREE.Vector3(cx(7),B+.3,cz(7)),lookTo:new THREE.Vector3(cx(2),B+.6,cz(2))},
     onStart(){SFX.sting(.25);MUS.tension=.8;}});
 }
-// Power-on vignette.
 function powerOnVignette(){
   const lit=fixtures.filter(f=>!f.tv&&f.f===0);lit.forEach(f=>{f.delay=now+rnd(.4,2.6);});
   vignette({dur:5,caps:[[.5,'The building hums awake.'],[2.6,'So does everything in it.']],
@@ -1780,7 +1623,6 @@ function powerOnVignette(){
     onStart(){SFX.static(1.2,.35);setTimeout(()=>SFX.whisper(new THREE.Vector3(cx(12),1.6,cz(15)),.5),2800);},
     onEnd(){if(L.state!=='CHASE'&&L.floor===0){teleportLarry(10,16);larrySetState('WANDER');}}});
 }
-// Release Larry from the apartment.
 function releaseLarry(){
   const d=doors[dkey(0,11,14)];
   vignette({dur:5.5,caps:[[.6,'Something upstairs heard you take it.']],
@@ -1804,7 +1646,6 @@ function updateFinale(dt){
     L.pos.copy(p);L.disp.copy(p);L.hidden=false;L.scale=1.12;SFX.impact(lpos(1.5),1.6);SFX.meow(lpos(1.8),1.8,.7);shake=.8;
     L.state='CHASE';L.chaseStart=now;L.windup=.5;L.lastSeen.copy(P.pos).setY(0);L.lastSeenT=now;L.maxSp=Math.max(L.maxSp,6.3);MUS.chaseT=1;}
 }
-// Hold-to-progress finale.
 function holdFinale(mode,dt){
   if(finale.mode&&finale.mode!==mode){finale.prog=0;finale.stage=Math.min(finale.stage,1);}
   finale.mode=mode;finale.active=now;finale.prog=Math.min(1,(finale.prog||0)+dt/(mode==='front'?6:4.5));
@@ -1815,13 +1656,11 @@ function holdFinale(mode,dt){
 
 /* ================= VIGNETTES (in-engine, letterboxed) ================= */
 let VG=null,vgHold=0;
-// Start a vignette (short cinematic).
 function vignette(o){
   if(state==='vignette'&&VG){const prev=VG;VG=null;if(prev.onEnd)prev.onEnd();}
   VG={...o,t:0};state='vignette';$('vg').classList.add('show');requestAnimationFrame(()=>$('vg').classList.add('on'));$('hud').classList.remove('show');$('vgCap').textContent='';
   $('gl').style.filter='saturate(.55) contrast(1.1)';if(o.onStart)o.onStart();
 }
-// Update the vignette camera.
 function updateVignette(dt){
   const v=VG;if(!v)return;v.t+=dt;const p=clamp(v.t/v.dur,0,1),e=p*p*(3-2*p);
   if(v.cam){camera.position.lerpVectors(v.cam.from,v.cam.to,e);const lk=new THREE.Vector3().lerpVectors(v.cam.lookFrom,v.cam.lookTo,e);camera.lookAt(lk);}
@@ -1831,21 +1670,16 @@ function updateVignette(dt){
   if(keys['Space'])vgHold+=dt;else vgHold=Math.max(0,vgHold-dt*2);$('vgRing').style.background=`conic-gradient(#b33 ${vgHold/1*360}deg,#222 0deg)`;
   if(v.t>=v.dur||vgHold>1){vgHold=0;endVignette();}
 }
-// End the vignette.
 function endVignette(){const v=VG;VG=null;$('vg').classList.remove('on');setTimeout(()=>{if(!VG)$('vg').classList.remove('show');},600);$('gl').style.filter='';
   if(state==='vignette'){state='play';$('hud').classList.add('show');}if(v&&v.onEnd)v.onEnd();}
 
 /* ================= INTERACTION ================= */
 let curInteract=null;
-// Find what the player can interact with.
 function interactCandidates(){
   const res=[],F=G.F,f=P.floor;const fw=new THREE.Vector3();camera.getWorldDirection(fw);
-  // Is a point near and in front of the camera?
   const near=(p,r=1.8,th=.55)=>{const v=p.clone().sub(camera.position);const d=v.length();return d<r&&fw.dot(v.normalize())>th;};
-  // World position of a cell on this floor.
   const at=(x,y,h=1.2)=>wp(f,x,y,h);
   if(P.hidden)return [{p:'[E] Leave hiding',a:exitLocker}];
-  // VCR interaction.
   const vcr=(tv,fl)=>{if(!near(new THREE.Vector3(tv.x,base(fl)+1,tv.z),2.1,.5))return;const tapes=allEntries().filter(e=>e.kind==='vhs');
     if(!tapes.length){res.push({p:'[E] VCR — no tape',a:()=>showMsg('The VCR is empty. Find a VHS tape somewhere in the building.',2.8)});return;}
     const pk=tapes.find(e=>!G.lore[items[e.ids[0]].tape])||tapes[0];const k=items[pk.ids[0]].tape;res.push({need:'vhs',p:'[E] Play tape: '+TAPE_TITLE[k]+(tapes.length>1?'  ('+tapes.length+' tapes)':''),a:()=>playVHS(k)});};
@@ -1885,7 +1719,6 @@ function interactCandidates(){
     if(near(wp(f,d.x,d.y,1.4),2,.6))res.push({p:'[E] Locked',a:()=>{SFX.thud(wp(f,d.x,d.y,1),.3);showMsg(d.type==='S'?'Something on the other side presses back.':d.type==='K'?'A keypad on the wall beside it.':"It won't open. The lock has no power.",2.5);}});}
   return res;
 }
-// Pick up an item.
 function takeItem(it){
   const idx=items.indexOf(it),first=!G.got[idx];G.got[idx]=true;
   it.taken=true;it.mesh.visible=false;if(it.glint)it.glint.visible=false;SFX.click(.3);const F=G.F;
@@ -1906,21 +1739,17 @@ function takeItem(it){
     case 'collar':G.F.collar=true;G.lore.collar=true;readLore('collar');saveCheckpoint();break;
   }
 }
-// Larry comes home event.
 function larryComesHome(){
   setTimeout(()=>{if(state==='dead'||state==='ending')return;SFX.impact(wp(1,11,12,1.5),1.4);shake=.5;setTimeout(()=>SFX.meow(wp(1,11,11,1.8),1.3,.8),700);
     L.floor=1;L.pos.set(cx(11),0,cz(12));L.disp.copy(L.pos);L.hidden=false;L.state='INVESTIGATE';L.noisePos.set(cx(5),0,cz(10));L.aware=.3;MUS.tension=.9;showMsg('He knows you were in his room.',3);},2500);
 }
-// Find Delgado.
 function findDelgado(){D.state='follow';D.pos.set(cx(30),0,cz(13));say(DELGADO_FOUND.map(l=>({...l})));setFlag('delgadoFound');}
-// Larry's lair vignette.
 function lairVignette(){
   const B=base(1);
   vignette({dur:7,caps:[[.5,"It isn't a generator."],[3.2,"It's his."]],
     cam:{from:new THREE.Vector3(cx(33),B+1.6,cz(9)),to:new THREE.Vector3(cx(33),B+1.8,cz(6)+.4),lookFrom:new THREE.Vector3(cx(33),B+1.6,cz(3)),lookTo:new THREE.Vector3(cx(33),B+2.4,cz(1))},
     onStart(){SFX.creak(wp(1,33,7,1.5),.8);MUS.silent=true;setTimeout(()=>SFX.sting(.4),2800);},onEnd(){MUS.silent=false;saveCheckpoint();setObjective();}});
 }
-// Crank the generator.
 function crankGen(dt){
   G.crank=Math.min(1,(G.crank||0)+dt/4.5);decor.crank.rotation.x+=dt*8;if(Math.random()<dt*3)SFX.gears(decor.crank.getWorldPosition(new THREE.Vector3()),.6,.5);emitNoise(1,P.pos,24);
   if(G.crank>=1){G.F.generator=true;G.circ={lights:true,locks:true,cams:true,elev:true};G.F.locksEver=true;
@@ -1931,18 +1760,14 @@ function crankGen(dt){
   }
 }
 const sparks=[];
-// Burst of sparks.
 function sparkBurst(p){for(let i=0;i<40;i++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:TEX.spark,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false}));s.scale.set(.25,.25,.25);s.position.copy(p);scene.add(s);
   sparks.push({s,v:new THREE.Vector3(rnd(-4,4),rnd(1,6),rnd(-4,4)),t:rnd(.8,1.6)});}}
-// Update sparks.
 function updateSparks(dt){for(let i=sparks.length-1;i>=0;i--){const k=sparks[i];k.t-=dt;k.v.y-=9*dt;k.s.position.addScaledVector(k.v,dt);k.s.material.opacity=clamp(k.t,0,1);if(k.t<=0){scene.remove(k.s);sparks.splice(i,1);}}}
-// Hide in a locker.
 function enterLocker(lk){
   P.hidden=lk;L.seenEnter=(L.state==='CHASE'||L.state==='STALK'||L.state==='HUNT_D')&&L.floor===P.floor&&(now-L.lastSeenT<1.0);
   SFX.creak(wp(P.floor,lk.cell[0],lk.cell[1],1),.5);SFX.thud(null,.25);$('slits').classList.add('show');
   P.pos.set(lk.center.x+lk.dir[0]*.55,0,lk.center.z+lk.dir[1]*.55);P.yaw=Math.atan2(lk.dir[0],lk.dir[1]);P.pitch=0;
 }
-// Leave the locker.
 function exitLocker(){const lk=P.hidden;P.hidden=null;$('slits').classList.remove('show');P.pos.set(lk.frontW.x,0,lk.frontW.z);SFX.creak(camera.position,.4);}
 
 /* ================= DEATH / RESTART ================= */
@@ -1953,11 +1778,9 @@ function killPlayer(){
   setTimeout(()=>{$('flash').style.display='none';},700);setTimeout(()=>{$('flash').style.display='block';},820);
   setTimeout(()=>{$('flash').style.display='none';showDeath();},1150);
 }
-// Show the death screen.
 function showDeath(){state='dead';$('deathBg').style.backgroundImage='url('+friedSrc()+')';
   const peenor=Math.random()<1/6;$('deathH').textContent=peenor?'LARRY TOOK IT':'LARRY FOUND YOU';$('deathLine').textContent=peenor?PEENOR_LINE:DEATH_LINES[(G.deaths-1)%DEATH_LINES.length];
   $('death').classList.add('show');$('hud').classList.remove('show');exitLock();MUS.chase=0;MUS.chaseT=0;}
-// Restart from the last checkpoint.
 function restartCheckpoint(){
   $('death').classList.remove('show');$('pauseP').classList.remove('show');$('photo').style.display='none';
   const c=checkpoint;const deaths=G.deaths;G=JSON.parse(JSON.stringify(c.G));G.deaths=deaths;scare=JSON.parse(JSON.stringify(c.scare));if(scare.behind)scare.behind.done=1;
@@ -1977,15 +1800,10 @@ function restartCheckpoint(){
 
 /* ================= PLAYER / WORLD UPDATE ================= */
 let heartT=0,whisperT=0,lightPoolT=0;
-// Distance to the nearest lit light.
 function nearLitFixture(p,f){let best=99;for(const fx of fixtures){if(fx.f===f&&fx.cur>.3){const d=Math.hypot(fx.x-p.x,fx.z-p.z);if(d<best)best=d;}}return best;}
-// The camera being rendered (player or security camera).
 function activeCam(){return state==='monitor'?secCam:camera;}
-// Which floor the active camera is on.
 function camFloor(){return clamp(Math.floor((activeCam().position.y+.4)/FH),0,1);}
-// In-game clock time.
 function gameClock(){return 13*60+gameT;}
-// Update the player: movement, stamina, flashlight and footsteps.
 function updatePlayer(dt){
   if(P.hidden)P.stam=Math.min(100,P.stam+dt*20);
   P.yaw-=mouseDX*.0022*S.sens;P.pitch+=mouseDY*.0022*S.sens*(S.invert==='1'?-1:1);
@@ -2023,12 +1841,10 @@ function updatePlayer(dt){
   const inv=G.inv,F=G.F;
   updateHandPose(dt);
 }
-// Animate doors.
 function updateDoorsAnim(dt){
   for(const k in doors){const d=doors[k];if(d.pivot){d.ang=lerp(d.ang,d.target,clamp(dt*3,0,1));let a=d.ang;if(d.shakeT&&now<d.shakeT)a+=Math.sin(now*60)*.03;d.pivot.rotation.y=d.base+a;}}
   const fr=doors[dkey(0,16,25)].front;if(fr.userData.opening){const t=clamp((now-fr.userData.opening)/1.5,0,1);fr.position.z=25*CELL+.1+t*1.4;fr.scale.x=1-t*.9;}
 }
-// Update lights (flicker and power).
 function updateLights(dt){
   for(const f of fixtures){
     if(f.tv){f.cur=f.tv.mode==='off'?0:.5+Math.random()*.25;continue;}
@@ -2049,7 +1865,6 @@ function updateLights(dt){
     t.scr.material=m;if(t.mode!=='off'&&t.f===P.floor)tvNear=Math.min(tvNear,Math.hypot(t.x-P.pos.x,t.z-P.pos.z));}
   const humD=nearLitFixture(P.pos,P.floor);const dry=updateDryer(dt);ambSet(.12,powerAlive()?clamp(.05*(1-humD/9),0,.05):0,clamp(.05*(1-tvNear/7),0,.05),dry);
 }
-// Update positional audio for the listener.
 function updateAudioWorld(dt){
   if(!ac)return;const l=ac.listener;const fw=new THREE.Vector3();camera.getWorldDirection(fw);
   if(l.positionX){l.positionX.value=camera.position.x;l.positionY.value=camera.position.y;l.positionZ.value=camera.position.z;l.forwardX.value=fw.x;l.forwardY.value=fw.y;l.forwardZ.value=fw.z;l.upX.value=0;l.upY.value=1;l.upZ.value=0;}
@@ -2068,19 +1883,16 @@ function updateAudioWorld(dt){
   if((st==='CHASE'||st==='STALK'||(P.hidden&&d<8))&&d<16){heartT-=dt;if(heartT<=0){heartT=lerp(.4,1,d/16);SFX.heartbeat(.4);}}
   if(st==='WANDER'&&now>whisperT){whisperT=now+rnd(55,110);if(Math.random()<.5)SFX.whisper(camera.position.clone().add(new THREE.Vector3(rnd(-7,7),0,rnd(-7,7))),.35);else SFX.scrape(lpos(1),.5,true);}
 }
-// Update music tension.
 function updateMusicState(dt){
   let ten=.15;if(G.F.fuse)ten=.35;if(L.state==='STALK')ten=.75;if(['INVESTIGATE','SEARCH','HUNT_D'].includes(L.state))ten=.55;if(G.F.blackout&&!G.F.generator)ten=Math.max(ten,.5);
   const d=L.floor===P.floor?L.pos.distanceTo(P.pos.clone().setY(0)):99;if(L.state!=='INACTIVE'&&d<14)ten=Math.max(ten,.6);
   if(L.state==='CHASE'||L.state==='HUNT_D')MUS.chaseT=1;else MUS.chaseT=Math.max(0,MUS.chaseT-dt*.25);
   MUS.tension=lerp(MUS.tension,ten,clamp(dt*.5,0,1));MUS.chase=lerp(MUS.chase,MUS.chaseT>0?1:0,clamp(dt*(MUS.chaseT>0?3:.5),0,1));
 }
-// Death animation.
 function updateDying(dt){
   const dir=new THREE.Vector3(Math.sin(P.yaw),0,Math.cos(P.yaw));const target=P.pos.clone().addScaledVector(dir,.95);L.disp.lerp(target,clamp(dt*12,0,1));L.pos.copy(L.disp);L.floor=P.floor;
   updateLarryVisual(dt);camera.fov=lerp(camera.fov,52,dt*6);camera.updateProjectionMatrix();camera.position.y=base(P.floor)+1.5+Math.sin(now*40)*.03;
 }
-// Main loop: update and render each frame.
 function frame(){
   requestAnimationFrame(frame);
   const t=performance.now();let dt=Math.min(.05,(t-lastT)/1000);lastT=t;now+=dt;
@@ -2137,12 +1949,9 @@ function initGL(){
   resize();
 }
 const eyeSprites=[];
-// Position Larry's glowing eyes on his face.
 function repositionEyes(){const W=2.3,Hh=2.8,F=FACES[activeFace];eyeSprites.forEach(e=>{const [u,v]=F.eyes[e.i];const k=e.base*F.eyeScale;e.s.scale.set(k,k,k);e.s.position.set((u-.5)*W,(1-v)*Hh,.06);});}
-// Resize the renderer to the window.
 function resize(){if(!renderer)return;renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)*S.res);renderer.setSize(innerWidth,innerHeight,false);camera.aspect=secCam.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();secCam.updateProjectionMatrix();}
 addEventListener('resize',()=>{resize();sizeCanvases();});
-// Set up a new run.
 function setupRun(){
   G=freshState();if(S.face==='random'){runFace=null;}applyFace();
   // code TVs and hidden valve order for this run
@@ -2160,7 +1969,6 @@ function setupRun(){
   const fr=doors[dkey(0,16,25)].front;fr.userData.opening=0;fr.position.z=25*CELL+.1;fr.scale.x=1;
   G.crank=0;
 }
-// Start the game.
 function startGame(){
   setupRun();if(L.purr)L.purr.kill();L.purr=makePurr(false);
   applyWorld(false);saveCheckpoint();hotbarSig='';renderHotbar();flashSig='';renderFlashHud();
@@ -2168,30 +1976,23 @@ function startGame(){
   MUS.mbox=null;MUS.silent=false;MUS.tension=.1;fadeIn(2.5);lockPointer(false);
   setTimeout(()=>{if(state==='play')SFX.whisper(camera.position.clone().add(new THREE.Vector3(0,2,0)),.35);},5000);
 }
-// Fade in from black.
 function fadeIn(s){const f=$('fade');f.style.transition='none';f.style.opacity=1;requestAnimationFrame(()=>{f.style.transition='opacity '+s+'s';f.style.opacity=0;});}
-// Fade out to black, then run cb.
 function fadeOut(s,cb){const f=$('fade');f.style.transition='opacity '+s+'s';f.style.opacity=1;setTimeout(cb,s*1000);}
-// Hide all UI layers.
 function hideAllUI(){['menu','cs','hud','mon','vg'].forEach(i=>$(i).classList.remove('show','on'));['settingsP','controlsP','pauseP'].forEach(i=>$(i).classList.remove('show'));
   ['death','endCard','paperOv','breakerOv','keypadOv','journalOv'].forEach(i=>$(i).classList.remove('show'));$('photo').style.display='none';$('subs').innerHTML='';subQ=[];subT=0;}
 let progExit=false;
-// Release the mouse pointer.
 function exitLock(){if(document.exitPointerLock&&pointerLocked){progExit=true;document.exitPointerLock();}}
 /* Mouse lock: always optional. A refused request never switches modes — you can always click again,
    and while unlocked you can hold the mouse button and drag to look. Chrome refuses a re-lock for ~1 s after
    you press Esc, so we wait that out instead of asking too early. */
 let lastUnlockT=-1e9,lockFails=0;
-// Lock the mouse pointer.
 function lockPointer(){const c=$('gl');if(pointerLocked||!c.requestPointerLock)return;if(performance.now()-lastUnlockT<1150)return;
   try{const r=c.requestPointerLock();if(r&&r.catch)r.catch(()=>{lockFails++;});}catch(e){lockFails++;}}
 document.addEventListener('pointerlockchange',()=>{const was=pointerLocked;pointerLocked=document.pointerLockElement===$('gl');
   if(pointerLocked){lockFails=0;dragging=false;return;}
   if(was){if(progExit){progExit=false;return;}lastUnlockT=performance.now();if(state==='play')pause();}});
 document.addEventListener('pointerlockerror',()=>{lockFails++;});
-// Pause.
 function pause(){if(state!=='play')return;state='paused';$('pauseP').classList.add('show');}
-// Resume.
 function resume(){$('pauseP').classList.remove('show');state='play';lastT=performance.now();lockPointer();}
 
 /* ---- input ---- */
@@ -2248,9 +2049,7 @@ const STACK={bottle:true,battery:true};
 const NO_HAND={page:true,vhs:true};
 /* ---- icons ---- */
 const ICON={};
-// Build the inventory icons.
 function buildIcons(){
-  // Make a 64 x 64 icon canvas.
   const mk=(fn)=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.lineCap='round';x.lineJoin='round';fn(x);return c.toDataURL();};
   ICON.camera=mk(x=>{x.fillStyle='#2a2a28';x.fillRect(8,20,48,32);x.fillStyle='#e8e2d0';x.fillRect(8,20,48,7);x.fillStyle='#111';x.beginPath();x.arc(32,38,11,0,7);x.fill();x.strokeStyle='#888';x.lineWidth=3;x.stroke();x.fillStyle='#fffbe0';x.fillRect(44,23,8,4);x.fillStyle='#5a5a58';x.fillRect(14,14,14,6);});
   ICON.musicbox=mk(x=>{x.fillStyle='#7a4a2a';x.fillRect(10,26,40,26);x.fillStyle='#9a6238';x.fillRect(8,20,44,8);x.fillStyle='#c9a43a';x.fillRect(26,34,8,6);x.strokeStyle='#c9a43a';x.lineWidth=3;x.beginPath();x.moveTo(50,38);x.lineTo(58,38);x.lineTo(58,30);x.stroke();});
@@ -2268,27 +2067,18 @@ function buildIcons(){
 }
 /* ---- data helpers ---- */
 const allEntries=()=>[...G.inv.hand.filter(Boolean),...G.inv.bag];
-// Do I have an item of this kind?
 const has=k=>allEntries().some(e=>e.kind===k);
-// Find the inventory entry for a kind.
 const entryOf=k=>allEntries().find(e=>e.kind===k);
-// The selected hotbar entry.
 const selEntry=()=>G.inv.hand[G.inv.sel]||null;
-// Kind of the selected entry.
 const selKind=()=>{const e=selEntry();return e?e.kind:null;};
-// How much tuna I have.
 function tunaCount(){return allEntries().filter(e=>e.kind==='tuna').reduce((s,e)=>s+items[e.ids[0]].count,0);}
-// Display name of an inventory entry.
 function entryName(e){if(e.kind==='vhs')return 'VHS — '+TAPE_TITLE[items[e.ids[0]].tape];if(e.kind==='page'){const l=LORE[items[e.ids[0]].lore];return l?l.title:'Document';}return IDEF[e.kind].n;}
-// Small subtitle for an inventory entry (film left, cans ...).
 function entrySub(e){
   switch(e.kind){case 'camera':return G.inv.film+' film';case 'tuna':return items[e.ids[0]].count+' cans';case 'laser':return Math.round(G.inv.battery*100)+'% battery';
     case 'bottle':case 'battery':return '× '+e.ids.length;
     case 'flashlight':{const c=items[e.ids[0]].count;return Math.round(c*100)+'%'+(P.light&&G.inv.hand.includes(e)?' · on':'');}case 'musicbox':return box.playing?'playing':box.winding?'winding…':'';default:return '';}
 }
-// Remove an inventory entry.
 function removeEntry(e){const h=G.inv.hand.indexOf(e);if(h>=0)G.inv.hand[h]=null;else{const b=G.inv.bag.indexOf(e);if(b>=0)G.inv.bag.splice(b,1);}}
-// Use up an item kind.
 function consumeKind(k){const e=entryOf(k);if(!e)return;e.ids.forEach(i=>{items[i].gone=true;items[i].taken=true;});removeEntry(e);renderHotbar();}
 /* pick up: returns where it went */
 function invAdd(it){
@@ -2298,12 +2088,10 @@ function invAdd(it){
   if(!NO_HAND[it.kind]){const free=G.inv.hand.indexOf(null);if(free>=0){G.inv.hand[free]=e;if(!selEntry())G.inv.sel=free;return 'hand '+(free+1);}}
   G.inv.bag.push(e);return 'bag';
 }
-// Message shown when picking something up.
 function pickupMsg(it,where){const n=(it.kind==='page'||it.kind==='vhs')?entryName({kind:it.kind,ids:[items.indexOf(it)]}):IDEF[it.kind].n;
   return where.startsWith('hand')?`${n} → hand slot ${where.slice(5)}`:where==='hand'?`${n} (${allEntries().find(e=>e.kind===it.kind).ids.length} carried)`:`${n} → bag${it.kind==='page'?' (read it again with Tab)':' (hands full — Tab to swap)'}`;}
 /* ---- drop ---- */
 const DROP_Y={battery:.05,bottle:.16,page:.02,tuna:.03,wheel:.03,keyring:.03,collar:.03,flashlight:.05,laser:.04};
-// Drop an entry (or one of a stack).
 function dropEntry(e,justOne){
   if(!e)return;const idx=(STACK[e.kind]&&justOne)?e.ids.pop():null;const ids=idx!=null?[idx]:e.ids.splice(0);
   if(!e.ids.length)removeEntry(e);
@@ -2316,11 +2104,9 @@ function dropEntry(e,justOne){
   if(e.kind==='musicbox'&&box.winding){box.winding=false;}if(e.kind==='laser'){useHeld=false;}
   SFX.thud(null,.15);renderHotbar();renderFlashHud();setObjective();return ids.length;
 }
-// Drop the selected item.
 function dropSelected(){if(state!=='play'||P.hidden)return;const e=selEntry();if(!e){showMsg('Your hand is empty.',1.4);return;}const n=entryName(e);dropEntry(e,true);showMsg(`Dropped: ${n}`,1.6);}
 /* ---- select / use ---- */
 function selectSlot(i){G.inv.sel=(i+HAND_N)%HAND_N;if(box.winding&&selKind()!=='musicbox')box.winding=false;renderHotbar();}
-// Use button pressed: use the held item.
 function useDown(){
   if(state!=='play'||P.hidden)return;useHeld=true;const e=selEntry();if(!e){showMsg('Nothing in your hand. Pick a slot with 1–4.',1.8);return;}
   switch(e.kind){
@@ -2335,11 +2121,9 @@ function useDown(){
   }
   renderHotbar();
 }
-// Use button released.
 function useUp(){useHeld=false;if(box.winding){box.winding=false;if(box.wind>.06)startBox();}renderHotbar();}
 /* ---- HUD hotbar ---- */
 let hotbarSig='';
-// Draw the hotbar.
 function renderHotbar(){
   if(!G)return;const sig=JSON.stringify([G.inv.hand.map(e=>e?[e.kind,entrySub(e)]:0),G.inv.sel,G.inv.bag.length]);if(sig===hotbarSig)return;hotbarSig=sig;
   $('tools').innerHTML=G.inv.hand.map((e,i)=>`<div class="slot${i===G.inv.sel?' sel':''}${e?'':' empty'}"><span class="kn">${i+1}</span>${e?`<img src="${ICON[e.kind]}" alt=""><span class="nm">${IDEF[e.kind].n}</span><span class="sb">${entrySub(e)}</span>`:'<span class="nm">empty</span>'}</div>`).join('')
@@ -2349,7 +2133,6 @@ function renderHotbar(){
 }
 /* ---- held item in first person ---- */
 let handGroup=null,handKind=null;
-// Switch the hand model to the selected item.
 function updateHandModel(){
   if(!handGroup)return;const k=selKind();if(k===handKind)return;handKind=k;
   while(handGroup.children.length)handGroup.remove(handGroup.children[0]);
@@ -2357,7 +2140,6 @@ function updateHandModel(){
   const S={flashlight:[.6,1.5,.12,0],battery:[.7,0,.2,0],camera:[.55,0,.35,0],musicbox:[.5,0,.45,0],tuna:[.5,.25,.2,0],laser:[.7,-.2,1.25,.3],bottle:[.5,0,0,.2],fuse:[.55,.5,.6,.2],wheel:[.5,1.2,0,0],keyring:[.6,1.1,.3,0],collar:[.55,1.2,0,0]}[k]||[.5,0,0,0];
   m.scale.setScalar(S[0]);m.rotation.set(S[1],S[2],S[3]);handGroup.add(m);
 }
-// Animate the held item.
 function updateHandPose(dt){
   if(!handGroup)return;const vis=state==='play'&&!P.hidden&&!!selKind();handGroup.visible=vis;if(!vis)return;
   const spd=Math.hypot(P.vel.x,P.vel.z);const bob=spd>.5?Math.sin(P.bob*2)*.012:Math.sin(now*1.6)*.004;
@@ -2367,20 +2149,15 @@ function updateHandPose(dt){
 }
 /* ---- inventory screen ---- */
 let invTab='items',invPick=null,invReturn=false;
-// Open the inventory/journal.
 function openInventory(tab){
   if(tab)invTab=tab;state='ui';exitLock();box.winding=false;useHeld=false;renderInventory();$('journalOv').classList.add('show');
 }
-// Close the inventory.
 function closeInventory(){$('journalOv').classList.remove('show');invPick=null;state='play';lockPointer();renderHotbar();}
-// Journal shortcuts.
 const openJournal=()=>openInventory('items'),closeJournal=closeInventory;
-// HTML for one inventory slot.
 function slotHTML(e,where,i){
   const picked=invPick&&invPick.e===e&&e;const sel=where==='hand'&&i===G.inv.sel;
   return `<button class="islot${e?'':' empty'}${picked?' picked':''}${sel?' cur':''}" data-w="${where}" data-i="${i}">${where==='hand'?`<span class="kn">${i+1}</span>`:''}${e?`<img src="${ICON[e.kind]}" alt=""><span class="nm">${entryName(e)}</span><span class="sb">${entrySub(e)}</span>`:'<span class="nm">empty</span>'}</button>`;
 }
-// Draw the inventory (items, documents and notes tabs).
 function renderInventory(){
   const tabs=['items','docs','notes'].map(t=>`<button class="tab${invTab===t?' on':''}" data-t="${t}">${{items:'Items',docs:'Documents',notes:'Notes'}[t]}</button>`).join('');
   let body='';
@@ -2401,7 +2178,6 @@ function renderInventory(){
       ${unwatched.length?`<h4>TAPES TO WATCH</h4><div class="doclist">${unwatched.map(e=>`<div class="doc"><img src="${ICON.vhs}" alt=""><span>${entryName(e)}</span><span class="dim">play at a VCR</span></div>`).join('')}</div>`:''}
       <h4>RECORDINGS</h4>${rec.length||tapes.length?`<div class="doclist">${rec.map(k=>`<button class="doc" data-vm="${k}"><span>${LORE_TITLES[k]}</span><span class="dim">Replay</span></button>`).join('')}${tapes.map(k=>`<button class="doc" data-vhs="${k}"><span>${LORE_TITLES[k]}</span><span class="dim">Watch again</span></button>`).join('')}</div>`:'<p class="dim">Answering machines and tapes you play are remembered here.</p>'}`;
   } else {
-    // Lore helpers and the code seen so far.
     const lk=k=>G.lore[k];const code=G.codeSeen.map(v=>v==null?'_':v).join(' ');
     const order=G.F.orderKnown?G.valveOrder.map(i=>['RED','GREEN','BLUE'][i]).join(' → '):'— (photograph the boiler room, or find the 1988 tape)';
     body=`<div class="cols"><div><h4>NOTES</h4><div class="notes">Flashlight: ${flashItem()?Math.round(flashCharge()*100)+'% · '+(entryOf('battery')||{ids:[]}).ids.length+' spare batteries':'not carried'}<br>Storage code: ${code}<br>Valve order: ${order}<br>${G.F.clueCollar?"Tape clue: Larry's collar has Mrs. Halloran's name. Return it to her bed in 2A?<br>":''}Film: ${G.inv.film} · Tuna: ${tunaCount()} · Laser: ${Math.round(G.inv.battery*100)}%<br>Mr. Delgado: ${({closet:'not found',follow:'with you',hiding:'hiding',wait:'waiting',taken:'taken',saved:'safe'})[D.state]}</div>
@@ -2432,36 +2208,26 @@ $('journalOv').addEventListener('click',ev=>{
   if(t.dataset.vm){const k=t.dataset.vm;closeInventory();say(VOICEMAIL[k].lines.map(l=>({...l})));return;}
   if(t.dataset.vhs){const k=t.dataset.vhs;$('journalOv').classList.remove('show');state='play';playVHS(k);return;}
 });
-// Move an entry into a hotbar slot.
 function moveToHand(e,i){const cur=G.inv.hand[i];const from=G.inv.hand.indexOf(e);
   if(from>=0){G.inv.hand[from]=cur;G.inv.hand[i]=e;}
   else{const b=G.inv.bag.indexOf(e);G.inv.bag.splice(b,1);G.inv.hand[i]=e;if(cur)G.inv.bag.splice(b,0,cur);}
   G.inv.sel=i;hotbarSig='';renderHotbar();}
-// Move an entry into the bag.
 function moveToBag(e){const h=G.inv.hand.indexOf(e);if(h<0)return;G.inv.hand[h]=null;G.inv.bag.push(e);if(e.kind==='flashlight')P.light=false;hotbarSig='';renderHotbar();renderFlashHud();}
-// Inventory keyboard shortcuts.
 function invKey(e){
   if(e.code==='Tab'||e.code==='Escape'){closeInventory();return;}
   if(/^Digit[1-4]$/.test(e.code)&&invPick&&invPick.e&&!NO_HAND[invPick.e.kind]){moveToHand(invPick.e,+e.code.slice(5)-1);renderInventory();}
 }
 /* ---- item state for checkpoints ---- */
 function itemState(){return items.map(it=>({t:it.taken,g:!!it.gone,f:it.f,p:[it.pos.x,it.pos.y,it.pos.z],c:it.count}));}
-// Restore items from a checkpoint.
 function restoreItems(st){st.forEach((s,i)=>{const it=items[i];it.taken=s.t;it.gone=s.g;it.f=s.f;it.pos.set(s.p[0],s.p[1],s.p[2]);it.mesh.position.copy(it.pos);if(it.glint)it.glint.position.set(it.pos.x,it.pos.y+.1,it.pos.z);if(s.c!=null)it.count=s.c;});}
-// Reset items for a new run.
 function resetItems(){FL.deadT=0;FL.warned=false;items.forEach(it=>{if(it.kind==='flashlight')it.count=1;const h=it.home;it.f=h.f;it.pos.copy(h.pos);it.mesh.position.copy(h.pos);if(it.glint)it.glint.position.set(h.pos.x,h.pos.y+.1,h.pos.z);it.taken=false;it.gone=false;it.ever=false;if(it.kind==='tuna')it.count=3;});}
-// Escape text for HTML.
 const escH=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-// Format a prompt like "[E] Open" with a key badge.
 function fmtPrompt(p){if(!p)return '';const m=p.match(/^\[(Hold )?([A-Z])\]\s*(.*)$/);if(!m)return escH(p);return `<span class="kc">${m[2]}</span>${m[1]?'<span class="hold">HOLD</span>':''}${escH(m[3])}`;}
 /* ================= FLASHLIGHT BATTERY ================= */
 const BAT_LIFE=240;                    // seconds of light per battery
 const FL={deadT:0,warned:false,noteT:0};
-// Flashlight inventory entry.
 const flashEntry=()=>G.inv.hand.find(e=>e&&e.kind==='flashlight')||null;
-// Flashlight item.
 const flashItem=()=>{const e=entryOf('flashlight');return e?items[e.ids[0]]:null;};
-// Flashlight battery charge.
 const flashCharge=()=>{const it=flashItem();return it?it.count:0;};
 /* effective light this frame: on, in a hand slot, and not fully dead */
 function updateFlashlight(dt){
@@ -2477,13 +2243,11 @@ function updateFlashlight(dt){
   flashlight.distance=c>0?28:FL.deadT>0?12:6;
   renderFlashHud();renderHotbar();
 }
-// Toggle the flashlight.
 function toggleLight(){
   if(!has('flashlight')){if(G.F.flashlight)showMsg('Your flashlight is on the floor somewhere. Pick it back up.',2.6);return;}
   if(!flashEntry()){showMsg('Your flashlight is in your bag. Move it to a hand slot (Tab).',2.6);return;}
   P.light=!P.light;SFX.click(.35);if(P.light&&flashCharge()<=0&&!has('battery'))showMsg('Dead. You need to find batteries.',2.4);renderFlashHud();
 }
-// Reload the flashlight battery.
 function reloadBattery(){
   if(state!=='play')return;const be=entryOf('battery');const fi=flashItem();
   if(!fi){showMsg('No flashlight to put it in.',1.8);return;}
@@ -2493,7 +2257,6 @@ function reloadBattery(){
   fi.count=1;FL.deadT=0;FL.warned=false;SFX.click(.3);setTimeout(()=>SFX.click(.25),180);showMsg('Fresh battery.',1.6);hotbarSig='';renderHotbar();renderFlashHud();
 }
 let flashSig='';
-// Draw the flashlight battery HUD.
 function renderFlashHud(){
   if(!G)return;const el=$('flashHud');const it=flashItem();
   if(!it){flashSig='';el.style.display=G.F.flashlight?'flex':'none';el.className='lost';$('batIcon').src=IMG_BAT_DEAD;$('batTxt').innerHTML=G.F.flashlight?'Flashlight<br><span>dropped</span>':'';return;}
@@ -2507,22 +2270,17 @@ function renderFlashHud(){
 
 /* ================= MENU ================= */
 const menuCv=$('menuCv'),mcx=menuCv.getContext('2d');let mouse={x:.5,y:.5,lastMove:0},creep=0,menuFlash=0,menuGlitch=0,eyeWide=0;
-// Size the menu and cutscene canvases.
 function sizeCanvases(){[menuCv,$('csCv')].forEach(c=>{c.width=innerWidth;c.height=innerHeight;});}
-// Track the mouse on the menu.
 function menuMouse(e){mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight;mouse.lastMove=now;}
-// Draw the animated main menu.
 function drawMenu(dt){
   const c=mcx,w=menuCv.width,h=menuCv.height;
   const idle=now-mouse.lastMove;creep=clamp(creep+(idle>7?dt*.05:-dt*.4),0,1);
   const flick=Math.random()<.03?.35:1;const b=(.55+Math.sin(now*.7)*.05)*flick;
   c.fillStyle='#000';c.fillRect(0,0,w,h);
   const vx=w*.66+(mouse.x-.5)*-30,vy=h*.48+(mouse.y-.5)*-20; // vanishing point drifts against mouse (parallax)
-  // Scale a color by k.
   const col=(r,g,bb,k)=>`rgb(${r*k|0},${g*k|0},${bb*k|0})`;
   // corridor planes
   const fw=w*.06,fh=h*.09;const L0=-w*.1,R0=w*1.1,T0=-h*.05,B0=h*1.05;
-  // Fill a polygon.
   const poly=(pts,fill)=>{c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(const p of pts)c.lineTo(p[0],p[1]);c.closePath();c.fillStyle=fill;c.fill();};
   const g1=c.createLinearGradient(0,0,vx,0);g1.addColorStop(0,col(150,132,70,b*.55));g1.addColorStop(1,col(20,17,8,b));
   poly([[L0,T0],[vx-fw,vy-fh],[vx-fw,vy+fh],[L0,B0]],g1);
@@ -2566,13 +2324,10 @@ document.querySelectorAll('#menuUI .mi').forEach(b=>{
     if(a==='settings')openSettings();
     if(a==='controls')$('controlsP').classList.add('show');});
 });
-// Show the main menu.
 function showMenu(){hideAllUI();$('menu').classList.add('show');state='menu';MUS.mbox={seq:[7,null,3,null,0,null,2,3,null,null,-2,null,0,null,null,null],i:0,step:.42,detune:.55,vol:.07};MUS.silent=false;MUS.chase=0;MUS.chaseT=0;fadeIn(1.5);
   if(L.purr){L.purr.kill();L.purr=null;}if(document.exitPointerLock&&pointerLocked)document.exitPointerLock();}
 let settingsFrom=null;
-// Open settings.
 function openSettings(){settingsFrom=state;$('settingsP').classList.add('show');drawFacePreview();}
-// Close settings.
 function closeSettings(){$('settingsP').classList.remove('show');}
 $('setBack').onclick=closeSettings;$('ctlBack').onclick=()=>$('controlsP').classList.remove('show');
 document.querySelectorAll('#pauseP .mi').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.p;
@@ -2582,13 +2337,9 @@ $('endBack').onclick=()=>showMenu();
 
 /* ================= CUTSCENES ================= */
 let CS=null;const csc=$('csCv').getContext('2d');let skipHold=0;
-// Start a cutscene.
 function startCutscene(shots,done){hideAllUI();$('cs').classList.add('show');state='cutscene';CS={shots,i:-1,t:0,done,tot:0};nextShot();fadeIn(1);}
-// Next cutscene shot.
 function nextShot(){CS.i++;CS.t=0;if(CS.i>=CS.shots.length){endCutscene();return;}const s=CS.shots[CS.i];CS.cap=s.cap||'';CS.capT=0;if(s.on)s.on();}
-// End the cutscene.
 function endCutscene(){const d=CS.done;CS=null;$('cap').textContent='';if(d)d();}
-// Draw the current cutscene shot.
 function drawCutscene(dt){
   if(!CS)return;const s=CS.shots[CS.i];CS.t+=dt;const p=clamp(CS.t/s.dur,0,1);const w=$('csCv').width,h=$('csCv').height;
   csc.save();csc.fillStyle='#000';csc.fillRect(0,0,w,h);s.draw(csc,w,h,CS.t,p);csc.restore();
@@ -2607,7 +2358,6 @@ let csHold=false;$('cs').addEventListener('mousedown',()=>csHold=true);addEventL
 
 /* painters */
 function sky(c,w,h,top,bot){const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,top);g.addColorStop(1,bot);c.fillStyle=g;c.fillRect(0,0,w,h);}
-// Draw a building (cutscene art).
 function building(c,x,y,bw,bh,o={}){
   c.fillStyle=o.wall||'#b08a66';c.fillRect(x,y,bw,bh);c.fillStyle='rgba(0,0,0,.12)';for(let i=0;i<bh;i+=bh/18)c.fillRect(x,y+i,bw,1);
   c.fillStyle=o.roof||'#5a3e2c';c.fillRect(x-bw*.03,y-bh*.04,bw*1.06,bh*.05);
@@ -2618,9 +2368,7 @@ function building(c,x,y,bw,bh,o={}){
     c.strokeStyle='#3a2c20';c.lineWidth=2;c.strokeRect(wx,wy,ww,wh);}
   c.fillStyle='#3a2a1c';c.fillRect(x+bw*.45,y+bh*.84,bw*.1,bh*.16);{const fs=Math.max(10,bw*.032);c.font=`${fs}px Special Elite`;const tw=c.measureText('HAWTHORNE COURT').width;const sw=tw+fs*1.4,sh=fs*1.5,sx=x+bw/2-sw/2,sy=y+bh*.815-sh;c.fillStyle='#0b0907';c.fillRect(sx,sy,sw,sh);c.strokeStyle='#8a6a2a';c.lineWidth=Math.max(1,fs*.08);c.strokeRect(sx,sy,sw,sh);c.fillStyle='#e8c068';c.textAlign='center';c.textBaseline='middle';c.fillText('HAWTHORNE COURT',x+bw/2,sy+sh/2+fs*.05);c.textBaseline='alphabetic';}
 }
-// Draw a tree.
 function tree(c,x,y,s,col){c.fillStyle='#4a3424';c.fillRect(x-s*.06,y-s*.5,s*.12,s*.5);c.fillStyle=col;c.beginPath();c.arc(x,y-s*.65,s*.35,0,7);c.arc(x-s*.22,y-s*.5,s*.25,0,7);c.arc(x+s*.22,y-s*.5,s*.25,0,7);c.fill();}
-// Draw a room (cutscene art).
 function room(c,w,h,o={}){
   const k=o.k??1;const wall=o.night?'#1d1a22':'#c9a978',floor=o.night?'#141016':'#7a5434';
   c.fillStyle=wall;c.fillRect(0,0,w,h);c.fillStyle=floor;c.fillRect(0,h*.68,w,h*.32);
@@ -2646,7 +2394,6 @@ function room(c,w,h,o={}){
     if(o.larryDoor){c.save();c.beginPath();c.rect(w*.02,h*.18,w*.08,h*.5);c.clip();const s=h*.5*o.larryDoor;c.globalAlpha=.95;c.drawImage(creepyCut(),w*.06-s*.4,h*.2,s*.8,s);c.restore();c.globalAlpha=1;}}
   if(o.dark){c.fillStyle=`rgba(0,0,0,${o.dark})`;c.fillRect(0,0,w,h);}
 }
-// Draw a polaroid photo.
 function polaroid(c,x,y,pw,ph,rot,paint,label,o={}){
   c.save();c.translate(x,y);c.rotate(rot);c.fillStyle='rgba(0,0,0,.45)';c.fillRect(-pw/2+6,-ph/2+8,pw,ph);
   c.fillStyle=o.aged?'#d8ceb4':'#f4f0e6';c.fillRect(-pw/2,-ph/2,pw,ph);
@@ -2655,11 +2402,8 @@ function polaroid(c,x,y,pw,ph,rot,paint,label,o={}){
   if(o.stamp){c.fillStyle='#ff8a1a';c.font=`${Math.max(11,pw*.06)}px VT323`;c.textAlign='right';c.fillText(o.stamp,iw/2-pw*.02,-ph/2+pw*.06+ih-6);}
   c.restore();
 }
-// Add film grain.
 function grainOver(c,w,h,a){for(let i=0;i<500;i++){c.fillStyle=`rgba(255,255,255,${Math.random()*a})`;c.fillRect(Math.random()*w,Math.random()*h,2,2);}}
-// Draw an image covering a rectangle.
 function coverRect(c,img,x,y,w,h){const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;if(!iw)return;const s=Math.max(w/iw,h/ih);c.save();c.beginPath();c.rect(x,y,w,h);c.clip();c.drawImage(img,x+(w-iw*s)/2,y+(h-ih*s)/2,iw*s,ih*s);c.restore();}
-// Draw a corkboard.
 function corkboard(c,w,h,notes,p,dark){
   c.fillStyle=dark?'#3a2a1c':'#9a6a40';c.fillRect(w*.15,h*.14,w*.7,h*.66);c.fillStyle='rgba(0,0,0,.2)';for(let i=0;i<400;i++)c.fillRect(w*.15+Math.random()*w*.7,h*.14+Math.random()*h*.66,2,2);
   c.strokeStyle='#5a3a20';c.lineWidth=10;c.strokeRect(w*.15,h*.14,w*.7,h*.66);
@@ -2696,7 +2440,6 @@ const PH={
     c.fillStyle='#1a1a24';c.beginPath();c.ellipse(w*.5,h*.27,w*.09,h*.07,0,0,7);c.fill();c.fillStyle='#3a3650';c.fillRect(w*.22,h*.34,w*.56,h*.52);
     c.fillStyle='rgba(200,255,120,.9)';c.beginPath();c.arc(w*.06,h*.5,2.5,0,7);c.arc(w*.11,h*.48,2.5,0,7);c.fill();grainOver(c,w,h,.25);}
 };
-// Draw the polaroid table scene.
 function polaroidTable(c,w,h,t,larry,dim,mode){
   c.fillStyle=dim?'#120c08':'#5a3a24';c.fillRect(0,0,w,h);for(let i=0;i<14;i++){c.fillStyle=`rgba(0,0,0,${.08+(i%3)*.04})`;c.fillRect(0,i*h/14,w,2);}
   const pw=Math.min(w*.19,h*.29),ph=pw*1.2;
@@ -2776,7 +2519,6 @@ PROLOGUE.splice(4,0,{dur:6,cap:'I signed the lease without reading Section 14.',
   c.fillStyle='#7a1a10';c.font=`${pw*.04}px Special Elite`;c.textAlign='left';c.fillText('§14. Tenant agrees to feed the building cat.',-pw*.4,ph*.2);
   c.strokeStyle='#1a2a6a';c.lineWidth=3;c.beginPath();const k=clamp(p*1.6,0,1);for(let i=0;i<=40*k;i++){const x=-pw*.3+i*pw*.012,y=ph*.36+Math.sin(i*.9)*6;i?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();c.restore();}});
 
-// VHS overlay effect.
 function vhsOverlay(c,w,h,t,label){
   c.fillStyle='rgba(20,30,60,.12)';c.fillRect(0,0,w,h);
   for(let y=0;y<h;y+=3){c.fillStyle='rgba(0,0,0,.18)';c.fillRect(0,y,w,1);}
@@ -2784,7 +2526,6 @@ function vhsOverlay(c,w,h,t,label){
   if(Math.random()<.06){const y=Math.random()*h;c.drawImage(c.canvas,0,y,w,20,rnd(-20,20),y,w,20);}
   c.fillStyle='#e8f0ff';c.font=`${Math.max(18,h*.04)}px VT323`;c.textAlign='left';c.fillText('▶ PLAY',w*.06,h*.16);c.textAlign='right';c.fillText(label,w*.94,h*.86);
 }
-// Draw a crowd.
 function crowd(c,w,h,n,y,col){for(let i=0;i<n;i++){const x=w*(.08+i*.84/n)+Math.sin(i*7)*8,s=h*(.09+((i*13)%5)*.006);c.fillStyle=col;c.beginPath();c.arc(x,y-s*1.1,s*.28,0,7);c.fill();c.fillRect(x-s*.3,y-s*.85,s*.6,s*.85);}}
 const VHS={
   vhs1:[
@@ -2820,10 +2561,8 @@ VHS.vhs2.splice(1,0,{dur:7,cap:'Before the party, the super bleeds the boiler. S
       if(t<1.2+(n-1)*1.4+.9){c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.arc(x+h*.05,y-h*.02,h*.05*(1+Math.random()),0,7);c.fill();}}});
   if(t>5.6){c.fillStyle='#e8f0ff';c.font=`${h*.05}px VT323`;c.textAlign='center';c.fillText(ord.map(i=>names[i]).join('  →  '),w/2,h*.82);}
   c.fillStyle='#1a1814';c.beginPath();c.arc(w*.12,h*.5,h*.05,0,7);c.fill();c.fillRect(w*.09,h*.55,w*.06,h*.2);vhsOverlay(c,w,h,t,'DEC 20 1988');}});
-// Security camera overlay.
 function camOverlay(c,w,h,t,label){c.fillStyle='rgba(0,0,0,.25)';for(let y=0;y<h;y+=3)c.fillRect(0,y,w,1);c.fillStyle='#e9f0e2';c.font=`${Math.max(18,h*.045)}px VT323`;c.textAlign='left';c.fillText('CAM 02 — STORAGE HALL',w*.05,h*.14);
   c.textAlign='right';c.fillText(label,w*.95,h*.88);c.fillStyle='#f44';c.textAlign='right';c.fillText('● REC',w*.95,h*.14);if(Math.random()<.05){const y=Math.random()*h;c.drawImage(c.canvas,0,y,w,16,rnd(-15,15),y,w,16);}}
-// Draw a hallway in camera view.
 function camHall(c,w,h,dark){const g=dark?.25:1;c.fillStyle=`rgb(${60*g},${60*g},${56*g})`;c.fillRect(0,0,w,h);const vx=w*.5,vy=h*.42;
   c.fillStyle=`rgb(${90*g},${90*g},${84*g})`;c.beginPath();c.moveTo(0,0);c.lineTo(vx-w*.08,vy-h*.1);c.lineTo(vx-w*.08,vy+h*.1);c.lineTo(0,h);c.fill();
   c.fillStyle=`rgb(${80*g},${80*g},${76*g})`;c.beginPath();c.moveTo(w,0);c.lineTo(vx+w*.08,vy-h*.1);c.lineTo(vx+w*.08,vy+h*.1);c.lineTo(w,h);c.fill();
@@ -2844,13 +2583,11 @@ VHS.vhs3=[
     if(off&&t>2){c.fillStyle='rgba(220,250,120,.95)';c.beginPath();c.arc(w*.6,h*.5,h*.012,0,7);c.arc(w*.64,h*.49,h*.012,0,7);c.fill();}
     camOverlay(c,w,h,t,'AUG 14 2026  03:13');}}];
 const TAPE_TITLE={vhs1:'Grand Opening, May 1971',vhs2:'Holiday Party, Dec 1988',vhs3:'Storage Hall CAM 02, Aug 2026'};
-// The clue a VHS tape gives.
 function tapeClue(key){
   if(key==='vhs1'){G.F.clueCollar=true;return "Clue: Larry's collar has Mrs. Halloran's name on it. Noted in your journal (Tab).";}
   if(key==='vhs2'){G.F.orderKnown=true;return 'Clue: the boiler valve order is noted in your journal (Tab).';}
   if(key==='vhs3'){G.codeSeen=G.code.slice();G.lore.posterDomino=G.lore.posterDomino||false;return 'Clue: the storage code is noted in your journal (Tab).';}
 }
-// Play a VHS tape.
 function playVHS(key){
   exitLock();G.lore[key]=true;MUS.mbox=null;SFX.click(.3);SFX.static(.5,.3);
   startCutscene(VHS[key],()=>{hideAllUI();$('cs').classList.remove('show');state='play';$('hud').classList.add('show');const m=tapeClue(key);setObjective();lockPointer();fadeIn(.6);hotbarSig='';renderHotbar();renderFlashHud();showMsg(m||'Journal updated. (Tab)',4);saveCheckpoint();});
@@ -2876,7 +2613,6 @@ const ENDING_TRUE=[
       const s=lerp(h*.7,h*.16,clamp(p*1.3,0,1));c.drawImage(creepyCut(),w*.5-s*.4,h*.52-s*.85,s*.8,s);}},
   {dur:6,cap:'He was never lost. He was waiting for her to come home.',on:()=>{MUS.silent=false;MUS.mbox={seq:HAPPY,i:0,step:.36,detune:0,vol:.1};},draw:(c,w,h,t,p)=>{sky(c,w,h,'#2a3a5a','#e8b890');building(c,w*.25,h*.22,w*.5,h*.66,{});c.fillStyle='#4a3a2a';c.fillRect(0,h*.88,w,h*.12);c.fillStyle=`rgba(255,220,160,${p*.25})`;c.fillRect(0,0,w,h);}}
 ];
-// End the game (good or bad ending).
 function endGame(kind){
   if(state==='ending'||state==='endcard')return;state='ending';exitLock();box.playing=false;MUS.mbox=null;
   const saved=(D.state==='follow'||D.state==='wait'||D.state==='hiding')&&D.f===P.floor&&D.pos.distanceTo(P.pos.clone().setY(0))<8;
@@ -2897,21 +2633,17 @@ function endGame(kind){
 
 /* ---- menu secret ---- */
 let typed='';
-// Secret typed codes on the menu.
 function menuType(k){if(!k||k.length!==1)return;typed=(typed+k.toLowerCase()).slice(-6);
   if(typed==='peenar'||typed.endsWith('peenor')){typed='';rollFried();menuFlash=.6;SFX.meow(null,1.6,.7);creep=1;const t=$('menuToast');t.textContent='Larry heard that.';t.style.opacity=1;setTimeout(()=>t.style.opacity=0,2200);}}
 
 /* ================= GRAIN ================= */
 const gcv=$('grain'),gcx=gcv.getContext('2d'),gimg=gcx.createImageData(240,135);
-// Draw film grain.
 function drawGrain(){if(S.grain!=='1')return;for(let i=0;i<gimg.data.length;i+=4){const v=Math.random()*255;gimg.data[i]=gimg.data[i+1]=gimg.data[i+2]=v;gimg.data[i+3]=255;}gcx.putImageData(gimg,0,0);}
 
 /* ================= BOOT ================= */
 $('gate').addEventListener('click',()=>{
   initAudio();if(ac.state==='suspended')ac.resume();
-  // Start once all images have loaded.
   let went=false;const go=()=>{if(went)return;went=true;applyFace();buildTextures();initGL();sizeCanvases();setupRun();$('gate').classList.remove('show');showMenu();};
-  // Wait for the images to load.
   const ready=()=>ALLIMG.every(i=>i.complete&&i.naturalWidth);if(ready())go();else{ALLIMG.forEach(i=>i.addEventListener('load',()=>{if(ready())go();}));setTimeout(()=>{if(state==='gate')go();},3000);}
 });
 sizeCanvases();requestAnimationFrame(frame);

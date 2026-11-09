@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notification Keys</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=DotGothic16&display=swap" rel="stylesheet"><link rel="stylesheet" href="/assets/theme.css">
+<style>
+  /* colors and fonts come from /theme.css */
+  :root { --ink: var(--paper); --muted: var(--dim); --line: var(--seam); --accent: var(--brass); }
+  main { max-width: 640px; margin: 28px auto; padding: 26px 28px; }
+  h1 { margin: 0 0 6px; } p { color: var(--muted); }
+  label { display: block; font-weight: 700; margin: 18px 0 6px; }
+  .theme-page textarea { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 13px; color: var(--led); resize: none; }
+  .warn { border-left: 3px solid var(--accent); padding-left: 10px; color: var(--ink); }
+</style>
+</head>
+<body class="theme-page">
+<main class="plate">
+  <h1>Notification keys</h1>
+  <p>Makes the key pair Pinned uses to send notifications. The keys are made right here in your browser and never leave this page.</p>
+  <button class="btn" id="go">Generate keys</button>
+  <div id="out" hidden>
+    <label>VAPID_PUBLIC_KEY (goes in config.js and in Supabase secrets)</label>
+    <textarea id="pub" rows="3" readonly></textarea>
+    <label>VAPID_PRIVATE_KEY (Supabase secrets only, keep it private)</label>
+    <textarea id="priv" rows="2" readonly></textarea>
+    <p class="warn">Copy both now. If you generate again, you'll get a new pair and both phones will need to turn notifications off and on again.</p>
+  </div>
+</main>
+<script>
+const b64u = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+document.getElementById("go").onclick = async () => {
+  const k = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+  document.getElementById("pub").value = b64u(await crypto.subtle.exportKey("raw", k.publicKey));
+  document.getElementById("priv").value = (await crypto.subtle.exportKey("jwk", k.privateKey)).d;
+  document.getElementById("out").hidden = false;
+};
+</script>
+</body>
+</html>

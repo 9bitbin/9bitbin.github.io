@@ -1,8 +1,3 @@
-<!--
-  File: REORGANIZE.md
-  Author: Himal Shrestha
-  Description: Notes on the November 2026 file reorganize (old paths and where they moved).
--->
 # File reorganize (Nov 2026)
 
 The site files were sorted into folders and all links were updated to match.

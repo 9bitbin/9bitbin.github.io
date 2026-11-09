@@ -1,0 +1,200 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#11130F;color:#E8E0C8}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kettle &amp; Seed Bakery</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Barlow:wght@400;500;700&family=DotGothic16&display=swap">
+<style>
+/* Layout: a kettle-steam hero, then a counter-board menu, hours, and a pickup pre-order card.
+   Colors follow the 9BITBIN brass + LED theme (see /assets/theme.css). */
+:root{
+  --bg:#11130F; --surface:#1A1C16; --ink:#E8E0C8; --muted:#9A9478;
+  --rye:#1A1C16; --on-rye:#E8E0C8; --sesame:#C49A4E; --sesame-ink:#1A1408;
+  --line:#3A3A2C; --banner:#0E100C; color-scheme:dark;
+  --display:"Chakra Petch", system-ui, sans-serif;
+  --body:"Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"DotGothic16", ui-monospace, Menlo, monospace;
+}
+header.top{border-bottom:3px solid #7A5A26;box-shadow:inset 0 -1px 0 #C49A4E}
+.hero{background:linear-gradient(160deg,#22251C,#1A1C16) !important}
+.hero h1{font-weight:700 !important}
+h2{font-weight:700 !important;color:#C49A4E}
+.eyebrow{color:#6DFF8E !important;text-shadow:0 0 6px rgba(109,255,142,.75),0 0 18px rgba(109,255,142,.35)}
+.btn{border-radius:3px !important;font-family:"Chakra Petch",system-ui,sans-serif !important;letter-spacing:.04em}
+.btn.primary{background:linear-gradient(180deg,#E2BE73,#C49A4E 45%,#7A5A26) !important;border-color:#3B2B10 !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 0 #2A1E0A}
+.btn.ghost{color:#6DFF8E !important;border-color:#275C36 !important;text-shadow:0 0 6px rgba(109,255,142,.75)}
+.col{border-radius:4px !important;background:linear-gradient(160deg,#22251C,#1A1C16) !important;border:2px solid #7A5A26 !important}
+
+body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--body)}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{text-wrap:balance;margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--sesame);outline-offset:2px}
+
+.demo{background:var(--banner);color:var(--muted);font-size:13px}
+.demo .wrap{padding-block:8px;text-align:center}
+
+header.top{background:var(--rye);color:var(--on-rye)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px;flex-wrap:wrap}
+.logo{font-family:var(--display);font-size:24px;letter-spacing:.5px;text-decoration:none}
+.logo span{color:var(--sesame)}
+.nav ul{display:flex;gap:20px;list-style:none;margin:0;padding:0;font-weight:500;font-size:15px}
+.nav a{text-decoration:none;opacity:.85}.nav a:hover{opacity:1;text-decoration:underline}
+
+.hero{background:var(--rye);color:var(--on-rye);position:relative;overflow:hidden}
+.hero .wrap{padding-block:56px 72px;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,8vw,88px);line-height:.95}
+.hero h1 em{font-style:normal;color:var(--sesame)}
+.hero p{max-width:44ch;font-size:18px;opacity:.9;margin:20px 0 28px}
+.btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:13px 22px;border-radius:999px;font-weight:700;text-decoration:none;border:2px solid var(--sesame);cursor:pointer;font:700 16px var(--body)}
+.btn.primary{background:var(--sesame);color:var(--sesame-ink)}
+.btn.ghost{background:transparent;color:var(--on-rye)}
+.kettle{width:100%;max-width:380px;aspect-ratio:1;justify-self:center}
+.steam path{fill:none;stroke:var(--on-rye);stroke-width:5;stroke-linecap:round;opacity:.5;animation:rise 3.2s ease-in-out infinite}
+.steam path:nth-child(2){animation-delay:.6s}.steam path:nth-child(3){animation-delay:1.2s}
+@keyframes rise{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-10px);opacity:.15}}
+@media (prefers-reduced-motion:reduce){.steam path{animation:none}}
+
+section{padding-block:64px}
+.eyebrow{font:500 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(32px,5vw,48px);line-height:1.05;margin:6px 0 12px}
+.lead{color:var(--muted);max-width:60ch;margin:0 0 32px}
+
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.col h3{font:700 18px var(--body);margin-bottom:12px}
+.item{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px dashed var(--line)}
+.item:first-of-type{border-top:0}
+.item small{display:block;color:var(--muted);font-size:14px}
+.price{font:500 15px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{margin-top:20px;font-size:14px;color:var(--muted)}
+.note b{color:var(--ink)}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td{padding:11px 0;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;font-family:var(--mono);font-size:15px}
+tr.today td{font-weight:700}
+tr.today td:first-child::after{content:"  today";font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--sesame)}
+.contact p{margin:0 0 12px}
+.contact .num{font:500 20px var(--mono);user-select:all}
+
+.order{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;display:grid;gap:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label{display:grid;gap:6px;font-weight:500;font-size:15px}
+input,select{font:400 16px var(--body);padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);min-width:0}
+.ok{background:var(--banner);border-radius:10px;padding:12px 14px;font-size:15px}
+
+footer{background:var(--rye);color:var(--on-rye);font-size:14px}
+footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;opacity:.85}
+
+@media (max-width:760px){
+  .hero .wrap,.split{grid-template-columns:1fr}
+  .board{grid-template-columns:1fr}
+  .kettle{max-width:220px;order:-1}
+  .row{grid-template-columns:1fr}
+  .nav ul{gap:14px}
+}
+</style>
+
+<div class="demo"><div class="wrap">Sample website by Himal Shrestha. Kettle &amp; Seed is a fictional bakery.</div></div>
+
+<header class="top"><div class="wrap nav">
+  <a class="logo" href="#top">Kettle <span>&amp;</span> Seed</a>
+  <ul><li><a href="#menu">Menu</a></li><li><a href="#hours">Hours</a></li><li><a href="#order">Pre-order</a></li></ul>
+</div></header>
+
+<div class="hero" id="top"><div class="wrap">
+  <div>
+    <h1>Boiled at 5am. <em>Gone by noon.</em></h1>
+    <p>Kettle-boiled bagels, rye loaves and black-and-white cookies, baked fresh every morning on Old Country Road in Hicksville.</p>
+    <div class="btns"><a class="btn primary" href="#order">Pre-order for pickup</a><a class="btn ghost" href="#menu">See the menu</a></div>
+  </div>
+  <svg class="kettle" viewBox="0 0 200 200" aria-hidden="true">
+    <g class="steam"><path d="M80 52c-8-10 8-16 0-28"/><path d="M100 48c-8-10 8-16 0-28"/><path d="M120 52c-8-10 8-16 0-28"/></g>
+    <ellipse cx="100" cy="132" rx="70" ry="46" fill="var(--sesame)"/>
+    <ellipse cx="100" cy="124" rx="24" ry="13" fill="var(--rye)"/>
+    <g fill="var(--rye)" opacity=".55"><ellipse cx="60" cy="112" rx="4" ry="2"/><ellipse cx="76" cy="98" rx="4" ry="2" transform="rotate(30 76 98)"/><ellipse cx="128" cy="100" rx="4" ry="2" transform="rotate(-20 128 100)"/><ellipse cx="144" cy="118" rx="4" ry="2"/><ellipse cx="72" cy="146" rx="4" ry="2" transform="rotate(15 72 146)"/><ellipse cx="132" cy="150" rx="4" ry="2" transform="rotate(-30 132 150)"/><ellipse cx="102" cy="160" rx="4" ry="2"/><ellipse cx="96" cy="94" rx="4" ry="2" transform="rotate(10 96 94)"/></g>
+  </svg>
+</div></div>
+
+<section id="menu"><div class="wrap">
+  <div class="eyebrow">The counter</div>
+  <h2>What's in the case</h2>
+  <p class="lead">Everything is made in-house the same morning. When a tray sells out, it's done for the day.</p>
+  <div class="board">
+    <div class="col"><h3>Bagels</h3>
+      <div class="item"><div>Single bagel<small>plain, everything, sesame, salt, pumpernickel</small></div><div class="price">$1.75</div></div>
+      <div class="item"><div>Baker's dozen<small>13 bagels, mix and match</small></div><div class="price">$19.00</div></div>
+      <div class="item"><div>With scallion cream cheese</div><div class="price">$4.25</div></div>
+      <div class="item"><div>Lox, capers, red onion</div><div class="price">$12.50</div></div>
+    </div>
+    <div class="col"><h3>Breads</h3>
+      <div class="item"><div>Seeded rye<small>caraway, sliced to order</small></div><div class="price">$8.50</div></div>
+      <div class="item"><div>Challah<small>Fridays only</small></div><div class="price">$9.00</div></div>
+      <div class="item"><div>Sourdough boule</div><div class="price">$10.00</div></div>
+    </div>
+    <div class="col"><h3>Sweets &amp; coffee</h3>
+      <div class="item"><div>Black-and-white cookie</div><div class="price">$3.50</div></div>
+      <div class="item"><div>Babka slice<small>chocolate or cinnamon</small></div><div class="price">$4.00</div></div>
+      <div class="item"><div>Drip coffee<small>12 oz / 16 oz</small></div><div class="price">$2.50 / 3.00</div></div>
+    </div>
+  </div>
+  <p class="note"><b>Catering:</b> bagel platters for 10–50 people with 24 hours' notice.</p>
+</div></section>
+
+<section id="hours" style="background:var(--surface)"><div class="wrap split">
+  <div>
+    <div class="eyebrow">Hours</div>
+    <h2>Open early</h2>
+    <table id="hoursTable"><tbody>
+      <tr data-d="1"><td>Monday</td><td>Closed</td></tr>
+      <tr data-d="2"><td>Tuesday</td><td>6:00a – 1:00p</td></tr>
+      <tr data-d="3"><td>Wednesday</td><td>6:00a – 1:00p</td></tr>
+      <tr data-d="4"><td>Thursday</td><td>6:00a – 1:00p</td></tr>
+      <tr data-d="5"><td>Friday</td><td>6:00a – 2:00p</td></tr>
+      <tr data-d="6"><td>Saturday</td><td>6:30a – 2:00p</td></tr>
+      <tr data-d="0"><td>Sunday</td><td>6:30a – 12:00p</td></tr>
+    </tbody></table>
+  </div>
+  <div class="contact">
+    <div class="eyebrow">Find us</div>
+    <h2>Old Country Rd</h2>
+    <p>Hicksville, NY 11801<br>Five minutes from the LIRR station. Free parking behind the shop.</p>
+    <p class="num">(475) 325-1160</p>
+    <p>Call ahead for orders over two dozen.</p>
+  </div>
+</div></section>
+
+<section id="order"><div class="wrap">
+  <div class="eyebrow">Skip the line</div>
+  <h2>Pre-order for pickup</h2>
+  <p class="lead">Order by 8pm and it'll be bagged and waiting the next morning.</p>
+  <form class="order" id="orderForm" novalidate>
+    <div class="row">
+      <label for="name">Name<input id="name" required value="Dana R."></label>
+      <label for="phone">Phone<input id="phone" type="tel" required value="(516) 555-0199"></label>
+    </div>
+    <div class="row">
+      <label for="item">Order<select id="item"><option>Baker's dozen (13)</option><option>Half dozen</option><option>Seeded rye loaf</option><option>Bagel platter (10 people)</option></select></label>
+      <label for="time">Pickup time<select id="time"><option>6:30am</option><option>7:00am</option><option selected>7:30am</option><option>8:00am</option><option>9:00am</option></select></label>
+    </div>
+    <div><button class="btn primary" type="submit">Place pre-order</button></div>
+    <div class="ok" id="ok" hidden></div>
+  </form>
+</div></section>
+
+<footer><div class="wrap"><span>Kettle &amp; Seed Bakery · Hicksville, NY</span><span>Sample site designed by Himal Shrestha</span></div></footer>
+
+<script>
+try{var d=new Date().getDay();var r=document.querySelector('tr[data-d="'+d+'"]');if(r)r.classList.add('today');}catch(e){}
+document.getElementById('orderForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var n=document.getElementById('name').value.trim()||'there';
+  var ok=document.getElementById('ok');
+  ok.textContent='Thanks, '+n+'. This is a demo, so no order was sent. On a real site this would text the bakery: '+document.getElementById('item').value+' at '+document.getElementById('time').value+'.';
+  ok.hidden=false;
+});
+</script>
+
+</body></html>

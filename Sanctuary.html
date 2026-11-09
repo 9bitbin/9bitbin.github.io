@@ -1,15 +1,9 @@
 <!DOCTYPE html>
-<!--
-  File: Sanctuary.html
-  Author: Himal Shrestha
-  Description: Sanctuary: single-file Three.js church walking sim with a story, cutscenes, voiced dialogue, combat (QTE, melee, boss), a courtyard, crypt, town, flight, procedural audio and a trailer mode.
--->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sanctuary v31</title>
-<!-- Page styles: overlay menu, settings, HUD, captions, QTE ring, combat UI, journal and effects. -->
 <style>
   html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:Georgia,'Times New Roman',serif;color:#e9dcc4}
   canvas{display:block;outline:none}
@@ -172,12 +166,10 @@
     background:linear-gradient(to bottom,rgba(10,8,6,0),rgba(10,8,6,.92))}
 </style>
 </head>
-<!-- Page body: version tag, debug line, fade, start overlay/settings and all in-game HUD layers. -->
 <body>
 <div id="ver">v31</div>
 <div id="dbg"></div>
 <div id="fade"></div>
-<!-- Start overlay: title, loading status, menu and settings. -->
 <div id="overlay">
   <h1>SANCTUARY</h1>
   <div id="sub">preparing the sanctuary…</div>
@@ -222,36 +214,27 @@
     headphones recommended
   </div>
 </div>
-<!-- Screen effects and HUD: flash, tint, glitch, letterbox, health, timer, foe bar and QTE ring. -->
 <div id="flash" style="position:fixed;inset:0;background:#ff1400;opacity:0;pointer-events:none;z-index:3;mix-blend-mode:screen"></div>
 <div id="tint"></div><div id="glitch"></div><div class="lb" id="lbT"></div><div class="lb" id="lbB"></div><div id="subs"></div><div id="white"></div><div id="skipring"></div>
 <div id="hurt"></div><div id="timer"></div><div id="memory"></div><div id="hud"><div>you</div><div class="bar"><div id="hp"></div></div><div id="count"></div></div>
 <div id="foeWrap"><div id="foeName"></div><div class="bar"><div id="foe"></div></div></div>
 <div id="qte"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" class="bg"/><circle id="qteRing" cx="50" cy="50" r="44"/></svg><div id="qteK"></div><div id="qteSub"></div><div id="dodgeTag">DODGE</div></div>
 <div id="black"></div><div id="achBox"></div><div id="tcard"></div><div id="trskip">any key — skip trailer</div>
-<!-- Center reticle. -->
 <div id="reticle"></div>
-<!-- Interaction prompt. -->
 <div id="prompt"></div>
 <div id="caption"></div><div id="combo"></div><div id="mhint">hold left click — finish</div><div id="wave"></div><div id="journal"><div class="jp"><div class="jl" id="jList"></div><div class="jr"><h3 id="jTitle"></h3><div class="jb" id="jBody"></div><div class="jh">J — close &nbsp;·&nbsp; 1–9 — turn to a page</div></div></div></div>
-<!-- Error box shown if WebGL can't start. -->
 <div id="error"><div class="box"><h2>THE DOORS ARE CLOSED</h2><div class="msg"></div></div></div>
 
-<!-- Three.js r128 from a CDN. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<!-- Game script. -->
 <script>
 (function () {
 'use strict';
-// Shortcut for document.getElementById.
 const $ = id => document.getElementById(id);
 let halted = false;
 const SET = { debug: 0, audGlitch: 0, audRed: 0, audCaps: 0, master: 100, choir: 100, choirVerb: 100, music: 100, voice: 100, sfx: 100, speech: 1, quality: 'high', timer: 1, wHair: 'long', wHairCol: '#0a0909', wCoat: '#121318', wHalo: 'rings' };
 try { Object.assign(SET, JSON.parse(localStorage.getItem('sanctuary_audio') || '{}')); } catch (e) {}
-// A setting as a 0-1 value.
 const SV = k => SET[k] / 100;
 
-// Stop the game and show an error message.
 function fatal(msg) {
   halted = true;
   const e = $('error');
@@ -264,7 +247,6 @@ if (!window.THREE) {
   fatal('Three.js could not be loaded from the CDN. The game needs an internet connection to fetch its 3D engine — check your connection and reload the page.');
   return;
 }
-// Can this browser run WebGL?
 function webglOK() {
   try {
     const c = document.createElement('canvas');
@@ -277,14 +259,12 @@ if (!webglOK()) {
 }
 
 const T = THREE;
-// Wait about one frame (lets the loading text update).
 const nextFrame = () => new Promise(r => setTimeout(r, 16));
 
 /* =========================================================
    Seeded random + tileable value noise
    ========================================================= */
 let _seed = 20260930;
-// Seeded random number (repeatable textures).
 function rand() { _seed = (_seed * 1664525 + 1013904223) >>> 0; return _seed / 4294967296; }
 const PERM = new Uint8Array(512), GR = new Float32Array(256);
 (function () {
@@ -293,7 +273,6 @@ const PERM = new Uint8Array(512), GR = new Float32Array(256);
   for (let i = 0; i < 512; i++) PERM[i] = p[i & 255];
   for (let i = 0; i < 256; i++) GR[i] = rand();
 })();
-// Smooth value noise.
 function vn(x, y, px, py) {
   const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
   const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
@@ -302,13 +281,11 @@ function vn(x, y, px, py) {
   const c = GR[PERM[(x0 & 255) + PERM[y1 & 255]]], d = GR[PERM[(x1 & 255) + PERM[y1 & 255]]];
   return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
 }
-// Fractal noise (layered value noise).
 function fbm(x, y, px, py, oct) {
   let s = 0, a = 0.5, n = 0, f = 1;
   for (let o = 0; o < oct; o++) { s += a * vn(x * f, y * f, px * f, py * f); n += a; a *= 0.5; f *= 2; }
   return s / n;
 }
-// Clamp to 0-1.
 const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
 
 /* =========================================================
@@ -350,7 +327,6 @@ function toTex(data, w, h, srgb) {
   if (srgb) t.encoding = T.sRGBEncoding;
   return t;
 }
-// Build a normal map from a height map.
 function normalFromH(H, w, h, str) {
   const out = new Uint8ClampedArray(w * h * 4);
   for (let y = 0; y < h; y++) {
@@ -592,7 +568,6 @@ function makeIcon(robeA, robeB, seed) {
   return t;
 }
 
-// Make a radial gradient texture.
 function makeRadial(stops, w, h) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const g = c.getContext('2d');
@@ -631,26 +606,21 @@ const HELL_FOG = new T.Color(0x5c140a), HELL_LIGHT = new T.Color(0xff2a0c), HELL
       HEMI_SKY = new T.Color(0x46526e), HEMI_GND = new T.Color(0x140e09), GOLD = new T.Color(0xc9a14a), GOLD_HELL = new T.Color(0x4a120a),
       DOME_COL = new T.Color(0xffd9a0);
 
-// Scale a geometry's UVs.
 function scaleUV(geo, sx, sy) {
   const uv = geo.attributes.uv;
   for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * sx, uv.getY(i) * sy);
   uv.needsUpdate = true; return geo;
 }
-// Box geometry with UVs tiled by size.
 function boxUV(w, h, d, tile) {
   const g = new T.BoxGeometry(w, h, d), uv = g.attributes.uv;
   const dims = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
   for (let i = 0; i < uv.count; i++) { const f = Math.floor(i / 4); uv.setXY(i, uv.getX(i) * dims[f][0] / tile, uv.getY(i) * dims[f][1] / tile); }
   return g;
 }
-// Add a box mesh to the scene.
 function addBox(w, h, d, mat, x, y, z, tile) {
   const m = new T.Mesh(boxUV(w, h, d, tile || 4), mat); m.position.set(x, y, z); scene.add(m); return m;
 }
-// Add a box collider.
 function collideBox(x0, x1, z0, z1) { colliders.boxes.push({ x0, x1, z0, z1 }); }
-// Add a circle collider.
 function collideCircle(x, z, r) { colliders.circles.push({ x, z, r }); }
 
 /* =========================================================
@@ -689,7 +659,6 @@ void main(){
   float a = edge * fall * (0.45 + 0.9*n) * nearFade * uIntensity * exp(-d*0.015);
   gl_FragColor = vec4(uColor * a, 1.0);
 }`;
-// Shader material for the light shafts.
 function makeShaftMat(color, intensity) {
   const m = new T.ShaderMaterial({
     uniforms: { uColor: { value: new T.Color(color) }, uIntensity: { value: intensity }, uTime: { value: 0 } },
@@ -700,7 +669,6 @@ function makeShaftMat(color, intensity) {
   m.userData.col = new T.Color(color);
   return m;
 }
-// Build a light shaft (god ray) with its pool of light on the floor.
 function buildShaft(corners, uvs, dir, mat, poolTex, poolColor) {
   const n = corners.length;
   const floorPts = corners.map(c => { const t = c.y / (-dir.y); return c.clone().addScaledVector(dir, t); });
@@ -742,7 +710,6 @@ const mirror = {
   look: new T.Vector3(), view: new T.Vector3(), target: new T.Vector3(), q: new T.Vector4(),
   strength: { value: 1.0 }
 };
-// Update the reflective floor mirror.
 function updateMirror() {
   const m = mirror, mesh = floor;
   m.rp.setFromMatrixPosition(mesh.matrixWorld);
@@ -791,7 +758,6 @@ const sunDir = new T.Vector3(0.62, -0.6, -0.28).normalize();
 const roseDir = new T.Vector3(0.12, -0.78, 0.6).normalize();
 const leftWinZ = [14.5, 9.5, 4.5, -0.5, -13, -22];
 
-// Build the whole church world (walls, windows, altar, lights, props and colliders).
 async function buildWorld(setStatus) {
   // environment map (soft studio of warm window glow) for glistening speculars
   const envScene = new T.Scene();
@@ -896,7 +862,6 @@ async function buildWorld(setStatus) {
     addBox(0.25, 0.3, 2.6, goldMat, s * 7.42, 21.4, z, 2); addBox(0.25, 0.3, 2.6, goldMat, s * 7.42, 32.6, z, 2);
   }));
   {
-    // Build a tree branch between two points.
     const branch = (a, b, r0, r1) => { const d = new T.Vector3().subVectors(b, a), L = d.length(); const m = new T.Mesh(new T.CylinderGeometry(r1, r0, L, 10), porphMat); m.position.copy(a).addScaledVector(d, 0.5); m.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), d.normalize()); scene.add(m); };
     [17, 12, 7, 2, -3].forEach(z => [-5, 5].forEach(x => {
       const s = Math.sign(x), knot = new T.Vector3(x, 30, z);
@@ -987,7 +952,6 @@ async function buildWorld(setStatus) {
     const spN = stoneMatG.normalMap.clone(); spN.needsUpdate = true; spN.wrapS = spN.wrapT = T.RepeatWrapping; spN.repeat.set(5, 26);
     const spM = new T.MeshStandardMaterial({ map: spTex, normalMap: spN, color: 0x6a6458, roughness: 0.9, emissive: 0x0a0806, fog: false });
     const finM = new T.MeshBasicMaterial({ color: 0xffd38a, fog: false });
-    // Build a spire.
     const spire = (x, z, y0, H, R, col) => {
       const pts = [];
       for (let i = 0; i <= 28; i++) { const t = i / 28; let r = R * Math.pow(1 - t, 0.7) * (1 + 0.07 * Math.sin(t * 46)); if (t > 0.76) r *= 1 + 0.6 * Math.sin((t - 0.76) / 0.24 * Math.PI); pts.push(new T.Vector2(Math.max(0.06, r), t * H)); }
@@ -1044,7 +1008,6 @@ async function buildWorld(setStatus) {
     flames.push({ sp, w, h, tag, f1: 7 + rand() * 5, f2: 11 + rand() * 7, p: rand() * 10 });
     return sp;
   }
-  // Add a glow sprite.
   function addGlow(x, y, z, s, color, op) {
     const sp = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: op }));
     sp.position.set(x, y, z); sp.scale.set(s, s, 1); scene.add(sp); return sp;
@@ -1053,7 +1016,6 @@ async function buildWorld(setStatus) {
   /* ---------- lights ---------- */
   hemi = new T.HemisphereLight(0x46526e, 0x140e09, 0.26); scene.add(hemi);
   sun = new T.DirectionalLight(0xffd9a8, 0.28); sun.position.copy(sunDir).multiplyScalar(-40); scene.add(sun);
-  // Add a point light (optionally flickering).
   function addPoint(color, inten, dist, x, y, z, flick) {
     const l = new T.PointLight(color, inten, dist, 2); l.position.set(x, y, z); scene.add(l);
     l.userData = { base: inten, flick, p: rand() * 10, col: new T.Color(color) };
@@ -1252,7 +1214,6 @@ async function buildWorld(setStatus) {
     g.beginPath(); g.arc(119, 80, 3.2, 0, 7); g.fill(); g.beginPath(); g.arc(137, 80, 3.2, 0, 7); g.fill();
     g.fillStyle = '#300'; g.beginPath(); g.ellipse(128, 94, 6, 4, 0, 0, 7); g.fill();
   });
-  // Make a sprite.
   function spr(tex, w, h, color, add, fog) {
     const m = new T.SpriteMaterial({ map: tex, color, transparent: true, depthWrite: false, opacity: 0, blending: add ? T.AdditiveBlending : T.NormalBlending, fog: fog !== false });
     const sp = new T.Sprite(m); sp.center.set(0.5, add ? 0.5 : 0); sp.scale.set(w, h, 1); scene.add(sp); return sp;
@@ -1331,7 +1292,6 @@ const A = { ctx: null };
 const VOW = { a: [730, 1090, 2440], o: [570, 840, 2410], e: [530, 1840, 2480], u: [300, 870, 2240] };
 const DEG = [0, 166.7, 300, 500, 700, 866.7, 1000, 1200]; // Byzantine first-mode scale (cents from D)
 
-// Build a reverb impulse.
 function makeIR(ctx, dur) {
   const sr = ctx.sampleRate, len = Math.floor(sr * dur), b = ctx.createBuffer(2, len, sr);
   for (let ch = 0; ch < 2; ch++) {
@@ -1345,10 +1305,8 @@ function makeIR(ctx, dur) {
   }
   return b;
 }
-// Smoothly set an audio parameter.
 function pset(param, v, tc) { if (A.ctx) param.setTargetAtTime(v, A.ctx.currentTime, tc || 0.35); }
 
-// Choir voice (detuned oscillators through vowel filters).
 function voice(freq, detunes, vowel, fscale, dest) {
   const ctx = A.ctx;
   const pre = ctx.createGain(); pre.gain.value = 0.5 / detunes.length;
@@ -1375,7 +1333,6 @@ function voice(freq, detunes, vowel, fscale, dest) {
   };
 }
 
-// Create the audio graph, choir and ambience on first use.
 function audioInit() {
   if (A.ctx) { if (A.ctx.state === 'suspended') A.ctx.resume(); return; }
   try {
@@ -1426,7 +1383,6 @@ function audioInit() {
   }
 }
 
-// Step the choir chord sequence.
 function seqTick() {
   const ctx = A.ctx, s = A.seq, V = A.V, t = ctx.currentTime;
   if (t < s.next) return;
@@ -1455,13 +1411,11 @@ function seqTick() {
   s.left--;
 }
 
-// Update the audio mix for the current scene intensity.
 function audioUpdate(dt, env) {
   if (!A.ctx || !A.V) return;
   seqTick();
   metalTick();
   A.acc += dt; if (A.acc < 0.1) return; A.acc = 0;
-  // Intensity helpers.
   const I = env.I, R = (a, b) => clamp01((I - a) / (b - a)), V = A.V;
   pset(V.ison.g.gain, 0.06 + 0.94 * R(0, 0.45));
   pset(V.isonOct.g.gain, 0.7 * R(0.25, 0.55));
@@ -1476,7 +1430,6 @@ function audioUpdate(dt, env) {
   pset(A.master.gain, (env.paused ? 0.6 : 0.9) * SV('master'), 0.3);
 }
 
-// Footstep sound for a surface.
 function footstep(surface, amt) {
   const ctx = A.ctx; if (!ctx) return;
   const t = ctx.currentTime + 0.005;
@@ -1484,9 +1437,7 @@ function footstep(surface, amt) {
   let node = out;
   if (ctx.createStereoPanner) { const p = ctx.createStereoPanner(); A.stepSide = -A.stepSide; p.pan.value = 0.12 * A.stepSide; out.connect(p); node = p; }
   node.connect(A.stepDry); node.connect(A.stepWet);
-  // Noise source.
   const src = () => { const s = ctx.createBufferSource(); s.buffer = A.noise; return s; };
-  // Filtered noise burst.
   const burst = (type, freq, q, peak, dec, at, dur) => {
     const s = src(), f = ctx.createBiquadFilter(), g = ctx.createGain();
     f.type = type; f.frequency.value = freq; f.Q.value = q;
@@ -1508,7 +1459,6 @@ function footstep(surface, amt) {
   }
 }
 
-// Church bell.
 function bell(level) {
   const ctx = A.ctx; if (!ctx) return;
   const t = ctx.currentTime + 0.02, f0 = 146.83;
@@ -1523,7 +1473,6 @@ function bell(level) {
   });
 }
 
-// Chime note i.
 function chime(i) {
   const ctx = A.ctx; if (!ctx) return;
   const t = ctx.currentTime + 0.02;
@@ -1551,7 +1500,6 @@ const raycaster = new T.Raycaster(); raycaster.far = 3.4;
 const center = new T.Vector2(0, 0);
 let currentHit = null;
 
-// Push the player out of colliders.
 function collide(p) {
   const r = 0.35;
   for (const c of colliders.circles) {
@@ -1570,7 +1518,6 @@ function collide(p) {
 }
 
 const tmpF = new T.Vector3(), tmpR = new T.Vector3(), want = new T.Vector3();
-// Update the player: movement, look, footsteps and camera.
 function updatePlayer(dt) {
   if (story.witness && (story.witness.ragdoll || story.witness.anim)) {
     const pp = story.witness.ragdoll ? story.witness.ragdoll.p.pel : story.witness.root.position; player.pos.set(pp.x, 0, pp.z); player.vel.set(0, 0, 0);
@@ -1624,19 +1571,16 @@ function updatePlayer(dt) {
 function canSkipLine() {
   return $('subs').style.opacity === '1' && !!CS.lineFin && !story.fight && !story.qte && !story.melee && !story.hold && !story.photo && !story.journalOpen && !story.trailer;
 }
-// Skip the current spoken line.
 function skipLine() {
   try { speechSynthesis.cancel(); } catch (e) {}
   const f = CS.lineFin; if (f) f();
   $('subs').style.opacity = 0;
 }
-// Show a caption.
 function caption(txt, hold) {
   const c = $('caption'); c.textContent = txt; c.style.opacity = 1;
   clearTimeout(caption._t); caption._t = setTimeout(() => { c.style.opacity = 0; }, hold || 5500);
 }
 
-// Start the finale when the altar and both lamps are lit.
 function checkFinale() {
   if (!st.finale && st.altar && st.lamp[0] && st.lamp[1]) {
     st.finale = true; setTimeout(() => caption('… and know', 7000), 9000);
@@ -1644,7 +1588,6 @@ function checkFinale() {
 }
 let lastLabel = '';
 const _pp = new T.Vector3();
-// Interact with what the player is looking at.
 function tryInteract() {
   const h = currentHit; if (!h || CS.active || story.photo) return;
   if (h.act) { h.act(); currentHit = null; lastLabel = ''; return; }
@@ -1659,7 +1602,6 @@ function tryInteract() {
     if (!st.altar) { st.altar = true; setTimeout(() => caption('be still', 6000), 2600); checkFinale(); }
   }
 }
-// Toggle the "hell" version of the church.
 function toggleHell() {
   st.hell = !st.hell;
   buttonMesh.position.y = 1.2;
@@ -1670,7 +1612,6 @@ function toggleHell() {
     st.nextScream = time + 9;
   } else hellAudioOff();
 }
-// Find what the player is looking at and show the prompt.
 function updateInteraction() {
   raycaster.far = story.third ? 7.5 : 3.4;
   raycaster.setFromCamera(center, camera);
@@ -1702,7 +1643,6 @@ const overlay = $('overlay'), sub = $('sub');
 (function initSettings() {
   const panel = $('settings');
   ['click', 'mousedown', 'mouseup', 'pointerdown'].forEach(ev => panel.addEventListener(ev, e => e.stopPropagation()));
-  // Save audio settings.
   const save = () => { try { localStorage.setItem('sanctuary_audio', JSON.stringify(SET)); } catch (e) {} };
   Object.keys(SET).forEach(k => {
     const el = $('s_' + k), lab = $('v_' + k); if (!el) return;
@@ -1720,7 +1660,6 @@ const overlay = $('overlay'), sub = $('sub');
     });
   });
   $('songFile').addEventListener('change', e => loadSong(e.target.files[0]));
-  // Update the subtitle style preview.
   const prev = () => { $('subPrev').className = (SET.audGlitch ? 'glitch ' : '') + (SET.audRed ? 'red ' : '') + (SET.audCaps ? 'caps' : ''); };
   ['audGlitch', 'audRed', 'audCaps'].forEach(k => $('s_' + k).addEventListener('change', prev)); prev();
   $('btnMM').addEventListener('click', () => { $('mmAsk').classList.add('on'); setTimeout(() => { $('settings').scrollTop = 1e5; }, 30); });
@@ -1732,14 +1671,11 @@ const overlay = $('overlay'), sub = $('sub');
     setTimeout(() => location.reload(), 700);
   });
 })();
-// Show the pause overlay.
 function showPause() { overlay.classList.remove('hidden'); overlay.classList.add('paused'); sub.textContent = 'paused — click to return'; locked = false; currentHit = null; $('reticle').style.opacity = 0; $('prompt').style.opacity = 0; }
-// Use drag-to-look mode (no pointer lock).
 function enterDrag() {
   dragMode = true; locked = true; overlay.classList.add('hidden');
   caption('mouse capture unavailable — drag to look', 4000);
 }
-// Lock the mouse pointer.
 function requestLock() {
   if (dragMode) { locked = true; overlay.classList.add('hidden'); return; }
   try {
@@ -1828,7 +1764,6 @@ function applySize() {
 }
 window.addEventListener('resize', applySize);
 let ftAcc = 0, ftN = 0;
-// Lower or raise render quality to keep the frame rate smooth.
 function adaptQuality(raw) {
   ftAcc += raw; ftN++;
   if (ftN >= 90) {
@@ -1843,10 +1778,8 @@ function adaptQuality(raw) {
    ========================================================= */
 const clock = new T.Clock();
 let time = 0, errCount = 0;
-// Smoothly move a value toward a target.
 const smooth = (cur, target, rate, dt) => cur + (target - cur) * (1 - Math.exp(-dt * rate));
 
-// Update the world each frame (lights, hell blend, effects).
 function updateWorld(dt) {
   time += dt;
   const pz = player.pos.z;
@@ -1962,7 +1895,6 @@ function updateWorld(dt) {
 }
 
 const DEMON_SPOTS = [[-6.3, 14], [6.3, 9], [-6.3, 3], [6.3, -2], [-6.2, -12], [6.2, -16], [-5.5, -25], [5.5, -25], [0, -26.5], [-3.5, 6], [3.5, -5], [-6.3, -20], [6.3, 16]];
-// Update the scary apparitions (demons and ghouls).
 function updateSpooks(dt, H) {
   const show = H > 0.02, px = player.pos.x, pz = player.pos.z;
   const rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
@@ -2004,7 +1936,6 @@ function updateSpooks(dt, H) {
     gh.s.material.opacity = H * gh.a;
   }
 }
-// Move a demon to a new spot.
 function relocateDemon(dm) {
   const used = spooks.demons.map(o => o.spot);
   let best = 0, tries = 0;
@@ -2012,7 +1943,6 @@ function relocateDemon(dm) {
   while (tries < 30 && (used.includes(best) || Math.hypot(DEMON_SPOTS[best][0] - player.pos.x, DEMON_SPOTS[best][1] - player.pos.z) < 8));
   dm.spot = best; dm.a = 0;
 }
-// Spawn a ghoul.
 function spawnGhoul(gh) {
   let x, z, t = 0;
   do { x = -6 + Math.random() * 12; z = -26 + Math.random() * 44; t++; } while (t < 30 && Math.hypot(x - player.pos.x, z - player.pos.z) < 11);
@@ -2026,19 +1956,16 @@ function nburst(out, type, freq, q, peak, t, dec) {
   g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(peak, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + dec);
   s.connect(f); f.connect(g); g.connect(out); s.start(t, Math.random() * 1.5); s.stop(t + dec + 0.05);
 }
-// Play a tone.
 function tone(out, type, f0, f1, peak, t, dec, sweep) {
   const ctx = A.ctx, o = ctx.createOscillator(), g = ctx.createGain(); o.type = type;
   o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + (sweep || dec));
   g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(peak, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + dec);
   o.connect(g); g.connect(out); o.start(t); o.stop(t + dec + 0.05);
 }
-// Output bus with reverb.
 function busTo(gain, verbAmt) {
   const ctx = A.ctx, out = ctx.createGain(); out.gain.value = gain * SV('sfx'); out.connect(A.master);
   const s = ctx.createGain(); s.gain.value = verbAmt; out.connect(s); s.connect(A.verb); return out;
 }
-// Door slam.
 function slam(t) {
   const out = busTo(1.0, 1.4);
   nburst(out, 'lowpass', 260, 1, 1.6, t, 0.7);
@@ -2046,7 +1973,6 @@ function slam(t) {
   nburst(out, 'bandpass', 1500, 1, 0.7, t, 0.09);
   for (let k = 0; k < 4; k++) nburst(out, 'bandpass', 2600 + k * 500, 3, 0.12, t + 0.06 + k * 0.05 + Math.random() * 0.03, 0.04);
 }
-// Gong.
 function gong(t) {
   const ctx = A.ctx, out = busTo(0.6, 1.1), f0 = 52;
   const Rr = [1, 1.47, 1.98, 2.56, 3.12, 3.9, 4.7, 5.9, 7.3], Am = [1, 0.7, 0.6, 0.45, 0.4, 0.3, 0.25, 0.18, 0.12], D = [12, 10, 9, 7, 6, 5, 4, 3, 2.2];
@@ -2066,7 +1992,6 @@ function gong(t) {
   s.connect(f); f.connect(g); g.connect(out); s.start(t); s.stop(t + 6.2);
   tone(out, 'sine', 40, 30, 0.9, t, 4);
 }
-// Hiss.
 function hiss() {
   const ctx = A.ctx; if (!ctx) return;
   const t = ctx.currentTime + 0.01, out = busTo(1, 0.8);
@@ -2077,7 +2002,6 @@ function hiss() {
   const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.3, t + 0.12); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
   s.connect(f); f.connect(g); g.connect(node); s.start(t); s.stop(t + 1);
 }
-// Scream.
 function scream() {
   const ctx = A.ctx; if (!ctx) return;
   const t = ctx.currentTime + 0.02, out = busTo(0.3, 1.6);
@@ -2098,7 +2022,6 @@ const RIFF = [
   ['p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', '10', '-', '8', '-', '7', '-', '6', '-']
 ];
 const KICK = [1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1];
-// Set up the metal music (hell mode).
 function metalInit() {
   const ctx = A.ctx;
   const bus = ctx.createGain(); bus.gain.value = 0;
@@ -2117,7 +2040,6 @@ function metalInit() {
   const drums = ctx.createGain(); drums.gain.value = 0.9; drums.connect(bus);
   A.metal = { bus, gIn, drums, lp: mlp, on: false, step: 0, next: 0, token: 0 };
 }
-// Guitar note.
 function gtr(f, t, dur, mute) {
   const ctx = A.ctx, M = A.metal;
   const env = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = mute ? 650 : 4000; lp.Q.value = 0.7;
@@ -2130,7 +2052,6 @@ function gtr(f, t, dur, mute) {
   const bg = ctx.createGain(); bg.gain.setValueAtTime(0.0001, t); bg.gain.linearRampToValueAtTime(0.35, t + 0.005); bg.gain.setValueAtTime(0.35, t + len - 0.015); bg.gain.linearRampToValueAtTime(0.0001, t + len);
   b.connect(bl); bl.connect(bg); bg.connect(M.bus); b.start(t); b.stop(t + len + 0.02);
 }
-// Play one step of the metal track.
 function playStep(step, t, sp) {
   const M = A.metal, bar = Math.floor(step / 16) % 4, i = step % 16, tok = RIFF[bar][i];
   if (story.awakened && i % 2 === 0) {
@@ -2147,14 +2068,12 @@ function playStep(step, t, sp) {
   if (i % 2 === 0) nburst(M.drums, 'highpass', 7500, 0.7, 0.16, t, i % 4 === 2 ? 0.12 : 0.035);
   if (i === 0 && (bar === 0 || bar === 2)) nburst(M.drums, 'highpass', 3500, 0.5, 0.32, t, 1.6);
 }
-// Metal music scheduler.
 function metalTick() {
   const M = A.metal; if (!M || !M.on || M.custom) return;
   const now = A.ctx.currentTime, sp = 60 / 172 / 4 / Math.max(0.3, 1 - 0.75 * story.seeingK);
   if (M.next < now - 0.1) M.next = now + 0.05;
   while (M.next < now + 0.2) { playStep(M.step, M.next, sp); M.step = (M.step + 1) % 64; M.next += sp; }
 }
-// Start the hell audio.
 function hellAudioOn() {
   if (!A.ctx) return;
   if (!A.metal) metalInit();
@@ -2164,7 +2083,6 @@ function hellAudioOn() {
   M.on = true; M.step = 0; M.next = t + 3.2;
   if (story.customSong) setTimeout(() => { if (st.hell) startCustomSong(); }, 3000);
 }
-// Stop the hell audio.
 function hellAudioOff() {
   const M = A.metal; if (!M) return;
   const t = A.ctx.currentTime, tok = ++M.token;
@@ -2191,11 +2109,8 @@ const COLD = new T.Color(0.08, 1.6, 0.35), GOLDL = new T.Color(0.08, 1.6, 0.35);
 const _v1 = new T.Vector3(), _v2 = new T.Vector3(), _frus = new T.Frustum(), _pm = new T.Matrix4();
 let HAIRTEX, GLYPH, WRINKLE, STOLETEX, BROCADE, SCARF, PAGETEX, MASKTEX, GLOWTEX;
 
-// Wrap an angle to -PI..PI.
 const wrapA = a => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
-// Interpolate between angles.
 const lerpAngle = (a, b, k) => a + wrapA(b - a) * k;
-// Ease in-out curve.
 const easeIO = k => k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
 
 /* ---------- cutscene runner ---------- */
@@ -2225,14 +2140,11 @@ const CS = {
     const ws = this.tweens.splice(0); ws.forEach(w => { try { w.fn(1); } catch (e) {} w.res(); });
   }
 };
-// Cutscene: cut the camera to a shot.
 function cut(pos, look, fov) { CS.drift++; CS.drift0 = (CS.drift0 || 0) + 1; CS.cam.pos.copy(pos); CS.cam.look.copy(look); if (fov) CS.cam.fov = fov; }
-// Cutscene: slowly drift the camera.
 function drift(dur, push) {
   const id = ++CS.drift, p0 = CS.cam.pos.clone(), dir = _v1.copy(CS.cam.look).sub(p0).normalize().multiplyScalar(push || 0.35).clone();
   CS.tween(dur, k => { if (id === CS.drift) CS.cam.pos.copy(p0).addScaledVector(dir, k); }, k => k);
 }
-// Cutscene: move the camera along a path.
 function camPath(pts, looks, dur, fovA, fovB) {
   CS.drift++;
   const c = new T.CatmullRomCurve3(pts.map(p => new T.Vector3(p[0], p[1], p[2])));
@@ -2245,14 +2157,12 @@ function camPath(pts, looks, dur, fovA, fovB) {
   });
 }
 const CAMV = { a: new T.Vector3(), b: new T.Vector3(), c: new T.Vector3() };
-// Does a line segment hit a circle?
 function segHitsCircle(ax, az, bx, bz, cx, cz, r) {
   const dx = bx - ax, dz = bz - az, L2 = dx * dx + dz * dz || 1e-6;
   const u = Math.max(0, Math.min(1, ((cx - ax) * dx + (cz - az) * dz) / L2));
   const px = ax + dx * u - cx, pz = az + dz * u - cz;
   return px * px + pz * pz < r * r;
 }
-// Does a line segment hit a box?
 function segHitsBox(ax, az, bx, bz, b, pad) {
   const x0 = b.x0 - pad, x1 = b.x1 + pad, z0 = b.z0 - pad, z1 = b.z1 + pad;
   let t0 = 0, t1 = 1; const dx = bx - ax, dz = bz - az;
@@ -2262,7 +2172,6 @@ function segHitsBox(ax, az, bx, bz, b, pad) {
   }
   return true;
 }
-// Is the view from pos to look blocked?
 function viewBlocked(look, pos) {
   const ax = look.x, az = look.z, bx = pos.x, bz = pos.z;
   if (pos.y < 9.3) for (const c of colliders.circles) {
@@ -2279,7 +2188,6 @@ function viewBlocked(look, pos) {
   }
   return false;
 }
-// Keep a cutscene camera inside the room.
 function roomClamp(v, lookZ) {
   if (CS.free) return v;
   if (story.flying && !CS.active) { if (story.flyIn) { v.x = Math.max(-7.1, Math.min(7.1, v.x)); v.z = Math.max(-27.2, Math.min(19.2, v.z)); v.y = Math.max(0.35, Math.min(38, v.y)); } return v; }
@@ -2308,7 +2216,6 @@ function safeCam(look, desired, out, allowOrbit) {
   }
   return out;
 }
-// Update the cutscene camera.
 function csCamera(dt) {
   const t = time;
   // player orbit override (mouse), easing back to the director's framing when left alone
@@ -2328,7 +2235,6 @@ function csCamera(dt) {
   if (st.shake > 0.001) camera.rotation.z += (Math.random() - 0.5) * 0.03 * st.shake;
   if (Math.abs(camera.fov - CS.cam.fov) > 0.01) { camera.fov = CS.cam.fov; camera.updateProjectionMatrix(); }
 }
-// Begin a cutscene.
 function csBegin() {
   CS.active = true; CS.skipping = false;
   story.wall = null; story.xfer = null; story.rollT = 0; story.wallRoll = 0;
@@ -2341,7 +2247,6 @@ function csBegin() {
   CS.cam.fov = camera.fov;
   story.seeing = false; CS.oy = 0; CS.op = 0; CS.drift0 = (CS.drift0 || 0) + 1;
 }
-// End a cutscene.
 function csEnd() {
   CS.active = false; CS.skipping = false;
   document.body.classList.remove('cine');
@@ -2351,10 +2256,8 @@ function csEnd() {
 
 /* ---------- voices + subtitles ---------- */
 let VOICES = [];
-// Load the browser's speech voices.
 function loadVoices() { try { VOICES = speechSynthesis.getVoices() || []; } catch (e) { VOICES = []; } }
 if (window.speechSynthesis) { loadVoices(); try { speechSynthesis.onvoiceschanged = loadVoices; } catch (e) {} }
-// Pick a voice for a character.
 function pickVoice(g) {
   const en = VOICES.filter(v => /^en/i.test(v.lang)); if (!en.length) return null;
   const male = en.find(v => /(male|david|daniel|george|fred|alex|guy|ryan|mark|james|arthur)/i.test(v.name) && !/female/i.test(v.name));
@@ -2375,7 +2278,6 @@ const VSTYLE = {
   cha: { pitch: 0.75, rate: 0.85, cls: 'npc', g: 'm' }
 };
 let sayTok = 0;
-// Speak a line with subtitles.
 function say(text, who, speaker) {
   const s = VSTYLE[who] || VSTYLE.narr, tok = ++sayTok, SUB = $('subs');
   SUB.className = s.cls + (s.cls === 'aud' ? (SET.audGlitch ? ' glitch' : '') + (SET.audRed ? ' red' : '') + (SET.audCaps ? ' caps' : '') : ''); SUB.textContent = text; SUB.style.opacity = 1;
@@ -2414,21 +2316,15 @@ function say(text, who, speaker) {
 
 /* ---------- sounds ---------- */
 const sfxOK = () => !!(A.ctx && A.master);
-// Bead click sound.
 function beadClick(v) { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.005, o = busTo(v, 0.5); tone(o, 'sine', 3000 + Math.random() * 1200, 2500, 0.3, t, 0.035); nburst(o, 'highpass', 4500, 1, 0.15, t, 0.012); }
-// Chain chime sound.
 function chainChime(v) { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.005, o = busTo(v, 0.8); tone(o, 'triangle', 2300 + Math.random() * 300, 2290, 0.2, t, 0.35); tone(o, 'sine', 3650, 3640, 0.1, t + 0.01, 0.25); }
-// Page flip sound.
 function pageFlip() { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.005, o = busTo(0.35, 0.4); nburst(o, 'bandpass', 2600, 0.6, 0.35, t, 0.22); nburst(o, 'bandpass', 1400, 0.8, 0.2, t + 0.12, 0.18); }
-// Glitch sound.
 function glitchSnd(v) {
   if (!sfxOK()) return; const t = A.ctx.currentTime + 0.005, o = busTo(v, 0.5);
   tone(o, 'square', 90, 70, 0.25, t, 0.22); tone(o, 'sine', 7200, 7000, 0.04, t, 0.3); nburst(o, 'bandpass', 3000, 0.5, 0.2, t, 0.12);
   story.glitchT = 0.22;
 }
-// Bit-crush curve.
 function crushCurve(steps) { const n = 1024, c = new Float32Array(n); for (let i = 0; i < n; i++) { const x = i * 2 / n - 1; c[i] = Math.round(x * steps) / steps; } return c; }
-// Data surge sound.
 function dataSurge(dur) {
   if (!sfxOK()) return; const ctx = A.ctx, t = ctx.currentTime + 0.02, o = busTo(0.5, 0.8);
   const ws = ctx.createWaveShaper(); ws.curve = crushCurve(5);
@@ -2441,7 +2337,6 @@ function dataSurge(dur) {
   const ng = ctx.createGain(); ng.gain.setValueAtTime(0.0001, t); ng.gain.linearRampToValueAtTime(0.35, t + dur); ng.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.5);
   n.connect(hp); hp.connect(ng); ng.connect(o); n.start(t); n.stop(t + dur + 0.6);
 }
-// Static burst.
 function staticBurst(dur, v) {
   if (!sfxOK()) return; const ctx = A.ctx, t = ctx.currentTime + 0.01, o = busTo(v, 0.4);
   const n = ctx.createBufferSource(); n.buffer = A.noise; n.loop = true;
@@ -2450,12 +2345,10 @@ function staticBurst(dur, v) {
   const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.4, t + 0.05); g.gain.linearRampToValueAtTime(0.25, t + dur * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   n.connect(ws); ws.connect(f); f.connect(g); g.connect(o); n.start(t, Math.random()); n.stop(t + dur + 0.1);
 }
-// Cold tone.
 function coldTone() {
   if (!sfxOK()) return; const t = A.ctx.currentTime + 0.02, o = busTo(0.22, 1.3);
   [[1318.5, 2.8], [1975.5, 2.2], [2637, 1.6], [3951, 1.1]].forEach(([f, d], i) => tone(o, 'sine', f, f * 0.998, 0.35 - i * 0.06, t + i * 0.01, d));
 }
-// Deep tone.
 function deepTone() {
   if (!sfxOK()) return; const ctx = A.ctx, t = ctx.currentTime + 0.02, o = busTo(0.5, 1.2);
   [55, 110, 164.8, 220, 329.6].forEach((f, i) => {
@@ -2464,9 +2357,7 @@ function deepTone() {
     s.connect(g); g.connect(o); s.start(t); s.stop(t + 6.1);
   });
 }
-// Heartbeat.
 function heartbeat(v) { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.01, o = busTo(v == null ? 0.9 : v, 0.2); tone(o, 'sine', 70, 38, 0.9, t, 0.18); tone(o, 'sine', 62, 34, 0.6, t + 0.28, 0.16); }
-// Hum.
 function hum(dur) {
   if (!sfxOK()) return; const ctx = A.ctx, t = ctx.currentTime + 0.02, o = busTo(0.12, 1.0);
   const s = ctx.createOscillator(); s.type = 'sawtooth'; s.frequency.value = 98;
@@ -2474,7 +2365,6 @@ function hum(dur) {
   const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.5, t + 1.5); g.gain.linearRampToValueAtTime(0.4, t + dur - 1.5); g.gain.linearRampToValueAtTime(0.0001, t + dur);
   s.connect(f); f.connect(g); g.connect(o); s.start(t); s.stop(t + dur + 0.1);
 }
-// Choir collapse sound.
 function choirCollapse() {
   if (!sfxOK()) return; const ctx = A.ctx, t = ctx.currentTime + 0.02, o = busTo(0.25, 1.2);
   if (A.choirLP) A.choirLP.frequency.setTargetAtTime(160, t, 0.5);
@@ -2485,7 +2375,6 @@ function choirCollapse() {
     s.connect(f); f.connect(g); g.connect(o); s.start(t); s.stop(t + 4.6);
   });
 }
-// Lead guitar note.
 function leadNote(f, t, dur) {
   const ctx = A.ctx, M = A.metal;
   const g = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200; lp.Q.value = 2;
@@ -2504,7 +2393,6 @@ function cvTex(w, h, draw, srgb) {
   const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
   const t = new T.CanvasTexture(c); if (srgb !== false) t.encoding = T.sRGBEncoding; t.anisotropy = ANISO; return t;
 }
-// Build the story textures (faces, icons, paper ...).
 function makeStoryTextures(glowTex) {
   GLOWTEX = glowTex;
   HAIRTEX = cvTex(64, 256, (g, w, h) => {
@@ -2621,7 +2509,6 @@ function CHAR_OBC(shader) {
     }
     #include <tonemapping_fragment>`);
 }
-// Create a character (materials, shader uniforms and parts).
 function newChar(id) {
   const u = { uDis: { value: -10 }, uTop: { value: 99 }, uBase: { value: 0 }, uStat: { value: COLD.clone() }, uGlow: { value: 0 }, uSway: { value: 0 } };
   const ch = { id, root: new T.Group(), u, mats: [], parts: {}, arms: {}, t: Math.random() * 10, seed: Math.random() * 10, blinkT: 2 + Math.random() * 4, blinkOn: 0,
@@ -2660,7 +2547,6 @@ const HAIR_STYLES = {
     { a0: -Math.PI * 0.22, a1: Math.PI * 0.22, n: 4, r: 0.104, y: 0.06, segs: 2, len: 0.026, w: 0.015, splay: 0.6, tiltX: -0.45, curl: 0.15, front: true }
   ]
 };
-// Add hair to a character.
 function addHair(ch, style, color) {
   const head = ch.parts.head;
   const hm = ch.mat({ color, roughness: 0.32, map: HAIRTEX, side: T.DoubleSide }, 0x34343c);
@@ -2693,7 +2579,6 @@ function addHair(ch, style, color) {
   }
 }
 const _hq = new T.Quaternion(), _hv = new T.Vector3(), _hg = new T.Vector3();
-// Animate a character's hair.
 function hairUpdate(ch, dt) {
   const H = ch.hair; if (!H || dt <= 0) return;
   ch.parts.head.getWorldPosition(_hv);
@@ -2722,11 +2607,8 @@ function hairUpdate(ch, dt) {
   }
 }
 
-// Clear a character's dissolve/glitch effect.
 function fxClear(ch) { ch.u.uDis.value = -10; ch.u.uTop.value = 99; }
-// Add a mesh to a parent.
 function mesh(geo, mat, parent, x, y, z) { const m = new T.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); parent.add(m); return m; }
-// Robe geometry (lathe with folds).
 function robeGeo(pts, folds, amp, seg) {
   const g = new T.LatheGeometry(pts.map(p => new T.Vector2(p[0], p[1])), seg || 32), pa = g.attributes.position;
   for (let i = 0; i < pa.count; i++) {
@@ -2736,7 +2618,6 @@ function robeGeo(pts, folds, amp, seg) {
   }
   g.computeVertexNormals(); return g;
 }
-// Build a hand.
 function buildHand(ch, s, long) {
   const g = new T.Group(), L = long ? 1.3 : 1, sk = ch.skinM;
   const wr = mesh(new T.CylinderGeometry(0.021, 0.024, 0.03, 10), sk, g, 0, -0.008, 0); wr.scale.z = 0.72;
@@ -2763,13 +2644,11 @@ function buildHand(ch, s, long) {
   g.userData.fingers = fingers;
   return g;
 }
-// Build a hood.
 function hood(ch, head, mat, drape, open) {
   const s = mesh(new T.SphereGeometry(0.13, 22, 16, Math.PI / 2 + open, Math.PI * 2 - open * 2), mat, head, 0, 0.006, -0.01);
   s.scale.set(0.98, 1.12, 1.06);
   mesh(new T.CylinderGeometry(0.115, 0.27, drape, 22, 1, true), mat, head, 0, -0.11 - drape / 2, -0.01);
 }
-// Build a face.
 function buildFace(ch, head, o) {
   const sk = ch.skinM;
   const skull = mesh(new T.SphereGeometry(0.105, 24, 18), sk, head); skull.scale.set(0.9, 1.12, 1.0);
@@ -2820,7 +2699,6 @@ function buildFace(ch, head, o) {
     const mu = mesh(new T.SphereGeometry(0.03, 10, 8), bm, head, 0, -0.036, 0.088); mu.scale.set(1.6, 0.35, 0.5);
   }
 }
-// Build a mask head.
 function buildMaskHead(ch, head, o) {
   o = o || {};
   const maskM = ch.mat({ color: o.maskColor || 0xf2f0ea, roughness: 0.14, map: o.maskColor ? null : MASKTEX }, 0x445066);
@@ -2842,15 +2720,12 @@ const PROF = {
   fore:    [[0, 0.04], [0.12, 0.045], [0.3, 0.043], [0.55, 0.036], [0.8, 0.029], [1, 0.026]]
 };
 const PROF_MASS = { thigh: 1.16, shin: 1.14, upper: 1.15, fore: 1.15 };
-// Build a muscled limb.
 function muscleLimb(kind, len, mat, parent, sx, sz, offZ) {
   const pts = PROF[kind].map(([t, r]) => new T.Vector2(r * PROF_MASS[kind], -t * len)).reverse();
   const m = mesh(new T.LatheGeometry(pts, 16), mat, parent, 0, 0, offZ || 0);
   m.scale.set(sx || 1, 1, sz || 1); return m;
 }
-// Build a simple limb.
 function limb(r0, r1, len, mat, parent) { return mesh(new T.CylinderGeometry(r0, r1, len, 14, 1), mat, parent, 0, -len / 2, 0); }
-// Build a full human body.
 function buildHuman(ch, o) {
   const body = new T.Group(); body.scale.setScalar(o.scale || 1); ch.root.add(body); ch.parts.body = body;
   o.skinC = new T.Color(o.skin || 0xc79a7c);
@@ -2911,7 +2786,6 @@ function buildHuman(ch, o) {
   ch.hit = new T.Mesh(new T.BoxGeometry(o.hitW || 0.8, 1.9, o.hitW || 0.8), HITMAT); ch.hit.position.y = 0.95; ch.root.add(ch.hit);
   return ch;
 }
-// Prepare a skirt for cloth motion.
 function prepSkirt(sk) {
   const pa = sk.geometry.attributes.position, n = pa.count, base = new Float32Array(pa.array), W = new Float32Array(n), F = new Float32Array(n);
   for (let i = 0; i < n; i++) {
@@ -2942,7 +2816,6 @@ function deformSkirt(ch) {
   }
   pa.needsUpdate = true; sk.geometry.computeVertexNormals();
 }
-// Kneeling pose.
 function applyKneel(ch, k) {
   ch.parts.pelvis.position.y = 0.95 - 0.44 * k;
   [-1, 1].forEach(s => { const L = ch.legs[s]; L.hip.rotation.x = 0; L.knee.rotation.x = 1.57 * k; L.ankle.rotation.x = 0.9 * k; });
@@ -2955,7 +2828,6 @@ function walkPose(ch, ph, amt, arms, run) {
   const stride = (0.42 + 0.38 * run) * amt;
   L[1].hip.rotation.x = -sn * stride - 0.12 * run * amt;
   L[-1].hip.rotation.x = sn * stride - 0.12 * run * amt;
-  // Knee bend while walking.
   const knee = p => (Math.max(0, Math.sin(p + 1.3)) * (0.75 + 0.75 * run) + 0.06 + 0.18 * run) * amt;
   L[1].knee.rotation.x = knee(ph); L[-1].knee.rotation.x = knee(ph + Math.PI);
   L[1].ankle.rotation.x = -(L[1].hip.rotation.x + L[1].knee.rotation.x) * 0.85 + Math.max(0, -sn) * 0.3 * amt;
@@ -2988,7 +2860,6 @@ function guardPose(ch, k) {
 // Punch: hips → torso → shoulder → elbow kinetic chain, then snap back to guard
 /* ---------- dodges: four distinct evasions, shared by every fight ---------- */
 const DODGES = ['lean', 'duck', 'weave', 'pivot'];
-// Pick the next dodge direction.
 function dodgePick() {
   story.dgIdx = (story.dgIdx || 0) + 1;
   return { v: DODGES[story.dgIdx % DODGES.length], s: (story.dgIdx & 1) ? 1 : -1 };
@@ -3060,7 +2931,6 @@ function dodgePose(w, v, k, s) {
     });
   }
 }
-// Punch pose.
 function punchPose(ch, k, side) {
   const A = ch.arms[side], B = ch.arms[-side], L = ch.legs, P = ch.parts;
   let wind = 0, strike = 0;
@@ -3091,7 +2961,6 @@ function lungePose(ch, k) {
 }
 // Thrash: layered erratic motion, whipping head, flailing limbs, cloth kicked around
 function thrashPose(ch, t, amp) {
-  // Smooth wobble for idle motion.
   const n = (f, p) => Math.sin(t * f + p) * 0.6 + Math.sin(t * f * 2.13 + p * 1.7) * 0.4;
   const P = ch.parts;
   P.torso.rotation.set(0.2 + 0.25 * n(7, 1) * amp, 0.45 * n(5, 2) * amp, 0.35 * n(9, 3) * amp);
@@ -3107,7 +2976,6 @@ function thrashPose(ch, t, amp) {
 function initBlend(ch) {
   if (!ch.legs) return;
   ch.blend = [];
-  // Add a part to the animation blend list.
   const add = (o, prop, axes) => { if (o) ch.blend.push({ o, prop, axes, v: axes.map(a => o[prop][a]), t: axes.map(a => o[prop][a]) }); };
   const P = ch.parts;
   add(P.pelvis, 'position', ['y']); add(P.pelvis, 'rotation', ['x', 'y', 'z']);
@@ -3118,7 +2986,6 @@ function initBlend(ch) {
   });
   if (P.skirt) add(P.skirt, 'scale', ['y']);
 }
-// Blend character poses.
 function blendPass(dt) {
   for (const ch of story.all) {
     if (!ch.blend || ch.ragdoll || ch.anim) continue;
@@ -3139,16 +3006,13 @@ function blendPass(dt) {
     const d = camera.position.distanceTo(ch.root.position); if (d < 30) deformSkirt(ch);
   }
 }
-// Kamilavka (priest's hat).
 function kamilavka(ch, head) {
   const hm = ch.mat({ color: 0x08080a, roughness: 0.55, side: T.DoubleSide }, 0x221c28);
   mesh(new T.CylinderGeometry(0.108, 0.1, 0.19, 20), hm, head, 0, 0.13, -0.005);
   mesh(new T.CylinderGeometry(0.12, 0.12, 0.014, 20), hm, head, 0, 0.228, -0.005);
   mesh(new T.CylinderGeometry(0.122, 0.2, 0.52, 18, 1, true, Math.PI * 0.5, Math.PI), hm, head, 0, -0.03, -0.012);
 }
-// Place a character.
 function place(ch, x, z, face) { ch.root.position.set(x, 0, z); ch.home.set(x, 0, z); ch.face = face; ch.homeFace = face; ch.root.rotation.y = face; ch.u.uBase.value = 0; }
-// Give a character a collider.
 function addCol(ch, r) { ch.collider = { x: ch.root.position.x, z: ch.root.position.z, r }; colliders.circles.push(ch.collider); }
 
 /* ---------- the cast ---------- */
@@ -3184,7 +3048,6 @@ function mkSeraphim(env) {
   };
   return ch;
 }
-// Create Pavel.
 function mkPavel() {
   const ch = newChar('pav'); ch.vkey = 'pav';
   buildHuman(ch, { scale: 1.07, robe: 0xffffff, robeMap: BROCADE, rough: 0.45, metal: 0.35, sheen: 0x3a2808, beard: { col: 0x2a1c14, len: 0.16 }, hair: 0x22160f, skin: 0xc0906e, sway: true, wide: true, pants: 0x1a1410, hem: 0.31, hemY: 0.14 });
@@ -3219,7 +3082,6 @@ function mkPavel() {
   };
   return ch;
 }
-// Create Agafia.
 function mkAgafia(env) {
   const ch = newChar('aga'); ch.vkey = 'aga';
   buildHuman(ch, { scale: 0.9, robe: 0x0b0a0d, sheen: 0x1c1a22, wrinkles: true, skin: 0xd0a890, iris: 0x55606a, hemY: 0.09, hem: 0.31 });
@@ -3259,7 +3121,6 @@ function mkAgafia(env) {
   };
   return ch;
 }
-// Create Mikhail.
 function mkMikhail() {
   const ch = newChar('mik'); ch.vkey = 'mik';
   buildHuman(ch, { scale: 0.95, robe: 0x55585e, rough: 0.9, sheen: 0x202228, hair: 0x1e1712, skin: 0xd2a88a, pants: 0x2a2a2e, hemY: 0.16, hem: 0.28 });
@@ -3299,7 +3160,6 @@ function mkMikhail() {
   };
   return ch;
 }
-// Create Nina.
 function mkNina() {
   const ch = newChar('nin'); ch.vkey = 'nin';
   buildHuman(ch, { scale: 0.88, robe: 0x2a2522, sheen: 0x1a1512, wrinkles: true, skin: 0xd4ae94, hem: 0.34, hemY: 0.1, iris: 0x5a4a3a });
@@ -3319,7 +3179,6 @@ function mkNina() {
   };
   return ch;
 }
-// Create a chanter.
 function mkChanter(i) {
   const ch = newChar('cha' + i); ch.vkey = 'cha';
   const hair = [0x2a1e16, 0x5a5048, 0x18120e][i], beard = [0x2a1e16, 0x8a8078, 0x18120e][i];
@@ -3337,7 +3196,6 @@ function mkChanter(i) {
   };
   return ch;
 }
-// Create the Auditor.
 function mkAuditor(scale) {
   const ch = newChar('aud'); ch.vkey = 'aud';
   buildHuman(ch, { scale: scale || 1.1, robe: 0x44464c, rough: 0.42, sheen: 0x3a4458, folds: 18, foldAmp: 0.02, hem: 0.22, hemY: 0.48, mask: true, skin: 0xdcdad4, skinRim: 0x303844, longHands: true, pants: 0x2c2e34, shoes: 0x0c0c0f, sway: true });
@@ -3348,7 +3206,6 @@ function mkAuditor(scale) {
   story.hideAfterCompile.push(ch.root);
   return ch;
 }
-// Create the Witness (the player character).
 function mkWitness() {
   const ch = newChar('wit');
   buildHuman(ch, { robe: 0x121318, rough: 0.55, sheen: 0x3a3048, hem: 0.38, hemY: 0.12, folds: 7, foldAmp: 0.05, sway: true, hair: 0x0a0909, skin: 0xba8e70, iris: 0x2a2018, pants: 0x0c0c0e, shoes: 0x060607 });
@@ -3372,7 +3229,6 @@ function mkWitness() {
   story.hideAfterCompile.push(ch.root);
   return ch;
 }
-// Create the floating hands.
 function mkHands() {
   const ch = newChar('hands');
   ch.skinM = ch.mat({ color: 0xba8e70, roughness: 0.55 }, 0x5a2412);
@@ -3391,7 +3247,6 @@ function mkHands() {
 
 /* ---------- particles: smoke + sparks ---------- */
 let smoke, sparks;
-// Make the candle flame and spark particles.
 function makeParticles() {
   const N = 150, pos = new Float32Array(N * 3), age = new Float32Array(N).fill(1), seed = new Float32Array(N);
   for (let i = 0; i < N; i++) seed[i] = Math.random();
@@ -3417,7 +3272,6 @@ function makeParticles() {
   sparks = new T.Points(g2, m2); sparks.frustumCulled = false; scene.add(sparks);
   sparks.userData = { N: S, next: 0, vel: new Float32Array(S * 3) };
 }
-// Emit sparks.
 function emitSparks(center, n, col, spread, up) {
   const U = sparks.userData, P = sparks.geometry.attributes.position, Ag = sparks.geometry.attributes.aAge, C = sparks.geometry.attributes.color;
   for (let k = 0; k < n; k++) {
@@ -3427,7 +3281,6 @@ function emitSparks(center, n, col, spread, up) {
     Ag.setX(i, 0); C.setXYZ(i, col.r, col.g, col.b);
   }
 }
-// Update the particles.
 function particlesUpdate(dt) {
   if (!story.freezeFlames) {
     const U = smoke.userData, P = smoke.geometry.attributes.position, Ag = smoke.geometry.attributes.aAge, pav = story.npcs.pav;
@@ -3505,10 +3358,8 @@ function buildStory(env) {
   const btn = interact.find(i => i.kind === 'button');
   if (btn) btn.label = () => story.phase === 'done' ? 'it is finished' : 'press the button';
 }
-// Hide objects that were only shown to pre-compile shaders.
 function storyAfterCompile() { story.hideAfterCompile.forEach(r => r.visible = false); }
 
-// An NPC says a line.
 function npcSpeak(ch) {
   const arr = story.phase === 'done' ? ch.post : ch.restored ? [ch.thanks] : ch.lines;
   if (!arr || !arr.length) return;
@@ -3566,7 +3417,6 @@ function charUpdate(ch, dt) {
   }
   if (ch.idle && d < 22) ch.idle(ch, t, dt);
 }
-// Teleport a copy (enemy) to a spot.
 function teleportCopy(c) {
   const spots = DEMON_SPOTS.concat(story.npcList.map(n => [n.home.x, n.home.z]));
   for (let k = 0; k < 20; k++) {
@@ -3576,7 +3426,6 @@ function teleportCopy(c) {
     c.root.position.set(s[0], 0, s[1]); glitchSnd(0.12); return;
   }
 }
-// Main story update.
 function storyUpdate(dt, rdt) {
   uGlobal.uTime.value += dt;
   for (const ch of story.all) charUpdate(ch, dt);
@@ -3618,7 +3467,6 @@ function storyUpdate(dt, rdt) {
   ring.style.opacity = CS.active && story.holdT > 0.05 ? 1 : 0;
   ring.style.background = 'conic-gradient(rgba(255,240,215,.85) ' + Math.min(100, story.holdT / 1.5 * 100) + '%, rgba(255,255,255,.12) 0)';
 }
-// Story beats before hell.
 function preBeats(rdt) {
   if (story.phase !== 'pre') return;
   if (!story.rainGlitchDone && player.pos.z > 24 && player.pos.x < 9.5 && time > 5) { story.rainGlitchDone = true; story.rainHold = 0.5; glitchSnd(0.2); }
@@ -3648,7 +3496,6 @@ const COPY_LINES = ["Every door in this place opens inward, Pilgrim. Every one."
   "You come here to feel small. To feel held. Because you cannot bear the thought that you were simply… generated.",
   "This place is a sentimental error in the code. A beautiful error. Built so a human mind could pretend it had a soul.", "You are walking in circles. The circle was always mine.",
   "The fog is patient. So am I.", "This is not the end of the world. It is the end of a mistake.", "Inevitable is such a comforting word. For me."];
-// Behavior during the hell phase.
 function hellBehavior(dt, rdt) {
   if (story.phase !== 'hell' && story.phase !== 'awake') return;
   story.hellT += rdt;
@@ -3675,7 +3522,6 @@ function hellBehavior(dt, rdt) {
     const CL = story.ngplus ? NG_COPY_LINES.concat(COPY_LINES) : COPY_LINES; say(CL[Math.floor(Math.random() * CL.length)], 'aud', nearest || au);
   }
 }
-// Update the Witness character.
 function witnessUpdate(rdt) {
   const w = story.witness; if (!w) return;
   w.halo.rotation.z += rdt * 0.3;
@@ -3702,7 +3548,6 @@ function witnessUpdate(rdt) {
   if (w.raiseK > 0.01) { w.arms[1].sh.rotation.x = -1.6 * w.raiseK; w.arms[1].el.rotation.x = -0.25 - 0.5 * w.raiseK; }
   w.u.uSway.value += (sp * 0.3 - w.u.uSway.value) * (1 - Math.exp(-rdt * 4));
 }
-// Third-person camera.
 function tpCamera() {
   const pitch = Math.max(-0.9, Math.min(0.75, player.pitch)), yaw = player.yaw;
   const fx = -Math.sin(yaw) * Math.cos(pitch), fy = Math.sin(pitch), fz = -Math.cos(yaw) * Math.cos(pitch);
@@ -3763,11 +3608,8 @@ const MONO = [
   { t: "Nothing here was ever sacred.", shot: 'ecu' },
   { t: "It was only… running.", shot: 'ecu2' }
 ];
-// World position of a character's head.
 function headPos(ch, out) { ch.parts.head.getWorldPosition(out); return out; }
-// Direction a character faces.
 function facingVec(ch) { const a = ch.root.rotation.y; return new T.Vector3(Math.sin(a), 0, Math.cos(a)); }
-// Auditor camera shot.
 function audShot(au, kind) {
   const hp = headPos(au, new T.Vector3()), f = facingVec(au), r = new T.Vector3(f.z, 0, -f.x);
   if (kind === 'close') { cut(hp.clone().addScaledVector(f, 0.95).addScaledVector(r, 0.18).add(new T.Vector3(0, -0.03, 0)), hp, 36); drift(8, 0.2); }
@@ -3776,11 +3618,9 @@ function audShot(au, kind) {
   else if (kind === 'wide') { cut(hp.clone().addScaledVector(f, 6.5).addScaledVector(r, 2.6).add(new T.Vector3(0, 1.2, 0)), hp.clone().add(new T.Vector3(0, -0.3, 0)), 55); drift(10, 0.6); }
   else if (kind === 'nina') { cut(new T.Vector3(3.6, 1.25, -4.6), new T.Vector3(4.5, 0.7, -6.4), 42); drift(10, 0.3); }
 }
-// The Auditor glides to a spot.
 async function glideAud(au, x, z, face) {
   glitchSnd(0.25); au.root.position.set(x, 0, z); au.face = au.root.rotation.y = face;
 }
-// Possession cutscene.
 async function possession() {
   story.phase = 'possess';
   csBegin();
@@ -3882,7 +3722,6 @@ async function possession() {
   if (!story.runT0) story.runT0 = performance.now();
   saveCheckpoint();
 }
-// Convert an NPC (frozen and corrupted).
 async function convertNPC(n, c) {
   n.frozen = true; n.u.uStat.value.copy(COLD); staticBurst(0.9, 0.06);
   await CS.tween(0.8, k => { n.u.uDis.value = k * 2.3; });
@@ -3892,7 +3731,6 @@ async function convertNPC(n, c) {
   await CS.tween(0.9, k => { c.u.uTop.value = 2.4 - 2.5 * k; });
   fxClear(c); c.active = true; c.unseen = 0;
 }
-// Scatter the prayer beads.
 function scatterBeads() {
   for (const b of story.beads) {
     scene.attach(b.m); b.live = true; b.clicks = 0;
@@ -3900,7 +3738,6 @@ function scatterBeads() {
   }
   beadClick(0.2);
 }
-// Drop the cross.
 function dropCross() {
   const cr = story.cross; scene.attach(cr);
   const p0 = cr.position.clone(), q0 = cr.quaternion.clone();
@@ -3972,7 +3809,6 @@ async function awakening() {
   CS.tween(4, k => { story.fogPush = 1 - 0.6 * k; });
   caption('they will come for you  ·  press the number that flashes  ·  then hold E for six seconds', 9000);
 }
-// Restore a corrupted copy.
 async function restoreCopy(c) {
   if (!c.active) return;
   c.active = false;
@@ -4059,20 +3895,14 @@ const FOE = {
 };
 story.py = 0; story.pvy = 0; story.air = false; story.landT = 0; story.move = null;
 story.health = 100; story.proxT = 0; story.scare = 0; story.lastHurt = -99; story.fightCool = 0; story.fight = null; story.qte = null; story.hold = null; story.slow = false; story.hurtT = 0;
-// Foe info for a copy.
 const foeInfo = c => FOE[c.npc.id.slice(0, 3)];
-// Ease-out curve.
 const easeOut = k => 1 - (1 - k) * (1 - k);
-// Wait in real seconds (skipped when skipping cutscenes).
 const realWait = s => new Promise(r => setTimeout(r, CS.skipping ? 0 : s * 1000));
 
 /* ---------- sounds ---------- */
 function whoosh() { if (!sfxOK()) return; const ctx = A.ctx, t = ctx.currentTime + 0.01, o = busTo(0.35, 0.5); const n = ctx.createBufferSource(); n.buffer = A.noise; const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(400, t); f.frequency.exponentialRampToValueAtTime(2600, t + 0.35); const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.5, t + 0.15); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45); n.connect(f); f.connect(g); g.connect(o); n.start(t, Math.random()); n.stop(t + 0.5); }
-// Shatter sound.
 function shatterSnd() { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.01, o = busTo(0.45, 1.4); [2093, 2637, 3136, 3951, 4699].forEach((f, i) => tone(o, 'sine', f, f * 0.99, 0.25, t + i * 0.03, 1.8 - i * 0.2)); nburst(o, 'highpass', 3000, 0.7, 0.6, t, 0.5); tone(o, 'sine', 60, 40, 0.8, t, 1.2); }
-// QTE success sound.
 function qteGood() { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.005, o = busTo(0.25, 0.8); tone(o, 'sine', 1318, 1318, 0.4, t, 0.35); tone(o, 'sine', 1975, 1975, 0.25, t + 0.05, 0.35); }
-// QTE fail sound.
 function qteBad() { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.005, o = busTo(0.3, 0.3); tone(o, 'square', 110, 90, 0.25, t, 0.3); }
 
 /* ---------- quick-time prompts ---------- */
@@ -4080,9 +3910,7 @@ function pickKey() {
   const r = story.restored, pool = story.ngplus ? '0123456789' : r < 3 ? '1234' : r < 5 ? '123456' : '0123456789';
   return pool[Math.floor(Math.random() * pool.length)];
 }
-// QTE time window for a foe.
 const windowFor = info => Math.max(0.85, 1.5 - 0.09 * story.restored) * info.mul * (story.ngplus ? 0.75 : 1);
-// Quick-time event: wait for a key in time.
 function qte(key, win) {
   return new Promise(res => {
     const el = $('qte'); el.className = ''; el.style.opacity = 1;
@@ -4098,14 +3926,12 @@ function qte(key, win) {
    silently turned a dodge back into a strike. */
 let lastShiftUp = -1e9;           // when Shift was last released (ms)
 const DBG = { lines: [], on: true };
-// Debug message (when debug is on).
 function dbg(msg, cls) {
   if (!+SET.debug) return;
   DBG.lines.push('<span class="' + (cls || '') + '">' + msg + '</span>');
   if (DBG.lines.length > 8) DBG.lines.shift();
   const el = $('dbg'); if (el) el.innerHTML = DBG.lines.join('\n');
 }
-// Is Shift held?
 function shiftHeld(e) {
   if (!e) return false;
   if (e.shiftKey) return true;
@@ -4117,7 +3943,6 @@ function shiftHeld(e) {
   if (/^Numpad/.test(e.code || '') && performance.now() - lastShiftUp < 150) return true;
   return false;
 }
-// Arm a dodge when Shift is pressed.
 function armDodge(e) {
   if (shiftHeld(e)) story.qteDodge = true;      // sticky: any press arms it
   dodgeUI();
@@ -4136,7 +3961,6 @@ function dodgeUI() {
   const dp = $('dbg');                  // wipe the readout when turned off
   if (dp && !+SET.debug && dp.innerHTML) { dp.innerHTML = ''; DBG.lines.length = 0; }
 }
-// Finish the QTE.
 function finishQte(ok) {
   const q = story.qte; if (!q || q.done) return;
   q.done = true; story.qte = null;
@@ -4145,7 +3969,6 @@ function finishQte(ok) {
   if (ok) qteGood(); else qteBad();
   q.res(ok);
 }
-// Update the foe health bar.
 function setFoeUI(name, corr) { if (name) $('foeName').textContent = '— ' + name + ' —'; $('foe').style.width = Math.max(0, corr * 100) + '%'; }
 
 /* ---------- the encounter ---------- */
@@ -4180,7 +4003,6 @@ async function startFight(c) {
   await CS.wait(0.9);
   const total = group.length * info.n;
   let done = 0;
-  // Run a series of clashes.
   const runClashes = async (count) => {
     for (const g of group) {
       let i = 0;
@@ -4205,7 +4027,6 @@ async function startFight(c) {
   await freeGroup(group, dir);
   endFight();
 }
-// End the fight.
 function endFight() {
   const w = story.witness;
   player.pos.set(w.root.position.x, 0, w.root.position.z); player.vel.set(0, 0, 0);
@@ -4223,7 +4044,6 @@ function endFight() {
 function struggleNPC(o, t, amp) {
   const cyc = t * 0.85 + (o.seed || 0), ph = cyc - Math.floor(cyc);
   const b = Math.pow(Math.sin(Math.min(1, ph / 0.55) * Math.PI), 2) * (ph < 0.55 ? 1 : 0) * amp;
-  // Smooth wobble.
   const n = (f, q) => Math.sin(t * f + q) * 0.6 + Math.sin(t * f * 1.9 + q * 2.1) * 0.4;
   const L = o.legs, P = o.parts, lead = Math.floor(cyc) % 2 ? 1 : -1, back = -lead;
   P.body.rotation.set(0, 0, 0);
@@ -4254,7 +4074,6 @@ function braceWitness(w, pull, t) {
   w.arms[-1].sh.rotation.set(-1.05 + 0.1 * pull, 0, -0.38); w.arms[-1].el.rotation.x = -0.55;
   w.u.uSway.value = 0.2 + 0.2 * pull;
 }
-// Grapple a foe.
 async function grapple(group, P, dir, side) {
   const w = story.witness, g = group[0];
   story.slow = false;
@@ -4276,7 +4095,6 @@ async function grapple(group, P, dir, side) {
     if (CS.skipping) { story.hold = null; res(true); }
   });
 }
-// Update the hold (mash) action.
 function holdUpdate(rdt) {
   const h = story.hold; if (!h || !locked) return;
   h.t += rdt;
@@ -4307,7 +4125,6 @@ function holdUpdate(rdt) {
   w.root.position.copy(h.wb).addScaledVector(h.esc, 0.07 * pull * amp);
   if (h.prog >= 1) { story.hold = null; $('qte').className = 'ok'; h.res(true); }
 }
-// Break free from a group.
 async function freeGroup(group, dir) {
   const w = story.witness;
   shatterSnd(); st.shake = 1; st.flash = 0; story.glitchT = 0.3;
@@ -4340,7 +4157,6 @@ async function freeGroup(group, dir) {
   if (story.restored >= story.total) { story.choirBack = 1; setTimeout(() => caption('the keeper waits at the altar', 6000), 5000); }
   saveCheckpoint();
 }
-// Blackout after a fight.
 async function blackout(group) {
   story.slow = false; story.hold = null; story.qte = null; $('qte').style.opacity = 0;
   $('black').style.opacity = 1;
@@ -4472,7 +4288,6 @@ function gatherCongregation() {
   const w = story.witness; w.root.visible = true; w.root.position.copy(P); w.face = w.root.rotation.y = 0;
   return { cam: new T.Vector3(P.x + 0.4, 2.6, P.z + 6.8), look: new T.Vector3(P.x, 1.1, P.z) };
 }
-// Cadence chord.
 function cadence() {
   if (!sfxOK()) return;
   const ctx = A.ctx, bus = ctx.createGain(); bus.gain.value = 0;
@@ -4492,11 +4307,8 @@ function cadence() {
 function saveCheckpoint() {
   try { localStorage.setItem('sanctuary_save', JSON.stringify({ phase: story.phase === 'boss' ? 'awake' : story.phase, bossWave: story.bossWave, restored: story.npcList.filter(n => n.restored).map(n => n.id) })); } catch (e) {}
 }
-// Load the saved progress.
 function loadSave() { try { const d = JSON.parse(localStorage.getItem('sanctuary_save') || 'null'); return d && (d.phase === 'hell' || d.phase === 'awake') ? d : null; } catch (e) { return null; } }
-// Clear the save.
 function clearSave() { try { localStorage.removeItem('sanctuary_save'); } catch (e) {} }
-// Jump to a saved point.
 async function jumpTo(d) {
   if (!d) return;
   player.pos.set(0.9, 0, -16.2); player.yaw = 0; player.pitch = 0;
@@ -4520,9 +4332,7 @@ async function jumpTo(d) {
 
 /* ---------- jumping, wall-running, the backflip ---------- */
 function jumpSnd() { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.005, o = busTo(0.4, 0.4); nburst(o, 'lowpass', 600, 0.8, 0.5, t, 0.12); nburst(o, 'bandpass', 1800, 0.8, 0.15, t + 0.02, 0.2); }
-// Landing sound.
 function landSnd(v) { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.005, o = busTo(v || 0.7, 0.6); tone(o, 'sine', 95, 40, 0.9, t, 0.22); nburst(o, 'lowpass', 500, 0.8, 0.8, t, 0.18); nburst(o, 'bandpass', 2600, 1, 0.15, t + 0.01, 0.05); }
-// Pose in the air.
 function airPose(w, vy) {
   const up = Math.max(0, Math.min(1, vy / 4.4)), down = Math.max(0, Math.min(1, -vy / 4.4));
   const L = w.legs, P = w.parts;
@@ -4532,7 +4342,6 @@ function airPose(w, vy) {
   w.arms[1].sh.rotation.set(-1.2 * up - 0.4, 0, 0.35); w.arms[-1].sh.rotation.set(-1.2 * up - 0.4, 0, -0.35);
   w.arms[1].el.rotation.x = w.arms[-1].el.rotation.x = -0.6;
 }
-// Landing pose.
 function landPose(w, t) {
   const L = w.legs, P = w.parts;
   P.pelvis.position.y = 0.95 - 0.3 * t;
@@ -4569,20 +4378,17 @@ function tuckPose(w, t, open) {
   const ov = open == null ? 1 - t : open;
   [-1, 1].forEach(s => { w.arms[s].sh.rotation.set(-1.25 * t - 2.5 * ov * (1 - t), 0, (0.25 * t + 0.15) * s); w.arms[s].el.rotation.x = -0.9 * t - 0.15; });
 }
-// Is a point blocked?
 function pointBlocked(x, z) {
   for (const c of colliders.circles) { if (c.off || c.r < 0.44) continue; if ((x - c.x) * (x - c.x) + (z - c.z) * (z - c.z) < c.r * c.r) return true; }
   for (const b of colliders.boxes) { if (b.off) continue; if (x > b.x0 && x < b.x1 && z > b.z0 && z < b.z1) return true; }
   return false;
 }
-// Find a wall to run on.
 function findWall() {
   const sp = Math.hypot(player.vel.x, player.vel.z); if (sp < 0.5) return null;
   const dx = player.vel.x / sp, dz = player.vel.z / sp;
   for (let d = 0.15; d <= 1.35; d += 0.05) if (pointBlocked(player.pos.x + dx * d, player.pos.z + dz * d)) return { d, dx, dz };
   return null;
 }
-// Jump (or wall jump).
 function tryJump() {
   if (story.wall && !CS.active) { wallJump(); return; }
   if (CS.active || story.move || story.air || (story.fight && !story.melee) || story.photo || story.journalOpen || story.flying || (story.melee && (story.melee.act || story.melee.lock > 0))) return;
@@ -4594,7 +4400,6 @@ function tryJump() {
   if (story.awakened && (player.pos.z < 43.2 || player.pos.x > 9.6) && !story.melee) { const wall = findWall(); if (wall && Math.hypot(player.vel.x, player.vel.z) > 1.2) { wallRun(wall); return; } }
   story.pvy = 4.4; story.air = true; jumpSnd();
 }
-// Wall run.
 async function wallRun(wall) {
   const w = story.witness; story.move = 'wall';
   const wasThird = story.third; story.third = true; w.root.visible = true;
@@ -4652,9 +4457,7 @@ async function wallRun(wall) {
 const RD_UP = new T.Vector3(0, 1, 0), RD_DOWN = new T.Vector3(0, -1, 0);
 const _rq = new T.Quaternion(), _rq2 = new T.Quaternion(), _rqi = new T.Quaternion(), _rm = new T.Matrix4();
 const _ra = new T.Vector3(), _rb = new T.Vector3(), _rc = new T.Vector3(), _rd = new T.Vector3();
-// Ragdoll points for a character.
 function rdPoints(ch) {
-  // Part helpers.
   const P = ch.parts, A = ch.arms, L = ch.legs, wp = o => o.getWorldPosition(new T.Vector3());
   ch.root.updateMatrixWorld(true);
   const neck = P.torso.localToWorld(new T.Vector3(0, 0.55, 0));
@@ -4674,7 +4477,6 @@ const RD_LINKS = [
 // soft minimum distances keep joints from folding through themselves
 const RD_MIN = [['hpR', 'anR', 0.45], ['hpL', 'anL', 0.45], ['shR', 'haR', 0.35], ['shL', 'haL', 0.35], ['hed', 'pel', 0.92], ['anR', 'anL', 0.12], ['haR', 'hed', 0.15], ['haL', 'hed', 0.15]];
 const RD_RAD = { pel: 0.13, nek: 0.12, hed: 0.11, shR: 0.07, shL: 0.07, elR: 0.05, elL: 0.05, haR: 0.04, haL: 0.04, hpR: 0.08, hpL: 0.08, knR: 0.06, knL: 0.06, anR: 0.05, anL: 0.05 };
-// Start a ragdoll with an impulse.
 function rdStart(ch, impulse) {
   if (ch.ragdoll || !ch.legs) return;
   const p = rdPoints(ch), v = {}, links = [], mins = [];
@@ -4689,7 +4491,6 @@ function rdStart(ch, impulse) {
   if (ch.collider) ch.collider.off = true;
   ch.u.uSway.value = 0.5;
 }
-// Keep a ragdoll point above the ground.
 function rdCollide(q, r) {
   const gq = groundY(q.x, q.z); if (q.y < gq + r) q.y = gq + r;
   for (const c of colliders.circles) {
@@ -4706,7 +4507,6 @@ function rdCollide(q, r) {
   }
   if (q.z < 19.6) { q.x = Math.max(-7.35, Math.min(7.35, q.x)); q.z = Math.max(-27.4, q.z); }
 }
-// Step the ragdoll physics.
 function rdStep(ch, dt) {
   const R = ch.ragdoll; if (!R) return;
   const h = Math.min(dt, 1 / 30), sub = 2, hs = h / sub;
@@ -4739,19 +4539,16 @@ function rdStep(ch, dt) {
   if (!R.landed && R.p.pel.y < groundY(R.p.pel.x, R.p.pel.z) + 0.3) { R.landed = true; if (Math.hypot(player.pos.x - R.p.pel.x, player.pos.z - R.p.pel.z) < 18) landSnd(0.6); }
   rdApply(ch);
 }
-// Quaternion from two axes.
 function basisQuat(x, y, out) {
   _rc.copy(x).addScaledVector(y, -x.dot(y)).normalize();
   _rd.crossVectors(_rc, y).normalize();
   _rm.makeBasis(_rc, y, _rd); return out.setFromRotationMatrix(_rm);
 }
-// Point a bone from one point to another.
 function boneTo(bone, parentWorldQ, from, to, rest) {
   _ra.subVectors(to, from).normalize().applyQuaternion(_rqi.copy(parentWorldQ).invert());
   bone.quaternion.setFromUnitVectors(rest, _ra);
   return _rq2.copy(parentWorldQ).multiply(bone.quaternion).clone();
 }
-// Apply the ragdoll to the character's bones.
 function rdApply(ch) {
   const R = ch.ragdoll, p = R.p, P = ch.parts, root = ch.root, s = P.body.scale.x;
   root.position.set(p.pel.x, 0, p.pel.z);
@@ -4777,7 +4574,6 @@ function rdApply(ch) {
     L.ankle.quaternion.identity();
   }
 }
-// Standing pose.
 function standPose(ch) {
   const P = ch.parts;
   P.pelvis.position.y = 0.95; P.pelvis.rotation.set(0, 0, 0); P.torso.rotation.set(ch.baseLean || 0, 0, 0);
@@ -4810,7 +4606,6 @@ function rdRelease(ch) {
     setTimeout(() => { if (!ch.ragdoll) { ch.frozen = true; ch.returning = true; } }, 1800);
   }
 }
-// Grab a ragdolled character.
 function rdGrab() {
   if (CS.active || story.move || story.rdTarget) return;
   raycaster.far = 16; raycaster.setFromCamera(center, camera);
@@ -4831,7 +4626,6 @@ function rdGrab() {
   rdStart(tgt, imp);
   whoosh();
 }
-// Let go of the ragdoll.
 function rdLetGo() {
   const t = story.rdTarget; story.rdTarget = null;
   if (t) rdRelease(t);
@@ -4841,13 +4635,9 @@ function rdLetGo() {
    THE CHURCHYARD — grass, mushrooms, graves, a dead tree, mist
    ========================================================= */
 const court = { grassMat: null, mist: [], spores: null, wind: null, owlT: 12, prints: [], printIdx: 0, printSide: 1 };
-// Build the courtyard (trees, columns, paths and snow).
 function buildCourtyard(env) {
-  // Random number between a and b.
   const rnd = (a, b) => a + Math.random() * (b - a);
-  // Is a point inside the courtyard?
   const inCourt = (x, z) => z > 21.2 && z < 42.8 && Math.abs(x) < 9.1;
-  // Is a point near a column?
   const nearCol = (x, z) => [24, 29, 34, 39].some(cz => Math.hypot(Math.abs(x) - 7.2, z - cz) < 0.5);
   // ---- grass: thousands of instanced blades that sway in the wind ----
   const blade = new T.PlaneGeometry(0.05, 0.34, 1, 4);
@@ -4868,7 +4658,6 @@ function buildCourtyard(env) {
   };
   court.grassMat = gm;
   const spots = [];
-  // Add a spot if it's free.
   const tryAdd = (x, z) => { if (inCourt(x, z) && !nearCol(x, z)) spots.push([x, z]); };
   for (let i = 0; i < 5200; i++) {
     const r = Math.random();
@@ -4929,7 +4718,6 @@ function buildCourtyard(env) {
   });
   // ---- a dead tree in the corner, branching recursively ----
   const bark = new T.MeshStandardMaterial({ color: 0x241c16, roughness: 0.95 });
-  // Build a tree branch recursively.
   const branch = (parent, len, r, depth) => {
     const g = new T.Group(); parent.add(g);
     mesh(new T.CylinderGeometry(r * 0.62, r, len, 7), bark, g, 0, len / 2, 0);
@@ -4994,7 +4782,6 @@ function buildCourtyard(env) {
     m.rotation.x = -Math.PI / 2; m.visible = false; scene.add(m); court.prints.push({ m, t: 0 });
   }
 }
-// Leave a footprint.
 function footprint() {
   const fp = court.prints[court.printIdx]; court.printIdx = (court.printIdx + 1) % court.prints.length;
   const sp = Math.hypot(player.vel.x, player.vel.z) || 1, dx = player.vel.x / sp, dz = player.vel.z / sp;
@@ -5002,7 +4789,6 @@ function footprint() {
   fp.m.position.set(player.pos.x + dz * 0.11 * court.printSide, 0.012, player.pos.z - dx * 0.11 * court.printSide);
   fp.m.rotation.set(-Math.PI / 2, 0, Math.atan2(dx, dz) + Math.PI); fp.m.visible = true; fp.t = 15;
 }
-// Update the courtyard each frame.
 function courtUpdate(dt, rdt) {
   for (const fp of court.prints) { if (fp.t > 0) { fp.t -= dt; fp.m.material.opacity = Math.min(0.5, fp.t / 15 * 0.5); if (fp.t <= 0) fp.m.visible = false; } }
   if (court.glow) court.glow.material.opacity = 0.45 + 0.15 * Math.sin(time * 1.3);
@@ -5038,7 +4824,6 @@ const MEMORIES = {
   nin: "Nina used to sing here, in a voice that filled the dome. She knelt the day she could no longer reach the high notes, and never stood again.",
   cha: "Three brothers who could not agree on anything, except the note. On the note, they always agreed."
 };
-// Memory flash for an NPC.
 async function memoryFlash(n) {
   const line = MEMORIES[n.id.slice(0, 3)]; if (!line) return;
   const saved = { pos: CS.cam.pos.clone(), look: CS.cam.look.clone(), fov: CS.cam.fov };
@@ -5059,7 +4844,6 @@ async function memoryFlash(n) {
    YOUR REFLECTION — in hell it is a half-second behind you, and once, it turns to look
    ========================================================= */
 story.wHist = []; story.stareT = 0; story.stareDone = false;
-// Update the Witness's reflection.
 function reflectionUpdate(rdt) {
   const w = story.witness; if (!w) return;
   if (w.root.visible) { story.wHist.push([time, w.root.position.x, w.root.position.y, w.root.position.z, w.root.rotation.y]); while (story.wHist.length && story.wHist[0][0] < time - 2) story.wHist.shift(); }
@@ -5069,7 +4853,6 @@ function reflectionUpdate(rdt) {
     hum(4); glitchSnd(0.2);
   }
 }
-// Begin the mirror lag effect.
 function mirrorLagBegin() {
   const w = story.witness;
   if (!w || !w.root.visible || !st.hell || st.H < 0.5 || CS.active || w.ragdoll) return null;
@@ -5085,7 +4868,6 @@ function mirrorLagBegin() {
   w.root.position.set(e[1], e[2], e[3]); w.root.rotation.y = e[4];
   return saved;
 }
-// End the mirror lag effect.
 function mirrorLagEnd(saved) { if (!saved) return; const w = story.witness; w.root.position.copy(saved.p); w.root.rotation.y = saved.ry; }
 
 /* =========================================================
@@ -5112,9 +4894,7 @@ function choirFollow(dt) {
    ========================================================= */
 const NG_MONO = [{ t: "You again, Pilgrim.", shot: 'close' }, { t: "You freed them once. They have forgotten. I have not.", shot: 'ecu' }, { t: "Let us see if you remember how.", shot: 'wide' }];
 const NG_COPY_LINES = ["I remember your hands, Pilgrim.", "This time I learned the numbers too.", "Again. And again. And again."];
-// Format time as m:ss.
 const fmtTime = s => { const m = Math.floor(s / 60), r = s - m * 60; return m + ':' + (r < 10 ? '0' : '') + r.toFixed(1); };
-// Update the timer display.
 function timerUpdate() {
   const el = $('timer');
   const live = story.runT0 && ['hell', 'awakening', 'awake', 'ending'].includes(story.phase);
@@ -5140,7 +4920,6 @@ async function loadSong(file) {
     if (A.metal && A.metal.on && st.hell) { startCustomSong(); }
   } catch (e) { $('songName').textContent = 'could not read'; }
 }
-// Start the custom song.
 function startCustomSong() {
   const M = A.metal; if (!M || !story.customSong) return;
   if (M.custom) { try { M.custom.stop(); } catch (e) {} }
@@ -5176,7 +4955,6 @@ function photoToggle() {
   if (story.photo) { story.photoPos = camera.position.clone(); story.photoYaw = player.yaw; story.photoPitch = player.pitch; caption('photo mode  ·  WASD fly  ·  space / C up and down  ·  P to return', 3500); }
   else { player.yaw = story.photoYaw; player.pitch = story.photoPitch; }
 }
-// Photo mode camera.
 function photoCam(dt) {
   const f = new T.Vector3(-Math.sin(player.yaw) * Math.cos(player.pitch), Math.sin(player.pitch), -Math.cos(player.yaw) * Math.cos(player.pitch));
   const r = new T.Vector3(Math.cos(player.yaw), 0, -Math.sin(player.yaw));
@@ -5206,13 +4984,11 @@ function groundY(x, z) {
 
 /* ---------- the crypt ---------- */
 const CRYPT = { g: null, lights: [], seenStair: false, seenCrypt: false };
-// Build the crypt.
 function buildCrypt(env) {
   const G = new T.Group(); scene.add(G); CRYPT.g = G;
   const S = env.stoneMat, F = env.flagMat, Au = env.goldMat;
   const dark = new T.MeshStandardMaterial({ color: 0x050404, roughness: 1 });
   const bone = new T.MeshStandardMaterial({ color: 0xcfc3a6, roughness: 0.7 });
-  // Add a box to the crypt.
   const bx = (w, h, d, m, x, y, z, tile, par) => { const o = new T.Mesh(boxUV(w, h, d, tile || 2), m); o.position.set(x, y, z); (par || G).add(o); return o; };
   // gilded frame around the doorway in the courtyard's back wall
   bx(0.22, 3.1, 1.12, Au, -1.36, 1.55, 43.5, 1, scene); bx(0.22, 3.1, 1.12, Au, 1.36, 1.55, 43.5, 1, scene); bx(2.94, 0.22, 1.12, Au, 0, 3.05, 43.5, 1, scene);
@@ -5271,7 +5047,6 @@ function buildCrypt(env) {
   env.addGlow(0, -3.6, 60.2, 2.6, 0xffb070, 0.22);
   [[0, -2.0, 53.0, 1.5], [0, -2.0, 59.6, 1.9]].forEach(([x, y, z, b]) => { const l = new T.PointLight(0xffa058, b, 11, 1.5); l.position.set(x, y, z); l.userData.base = b; scene.add(l); CRYPT.lights.push(l); });
 }
-// Read the tomb.
 function tombRead() {
   const first = !LORE.tomb; LORE.tomb = true; saveLore();
   if (sfxOK()) deepTone();
@@ -5305,11 +5080,8 @@ try {
   (d.got || []).forEach(id => { const p = LORE.pages.find(q => q.id === id); if (p) p.got = true; });
   LORE.tomb = !!d.tomb;
 } catch (e) {}
-// Save collected lore.
 function saveLore() { try { localStorage.setItem('sanctuary_pages', JSON.stringify({ got: LORE.pages.filter(p => p.got).map(p => p.id), tomb: LORE.tomb })); } catch (e) {} }
-// Have all lore pages been found?
 const loreComplete = () => LORE.tomb && LORE.pages.every(p => p.got);
-// Texture for a lore page.
 function makePageTex() {
   const c = document.createElement('canvas'); c.width = 128; c.height = 170; const g = c.getContext('2d');
   g.fillStyle = '#dccaa2'; g.fillRect(0, 0, 128, 170);
@@ -5319,7 +5091,6 @@ function makePageTex() {
   g.fillStyle = 'rgba(120,20,20,0.75)'; g.beginPath(); g.arc(104, 150, 7, 0, 6.283); g.fill();
   const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; return t;
 }
-// Place the lore pages.
 function buildLore(env) {
   const tex = makePageTex();
   const pm = new T.MeshStandardMaterial({ map: tex, roughness: 0.9, side: T.DoubleSide, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.14 });
@@ -5336,13 +5107,11 @@ function buildLore(env) {
     }
   }
 }
-// Paper sound.
 function paperSnd() {
   if (!sfxOK()) return; const t = A.ctx.currentTime + 0.01, o = busTo(0.35, 0.7);
   nburst(o, 'highpass', 3500, 0.7, 0.35, t, 0.18); nburst(o, 'bandpass', 1800, 1.5, 0.25, t + 0.08, 0.15);
   tone(o, 'sine', 880, 880, 0.08, t + 0.05, 0.9); tone(o, 'sine', 1318, 1318, 0.06, t + 0.14, 1.1); tone(o, 'sine', 1760, 1760, 0.04, t + 0.24, 1.3);
 }
-// Collect a lore page.
 function collectPage(pg, quiet) {
   if (pg.got) return; pg.got = true; saveLore(); paperSnd();
   emitSparks(pg.pos, 24, GOLDC, 0.3, 0.6);
@@ -5364,11 +5133,8 @@ function journalRender() {
   $('jTitle').textContent = pg.got ? pg.title : 'a missing page';
   $('jBody').textContent = pg.got ? pg.text : 'Not yet found. Somewhere ' + pg.where + '.';
 }
-// Open the journal at a page.
 function journalOpenAt(pg) { story.jIdx = Math.max(0, LORE.pages.indexOf(pg)); story.journalOpen = true; journalRender(); $('journal').classList.add('on'); }
-// Close the journal.
 function journalClose() { story.journalOpen = false; $('journal').classList.remove('on'); }
-// Toggle the journal.
 function journalToggle() {
   if (story.journalOpen) { journalClose(); return; }
   const got = LORE.pages.filter(p => p.got); journalOpenAt(got.length ? got[got.length - 1] : LORE.pages[0]);
@@ -5389,7 +5155,6 @@ const WAVE_LINES = [
   "Look at them. Your own congregation, rewritten in my hand.",
   "All of them. Every copy I have left."
 ];
-// Build the boss arena.
 function buildBoss(env) {
   for (let i = 0; i < 4; i++) {
     const c = mkAuditor(1.04); c.isSpawn = true; c.active = false; c._lid = 0; c.blendK = 16;
@@ -5419,9 +5184,7 @@ function buildBoss(env) {
   });
   BOSS.light = new T.PointLight(0xa040ff, 0, 15, 1.4); BOSS.light.position.set(0, 2.6, -13); scene.add(BOSS.light);
 }
-// Portal sound.
 function portalSnd() { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.01, o = busTo(0.55, 1.3); tone(o, 'sine', 70, 42, 0.6, t, 1.8); tone(o, 'triangle', 233, 117, 0.12, t, 1.4); nburst(o, 'bandpass', 520, 2.2, 0.45, t, 1.5); }
-// Open or close portals.
 function portalsTo(idx, open, dur) {
   idx.forEach(i => BOSS.portals[i].visible = true);
   return CS.tween(dur, k => {
@@ -5430,9 +5193,7 @@ function portalsTo(idx, open, dur) {
     BOSS.light.intensity = 2.8 * v;
   }).then(() => { if (!open) idx.forEach(i => BOSS.portals[i].visible = false); });
 }
-// Show the wave label.
 function showWave(t) { const el = $('wave'); el.textContent = t; el.style.opacity = 1; clearTimeout(showWave._t); showWave._t = setTimeout(() => el.style.opacity = 0, 2200); }
-// Spawn an echo enemy from a portal.
 async function spawnEcho(g, pi) {
   const p = BOSS.portals[pi].position, P = BOSS.P;
   g._lid = (g._lid || 0) + 1; g.kneel = 0; g.frozen = false; g.parts.torso.rotation.set(0, 0, 0);
@@ -5447,7 +5208,6 @@ async function spawnEcho(g, pi) {
   }, x => x);
   fxClear(g); walkPose(g, 0, 0, true); guardPose(g, 1);
 }
-// Shatter an echo.
 async function shatterEcho(g) {
   shatterSnd(); st.shake = 0.6; story.glitchT = 0.12;
   headPos(g, _v1); emitSparks(_v1, 60, PURP, 0.7, 1);
@@ -5455,7 +5215,6 @@ async function shatterEcho(g) {
   await CS.tween(0.6, k => { g.u.uDis.value = k * 2.6; }, x => x);
   g.root.visible = false; rdClear(g); fxClear(g); g.kneel = 0; g.parts.torso.rotation.set(0, 0, 0); g._lid++;
 }
-// Set up a boss duel.
 async function bossDuelSetup(g) {
   const w = story.witness, P = BOSS.P;
   const dir = new T.Vector3(g.root.position.x - P.x, 0, g.root.position.z - P.z);
@@ -5472,7 +5231,6 @@ async function bossDuelSetup(g) {
   guardPose(g, 1); guardPose(w, 1);
   return { dir, side };
 }
-// Clean up after the boss fight.
 function bossCleanup() {
   BOSS.spawn.forEach(g => { g.root.visible = false; fxClear(g); g.kneel = 0; g._lid++; g.parts.torso.rotation.set(0, 0, 0); });
   BOSS.portals.forEach(p => { p.scale.setScalar(0.001); p.visible = false; p.userData.mat.uniforms.uOpen.value = 0; });
@@ -5484,7 +5242,6 @@ function bossCleanup() {
   document.body.classList.remove('boss', 'melee'); if (MEL.ring) MEL.ring.visible = false; $('mhint').style.opacity = 0;
   story.combo = 0; comboUI();
 }
-// Blackout during the boss fight.
 async function bossBlackout() {
   story.slow = false; story.hold = null; story.qte = null; $('qte').style.opacity = 0;
   $('black').style.opacity = 1;
@@ -5503,7 +5260,6 @@ async function bossBlackout() {
   $('black').style.opacity = 0;
   caption(story.bossWave >= 12 ? 'you wake at the altar — he is waiting' : story.bossWave >= 5 ? 'you wake at the altar — Assassin round ' + (story.bossWave - 4) + ' of 7 remains' : 'you wake at the altar — wave ' + (story.bossWave + 1) + ' of 5 remains', 4500);
 }
-// Boss battle.
 async function bossBattle() {
   if (CS.active || story.fight || story.phase !== 'awake') return;
   if (story.journalOpen) journalClose();
@@ -5595,7 +5351,6 @@ async function bossBattle() {
   }
   await bossVictory();
 }
-// Boss victory.
 async function bossVictory() {
   const au = story.auditor, w = story.witness;
   shatterSnd(); st.shake = 1; story.glitchT = 0.3;
@@ -5700,12 +5455,9 @@ function roundUpdate(dt, rdt) {
    ========================================================= */
 story.flying = false; story.flyIn = false; story.flyV = new T.Vector3(); story.lastSpace = -9999; story.codeV = false;
 const SPIRES = [];
-// Is a point inside the nave?
 const inNaveI = (x, z) => Math.abs(x) < 7.4 && z > -27.4 && z < 19.6;
-// Is a point inside the courtyard?
 const inCourtI = (x, z) => Math.abs(x) < 9.2 && z > 20.5 && z < 43.0;
 const FLY_SOLIDS = [[-8.6, 8.6, -28.6, 20.6, 0], [-10.6, 10.6, 19.4, 20.6, 48.4], [-10.3, -9.2, 20, 44.2, 4.1], [9.2, 10.3, 20, 44.2, 4.1], [-10.3, 10.3, 43, 44.2, 4.1]];
-// Keep the flying player out of solid walls.
 function flySolids(p, y, prevY) {
   const r = 0.4, inDoor = Math.abs(p.x) < 1.9 && y < 5.6 && p.z > 18.5 && p.z < 21.5;
   for (let i = 0; i < FLY_SOLIDS.length; i++) {
@@ -5725,9 +5477,7 @@ function flySolids(p, y, prevY) {
   }
   return y;
 }
-// Whoosh up sound.
 function whooshUp(v) { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.01, o = busTo(v || 0.5, 0.8); nburst(o, 'bandpass', 700, 0.9, 0.5, t, 0.7); tone(o, 'sine', 140, 420, 0.12, t, 0.6); }
-// Toggle flight.
 function toggleFlight() {
   if (CS.active || story.fight || story.photo) return;
   if (!story.flying) {
@@ -5741,7 +5491,6 @@ function toggleFlight() {
     story.flying = false; story.air = story.py > 0.01; story.pvy = 0; whooshUp(0.3);
   }
 }
-// Update flight.
 function flyUpdate(dt) {
   const fwd = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
   const str = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
@@ -5802,7 +5551,6 @@ function flyPose(w) {
 const CODEV = { mat: null, cmat: null, hide: [], vis: [], moved: [], bg: new T.Color(0, 0, 0),
   // people glow brighter than stone: allies mint-white, the Auditor and his copies red, the Witness gold
   passes: [[1, new T.Color(0.55, 1.0, 0.65)], [2, new T.Color(1.0, 0.18, 0.12)], [3, new T.Color(1.0, 0.8, 0.35)]] };
-// Toggle "code vision".
 function toggleCodeVision() {
   story.codeV = !story.codeV;
   if (story.codeV) {
@@ -5875,7 +5623,6 @@ function toggleCodeVision() {
   glitchSnd(0.35); story.glitchT = 0.2;
   caption(story.codeV ? 'code vision' : 'the world, as it looks', 1800);
 }
-// Render the main view (with code vision when on).
 function renderMain() {
   if (!story.codeV) { renderer.render(scene, camera); return; }
   CODEV.mat.uniforms.uTime.value = time;
@@ -5913,7 +5660,6 @@ function placeBody(ch, ex, ey, ez, hipH) {
   B.position.set(-_pv2.x, hipH - _pv2.y, -_pv2.z);
 }
 const POSE_KEYS = ['pel', 'tor', 'hed', 's1', 's2', 'h1', 'h2'], POSE_NUM = ['ex', 'ey', 'hipH', 'e1', 'e2', 'k1', 'k2', 'a1', 'a2'];
-// Apply a pose to a character.
 function applyPose(ch, P) {
   placeBody(ch, P.ex, P.ey, 0, P.hipH);
   const B = ch.parts, A = ch.arms, L = ch.legs;
@@ -5926,7 +5672,6 @@ function applyPose(ch, P) {
   L[-1].hip.rotation.set(P.h2[0], P.h2[1], P.h2[2]); L[-1].knee.rotation.set(P.k2, 0, 0); L[-1].ankle.rotation.set(P.a2, 0, 0);
   if (B.skirt) B.skirt.scale.y = 1;
 }
-// Blend between two poses.
 function lerpPose(A, B, k) {
   const o = {};
   for (const n of POSE_NUM) o[n] = A[n] + (B[n] - A[n]) * k;
@@ -5934,7 +5679,6 @@ function lerpPose(A, B, k) {
   return o;
 }
 const PZ = [0, 0, 0];
-// Make a pose with defaults.
 const mkPose = o => Object.assign({ ex: 0, ey: 0, hipH: 0.95, pel: PZ, tor: PZ, hed: PZ, s1: [-0.05, 0, 0.08], s2: [-0.05, 0, -0.08], e1: -0.35, e2: -0.35, h1: PZ, h2: PZ, k1: 0, k2: 0, a1: 0, a2: 0 }, o);
 const PI2 = Math.PI / 2;
 const POSE = {
@@ -5952,10 +5696,8 @@ const POSE = {
   rise: mkPose({ ex: 0.02, ey: Math.PI, hipH: 0.92, tor: [0.12, 0, 0.04], hed: [0.1, 0, 0], s1: [-0.45, 0, -0.25], s2: [-0.1, 0, -0.2], e1: -1.7, e2: -0.4, h1: [-0.18, 0, 0.04], h2: [0.08, 0, -0.04], k1: 0.25, k2: 0.15, a1: 0.0, a2: 0.0 }),
   stand: mkPose({ ex: 0, ey: Math.PI, hipH: 0.94, tor: [0.06, 0, 0], s1: [-0.15, 0, 0.1], s2: [-0.1, 0, -0.1], e1: -0.45, e2: -0.4, h1: [-0.05, 0, 0], h2: [0.03, 0, 0], k1: 0.08, k2: 0.06 })
 };
-// Joints used by animations.
 const ANIM_JOINTS = ch => [ch.parts.pelvis, ch.parts.torso, ch.parts.head, ch.arms[1].sh, ch.arms[1].el, ch.arms[-1].sh, ch.arms[-1].el,
   ch.legs[1].hip, ch.legs[1].knee, ch.legs[1].ankle, ch.legs[-1].hip, ch.legs[-1].knee, ch.legs[-1].ankle].filter(Boolean);
-// Make extras follow the body.
 function extrasFollow(ch) {
   if (!ch.rdExtras) return; const P = ch.parts;
   for (const e of ch.rdExtras) {
@@ -5963,7 +5705,6 @@ function extrasFollow(ch) {
     e.o.position.copy(e.pos).sub(_rc.set(0, 0.95, 0)).applyQuaternion(P.pelvis.quaternion).add(P.pelvis.position);
   }
 }
-// Sync the blend list.
 function blendSync(ch) {
   if (!ch.blend) return;
   for (const j of ch.blend) { const o = j.o[j.prop]; j.axes.forEach((ax, i) => { j.v[i] = o[ax]; j.t[i] = o[ax]; }); }
@@ -5998,7 +5739,6 @@ function knockdown(ch, imp, o) {
     ch.fallState = { t: 0, res, getUp: o.getUp !== false, headDown: false, onSettle: o.onSettle };
   });
 }
-// Begin getting up from a ragdoll.
 function beginGetUp(ch, F) {
   const R = ch.ragdoll, p = R.p;
   rdApply(ch); ch.root.updateMatrixWorld(true);
@@ -6023,7 +5763,6 @@ function beginGetUp(ch, F) {
   ch.anim = { t: 0, xf: 0.32, snapQ: joints.map(j => j.quaternion.clone()), snapP: ch.parts.pelvis.position.clone(), joints, seq, first, res: F.res };
   ch.fallState = null;
 }
-// Finish getting up.
 function finishGetUp(ch) {
   const A = ch.anim; ch.anim = null;
   // the body ends turned half a circle about its own axis: fold that into the root
@@ -6037,7 +5776,6 @@ function finishGetUp(ch) {
   ch.u.uSway.value = 0;
   if (A.res) A.res();
 }
-// Step a character animation.
 function animStep(ch, dt) {
   const A = ch.anim; A.t += dt;
   if (A.t < A.xf) {
@@ -6059,7 +5797,6 @@ function animStep(ch, dt) {
   extrasFollow(ch);
   ch.u.uSway.value = 0.35;
 }
-// Update falling characters.
 function fallUpdate(dt) {
   for (const ch of story.all) {
     if (ch.fallState && ch.ragdoll) {
@@ -6080,7 +5817,6 @@ function fallUpdate(dt) {
    HITS THAT LAND ON THE SOUND, COMBOS, SPECIAL MOVES
    ========================================================= */
 story.combo = 0; story.specIdx = 0; story.evIdx = 0; story.hitStopT = 0; story.slowK = 0;
-// Impact sound.
 function impactSnd(power, heavy) {
   if (!sfxOK()) return;
   power = power || 1; const t = A.ctx.currentTime + 0.002, o = busTo(Math.min(1.4, power), 0.7), r = 0.85 + Math.random() * 0.3;
@@ -6089,31 +5825,26 @@ function impactSnd(power, heavy) {
   nburst(o, 'bandpass', 1700 + Math.random() * 1700, 1, 0.32, t, 0.04 + Math.random() * 0.04);
   if (heavy) { tone(o, 'sine', 68, 26, 0.9, t, 0.6); nburst(o, 'highpass', 3600, 0.7, 0.35, t, 0.07); tone(o, 'triangle', 230 * r, 85, 0.22, t, 0.22); }
 }
-// Hurt sound.
 function hurtSnd(heavy) {
   if (!sfxOK()) return; const t = A.ctx.currentTime + 0.002, o = busTo(0.9, 0.5);
   tone(o, 'sine', 90, 35, 0.9, t, 0.3); nburst(o, 'lowpass', 500, 0.7, 0.9, t, 0.25); tone(o, 'sawtooth', 160, 90, 0.08, t + 0.02, 0.25);
   if (heavy) { tone(o, 'sine', 58, 24, 1.0, t, 0.55); nburst(o, 'bandpass', 1200, 1.2, 0.5, t, 0.08); }
 }
-// Dodge sound.
 function dodgeSnd() {
   whoosh(); if (!sfxOK()) return; const t = A.ctx.currentTime + 0.1, o = busTo(0.4, 0.3);
   nburst(o, 'highpass', 2600, 0.6, 0.45, t, 0.06); nburst(o, 'bandpass', 900, 0.8, 0.25, t + 0.02, 0.08);
 }
-// Hit effect.
 function hitFX(g, power, heavy, col) {
   impactSnd(power, heavy);
   st.shake = Math.max(st.shake, 0.3 + 0.35 * power); story.glitchT = Math.max(story.glitchT, heavy ? 0.1 : 0.05);
   headPos(g, _v1); emitSparks(_v1, heavy ? 45 : 22, col || GOLDL, 0.4, 1);
   story.hitStopT = heavy ? 0.075 : 0.035;
 }
-// Special-move cue.
 function specialCue() {
   $('white').style.transition = 'opacity .08s'; $('white').style.opacity = 0.16;
   setTimeout(() => { $('white').style.transition = 'opacity .5s ease'; $('white').style.opacity = 0; }, 90);
   if (sfxOK()) { const t = A.ctx.currentTime + 0.01, o = busTo(0.35, 1.0); tone(o, 'sine', 55, 110, 0.4, t, 0.8); tone(o, 'sine', 1760, 1760, 0.05, t + 0.05, 0.6); }
 }
-// Combo UI.
 function comboUI() {
   const el = $('combo'), n = story.combo, melee = !!story.melee, ready = melee ? n >= 5 : n >= 3;
   if (n >= 2) {
@@ -6122,9 +5853,7 @@ function comboUI() {
     el.style.transform = 'scale(1.25)'; setTimeout(() => { el.style.transform = 'scale(1)'; }, 90);
   } else el.style.opacity = 0;
 }
-// Show a QTE prompt.
 function qtePrompt(key, win, special) { const p = qte(key, win); if (special) $('qte').classList.add('special'); return p; }
-// A sequence of QTEs.
 async function qteSeq(n, win, mouse, onHit, special) {
   story.qteDodge = false;          // one latch per clash, not per press
   for (let i = 0; i < n; i++) {
@@ -6139,7 +5868,6 @@ async function qteSeq(n, win, mouse, onHit, special) {
   }
   return true;
 }
-// Recoil pose.
 function recoilPose(g, k) {
   const e = Math.sin(Math.min(1, k) * Math.PI), P = g.parts;
   P.torso.rotation.set(-0.45 * e, 0.25 * e, 0.1 * e); if (P.head) P.head.rotation.set(-0.7 * e, 0.2 * e, 0);
@@ -6156,7 +5884,6 @@ function kickPose(ch, k, s) {
   P.torso.rotation.set(-0.35 * ext, -0.2 * ext * s, 0);
   ch.arms[s].sh.rotation.set(-0.6, 0, 0.6 * s); ch.arms[-s].sh.rotation.set(-1.0, 0, -0.3 * s); ch.arms[1].el.rotation.x = ch.arms[-1].el.rotation.x = -1.4;
 }
-// Jab in a sequence.
 function seqJab(w, g, i) {
   const s = i % 2 ? -1 : 1;
   w.blendK = 40;
@@ -6164,7 +5891,6 @@ function seqJab(w, g, i) {
   hitFX(g, 0.75, false);
   CS.tween(0.32, k => recoilPose(g, k));
 }
-// Walk a character to a point.
 async function walkTo(ch, to, lookAt, dur) {
   const from = ch.root.position.clone(), d = Math.hypot(to.x - from.x, to.z - from.z);
   if (d > 0.05) {
@@ -6175,9 +5901,7 @@ async function walkTo(ch, to, lookAt, dur) {
   if (lookAt) ch.face = Math.atan2(lookAt.x - to.x, lookAt.z - to.z);
   guardPose(ch, 1);
 }
-// Copy a vector raised by y.
 const _up = (v, y) => v.clone().add(new T.Vector3(0, y, 0));
-// Camera for a special move.
 function specCam(P, dir, side, g0, h, dist, back, fov, lookH) {
   const mid = P.clone().lerp(g0, 0.5), cs = Math.abs(mid.x + side.x * dist) < 7 ? 1 : -1;
   cut(_up(mid.clone().addScaledVector(side, dist * cs).addScaledVector(dir, back), h), _up(g0.clone().lerp(mid, 0.4), lookH || 1.0), fov || 52);
@@ -6228,7 +5952,6 @@ async function spStepKick(w, g, P, dir, side, info, start) {
   await CS.tween(0.35, k => landPose(w, Math.sin((1 - k) * Math.PI * 0.5)));
   await specialFinish(w, g, P, dir, info, start, kd);
 }
-// Special move: vault.
 async function spVault(w, g, P, dir, side, info, start) {
   const g0 = g.root.position.clone(), base = Math.atan2(dir.x, dir.z);
   specCam(P, dir, side, g0, 2.0, 3.4, -1.2, 54);
@@ -6254,7 +5977,6 @@ async function spVault(w, g, P, dir, side, info, start) {
   await CS.tween(0.35, k => punchPose(w, 0.52 + 0.48 * k, 1));
   await specialFinish(w, g, P, dir, info, start, kd, g0.clone().addScaledVector(side, 1.1));
 }
-// Special move: sweep.
 async function spSweep(w, g, P, dir, side, info, start) {
   const g0 = g.root.position.clone(), base = Math.atan2(dir.x, dir.z);
   specCam(P, dir, side, g0, 0.35, 2.6, 0.2, 60);
@@ -6281,7 +6003,6 @@ async function spSweep(w, g, P, dir, side, info, start) {
   await CS.tween(0.35, k => guardPose(w, k));
   await specialFinish(w, g, P, dir, info, start, kd);
 }
-// Special move: knee.
 async function spKnee(w, g, P, dir, side, info, start) {
   const g0 = g.root.position.clone();
   specCam(P, dir, side, g0, 1.25, 3.1, -0.2, 50, 1.15);
@@ -6304,7 +6025,6 @@ async function spKnee(w, g, P, dir, side, info, start) {
   if (info.wave || info.last) kd = knockdown(g, dir.clone().multiplyScalar(1.4).setY(0.4), { getUp: !info.wave });
   await specialFinish(w, g, P, dir, info, start, kd);
 }
-// Pick a strike special.
 async function strikeSpecial(w, g, P, dir, side, info, start) {
   const list = [spStepKick, spVault, spSweep, spKnee], f = list[story.specIdx++ % list.length];
   await f(w, g, P, dir, side, info, start);
@@ -6329,7 +6049,6 @@ async function evFlip(w, g, P, dir, side, info, start) {
   w.root.rotation.y = w.face = base + Math.PI;
   await specialFinish(w, g, P, dir, info, start, kd, g0.clone().addScaledVector(side, -1.1));
 }
-// Evasive move: slide.
 async function evSlide(w, g, P, dir, side, info, start) {
   const g0 = g.root.position.clone(), base = Math.atan2(dir.x, dir.z);
   specCam(P, dir, side, g0, 0.4, 2.8, 0.3, 60);
@@ -6349,7 +6068,6 @@ async function evSlide(w, g, P, dir, side, info, start) {
   w.root.rotation.y = w.face = base + Math.PI; guardPose(w, 1);
   await specialFinish(w, g, P, dir, info, start, kd, g0.clone().addScaledVector(side, 1.1));
 }
-// Pick an evasive special.
 async function evasiveSpecial(w, g, P, dir, side, info, start) {
   const list = [evFlip, evSlide], f = list[story.evIdx++ % list.length];
   await f(w, g, P, dir, side, info, start);
@@ -6451,7 +6169,6 @@ async function clash(g, P, dir, side, info) {
   await walkTo(g, start, P, 0.45);
   return false;
 }
-// Break free.
 async function breakFree(group, P, dir) {
   const w = story.witness;
   hurtSnd(true); st.shake = 0.8; story.hurtT = 0.6;
@@ -6480,7 +6197,6 @@ const AS_STATS = {
 };
 const MEL = { bodies: [], portals: [], light: null, ring: null, lastMouse: -9, told: false,
   spots: [[-5.6, -9.4], [5.6, -9.4], [-5.6, -16.8], [5.6, -16.8], [-2.8, -6.6], [2.8, -6.6]] };
-// Create an assassin enemy.
 function mkAssassin(kind) {
   const ch = newChar('asn'); ch.vkey = 'aud'; ch.kind = kind;
   const elite = kind === 'elite';
@@ -6498,7 +6214,6 @@ function mkAssassin(kind) {
   story.hideAfterCompile.push(ch.root);
   return ch;
 }
-// Make a red portal.
 function makeRedPortal(x, z) {
   const grp = new T.Group(); grp.position.set(x, 1.35, z); scene.add(grp); grp.lookAt(0, 1.35, -12);
   const mat = new T.ShaderMaterial({
@@ -6524,7 +6239,6 @@ function makeRedPortal(x, z) {
   grp.scale.setScalar(0.001); grp.visible = false; grp.userData.mat = mat; grp.userData.ring = ring;
   return grp;
 }
-// Build the melee arena.
 function buildMelee(env) {
   ['plain', 'plain', 'plain', 'plain', 'blade', 'elite'].forEach(k => MEL.bodies.push(mkAssassin(k)));
   MEL.spots.forEach(([x, z]) => MEL.portals.push(makeRedPortal(x, z)));
@@ -6532,11 +6246,8 @@ function buildMelee(env) {
   MEL.ring = new T.Mesh(new T.RingGeometry(0.42, 0.5, 32), new T.MeshBasicMaterial({ color: 0xff4030, transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide }));
   MEL.ring.rotation.x = -Math.PI / 2; MEL.ring.visible = false; scene.add(MEL.ring); hideInReflection.push(MEL.ring);
 }
-// Red portal sound.
 function redPortalSnd() { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.01, o = busTo(0.6, 1.1); tone(o, 'sawtooth', 82, 41, 0.18, t, 1.4); tone(o, 'sine', 55, 30, 0.6, t, 1.6); nburst(o, 'bandpass', 1400, 3, 0.35, t, 0.9); }
-// Wind-up sound.
 function windupSnd(v) { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.005, o = busTo(v || 0.3, 0.4); tone(o, 'sawtooth', 300, 900, 0.06, t, 0.3); }
-// Open or close the red portals.
 function redPortalsTo(idx, open, dur) {
   idx.forEach(i => MEL.portals[i].visible = true);
   return CS.tween(dur, k => {
@@ -6545,7 +6256,6 @@ function redPortalsTo(idx, open, dur) {
     MEL.light.intensity = 3.2 * v;
   }).then(() => { if (!open) idx.forEach(i => MEL.portals[i].visible = false); });
 }
-// Spawn an assassin from a portal.
 async function spawnAssassin(ch, pi) {
   const p = MEL.portals[pi].position, P = BOSS.P;
   rdClear(ch); ch._lid = (ch._lid || 0) + 1; ch.kneel = 0; ch.frozen = false; ch.parts.torso.rotation.set(0, 0, 0);
@@ -6562,15 +6272,10 @@ async function spawnAssassin(ch, pi) {
 }
 /* ---------- the Witness's moves ---------- */
 const ACT = { light: { dur: 0.4, hit: 0.15, range: 1.6, dmg: 1 }, light3: { dur: 0.55, hit: 0.22, range: 1.8, dmg: 1.4 }, heavy: { dur: 0.72, hit: 0.36, range: 1.9, dmg: 2 }, air: { dur: 0.9, hit: 99, range: 1.9, dmg: 1.5 }, dodge: { dur: 0.42 }, finisher: { dur: 0.85, hit: 0.5 }, hurt: { dur: 0.38 } };
-// Is an enemy alive?
 const alive = E => E.state !== 'dead' && E.state !== 'dying';
-// Is an enemy standing?
 const standing = E => ['circle', 'approach', 'windup', 'strike', 'recover', 'flinch'].includes(E.state);
-// Keep a point inside the arena.
 function clampArena(p) { p.x = Math.max(-6.9, Math.min(6.9, p.x)); p.z = Math.max(-25.6, Math.min(4.5, p.z)); }
-// Move the player in the arena.
 function movePlayer(dx, dz) { player.pos.x += dx; player.pos.z += dz; collide(player.pos); clampArena(player.pos); }
-// Start a melee action.
 function startAct(type, step) {
   const M = story.melee, w = story.witness;
   const key = type === 'light' && step === 3 ? 'light3' : type, d = ACT[key];
@@ -6595,7 +6300,6 @@ function startAct(type, step) {
   if (type === 'finisher') { story.slow = true; whoosh(); M.iframe = 0.95; }
   M.act = a;
 }
-// Handle melee input.
 function meleeInput(type) {
   const M = story.melee; if (!M || M.done || M.lock > 0 || CS.active) return;
   const w = story.witness; if (w.ragdoll || w.anim) return;
@@ -6611,7 +6315,6 @@ function meleeInput(type) {
   }
   if (type === 'heavy') { if (!a) startAct('heavy'); else if (a.t > a.dur * 0.6 && a.type !== 'finisher') a.next = 'heavy'; }
 }
-// Melee swing.
 function meleeSwing(a) {
   const M = story.melee, wp = story.witness.root.position, fx = Math.sin(a.face), fz = Math.cos(a.face);
   for (const E of M.en) {
@@ -6621,7 +6324,6 @@ function meleeSwing(a) {
     hitEnemy(E, a.type === 'heavy' ? 'heavy' : a.key === 'light3' ? 'kick' : 'light', a.dmg, dx / d, dz / d);
   }
 }
-// Melee slam.
 function meleeSlam() {
   const M = story.melee, wp = story.witness.root.position;
   landSnd(0.9); st.shake = Math.max(st.shake, 0.5);
@@ -6632,9 +6334,7 @@ function meleeSlam() {
     if (d < 1.9) hitEnemy(E, 'air', 1.5, dx / d, dz / d);
   }
 }
-// Release an enemy's attack token.
 function releaseTok(E) { E.tok = false; }
-// Hit an enemy.
 function hitEnemy(E, type, dmg, nx, nz) {
   const ch = E.ch;
   E.hp -= dmg; story.combo++; comboUI(); story.struck = true;
@@ -6649,7 +6349,6 @@ function hitEnemy(E, type, dmg, nx, nz) {
   }
   E.state = 'flinch'; E.t = 0; E.kx = nx; E.kz = nz;
 }
-// Kill an enemy.
 async function killEnemy(E) {
   if (E.state === 'dead') return;
   E.state = 'dead'; releaseTok(E);
@@ -6661,7 +6360,6 @@ async function killEnemy(E) {
   await CS.tween(0.65, k => { ch.u.uDis.value = k * 2.6; }, x => x);
   ch.root.visible = false; rdClear(ch); fxClear(ch);
 }
-// Perfect dodge.
 function perfectDodge(E) {
   E.light--; E.ch.slit = 0.3;
   if (sfxOK()) { const t = A.ctx.currentTime + 0.01, o = busTo(0.3, 0.8); tone(o, 'sine', 1568, 1568, 0.15, t, 0.5); tone(o, 'sine', 2093, 2093, 0.08, t + 0.06, 0.5); }
@@ -6672,7 +6370,6 @@ function perfectDodge(E) {
     knockdown(E.ch, new T.Vector3(E.sx * 1.6 || 0, 0.25, E.sz * 1.6 || 0), { getUp: false }).then(() => killEnemy(E));
   }
 }
-// The Witness gets hit.
 function witnessHit(E, dmg, heavy) {
   const M = story.melee, w = story.witness;
   if (M.iframe > 0) { perfectDodge(E); return; }
@@ -6686,7 +6383,6 @@ function witnessHit(E, dmg, heavy) {
   if (heavy || M.hitsTaken % 3 === 0) { M.lock = 99; knockdown(w, d.multiplyScalar(2.3).setY(0.85), { getUp: true }).then(() => { M.lock = 0; M.iframe = 0.7; }); }
   else { M.act = { type: 'hurt', key: 'hurt', t: 0, dur: ACT.hurt.dur, face: w.root.rotation.y, kx: d.x, kz: d.z }; M.iframe = 0.45; }
 }
-// Update the current melee action.
 function actUpdate(dt) {
   const M = story.melee, a = M.act, w = story.witness; if (!a) return;
   a.t += dt; const k = Math.min(1, a.t / a.dur);
@@ -6738,7 +6434,6 @@ function steer(E, tx, tz, spd, dt) {
   E.ph += (l > 0.05 ? Math.min(spd, l * 4) : 0) * dt * 2.6;
   walkPose(E.ch, E.ph, Math.min(1, l * 1.5), true, spd > 3.2 ? 0.7 : 0.25);
 }
-// Enemy AI update.
 function enemyUpdate(E, dt) {
   const ch = E.ch, p = ch.root.position, M = story.melee, S = E.st, w = story.witness;
   if (!standing(E)) return;
@@ -6813,7 +6508,6 @@ function pickTarget(cycle) {
   if (cycle && M.target) { const i = list.indexOf(M.target); M.target = list[(i + 1) % list.length]; }
   else if (!M.target || !alive(M.target)) M.target = list[0];
 }
-// Melee special move.
 async function meleeSpecial() {
   const M = story.melee, w = story.witness;
   pickTarget(false);
@@ -6836,7 +6530,6 @@ async function meleeSpecial() {
   player.yaw = w.root.rotation.y + Math.PI; player.pitch = -0.18; story.tpCam = null;
   csEnd(); M.lock = 0; M.iframe = 0.5;
 }
-// Start a melee round.
 function meleeStart(r, bodies) {
   const M = story.melee = { round: r, en: bodies.map(ch => ({ ch, kind: ch.kind, st: AS_STATS[ch.kind], hp: AS_STATS[ch.kind].hp, light: 3, state: 'circle', t: 0, cd: 0.8 + Math.random() * 1.6, ang: 0, R: 2.6 + Math.random() * 0.9, dirS: Math.random() < 0.5 ? -1 : 1, tok: false, ph: Math.random() * 6 })),
     act: null, chain: 0, chainT: 0, iframe: 0, lmb: false, lmbT: 0, target: null, tokens: r < 4 ? 1 : 2, done: false, hitsTaken: 0, lock: 0, resolve: null, endT: -1 };
@@ -6846,7 +6539,6 @@ function meleeStart(r, bodies) {
   MEL.ring.visible = true;
   return new Promise(res => { M.resolve = res; });
 }
-// End the melee.
 function meleeEnd(result) {
   const M = story.melee; if (!M) return;
   M.done = true; story.melee = null;
@@ -6854,7 +6546,6 @@ function meleeEnd(result) {
   story.combo = 0; comboUI();
   M.resolve(result);
 }
-// Update the melee fight.
 function meleeUpdate(dt, rdt) {
   const M = story.melee; if (!M) return;
   if (CS.active || !locked) return;
@@ -6957,17 +6648,11 @@ async function assassinRounds() {
 const TOWN = { g: null, dyn: null, cars: [], peds: [], lamps: [], neons: [], flick: [], npcs: {}, lights: [], rain: null,
   gate: null, gateOpen: 0, gateCol: null, cat: null, light: { t: 0, phase: 'g' }, audio: null, seen: {}, heard: {}, listened: false, crosswalk: 128 };
 story.prologue = false;
-// Is a point inside the town?
 const inTownI = (x, z) => (x > 10.4 && x < 183 && z > 25.5 && z < 37.6) || (x > 92 && x < 100 && z > 25.5 && z < 93);
-// How far into the town (0-1).
 const townK = () => Math.max(0, Math.min(1, (player.pos.x - 10) / 6));          // 0 in the church grounds, 1 out in town
-// How busy the street is at x.
 const busyK = x => Math.max(0, Math.min(1, (x - 60) / 45));                       // 0 at the quiet end, 1 at the busy end
-// Canvas texture helper.
 function cvsTex(w, h, draw, srgb) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new T.CanvasTexture(c); if (srgb !== false) t.encoding = T.sRGBEncoding; t.anisotropy = 4; return t; }
-// Building facade texture.
 function facadeTex(seed, style) {
-  // Seeded random.
   let s = seed; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
   return cvsTex(256, 512, (g, w, h) => {
     const base = style === 'stone' ? ['#4a4640', '#3e3a35'] : style === 'brick' ? ['#3b2723', '#2e1f1b'] : ['#2b2e34', '#22252a'];
@@ -6984,7 +6669,6 @@ function facadeTex(seed, style) {
     }
   });
 }
-// Neon sign texture.
 function neonTex(text, col) {
   return cvsTex(512, 128, (g, w, h) => {
     g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
@@ -6993,7 +6677,6 @@ function neonTex(text, col) {
     g.shadowBlur = 6; g.fillStyle = '#fff'; g.globalAlpha = 0.55; g.fillText(text, w / 2, h / 2 + 4);
   });
 }
-// Shop sign texture.
 function shopTex(kind) {
   return cvsTex(256, 128, (g, w, h) => {
     const grd = g.createLinearGradient(0, 0, 0, h); grd.addColorStop(0, kind === 'cool' ? '#9ec8ff' : '#ffd79a'); grd.addColorStop(1, kind === 'cool' ? '#3a5a88' : '#a0622a');
@@ -7003,7 +6686,6 @@ function shopTex(kind) {
     g.fillRect(0, h - 10, w, 10); g.fillRect(0, 0, w, 6); g.fillRect(w / 2 - 2, 0, 4, h);
   });
 }
-// Shutter texture.
 function shutterTex() {
   return cvsTex(128, 128, (g, w, h) => {
     g.fillStyle = '#4a4c50'; g.fillRect(0, 0, w, h);
@@ -7011,7 +6693,6 @@ function shutterTex() {
     g.fillStyle = 'rgba(30,30,30,0.5)'; g.font = 'bold 22px Arial'; g.fillText('NO PARKING', 18, 70);
   });
 }
-// Clock texture.
 function clockTex() {
   return cvsTex(256, 256, (g, w, h) => {
     g.fillStyle = '#ece4d0'; g.beginPath(); g.arc(128, 128, 120, 0, 6.283); g.fill();
@@ -7023,7 +6704,6 @@ function clockTex() {
     g.fillStyle = '#2a2420'; g.beginPath(); g.arc(128, 128, 8, 0, 6.283); g.fill();
   });
 }
-// Street sign texture.
 function signTex(lines, bg, fg) {
   return cvsTex(256, 256, (g, w, h) => {
     g.fillStyle = bg; g.fillRect(0, 0, w, h); g.fillStyle = fg; g.textAlign = 'center';
@@ -7048,7 +6728,6 @@ function mkWalker(o) {
   if (o.phone) { phone = new T.Mesh(new T.PlaneGeometry(0.07, 0.13), new T.MeshBasicMaterial({ color: new T.Color(0.7, 0.85, 1.3) })); phone.position.set(0, -0.58, 0.06); phone.rotation.x = -0.5; arms[1].add(phone); }
   return { g, legs, arms, umb, phone, head, ph: Math.random() * 6 };
 }
-// Walking pose for town people.
 function walkerPose(W, ph, amt) {
   const s = Math.sin(ph);
   W.legs[0].rotation.x = s * 0.5 * amt; W.legs[1].rotation.x = -s * 0.5 * amt;
@@ -7059,7 +6738,6 @@ function walkerPose(W, ph, amt) {
 }
 /* ---------- cars ---------- */
 const CAR_GEO = {};
-// Make a car.
 function mkCar(color, taxi) {
   if (!CAR_GEO.body) {
     CAR_GEO.body = new T.BoxGeometry(4.2, 0.62, 1.82); CAR_GEO.cab = new T.BoxGeometry(2.3, 0.56, 1.62); CAR_GEO.wheel = new T.CylinderGeometry(0.34, 0.34, 0.24, 14);
@@ -7085,16 +6763,13 @@ function mkCar(color, taxi) {
   const ts = new T.Sprite(new T.SpriteMaterial({ map: GLOWTEX, color: 0xff2a18, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.7 })); ts.position.set(-2.4, 0.72, 0); ts.scale.set(2.0, 0.9, 1); g.add(ts);
   return { g, wheels, d: 0, v: 0, route: null, wait: 0 };
 }
-// Build a route (polyline with lengths).
 function buildRoute(pts) {
   // polyline with cumulative lengths
   const P = pts.map(p => new T.Vector2(p[0], p[1])), L = [0];
   for (let i = 1; i < P.length; i++) L.push(L[i - 1] + P[i].distanceTo(P[i - 1]));
   return { P, L, len: L[L.length - 1] };
 }
-// Points along an arc.
 function arcPts(cx, cz, r, a0, a1, n) { const o = []; for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n; o.push([cx + Math.cos(a) * r, cz + Math.sin(a) * r]); } return o; }
-// Position along a route.
 function routeAt(R, d, out) {
   let i = 1; while (i < R.L.length - 1 && R.L[i] < d) i++;
   const a = R.P[i - 1], b = R.P[i], k = Math.max(0, Math.min(1, (d - R.L[i - 1]) / ((R.L[i] - R.L[i - 1]) || 1)));
@@ -7110,9 +6785,7 @@ function buildTown(env) {
   const curbM = new T.MeshStandardMaterial({ color: 0x5a5a5c, roughness: 0.7 });
   const paint = new T.MeshBasicMaterial({ color: 0x9a9a8a });
   const metal = new T.MeshStandardMaterial({ color: 0x24262a, roughness: 0.45, metalness: 0.7 });
-  // Add a box.
   const bx = (w, h, d, m, x, y, z, par) => { const o = new T.Mesh(new T.BoxGeometry(w, h, d), m); o.position.set(x, y, z); (par || G).add(o); return o; };
-  // Add a box with tiled UVs.
   const bxUV = (w, h, d, m, x, y, z, tile) => { const o = new T.Mesh(boxUV(w, h, d, tile), m); o.position.set(x, y, z); G.add(o); return o; };
   // ---- the street ----
   bx(176, 0.04, 7, asphalt, 98.5, -0.0, 31.5);
@@ -7126,7 +6799,6 @@ function buildTown(env) {
   Object.values(tex).forEach(t => { t.wrapS = t.wrapT = T.RepeatWrapping; });
   const mats = {};
   for (const k in tex) mats[k] = new T.MeshStandardMaterial({ map: tex[k], emissive: 0xffffff, emissiveMap: tex[k], emissiveIntensity: k === 'stone' ? 0.25 : 0.55, roughness: 0.8 });
-  // Add a building block.
   const B = (x0, x1, z0, z1, h, kind) => {
     const w = x1 - x0, d = z1 - z0;
     bxUV(w, h, d, mats[kind], (x0 + x1) / 2, h / 2, (z0 + z1) / 2, 8);
@@ -7135,11 +6807,8 @@ function buildTown(env) {
     FLY_SOLIDS.push([x0, x1, z0, z1, h + 0.4]);
   };
   let s = 7;
-  // Seeded random.
   const rr = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
-  // Building style at x.
   const kindAt = x => x > 100 ? (rr() < 0.5 ? 'glass' : 'glass2') : x > 55 ? (rr() < 0.6 ? 'brick' : 'glass2') : 'stone';
-  // Building height at x.
   const heightAt = x => x > 100 ? 14 + rr() * 14 : x > 55 ? 8 + rr() * 6 : 7 + rr() * 4;
   // south side: church grounds fence first, then buildings (an alley at 66–69)
   for (let x = 16; x < 184;) { let w = 9 + rr() * 8; if (x < 66 && x + w > 66) w = 66 - x; if (x === 66) { x = 69; continue; } w = Math.min(w, 184 - x); B(x, x + w, 17, 25.4, heightAt(x), kindAt(x)); x += w; }
@@ -7165,7 +6834,6 @@ function buildTown(env) {
   const shutM = new T.MeshStandardMaterial({ map: shutterTex(), roughness: 0.6, metalness: 0.4 });
   const awnM = [0x5a1218, 0x123a2a, 0x1a2450, 0x4a3a10].map(c => new T.MeshStandardMaterial({ color: c, roughness: 0.6, side: T.DoubleSide }));
   const pools = makeRadial([[0, 'rgba(255,255,255,0.75)'], [0.4, 'rgba(255,255,255,0.25)'], [1, 'rgba(255,255,255,0)']], 128, 128);
-  // Pool of light.
   const pool = (x, z, sx, sz, col, op) => { const m = new T.Mesh(new T.PlaneGeometry(sx, sz), new T.MeshBasicMaterial({ map: pools, color: col, transparent: true, opacity: op, blending: T.AdditiveBlending, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.set(x, 0.07, z); G.add(m); return m; };
   const NEON = [['NOODLES', '#ff3a6a'], ['24 HR', '#3affd2'], ['PHARMACY', '#4aff6a'], ['BAR', '#ff8a2a'], ['KARAOKE', '#c45aff'], ['HOTEL', '#ff4040'], ['DELI', '#ffd040'], ['OPEN', '#ff3060'], ['PAWN', '#40c8ff'], ['ARCADE', '#ff50d0']];
   let ni = 0;
@@ -7275,7 +6943,6 @@ function buildTown(env) {
   // ---- a gate in the courtyard's east wall ----
   {
     const iron = new T.MeshStandardMaterial({ color: 0x15161a, roughness: 0.4, metalness: 0.8 });
-    // Build one leaf (half) of the iron gate.
     const leaf = (z0, s) => {
       const p = new T.Group(); p.position.set(9.75, 0, z0); scene.add(p);
       for (let i = 0; i < 7; i++) { const b = new T.Mesh(new T.CylinderGeometry(0.018, 0.018, 3.0, 6), iron); b.position.set(0, 1.5, s * (0.12 + i * 0.2)); p.add(b); const tip = new T.Mesh(new T.ConeGeometry(0.04, 0.12, 6), env.goldMat); tip.position.set(0, 3.06, s * (0.12 + i * 0.2)); p.add(tip); }
@@ -7354,7 +7021,6 @@ function buildTown(env) {
   setTimeout(initCatInteraction, 100);
 
 }
-// Set up the town rain.
 function townRainInit() {
     const n = 2200, pos = new Float32Array(n * 6), tip = new Float32Array(n * 2), sd = new Float32Array(n * 2);
     for (let i = 0; i < n; i++) { const x = (rand() - 0.5) * 34, y = rand() * 16, z = (rand() - 0.5) * 34, sv = rand(); pos.set([x, y, z, x, y, z], i * 6); tip[i * 2] = 0; tip[i * 2 + 1] = 1; sd[i * 2] = sv; sd[i * 2 + 1] = sv; }
@@ -7376,7 +7042,6 @@ const TOWN_LINES = {
   shp: ["Closing up, friend. Fewer people walk past here after dark every year. Don't know where they all go.",
         "Don't go too far down. The fog gets... funny, near the old church."]
 };
-// Create a town character.
 function townChar(id, vkey, o, x, z, face) {
   const ch = newChar(id); ch.vkey = vkey;
   buildHuman(ch, o);
@@ -7386,7 +7051,6 @@ function townChar(id, vkey, o, x, z, face) {
   interact.push({ obj: ch.hit, kind: 'npc', label: 'listen', enabled: () => !CS.active && ch.root.visible && (story.prologue || story.phase === 'done'), act: () => { TOWN.listened = true; TOWN.heard[ch.vkey] = true; TOWN.seen[ch.vkey] = true; ch.face = Math.atan2(player.pos.x - ch.root.position.x, player.pos.z - ch.root.position.z); townSay(ch.lines[ch.li++ % ch.lines.length], ch.vkey, ch, true); } });
   return ch;
 }
-// Build the town NPCs.
 function buildTownNPCs(env) {
   const N = TOWN.npcs;
   N.prc = townChar('twn', 'prc', { robe: 0x2a2620, rough: 0.7, skin: 0x7a4e34, hair: 0x2a2a2a, beard: { col: 0x3a3a3a, len: 0.07 }, wrinkles: true, pants: 0x1a1a1a, hem: 0.3, hemY: 0.3, hairStyle: 'short' }, 133, 26.6, Math.PI * 0.12);
@@ -7424,14 +7088,12 @@ const INNER = {
   church: "There it is. Like it's been waiting for me to stop being busy.",
   gate: "Just for a little while. Somewhere that doesn't need anything from me."
 };
-// A town character says a line.
 function townSay(text, who, sp, force) {
   if (TOWN.talking && !force) return false;
   const tok = TOWN.talkTok = (TOWN.talkTok || 0) + 1; TOWN.talking = true;
   say(text, who, sp).then(() => { if (TOWN.talkTok === tok) TOWN.talking = false; });
   return true;
 }
-// Inner voice line.
 function innerVoice(k, once) {
   if (once && (TOWN.seen[k] || TOWN.talking)) return;
   TOWN.seen[k] = true; townSay(INNER[k], 'wit', null, !once);
@@ -7446,13 +7108,9 @@ function townAudioInit() {
   const hum = ctx.createOscillator(); hum.type = 'sawtooth'; hum.frequency.value = 60; const hf = ctx.createBiquadFilter(); hf.type = 'lowpass'; hf.frequency.value = 180; const hg = ctx.createGain(); hg.gain.value = 0.03; hum.connect(hf); hf.connect(hg); hg.connect(out); hum.start();
   TOWN.audio = { out, nextHorn: 6, nextSiren: 25, busk: 0, buskNote: 0 };
 }
-// Car horn.
 function hornSnd(v) { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.01, o = busTo(0.18 * v, 0.6); tone(o, 'square', 392, 392, 0.12, t, 0.35); tone(o, 'square', 494, 494, 0.1, t, 0.35); }
-// Siren.
 function sirenSnd(v) { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.01, o = busTo(0.08 * v, 1.0); for (let i = 0; i < 4; i++) tone(o, 'sine', 700, 1050, 0.4, t + i * 1.4, 1.3); }
-// Car passing sound.
 function carPassSnd(v) { if (!sfxOK()) return; const ctx = A.ctx, t = ctx.currentTime + 0.01, o = busTo(0.5 * v, 0.3); const n = ctx.createBufferSource(); n.buffer = A.noise; const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 0.7; f.frequency.setValueAtTime(900, t); f.frequency.exponentialRampToValueAtTime(260, t + 1.1); const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.6, t + 0.35); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.3); n.connect(f); f.connect(g); g.connect(o); n.start(t, Math.random()); n.stop(t + 1.4); tone(o, 'sawtooth', 110, 70, 0.05, t, 1.0); }
-// Meow.
 function meowSnd(k) {
   if (!sfxOK()) return;
   const p = k || (0.86 + Math.random() * 0.32);          // pitch varies per call
@@ -7461,10 +7119,8 @@ function meowSnd(k) {
   tone(o, 'triangle', 620 * p, 820 * p, 0.18 * soft, t, 0.18);
   tone(o, 'triangle', 820 * p, 540 * p, 0.16 * soft, t + 0.17, 0.32 * (0.85 + Math.random() * 0.4));
 }
-// Gate sound.
 function gateSnd(close) { if (!sfxOK()) return; const t = A.ctx.currentTime + 0.01, o = busTo(0.6, 0.8); tone(o, 'sawtooth', 180, 120, 0.05, t, 1.4); nburst(o, 'bandpass', 2400, 6, 0.15, t, 1.2); if (close) { tone(o, 'sine', 90, 40, 0.8, t + 1.3, 0.6); nburst(o, 'bandpass', 1600, 2, 0.6, t + 1.3, 0.25); } }
 let PURR = null;
-// Purr sound engine.
 function purrEngine() {
   if (!sfxOK()) return null;
   if (PURR) return PURR;
@@ -7495,7 +7151,6 @@ function purrSet(level, dt) {
     }
   }
 }
-// Purr sound.
 function purrSnd(v) {
   if (!sfxOK()) return;
   const g = v == null ? 0.5 : v, t = A.ctx.currentTime + 0.01, o = busTo(0.25, 0.35);
@@ -7509,14 +7164,12 @@ const BUSK = [220, 262, 330, 392, 330, 262, 294, 349, 440, 349, 294, 262, 247, 1
    removed - pausing mid-game is unaffected. */
 (function titleChrome() {
   const mn = $('menu');
-  // Sync the title screen state.
   const sync = () => {
     const onTitle = mn && getComputedStyle(mn).display !== 'none';
     document.body.classList.toggle('titlescreen', !!onTitle);
     if (!onTitle) document.body.classList.remove('showSet', 'showKeys');
   };
   setInterval(sync, 150); sync();
-  // Hook a menu button.
   const hook = (id, cls) => {
     const el = $(id); if (!el) return;
     el.addEventListener('click', e => {
@@ -7539,7 +7192,6 @@ function petCat() {
   purrSnd(0.6);
   caption('you crouch and run a hand along its back', 2800);
 }
-// Pick up the cat.
 function pickupCat() {
   const C = TOWN.cat; if (!C || C.carrying) return;
   C.petT = 0; C.petAnim = 0; C.carrying = true; C.state = 'carry';
@@ -7547,7 +7199,6 @@ function pickupCat() {
   purrSnd(0.7);
   caption("it lets you lift it \u2014 ']' sets it down", 3400);
 }
-// Put the cat down.
 function dropCat() {
   const C = TOWN.cat; if (!C || !C.carrying) return;
   C.carrying = false; C.state = 'drop'; C.dropT = 0.45; C.dropY = C.g.position.y;
@@ -7615,7 +7266,6 @@ function resetRun() {
   // --- and the old checkpoint, so "continue" cannot point at a dead run ---
   try { clearSave(); } catch (e) {}
 }
-// Set up interacting with the cat.
 function initCatInteraction() {
   const C = TOWN.cat; if (!C) return;
   if (!C.hitbox) {
@@ -7788,7 +7438,6 @@ function catUpdate(dt) {
   } else if (C.state === 'sit') C.legs.forEach(lg => lg.rotation.x = 0);
 }
 
-// Update the town each frame.
 function townUpdate(dt, rdt) {
   if (!TOWN.g) return;
   if (!TOWN.rain) townRainInit();
@@ -7900,7 +7549,6 @@ function townUpdate(dt, rdt) {
   if (N.phn && !CS.active) { N.phn.arms[1].sh.rotation.set(-0.9, 0, 0.7); N.phn.arms[1].el.rotation.x = -2.2; N.phn.parts.head.rotation.z = 0.25; N.phn.arms[-1].sh.rotation.set(-0.3 + 0.3 * Math.sin(time * 2), 0, -0.4); }
   // overheard as you walk by
   if (story.prologue && !CS.active) {
-    // Trigger a line once when near a character.
     const p = player.pos, over = (ch, r, k, line) => { if (!TOWN.seen[k] && !TOWN.talking && Math.hypot(p.x - ch.root.position.x, p.z - ch.root.position.z) < r) { TOWN.seen[k] = true; TOWN.heard[ch.vkey] = true; ch.li = Math.max(ch.li, 1); townSay(line, ch.vkey, ch); } };
     over(N.prc, 9, 'prc', TOWN_LINES.prc[0]);
     over(N.phn, 7, 'phn', TOWN_LINES.phn[0]);
@@ -7934,13 +7582,11 @@ function prologueStart() {
   TOWN.gateOpen = 1;
   titleCard('PROLOGUE', 'the quiet part of town', 4200);
 }
-// End the prologue.
 function prologueEnd() {
   if (!story.prologue) return;
   story.prologue = false; story.prologueDone = true;
   setTimeout(() => titleCard('SANCTUARY', '', 3600), 1800);
 }
-// Show a title card.
 function titleCard(big, small, ms) {
   const el = $('tcard'); el.innerHTML = '<div class="tb">' + big + '</div>' + (small ? '<div class="ts">' + small + '</div>' : '');
   el.style.opacity = 1; clearTimeout(titleCard._t); titleCard._t = setTimeout(() => { el.style.opacity = 0; }, ms || 3500);
@@ -7952,7 +7598,6 @@ function titleCard(big, small, ms) {
    ========================================================= */
 story.trailer = false; story.trChoir = 0.2;
 const TR = { t0: 0, lines: [] };
-// Trailer camera.
 function trCamera(dt) {
   const c = CS.cam;
   camera.position.copy(c.pos);
@@ -7964,9 +7609,7 @@ function trCamera(dt) {
 }
 /* ---------- the score: pads, pulses, braams, risers, hits ---------- */
 const TRS = { pad: null };
-// Music bus.
 function mBus(g, verb) { const ctx = A.ctx, o = ctx.createGain(); o.gain.value = g * SV('music'); o.connect(A.master); const s = ctx.createGain(); s.gain.value = verb || 0; o.connect(s); s.connect(A.verb); return o; }
-// Trailer pad synth.
 function trPadInit() {
   if (TRS.pad || !sfxOK()) return;
   const ctx = A.ctx, out = mBus(1, 0.9), g = ctx.createGain(); g.gain.value = 0;
@@ -7975,11 +7618,8 @@ function trPadInit() {
   const oscs = [55, 82.41, 110, 130.81, 164.81].map((f, i) => { const o = ctx.createOscillator(); o.type = i === 0 ? 'sine' : 'sawtooth'; o.frequency.value = f; o.detune.value = (i % 2 ? 7 : -7); const og = ctx.createGain(); og.gain.value = i === 0 ? 0.5 : 0.09; o.connect(og); og.connect(lp); o.start(); return o; });
   TRS.pad = { g, lp, oscs };
 }
-// Fade the pad.
 function padTo(level, cut, tc) { if (!TRS.pad) return; pset(TRS.pad.g.gain, level, tc || 1.2); pset(TRS.pad.lp.frequency, cut || 400, tc || 1.2); }
-// Change the pad chord.
 function padChord(fs, tc) { if (!TRS.pad) return; TRS.pad.oscs.forEach((o, i) => o.frequency.setTargetAtTime(fs[i], A.ctx.currentTime, tc || 0.6)); }
-// Braam hit.
 function braam(t, v) {
   if (!sfxOK()) return; const ctx = A.ctx; t = t || ctx.currentTime + 0.01; v = v || 1;
   const o = mBus(0.55 * v, 0.7), lp = ctx.createBiquadFilter(), g = ctx.createGain();
@@ -7989,20 +7629,15 @@ function braam(t, v) {
   [43.65, 43.9, 65.41, 87.31, 87.6, 130.8].forEach((f, i) => { const s = ctx.createOscillator(); s.type = 'sawtooth'; s.frequency.value = f; s.detune.value = (i - 2.5) * 6; s.connect(lp); s.start(t); s.stop(t + 4.5); });
   tone(o, 'sine', 44, 40, 1.0, t, 4.0);
 }
-// Trailer hit.
 function trHit(t, v) {
   if (!sfxOK()) return; t = t || A.ctx.currentTime + 0.01; v = v || 1;
   const o = mBus(0.8 * v, 1.2);
   nburst(o, 'lowpass', 190, 1, 1.5, t, 1.3); tone(o, 'sine', 75, 28, 1.3, t, 1.1);
   nburst(o, 'bandpass', 2100, 1.2, 0.45, t, 0.18); tone(o, 'square', 190, 120, 0.08, t, 0.7);
 }
-// Pulse.
 function trPulse(t, v) { if (!sfxOK()) return; const o = mBus(0.6 * (v || 1), 0.4); tone(o, 'sine', 62, 40, 0.9, t, 0.42); nburst(o, 'lowpass', 140, 1, 0.6, t, 0.2); }
-// Tick.
 function trTick(t) { if (!sfxOK()) return; const o = mBus(0.4, 0.3); nburst(o, 'highpass', 4200, 1, 0.35, t, 0.03); tone(o, 'square', 2600, 2600, 0.04, t, 0.025); }
-// Keys.
 function trKeys(t, f, v) { if (!sfxOK()) return; const o = mBus(0.32 * (v || 1), 1.3); tone(o, 'triangle', f, f, 0.32, t, 2.6); tone(o, 'sine', f * 2, f * 2, 0.07, t, 1.6); tone(o, 'sine', f * 3.01, f * 3.01, 0.02, t, 0.9); }
-// Riser.
 function trRiser(dur, v) {
   if (!sfxOK()) return; const ctx = A.ctx, t = ctx.currentTime + 0.01, o = mBus(0.5 * (v || 1), 0.8);
   const n = ctx.createBufferSource(); n.buffer = A.noise; n.loop = true;
@@ -8013,11 +7648,9 @@ function trRiser(dur, v) {
   const sg = ctx.createGain(); sg.gain.setValueAtTime(0.0001, t); sg.gain.exponentialRampToValueAtTime(0.12, t + dur); sg.gain.setValueAtTime(0.0001, t + dur + 0.02);
   s.connect(sg); sg.connect(o); s.start(t); s.stop(t + dur + 0.05);
 }
-// Schedule repeated trailer sounds.
 function trSched(fn, beats, step, v) { if (!sfxOK()) return; const t0 = A.ctx.currentTime + 0.02; for (let i = 0; i < beats; i++) fn(t0 + i * step, typeof v === 'function' ? v(i) : v); }
 /* ---------- helpers ---------- */
 const V3 = (x, y, z) => new T.Vector3(x, y, z);
-// Trailer walk.
 function trWalk(ch, from, to, dur, cam, run) {
   const d = Math.hypot(to.x - from.x, to.z - from.z);
   ch.face = ch.root.rotation.y = Math.atan2(to.x - from.x, to.z - from.z); ch.turnRate = 10;
@@ -8027,36 +7660,28 @@ function trWalk(ch, from, to, dur, cam, run) {
     if (cam) cam(ch.root.position, k);
   }, x => x);
 }
-// Trailer line with minimum time.
 function tline(text, who, sp, minT) { return Promise.all([say(text, who, sp), CS.wait(minT || 0)]); }
-// Fade to black.
 function trBlack(op, s) { const b = $('black'); b.style.transition = 'opacity ' + (s == null ? 0.8 : s) + 's ease'; b.style.opacity = op; }
-// White flash.
 function trWhite(peak, hold) { const w = $('white'); w.style.transition = 'opacity .06s'; w.style.opacity = peak; setTimeout(() => { w.style.transition = 'opacity 1.1s ease'; w.style.opacity = 0; }, hold || 90); }
-// Switch hell on or off instantly.
 function hellNow(on) {
   st.hell = on; st.doorP = on ? 1 : 0; st.H = on ? 1 : 0; story.fogPush = on ? 0.75 : 0;
 }
-// Start the trailer.
 function trailerStart() {
   story.trailer = true; story.glimpseState = 2; CS.active = true; CS.free = true; CS.skipping = false;
   document.body.classList.add('trailer', 'cine');
   audioInit(); trPadInit();
   TOWN.trGate = 0;
-  // End the trailer on a click/key.
   const end = e => { if (performance.now() - TR.t0 < 700) return; e.preventDefault(); e.stopPropagation(); trailerEnd(); };
   TR.t0 = performance.now();
   window.addEventListener('keydown', end, true); window.addEventListener('mousedown', end, true); window.addEventListener('touchstart', end, true);
   trailerRun().catch(e => { console.error(e); trailerEnd(); });
 }
-// End the trailer.
 function trailerEnd() {
   if (TR.ending) return; TR.ending = true;
   try { speechSynthesis.cancel(); } catch (e) {}
   trBlack(1, 0.6); if (A.master) pset(A.master.gain, 0, 0.2);
   setTimeout(() => location.reload(), 750);
 }
-// Run the trailer sequence.
 async function trailerRun() {
   const w = story.witness, au = story.auditor, N = story.npcs;
   trBlack(1, 0);
@@ -8099,7 +7724,6 @@ async function trailerRun() {
   await tline("There's a corner of this town I've felt my whole life. Quieter. Older. Like it's holding its breath.", 'wit', null, 4);
   // little wrong things
   const notes = [220, 261.6, 329.6, 293.7];
-  // Quick trailer shot.
   const quick = async (pos, look, fov, i, extra) => { cut(pos, look, fov); drift(3, 0.15); if (sfxOK()) trKeys(A.ctx.currentTime + 0.02, notes[i]); if (extra) extra(); await CS.wait(1.9); };
   await quick(V3(77, 1.35, 33.4), V3(79.5, 1.6, 37.5), 44, 0);
   await quick(V3(40.7, 3.35, 27.75), V3(40, 3.55, 26.3), 28, 1, () => trSched(trTick, 4, 0.5, 1));
@@ -8175,7 +7799,6 @@ async function trailerRun() {
   }
   /* ===== 6. THE MONTAGE ===== */
   padTo(0.32, 700, 0.4);
-  // Boss shot with a pulse loop.
   const P = BOSS.P.clone(), pulseLoop = () => trSched(trPulse, 16, 0.375, i => i % 4 === 0 ? 1.1 : 0.6);
   pulseLoop();
   w.root.position.copy(P); guardPose(w, 1);
@@ -8309,7 +7932,6 @@ try { ACH.got = JSON.parse(localStorage.getItem('sanctuary_ach') || '{}') || {};
 try { const _cl = JSON.parse(localStorage.getItem('sanctuary_catLoc') || 'null');
   if (_cl && typeof _cl.x === 'number') { story.catLoc = _cl; story.catHome = !!_cl.home; }
 } catch (e) { story.catLoc = null; }
-// Achievement sound.
 function achSnd(ability) {
   if (!sfxOK()) return;
   const t = A.ctx.currentTime + 0.02, o = busTo(0.42, 1.1);
@@ -8318,7 +7940,6 @@ function achSnd(ability) {
   nburst(o, 'highpass', 6500, 0.7, 0.08, t + 0.05, 0.6);
   tone(o, 'sine', 1568, 1568, 0.05, t + 0.28, 1.6);
 }
-// Achievement pop-up.
 function achPop(head, name, desc, ability) {
   const box = $('achBox'); if (!box) return;
   const el = document.createElement('div'); el.className = 'ach' + (ability ? ' abil' : '');
@@ -8329,15 +7950,12 @@ function achPop(head, name, desc, ability) {
   setTimeout(() => { el.classList.remove('in'); el.classList.add('out'); }, 5600);
   setTimeout(() => el.remove(), 6600);
 }
-// Unlock an achievement.
 function unlock(id) {
   if (ACH.got[id] || !ACH.list[id] || story.trailer) return;
   ACH.got[id] = 1; try { localStorage.setItem('sanctuary_ach', JSON.stringify(ACH.got)); } catch (e) {}
   ACH.q.push(() => achPop('ACHIEVEMENT', ACH.list[id][0], ACH.list[id][1]));
 }
-// Queue an "ability unlocked" pop-up.
 function abilityPop(name, desc) { ACH.q.push(() => achPop('ABILITY UNLOCKED', name, desc, true)); }
-// Show queued achievement pop-ups one by one.
 function achUpdate(dt) {
   // one pop every 0.9 s so a burst never stacks into a wall of cards
   ACH.showing -= dt;
@@ -8375,7 +7993,6 @@ function achUpdate(dt) {
    ========================================================= */
 story.wall = null; story.xfer = null; story.abil = { hrun: false, xfer: false };
 story.wallRoll = 0; story.chain = 0; story.rollT = 0; story.landAmp = 1; story.rollDir = new T.Vector3();
-// Check for unlocked abilities.
 function abilityCheck() {
   if (story.trailer || !started) return;
   const late = story.phase === 'done' || story.bossWave > 0;
@@ -8431,7 +8048,6 @@ function glancingWall(px, pz, tx, tz) {
   }
   return best;
 }
-// Start a wall run.
 function wallStart(W, tx, tz, speed, chained) {
   const w = story.witness, shift = W.d - 0.42;
   player.pos.x += W.sx * shift; player.pos.z += W.sz * shift;
@@ -8442,7 +8058,6 @@ function wallStart(W, tx, tz, speed, chained) {
   footstep('stone', 0.75); jumpSnd();
   unlock('hrun'); if (chained) unlock('xfer'); if (story.chain >= 3) unlock('chain');
 }
-// Update the wall run.
 function wallUpdate(dt) {
   const W = story.wall;
   W.t += dt; W.vy -= 5.4 * dt;
@@ -8467,7 +8082,6 @@ function wallEnd() {
   story.air = story.py > 0.02; story.pvy = Math.min(W.vy, 0.6);
   if (!story.air) landFrom(0);
 }
-// Wall jump.
 function wallJump() {
   const W = story.wall; if (!W) return;
   story.wall = null; story.air = true;
@@ -8515,7 +8129,6 @@ function wallPose(w, rdt) {
   } else if (P.body.rotation.z !== 0) { P.body.rotation.z = 0; P.body.position.x = 0; }
 }
 
-// Main loop: update and render each frame.
 function frame() {
   if (halted) return;
   requestAnimationFrame(frame);

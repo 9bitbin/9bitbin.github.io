@@ -1,8 +1,3 @@
-<!--
-  File: POLISH-STEPS.md
-  Author: Himal Shrestha
-  Description: Notes on the site polish pass and any follow-up steps.
--->
 # Quick polish: what was added and what you might need to do
 
 Everything below is already live. **Nothing is required from you.** The optional steps are there if
