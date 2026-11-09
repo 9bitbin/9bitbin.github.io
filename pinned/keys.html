@@ -29,9 +29,11 @@
   </div>
 </main>
 <script>
+// Web Push uses a P-256 VAPID key pair; base64url is the format expected by the app and push service.
 const b64u = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 document.getElementById("go").onclick = async () => {
   const k = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+  // The public key is safe for the browser config; keep the private scalar in Supabase secrets only.
   document.getElementById("pub").value = b64u(await crypto.subtle.exportKey("raw", k.publicKey));
   document.getElementById("priv").value = (await crypto.subtle.exportKey("jwk", k.privateKey)).d;
   document.getElementById("out").hidden = false;

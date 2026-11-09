@@ -2,6 +2,7 @@
 // Points are {lat, lng}. Distances are in metres.
 
 export function haversine(a, b) {
+  // Great-circle distance; clamp the square-rooted value to avoid rounding errors in asin.
   const R = 6371000, toR = Math.PI / 180;
   const dLat = (b.lat - a.lat) * toR, dLng = (b.lng - a.lng) * toR;
   const la1 = a.lat * toR, la2 = b.lat * toR;
@@ -9,12 +10,14 @@ export function haversine(a, b) {
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 export function bearing(a, b) {
+  // Initial bearing clockwise from north, normalized for the compass-sector lookup below.
   const toR = Math.PI / 180;
   const y = Math.sin((b.lng - a.lng) * toR) * Math.cos(b.lat * toR);
   const x = Math.cos(a.lat * toR) * Math.sin(b.lat * toR) - Math.sin(a.lat * toR) * Math.cos(b.lat * toR) * Math.cos((b.lng - a.lng) * toR);
   return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
 }
 export const COMPASS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+// Round to the nearest 45-degree compass sector.
 export const compassOf = (deg) => COMPASS[Math.round(deg / 45) % 8];
 export function fmtDist(m) {
   const ft = m * 3.28084;

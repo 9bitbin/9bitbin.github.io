@@ -10,6 +10,7 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
+      // Keep the separately versioned Bible cache when rotating the app-shell cache.
       .then((keys) => Promise.all(keys.filter((k) => k !== CACHE && k !== BIBLE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
