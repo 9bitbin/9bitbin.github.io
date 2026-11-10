@@ -1,5 +1,6 @@
 # Constellation — setup (GitHub Pages + Supabase)
 
+
 Files:
 - `index.html`: the quiz. Takers enter a name, take the quiz, and their result is saved.
 - `admin.html`: your private results table (needs your login).
