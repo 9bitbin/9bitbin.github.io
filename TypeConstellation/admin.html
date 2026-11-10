@@ -50,6 +50,8 @@ ol.ans .q{color:var(--muted)}
 ol.ans .a{color:var(--ink)}
 .k{font:600 .66rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:6px 0 10px}
 .empty{text-align:center;color:var(--muted);padding:40px}
+.fitb{display:inline-block;padding:2px 9px;border-radius:999px;font-weight:700;font-size:.78rem}.f1,.f2{background:rgba(253,164,175,.15);color:#fda4af}.f3{background:rgba(252,211,77,.15);color:#fcd34d}.f4,.f5{background:rgba(110,231,183,.15);color:#6ee7b7}
+.fbbox{font-size:.82rem;line-height:1.7;margin-bottom:14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--edge)}.fbnote{margin-top:4px;color:#d6d8f2;font-style:italic}
 .pill{display:inline-block;padding:2px 9px;border-radius:999px;border:1px solid var(--edge);font-size:.75rem;color:var(--muted)}
 </style>
 </head>
@@ -75,11 +77,12 @@ ol.ans .a{color:var(--ink)}
     </form>
   </section>
 
+  <div id="summary" class="sub" style="margin:-12px 0 14px"></div>
   <section id="tableView" class="panel" hidden>
     <table>
       <thead><tr>
         <th data-k="name">Name</th><th data-k="type">Type</th><th data-k="subtype">Subtype</th>
-        <th data-k="type_prob" class="hide-sm">Confidence</th><th data-k="lead" class="hide-sm">Lead</th><th data-k="created_at">Date ↓</th>
+        <th data-k="type_prob" class="hide-sm">Confidence</th><th data-k="fit">Fit</th><th data-k="lead" class="hide-sm">Lead</th><th data-k="created_at">Date ↓</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -93,6 +96,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const base=()=>SUPABASE_URL.replace(/\/$/,'');
+const OFFL={type:'Type',saviors:'Saviors',descriptions:'Descriptions',growth:'Growth tips',questions:'Questions'};
+const FOCL={general:'General',work:'Work / career',rel:'Relationships',change:'Big life change',motiv:'Motivation',create:'Creative block'};
 const COINL={OD:['Observer-led','Decider-led'],DI:['Self above tribe (Di)','Tribe above self (De)'],OI:['Organize (Oi)','Gather (Oe)'],N:['Intuition','Sensing'],T:['Thinking','Feeling'],FT:['Fi/Te','Ti/Fe'],NS:['Ni/Se','Si/Ne'],IE:['Introverted lead','Extroverted lead']};
 let session=null, rows=[], sortK='created_at', sortDir=-1, openId=null;
 
@@ -106,13 +111,13 @@ async function login(email,password){
   return {token:j.access_token, email:j.user&&j.user.email, exp:Date.now()+(j.expires_in||3600)*1000};
 }
 async function fetchRows(){
-  const r=await fetch(base()+'/rest/v1/quiz_results?select=*&order=created_at.desc',{headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.token}});
+  const r=await fetch(base()+'/rest/v1/quiz_results?select=*,quiz_feedback(*)&order=created_at.desc',{headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.token}});
   if(r.status===401){ logout('Session expired. Log in again.'); return; }
   if(!r.ok) throw new Error('Could not load results ('+r.status+')');
-  rows=await r.json(); render();
+  rows=(await r.json()).map(x=>{ const fb=(x.quiz_feedback||[]).sort((a,b)=>a.created_at<b.created_at?1:-1)[0]||null; return {...x, fb, fit: fb?fb.fit:null}; }); render();
 }
 function showApp(){ $('#loginView').hidden=true; $('#tableView').hidden=false; $('#tools').hidden=false; $('#who').textContent='Signed in as '+(session.email||'owner'); }
-function logout(msg){ session=null; store(null); rows=[]; $('#loginView').hidden=false; $('#tableView').hidden=true; $('#tools').hidden=true; $('#who').textContent='Owner view'; $('#loginMsg').textContent=msg||''; }
+function logout(msg){ session=null; store(null); rows=[]; $('#summary').textContent=''; $('#loginView').hidden=false; $('#tableView').hidden=true; $('#tools').hidden=true; $('#who').textContent='Owner view'; $('#loginMsg').textContent=msg||''; }
 
 function fmtDate(d){ const x=new Date(d); return x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+x.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
 function detail(r){
@@ -125,27 +130,35 @@ function detail(r){
       <div class="type">${esc(r.type)} <span class="muted" style="font-weight:500">${esc(r.subtype)}</span></div>
       <div class="muted" style="font-size:.82rem;margin:6px 0 14px">${esc(r.subtype_pos==='aux'?'Dom + Aux':'Dom + Tert')} · ${esc(r.lead)}-led · ${esc(r.animal)}</div>
       <div style="margin-bottom:14px">${tp}</div>
+      ${r.fb?`<div class="k">Feedback</div><div class="fbbox"><div><b>Fit:</b> <span class="fitb f${r.fb.fit}">${r.fb.fit}/5</span></div>
+        ${r.fb.off&&r.fb.off.length?`<div><b>Felt off:</b> ${r.fb.off.map(o=>esc(OFFL[o]||o)).join(', ')}</div>`:''}
+        ${r.fb.self_type?`<div><b>Thinks they are:</b> ${esc(r.fb.self_type)}${r.fb.self_type!==r.type?' <span class="pill">differs</span>':''}</div>`:''}
+        ${r.fb.focus?`<div><b>Focus:</b> ${esc(FOCL[r.fb.focus]||r.fb.focus)}</div>`:''}
+        ${r.fb.note?`<div class="fbnote">"${esc(r.fb.note)}"</div>`:''}</div>`:'<div class="k">Feedback</div><div class="muted" style="font-size:.8rem;margin-bottom:14px">None sent</div>'}
       <div class="k">Coins</div>${coinHtml}
       <div class="muted" style="font-size:.72rem;margin-top:10px">Browser ID: ${esc((r.client_id||'—').slice(0,8))} · ${esc(r.quiz_version||'')}</div>
     </div><div><div class="k">Answers</div><ol class="ans">${ans}</ol></div></div>`;
 }
-function render(){
+function summarize(){ const f=rows.filter(r=>r.fit); const avg=f.length?(f.reduce((a,r)=>a+r.fit,0)/f.length).toFixed(1):'—';
+  const mism=rows.filter(r=>r.fb&&r.fb.self_type&&r.fb.self_type!==r.type).length;
+  $('#summary').textContent=`${rows.length} takes · ${f.length} with feedback · average fit ${avg}/5 · ${mism} think they're a different type`; }
+function render(){ summarize();
   const f=$('#filter').value.trim().toLowerCase();
   let list=rows.filter(r=>!f||(r.name||'').toLowerCase().includes(f)||(r.type||'').toLowerCase().includes(f));
   list.sort((a,b)=>{ const x=a[sortK],y=b[sortK]; return (x>y?1:x<y?-1:0)*sortDir; });
   document.querySelectorAll('th').forEach(th=>{ const k=th.dataset.k; th.textContent=th.textContent.replace(/ [↑↓]$/,'')+(k===sortK?(sortDir>0?' ↑':' ↓'):''); });
-  if(!list.length){ $('#tbody').innerHTML=`<tr><td colspan="6" class="empty">${rows.length?'No matches.':'No results yet. Share your quiz link!'}</td></tr>`; return; }
+  if(!list.length){ $('#tbody').innerHTML=`<tr><td colspan="7" class="empty">${rows.length?'No matches.':'No results yet. Share your quiz link!'}</td></tr>`; return; }
   $('#tbody').innerHTML=list.map(r=>`<tr class="row${openId===r.id?' open':''}" data-id="${esc(r.id)}">
       <td><b>${esc(r.name)}</b></td><td class="type">${esc(r.type)}</td><td>${esc(r.subtype)}</td>
-      <td class="hide-sm muted">${r.type_prob!=null?Math.round(r.type_prob*100)+'%':'—'}</td><td class="hide-sm muted">${esc(r.lead)}</td><td class="muted">${esc(fmtDate(r.created_at))}</td></tr>`
-    +(openId===r.id?`<tr class="detail"><td colspan="6">${detail(r)}</td></tr>`:'')).join('');
+      <td class="hide-sm muted">${r.type_prob!=null?Math.round(r.type_prob*100)+'%':'—'}</td><td>${r.fit?`<span class="fitb f${r.fit}">${r.fit}/5</span>`:'<span class="muted">—</span>'}</td><td class="hide-sm muted">${esc(r.lead)}</td><td class="muted">${esc(fmtDate(r.created_at))}</td></tr>`
+    +(openId===r.id?`<tr class="detail"><td colspan="7">${detail(r)}</td></tr>`:'')).join('');
   document.querySelectorAll('tr.row').forEach(tr=>tr.addEventListener('click',()=>{ openId = openId===tr.dataset.id?null:tr.dataset.id; render(); }));
 }
 document.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{ const k=th.dataset.k; if(sortK===k) sortDir*=-1; else { sortK=k; sortDir=k==='created_at'?-1:1; } render(); }));
 $('#filter').addEventListener('input',render);
 $('#refresh').addEventListener('click',()=>fetchRows().catch(e=>alertMsg(e)));
 $('#logout').addEventListener('click',()=>logout());
-function alertMsg(e){ $('#tbody').innerHTML=`<tr><td colspan="6" class="empty">${esc(e.message||e)}</td></tr>`; }
+function alertMsg(e){ $('#tbody').innerHTML=`<tr><td colspan="7" class="empty">${esc(e.message||e)}</td></tr>`; }
 $('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault(); $('#loginMsg').textContent='';
   if(/YOUR-PROJECT|YOUR-ANON/.test(SUPABASE_URL+SUPABASE_ANON_KEY)){ $('#loginMsg').textContent='Add your Supabase URL and anon key at the bottom of admin.html first.'; return; }

@@ -167,6 +167,41 @@ h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);
 .savechip.err{color:#fda4af;border-color:rgba(253,164,175,.35)}
 .savechip button{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}
 @media (max-width:600px){.nrow{flex-direction:column;border-radius:22px;padding:10px}.nrow input{padding:10px 8px;text-align:center;width:100%}.nrow .cta{width:100%}}
+.focus-k{font:600 .7rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.foci{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.focus{font:600 .82rem Manrope;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:999px;padding:8px 14px;cursor:pointer;transition:.25s}
+.focus:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
+.focus.on{color:#07051a;background:linear-gradient(110deg,#67e8f9,#a78bfa);border-color:transparent}
+#guide{transition:opacity .18s}
+.gblock{position:relative;padding:16px 18px 14px 20px;margin-bottom:12px;border-radius:16px;background:rgba(255,255,255,.025);border:1px solid var(--edge);border-left:3px solid var(--c)}
+.gblock p{margin:6px 0;color:#d6d8f2;line-height:1.6;font-size:.93rem}
+.gblock ul,.gblock ol{margin:6px 0 4px;padding-left:20px;color:#d6d8f2;font-size:.92rem;line-height:1.6}
+.gk{font:700 .7rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--c);margin-bottom:4px}
+.gs{font:600 .68rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:12px 0 2px}
+.chips2{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.chips2 span{font-size:.78rem;padding:4px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);color:var(--ink)}
+.apply{list-style:none;padding-left:0!important}.apply li{margin-bottom:4px}
+.hl{background:color-mix(in srgb,var(--c) 12%,transparent);border-radius:10px;padding:10px 12px}
+.muted2{color:var(--muted);font-size:.84rem;margin-top:6px}
+.note{padding:12px 14px;border-radius:14px;margin-bottom:12px;font-size:.88rem;line-height:1.55;color:#e9d5ff;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3)}
+.care{font-size:.78rem;color:var(--faint);line-height:1.6;margin-top:6px}
+.fb-q{font-weight:600;font-size:.92rem;margin:16px 0 8px}.fb-q:first-child{margin-top:0}
+.opt-l{color:var(--faint);font-weight:500;font-size:.8rem}
+.fit{display:flex;gap:8px}
+.fit button{flex:1;max-width:64px;height:46px;border-radius:14px;border:1px solid var(--edge);background:rgba(255,255,255,.03);color:var(--ink);font:700 1rem Unbounded;cursor:pointer;transition:.25s}
+.fit button:hover{border-color:rgba(255,255,255,.3)}
+.fit button.on{background:linear-gradient(140deg,#67e8f9,#a78bfa);color:#07051a;border-color:transparent}
+.fit-l{display:flex;justify-content:space-between;max-width:352px;font-size:.72rem;color:var(--faint);margin-top:6px}
+.offs{display:flex;flex-wrap:wrap;gap:8px}
+.off{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;border:1px solid var(--edge);cursor:pointer;font-size:.86rem;color:#d6d8f2}
+.off input{accent-color:#a78bfa}
+#selfType,#fbNote{width:100%;max-width:420px;background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:12px;color:var(--ink);font:500 .9rem Manrope;padding:10px 12px;outline:0}
+#selfType option{background:#120f28}
+#fbNote{max-width:100%;min-height:80px;resize:vertical}
+.fb-actions{display:flex;align-items:center;gap:14px;margin-top:16px}
+.fb-msg{font-size:.84rem;color:var(--muted)}
+.ghost:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.fb-thanks{text-align:center;padding:18px;font-family:Unbounded;font-weight:300;font-size:1.05rem;color:#c4b5fd}
 @media (max-width:600px){.card{padding:24px 18px 18px;border-radius:22px}.side .hint{display:none}.brand span.x{display:none}.opt{padding:14px 14px;font-size:.93rem}.side .orbit-wrap{width:130px!important}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -209,7 +244,7 @@ h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);
         <div class="qmeta"><span class="qnum" id="qnum">Signal 01</span><button class="back" id="backBtn" disabled>← Back</button></div>
         <div class="qbody" id="qbody"></div>
         <div class="kbd">Press 1–4</div>
-      </div> 
+      </div>
     </div>
   </section>
 
@@ -222,7 +257,7 @@ h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);
 const SUPABASE_URL = 'https://lcbzmlsowikajunifdjt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjYnptbHNvd2lrYWp1bmlmZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1OTE4NDAsImV4cCI6MjEwOTE2Nzg0MH0.Bbc5Jndb9yj5Ar27MyYba5tIx3GL6zH99SoXkVAY630';
 
-const QUIZ_VERSION = 'constellation-v1';
+const QUIZ_VERSION = 'constellation-v1.1';
 </script>
 <script>
 // ===== OPS-inspired scoring engine (shared by page + tests) =====
@@ -347,7 +382,7 @@ const QUESTIONS = [
  { q:"Your room or workspace gets messy. A friend has also been cold to you this week. Which do you shrug off with \"I'll deal with it later\"?",
    o:[ {t:"The mess. Things can wait. The friend thing is what's really on my mind.", s:{OD:-2}},
        {t:"The friend. People are people. The mess is what's bugging me.", s:{OD:2}} ]},
- { q:"When things finally break down for you, it usually looks like…",
+ { id:"crash", q:"When things finally break down for you, it usually looks like…",
    o:[ {t:"Getting convinced something bad is coming and spiraling into worst-case research.", s:{OD:1,OI:1}},
        {t:"Feeling boxed in and controlled. I need out, now.", s:{OD:1,OI:-1}},
        {t:"Burning out from giving to everyone, then realizing I don't know who I am.", s:{OD:-1,DI:-1}},
@@ -377,15 +412,15 @@ const QUESTIONS = [
        {t:"Tangled up with how everyone else feels, and what the room feels.", s:{FT:-1,T:-0.5}},
        {t:"Thoughts about why people feel what they feel.", s:{FT:-1,T:0.5}},
        {t:"Something I'll get to after the work is done.", s:{FT:1,T:0.5}} ]},
- { q:"What drains you more over a long stretch?",
+ { id:"drain", q:"What drains you more over a long stretch?",
    o:[ {t:"Being on all the time: always out, always talking, always doing.", s:{IE:-1,animal:{Play:-1,Sleep:1}}},
        {t:"Being stuck in all the time, with no outlet and nothing happening.", s:{IE:1,animal:{Sleep:-1,Play:1}}} ]},
- { q:"Which fear hits closest to home?",
+ { id:"fearO", q:"Which fear hits closest to home?",
    o:[ {t:"That new facts come along and collapse the worldview I've spent years building.", s:{fn:{Ni:1.4}}},
        {t:"That everything that felt new was really just me running in the same circle.", s:{fn:{Se:1.4}}},
        {t:"That someone locks me down, controls my options, and won't let me explore.", s:{fn:{Ne:1.4}}},
        {t:"That random chaos drops out of the sky and wrecks everything I've built.", s:{fn:{Si:1.4}}} ]},
- { q:"And which of these fears stings more?",
+ { id:"fearD", q:"And which of these fears stings more?",
    o:[ {t:"Being told what I love is stupid, and that I have to do work I hate to be worth anything.", s:{fn:{Fi:1.4}}},
        {t:"Getting all the hard work done for everyone, and still not being loved.", s:{fn:{Te:1.4}}},
        {t:"Spending years building something brilliant, only to find nobody cares.", s:{fn:{Ti:1.4}}},
@@ -469,6 +504,80 @@ const COINLABELS = {
   NS:['Ni / Se axis','Si / Ne axis','',''],
   IE:['Introverted lead','Extroverted lead','','']
 };
+
+// ===== Growth guide content (Option A: content blocks + rules) =====
+const FOCI = { general:'Just in general', work:'Work / career', rel:'Relationships', change:'Big life change', motiv:'Motivation', create:'Creative block' };
+
+const GUIDE = {
+ Ni:{
+  first:{ real:"You compress everything into one throughline. You often know where something is heading before you can explain why.",
+    strengths:["Seeing the long arc","Cutting through noise to the core idea","Holding one vision steady"],
+    apply:{ work:"Strategy, planning, and roles where you set direction and others execute.", rel:"You read where a relationship is heading early, so say it out loud sooner.", change:"Write the one-sentence vision for this change and let it filter every decision.", motiv:"Tie today's task to the bigger arc, in writing.", create:"Pick one theme and go deep instead of wide." } },
+  last:{ struggle:"Losing the thread. Lots of action and new experiences, but you're unsure what any of it adds up to, and sudden gut-feeling predictions about the future spook you.",
+    signs:["Saying yes to everything, then feeling empty","Sudden dark predictions about where life is going","Not being able to answer \"where is this going?\""],
+    exp:{ general:["Once a week, write three sentences: what pattern keeps repeating in my life?","Before starting something new, name in one line what it's for."], work:"Pick one 90-day goal and drop one thing that doesn't serve it.", rel:"Ask someone close: \"What do you think I'm really after?\"", change:"Picture yourself one year after this change. Write what you see in a paragraph.", motiv:"Write your \"why\" on a sticky note where you'll see it daily.", create:"Before making more, review your last five pieces and name their common thread." } },
+  loop:"replaying the same story about how things will turn out", exit:"step back and name the one thing this is really about" },
+ Se:{
+  first:{ real:"You live in the present moment. You notice what's actually in front of you, read a room physically, and act fast.",
+    strengths:["Reacting in real time","Noticing what's really there, not what's assumed","Making things happen hands-on"],
+    apply:{ work:"Live, hands-on roles: events, operations, troubleshooting, sales, craft.", rel:"You bring people into experiences, so plan things to do together.", change:"Go see it in person: tour it, visit it, try it before deciding.", motiv:"Make the first step physical, and start within five minutes.", create:"Work from real references and materials, and test things live." } },
+  last:{ struggle:"Stuck in your head. Plans and theories pile up but you stall on actually doing, the physical side of life (body, room, money details) gets neglected, and under stress you overindulge.",
+    signs:["Weeks in planning mode with nothing started","Ignoring sleep, food, and movement","Binging on sensation when stressed (food, scrolling, spending)"],
+    exp:{ general:["Do one ten-minute thing with your hands every day: walk, cook, fix something.","Turn one plan into a same-day action."], work:"Ship a rough version this week before you perfect the plan.", rel:"Plan one real-world activity together instead of another long talk.", change:"Visit or test the new thing in person before you decide.", motiv:"Set a ten-minute timer and just start. No planning allowed.", create:"Make a fast, messy draft with real materials." } },
+  loop:"chasing the next sensation or task", exit:"do something physical and fully present right now" },
+ Si:{
+  first:{ real:"You build a reliable base. You remember how things went before, refine your routines, and make things solid.",
+    strengths:["Consistency and follow-through","Remembering details and history","Refining something until it's dependable"],
+    apply:{ work:"Process, documentation, QA, and systems that have to be reliable.", rel:"Consistency is how you show care. Name it, so people notice it.", change:"Bring your routines with you, and rebuild one anchor habit first.", motiv:"Track streaks, and let routine carry you on low days.", create:"Master a craft through repetition and refinement." } },
+  last:{ struggle:"Scattered. You chase new ideas but drop the basics (bills, sleep, follow-through, what worked last time). Routines feel like a cage until things fall apart.",
+    signs:["Lots of starts, few finishes","Losing track of basics like deadlines, bills, and keys","Feeling physically run down out of nowhere"],
+    exp:{ general:["Pick one tiny daily anchor, like the same wake time or a five-minute reset.","After each project, jot down \"what worked\" in a running log."], work:"Write a checklist for the task you redo most often.", rel:"Remember one thing someone told you last week, and follow up on it.", change:"Before moving on, list what you're keeping from before.", motiv:"Finish one existing thing before you start a new one.", create:"Revisit and polish an old piece instead of starting fresh." } },
+  loop:"clinging to the routine and the way things were", exit:"go back to a reliable routine or what worked before" },
+ Ne:{
+  first:{ real:"You see possibilities everywhere. You connect ideas nobody else links, reframe problems, and generate options fast.",
+    strengths:["Generating options quickly","Connecting unrelated ideas","Reframing a stuck problem"],
+    apply:{ work:"Brainstorming, R&D, early-stage projects, and reframing problems.", rel:"You keep things fresh. Let people know which of your ideas you actually mean.", change:"Map three to five possible paths before committing to one.", motiv:"Gamify boring tasks or add some novelty.", create:"Mashups, experiments, and variations on a theme." } },
+  last:{ struggle:"Stuck on one track. You're convinced there's only one way things can go, so setbacks feel catastrophic and new possibilities feel threatening instead of exciting.",
+    signs:["Worst-case thinking about one outcome","Rejecting alternatives before hearing them","Feeling trapped with no options"],
+    exp:{ general:["When you're stuck, list five other ways it could go, even silly ones.","Try one small new thing each week: a new route, food, or genre."], work:"Before deciding, ask a coworker: \"How else could we do this?\"", rel:"Ask \"what if…\" questions instead of predicting how they'll react.", change:"Write three versions of how this change could turn out well.", motiv:"Change the setting or format of a task to restart momentum.", create:"Do a 15-minute \"bad ideas only\" brainstorm." } },
+  loop:"jumping between ideas without landing anywhere", exit:"talk it out or try one fresh angle" },
+ Ti:{
+  first:{ real:"You build your own understanding. You need things to make sense to you and won't accept a rule until you've tested it.",
+    strengths:["Finding the flaw in a system","Precise definitions and logic","Deep, independent problem-solving"],
+    apply:{ work:"Troubleshooting, engineering, analysis, debugging.", rel:"Explain your reasoning, and then check how it landed.", change:"Build your own decision criteria instead of borrowing someone else's.", motiv:"Turn the task into a puzzle you want to solve.", create:"Design systems, rules, and structure into your work." } },
+  last:{ struggle:"Outsourcing your own judgment. You lean on what others say or what \"works\" instead of thinking it through, and get defensive when your logic is questioned.",
+    signs:["Following rules you don't actually believe","Feeling dumb when you can't explain why","Overreacting to being corrected"],
+    exp:{ general:["Before agreeing to something, write one line of your own reasoning.","Spend 20 quiet minutes understanding one thing all the way."], work:"Pick one process and figure out exactly why each step exists.", rel:"When you disagree, say \"here's how I see it\" instead of going along.", change:"Define your own criteria for the decision before you ask anyone else.", motiv:"Ask yourself \"why does this matter, logically?\" and write the answer.", create:"Learn the underlying rules of your craft: theory, structure, technique." } },
+  loop:"overthinking alone until it's perfect", exit:"pause and work out what you actually think" },
+ Te:{
+  first:{ real:"You organize the world around you. You turn plans into action, measure what works, and get things done for the group.",
+    strengths:["Turning plans into action","Organizing people and resources","Measuring what actually works"],
+    apply:{ work:"Project management, operations, leadership, and anything with deadlines.", rel:"You show care by getting things done. Also ask what they actually want.", change:"Make the timeline and the checklist. It calms the chaos.", motiv:"Set measurable targets and track progress where you can see it.", create:"Set a release schedule, then finish and ship." } },
+  last:{ struggle:"Knowing what you love but not making it real. Passion projects stay in your head, deadlines feel like attacks, and \"just get it done\" pressure makes you shut down or rebel.",
+    signs:["Lots of passions, few finished","Avoiding tasks that feel like someone else's rules","Crash moments when everyone suddenly wants something from you"],
+    exp:{ general:["Break one thing you love into three steps with dates.","Tell one person a deadline out loud, and let the outside world hold you to it."], work:"Time-box your most annoying task to 25 minutes and get it done.", rel:"Turn one \"we should\" into a calendar invite.", change:"Make a simple timeline of what has to happen by when.", motiv:"Track one number weekly: pages, songs, hours.", create:"Set a release date and work backwards from it." } },
+  loop:"piling on tasks and fixing everyone's problems", exit:"make a small plan and take one concrete step" },
+ Fi:{
+  first:{ real:"You know what you value. You have a strong inner compass, spot what's fake, and stay loyal to what's real to you.",
+    strengths:["Knowing what matters to you","Spotting what's fake or off","Deep loyalty to the people and causes you choose"],
+    apply:{ work:"Mission-driven roles, creative work, advocacy, anything you believe in.", rel:"Your honesty about what you feel is a gift. Share it in words, not just by withdrawing.", change:"Check every option against \"does this feel like me?\"", motiv:"Connect the task to a value you actually hold.", create:"Personal expression. Your taste is your edge." } },
+  last:{ struggle:"Running on everyone else's needs and metrics until you don't know what you want, then feeling unappreciated and hit by a wave of \"nobody cares about me.\"",
+    signs:["Not being able to answer \"what do you want?\"","Resentment after over-delivering","A sudden emotional crash after a productive streak"],
+    exp:{ general:["Each day, write one thing you liked and one you didn't. No reasons needed.","Say no to one request that doesn't matter to you."], work:"Pick one project you care about personally and protect time for it.", rel:"Tell someone one thing you actually want, plainly.", change:"Before deciding, ask yourself: \"What would I choose if nobody was watching?\"", motiv:"Find your personal \"why\" before working out the \"how.\"", create:"Make one thing only for yourself, not to show anyone." } },
+  loop:"withdrawing into what you feel and love", exit:"check in with what you actually feel and want" },
+ Fe:{
+  first:{ real:"You read the emotional weather. You sense how the group feels, bring people together, and make people feel seen.",
+    strengths:["Reading the room","Bringing people together","Making people feel seen"],
+    apply:{ work:"Teaching, support, HR, community, and client-facing roles.", rel:"You notice everyone's needs. Put your own on that list too.", change:"Lean on your people and tell them what you need.", motiv:"Work alongside others, or for someone you care about.", create:"Make things that move or connect an audience." } },
+  last:{ struggle:"Feeling disconnected from the group. You're unsure how people feel about you, awkward in emotional moments, and surprised when people get upset over things that made sense to you.",
+    signs:["Being shocked that someone is hurt","Avoiding emotional conversations","Feeling like the outsider who doesn't get it"],
+    exp:{ general:["Once a day, ask someone how they're doing and really listen.","Before sharing a conclusion, ask yourself: \"How will this land for them?\""], work:"Thank one person for something specific they did.", rel:"Ask \"what would make this better for you?\" and then do it.", change:"Tell the people around you what's changing and how they can help.", motiv:"Find an accountability buddy.", create:"Share a work in progress and ask how it made them feel." } },
+  loop:"bending over backwards to keep everyone happy", exit:"reach out and connect with someone" }
+};
+
+// which question ids to quote back (ids set in questions.js)
+const QUOTE_IDS = { crash:'how things break down for you', fearO:'the fear that hit closest', fearD:'the fear that stung more', drain:'what drains you' };
+if (typeof module!=='undefined') module.exports={GUIDE,FOCI,QUOTE_IDS};
 
 </script>
 <script>
@@ -679,23 +788,23 @@ $('#nameForm').addEventListener('submit',e=>{
 });
 
 /* ---------- Supabase save ---------- */
+function newId(){ return crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&3|8)).toString(16);}); }
 function clientId(){
   try{ let id=localStorage.getItem('constellation_client_id');
-    if(!id){ id=(crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&3|8)).toString(16);})); localStorage.setItem('constellation_client_id',id); }
+    if(!id){ id=newId(); localStorage.setItem('constellation_client_id',id); }
     return id; }catch(e){ return null; }
 }
 const supaReady = ()=> typeof SUPABASE_URL==='string' && !/YOUR-PROJECT/.test(SUPABASE_URL) && !/YOUR-ANON/.test(SUPABASE_ANON_KEY);
-async function saveResult(rec){
+async function supaInsert(table,rec){
   if(!supaReady()) throw new Error('not-configured');
-  const res = await fetch(SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/quiz_results',{
-    method:'POST', headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body: JSON.stringify(rec)});
+  const res = await fetch(SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/'+table,{method:'POST',headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(rec)});
   if(!res.ok) throw new Error('HTTP '+res.status+' '+(await res.text()).slice(0,200));
 }
+async function saveResult(rec){ return supaInsert('quiz_results',rec); }
 function buildRecord(r){
   const t=r.top, round=x=>Math.round(x*1000)/1000, coins={}, tp={};
   for(const c of COINS) coins[c]=round(r.coins[c]); for(const k in r.types) tp[k]=round(r.types[k]);
-  return { name:takerName, client_id:clientId(), quiz_version:QUIZ_VERSION,
+  return { id:currentResultId, name:takerName, client_id:clientId(), quiz_version:QUIZ_VERSION,
     type:t.type, subtype:t.key, dom:t.dom, other:t.other, subtype_pos:t.pos,
     lead: t.sign.OD>0?'Observer':'Decider', animal:t.animal,
     type_prob:round(r.types[t.type]), subtype_prob:round(t.p), coins, type_probs:tp,
@@ -708,12 +817,85 @@ function renderSave(state,msg){
   if(msg) el.title=msg;
   const rb=$('#retrySave'); if(rb) rb.addEventListener('click',()=>doSave());
 }
-let lastRecord=null;
+let lastRecord=null, currentResultId=null, resultSaved=false;
 async function doSave(){
   if(!lastRecord) return;
   if(!supaReady()){ renderSave('off'); return; }
   renderSave('saving');
-  try{ await saveResult(lastRecord); renderSave('ok'); }catch(e){ renderSave('err',String(e.message||e)); }
+  try{ await saveResult(lastRecord); resultSaved=true; renderSave('ok'); }catch(e){ renderSave('err',String(e.message||e)); }
+}
+
+/* ================= GROWTH GUIDE ================= */
+const qById = id=>QUESTIONS.findIndex(q=>q.id===id);
+const unp=s=>String(s).replace(/[.。!?…]+$/,'');
+function chosen(id){ const i=qById(id); if(i<0||answers[i]==null) return null; return QUESTIONS[i].o[answers[i]]; }
+function fnOfOption(o){ return o&&o.s&&o.s.fn ? Object.keys(o.s.fn)[0] : null; }
+function guideHtml(r, focus){
+  const t=r.top, st=STACKS[t.type], f1=st[0], aux=st[1], tert=st[2], f4=st[3];
+  const G1=GUIDE[f1], G4=GUIDE[f4], intro=FN[f1].att==='i';
+  const fc = focus==='general'?null:focus;
+  const applyList = fc ? `<p class="hl">→ <b>${FOCI[fc]}:</b> ${G1.first.apply[fc]}</p>` :
+     `<ul class="apply">${Object.entries(G1.first.apply).map(([k,v])=>`<li><b>${FOCI[k]}:</b> ${v}</li>`).join('')}</ul>`;
+  // loop
+  const loopPair = `<b style="color:${FCOLOR[f1]}">${f1}</b> + <b style="color:${FCOLOR[tert]}">${tert}</b>`;
+  const loopCore = intro
+    ? `When you're stressed, you tend to retreat inward into ${loopPair}: ${GUIDE[f1].loop}, and ${GUIDE[tert].loop}. It feels safe because it skips your <b style="color:${FCOLOR[aux]}">${aux}</b>, the outward function that actually moves you forward.`
+    : `When you're stressed, you tend to go full speed outward with ${loopPair}: ${GUIDE[f1].loop}, and ${GUIDE[tert].loop}. It skips your <b style="color:${FCOLOR[aux]}">${aux}</b>, the inward pause that gives you direction.`;
+  const loopFrame = t.pos==='tert'
+    ? `Your result is the <b>${f1}–${tert}</b> subtype, so this pairing is your home base, not a flaw. The trap is staying there too long.`
+    : `Your result is the balanced <b>${f1}–${aux}</b> subtype, so the loop mostly shows up under pressure.`;
+  // personal quotes
+  const quotes=[]; const crash=chosen('crash'); if(crash) quotes.push(`When things break down, you said it looks like: <i>"${unp(crash.t)}."</i>`);
+  const fo=chosen('fearO'), fd=chosen('fearD');
+  for (const [o,kind] of [[fo,'observer'],[fd,'decider']]) if(o){ const fx=fnOfOption(o), mine = kind==='observer'?t.obs:t.dec;
+    quotes.push(`The fear you picked, <i>"${unp(o.t)},"</i> ` + (fx===mine ? `matches your ${fx} savior exactly.` : `is the classic ${fx} fear, not ${mine}. That could mean ${fx} runs stronger in you than your result shows. Worth watching.`)); }
+  // experiments
+  const ex=[ fc? G4.last.exp[fc] : G4.last.exp.general[0], fc? G4.last.exp.general[0] : G4.last.exp.general[1], `When you catch yourself in the loop: <b>${GUIDE[aux].exit}</b>.` ];
+  // adaptive notes
+  const notes=[];
+  if (r.funcs[f4] > .35) notes.push(`Your answers show more ${f4} than most ${t.type}s, so it may be less of a blind spot for you. Read the section below as "things to keep an eye on."`);
+  const sorted=Object.entries(r.types).sort((a,b)=>b[1]-a[1]);
+  if (sorted[0][1] < .45) { const alt=sorted[1][0], a1=STACKS[alt][0], a4=STACKS[alt][3];
+    notes.push(`Your result was close. <b>${alt}</b> came in second at ${pct(sorted[1][1])}%. If the guide below doesn't land, try reading it as ${alt}, with ${a1} first and ${a4} last.`); }
+  return `
+   ${notes.map(n=>`<div class="note">${n}</div>`).join('')}
+   <div class="gblock" style="--c:${FCOLOR[f1]}"><div class="gk">Your #1 function · ${f1} · ${FNAME[f1]}</div>
+     <p>${G1.first.real}</p><div class="chips2">${G1.first.strengths.map(s=>`<span>${s}</span>`).join('')}</div>
+     <div class="gs">Where to use it</div>${applyList}</div>
+   <div class="gblock" style="--c:${FCOLOR[f4]}"><div class="gk">Your #4 function · ${f4} · the blind spot</div>
+     <p>${G4.last.struggle}</p><div class="gs">Early warning signs</div><ul>${G4.last.signs.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+   <div class="gblock" style="--c:${FCOLOR[tert]}"><div class="gk">Your stuck loop</div><p>${loopCore}</p><p class="muted2">${loopFrame}</p></div>
+   ${quotes.length?`<div class="gblock" style="--c:#c4b5fd"><div class="gk">From your own answers</div>${quotes.map(q=>`<p>${q}</p>`).join('')}</div>`:''}
+   <div class="gblock try" style="--c:#fcd34d"><div class="gk">Try this week${fc?` · ${FOCI[fc]}`:''}</div><ol>${ex.map(e=>`<li>${e}</li>`).join('')}</ol>
+     <div class="muted2">Small experiments, not rules. Notice what changes after a week, then retake if you like.</div></div>
+   <div class="care">These are self-reflection ideas, not therapy. If you're dealing with something heavy, talking it through with someone you trust or a professional helps more than any type description.</div>`;
+}
+let currentFocus='general';
+function wireGuide(r){
+  currentFocus='general';
+  const draw=()=>{ $('#guide').innerHTML=guideHtml(r,currentFocus); };
+  draw();
+  document.querySelectorAll('#foci .focus').forEach(b=>b.addEventListener('click',()=>{
+    currentFocus=b.dataset.f; document.querySelectorAll('#foci .focus').forEach(x=>x.classList.toggle('on',x===b));
+    $('#guide').style.opacity=0; setTimeout(()=>{ draw(); $('#guide').style.opacity=1; },180);
+  }));
+}
+/* ================= FEEDBACK ================= */
+function wireFeedback(){
+  let fit=null;
+  document.querySelectorAll('#fit button').forEach(b=>b.addEventListener('click',()=>{
+    fit=+b.dataset.v; document.querySelectorAll('#fit button').forEach(x=>x.classList.toggle('on',+x.dataset.v<=fit)); $('#fbSend').disabled=false; }));
+  $('#fbSend').addEventListener('click',async()=>{
+    if(!fit) return;
+    const rec={ result_id:currentResultId, fit, off:[...document.querySelectorAll('.offs input:checked')].map(i=>i.value),
+      self_type:$('#selfType').value||null, focus:currentFocus, note:($('#fbNote').value||'').trim().slice(0,300)||null };
+    const msg=$('#fbMsg');
+    if(!supaReady()){ msg.textContent='Feedback saving isn\'t set up on this copy.'; return; }
+    if(!resultSaved){ msg.textContent='Your result hasn\'t saved yet. Use "Try again" above first.'; return; }
+    $('#fbSend').disabled=true; msg.textContent='Sending…';
+    try{ await supaInsert('quiz_feedback',rec); $('#fbPanel').innerHTML='<div class="fb-thanks">✦ Thank you. This helps make the quiz better for everyone.</div>'; }
+    catch(e){ msg.textContent='Couldn\'t send. Try again.'; msg.title=String(e.message||e); $('#fbSend').disabled=false; }
+  });
 }
 
 /* ================= RESULTS ================= */
@@ -756,10 +938,25 @@ function finish(){
       <div class="panel">${alts}</div></div></div>
     <div class="section"><h3>All 16 types</h3><div class="panel"><div class="types" style="--g1:${g1}">${typeCards}</div></div></div>
     <div class="section"><h3>Your savior letters</h3><div class="panel"><div class="letter"><b>${sN}</b> — ${LETTERS[sN]}</div><div class="letter"><b>${sT}</b> — ${LETTERS[sT]}</div></div></div>
+    <div class="section"><h3>Your growth map</h3>
+      <div class="panel"><div class="focus-k">What's on your mind right now?</div><div class="foci" id="foci">${Object.entries(FOCI).map(([k,v])=>`<button class="focus${k==='general'?' on':''}" data-f="${k}">${v}</button>`).join('')}</div>
+      <div id="guide"></div></div></div>
+    <div class="section"><h3>Did this fit?</h3><div class="panel" id="fbPanel">
+      <div class="fb-q">How well does this result fit you?</div>
+      <div class="fit" id="fit">${[1,2,3,4,5].map(n=>`<button data-v="${n}">${n}</button>`).join('')}</div><div class="fit-l"><span>Not me at all</span><span>Spot on</span></div>
+      <div class="fb-q">What felt off? <span class="opt-l">(optional)</span></div>
+      <div class="offs">${[['type','My type'],['saviors','My two saviors'],['descriptions','The descriptions'],['growth','The growth tips'],['questions','Some questions']].map(([k,v])=>`<label class="off"><input type="checkbox" value="${k}"><span>${v}</span></label>`).join('')}</div>
+      <div class="fb-row"><div><div class="fb-q">What type do you think you are? <span class="opt-l">(optional)</span></div>
+        <select id="selfType"><option value="">Not sure</option>${Object.keys(STACKS).sort().map(t=>`<option>${t}</option>`).join('')}</select></div></div>
+      <div class="fb-q">Anything else? <span class="opt-l">(optional)</span></div>
+      <textarea id="fbNote" maxlength="300" placeholder="What surprised you, or what was missing?"></textarea>
+      <div class="fb-actions"><button class="ghost" id="fbSend" disabled>Send feedback</button><span id="fbMsg" class="fb-msg"></span></div>
+    </div></div>
     <div class="actions"><button class="cta" id="retake">Retake</button><button class="ghost" id="copyBtn">Copy my result</button></div>
     <p class="disclaimer">Built from the Objective Personality framework (Dave &amp; Shan Powers) and your own notes. OPS isn't peer-reviewed science, and a self-report quiz can't see your blind spots: the transcripts point out that people mostly see their middle functions, not their first and last. Treat this as a hypothesis to test against how you actually live over time, not a verdict.</p>`;
   show('results');
-  lastRecord=buildRecord(r); doSave();
+  currentResultId=newId(); resultSaved=false; lastRecord=buildRecord(r); doSave();
+  wireGuide(r); wireFeedback();
   const ro=new Orbit($('#orbitRes'),{labels:true}); ro.size={...r.funcs}; ro.set(r.funcs); ro.highlight=[top.dom,top.other]; orbits.push(ro);
   setAurora([g1,g2,g1,g2]);
   const panels=[...document.querySelectorAll('#results .panel')];
