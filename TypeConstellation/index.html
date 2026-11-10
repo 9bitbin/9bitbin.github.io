@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-
 :root{
   --ink:#eef0ff; --muted:#9aa0c3; --faint:#5d6290;
   --glass:rgba(18,16,40,.42); --glass-2:rgba(255,255,255,.04); --edge:rgba(255,255,255,.09);
@@ -203,6 +202,74 @@ h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);
 .fb-msg{font-size:.84rem;color:var(--muted)}
 .ghost:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .fb-thanks{text-align:center;padding:18px;font-family:Unbounded;font-weight:300;font-size:1.05rem;color:#c4b5fd}
+.xmap{max-width:760px;margin:0 auto}
+.xcap{text-align:center;font-size:.8rem;color:var(--faint);margin-top:6px}.xcap b{color:var(--muted)}
+.xsvg{width:100%;height:auto;display:block;overflow:visible}
+.xq{fill:rgba(255,255,255,.02);stroke:rgba(255,255,255,.08)}
+.xmid{stroke:rgba(255,255,255,.1);stroke-dasharray:3 7}
+.xh{fill:#9aa0c3;font:700 13px Manrope;letter-spacing:.2em;text-anchor:middle}
+.xs{fill:#5d6290;font:600 10px Manrope;letter-spacing:.22em}
+.xl{fill:#5d6290;font:600 11px Manrope;letter-spacing:.14em;text-anchor:middle;text-transform:uppercase}
+.xaxl{fill:#5d6290;font:500 10px Manrope;letter-spacing:.1em;text-anchor:middle}
+.xaxis{stroke:rgba(255,255,255,.12);stroke-width:2;stroke-dasharray:6 8;transition:stroke .4s,stroke-width .4s}
+.xaxis.on{stroke:rgba(255,255,255,.65);stroke-width:2.5;stroke-dasharray:0;filter:drop-shadow(0 0 6px #a78bfa)}
+.xnode{cursor:pointer;outline:none;transition:opacity .35s}
+.xnode .body{fill:var(--c);stroke:rgba(255,255,255,.35);stroke-width:1.5;transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
+.xnode .halo{fill:var(--c);opacity:.12;transition:opacity .35s,transform .45s}
+.xnode .sz{transition:transform .7s cubic-bezier(.3,1.5,.5,1);transform-box:view-box;transform-origin:0 0}
+.xnode .ring{fill:none;stroke:var(--c);stroke-width:2;stroke-dasharray:4 5;animation:spinr 14s linear infinite;transform-origin:center;opacity:0;transition:opacity .4s}
+.xnode.savior .ring{opacity:1}
+.xnode .you{opacity:0;transition:opacity .4s}.xnode.mine .you{opacity:1}
+.xnode .rk{fill:rgba(255,255,255,.9);font:800 8px Manrope;letter-spacing:.12em;text-anchor:middle;pointer-events:none}
+.xnode.offstack .body{opacity:.45}.xnode.offstack .fk{opacity:0}
+.xsizing{text-align:center;font-size:.82rem;color:var(--muted);margin:0 auto 6px;max-width:680px;line-height:1.6}.xsizing b{color:var(--ink)}
+.xback{margin-left:6px;background:none;border:1px solid var(--edge);color:var(--ink);border-radius:999px;padding:3px 10px;font:600 .74rem Manrope;cursor:pointer}
+.xc.pickable{cursor:pointer;transition:transform .3s,border-color .3s}.xc.pickable:hover{transform:translateY(-2px)}.xc.pickable.on{box-shadow:0 0 0 1px var(--c) inset,0 0 24px -8px var(--c)}
+@keyframes spinr{to{transform:rotate(360deg)}}
+.xnode .fx{fill:#fff;font:900 24px Unbounded;text-anchor:middle;dominant-baseline:middle;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+.xnode .fk{fill:rgba(255,255,255,.85);font:700 8.5px Manrope;letter-spacing:.14em;text-anchor:middle;pointer-events:none}
+.xnode .you{fill:var(--c);font:800 9px Manrope;letter-spacing:.18em;text-anchor:middle}
+.xnode:hover .body,.xnode:focus-visible .body{transform:scale(1.08);transform-box:fill-box;transform-origin:center}
+.xnode:hover .halo{opacity:.28}
+.xnode.sel .body{stroke:#fff;stroke-width:3;transform:scale(1.12)}
+.xnode.sel .halo{opacity:.4;transform:scale(1.15)}
+.xnode.dim{opacity:.28}
+.xtypes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 8px}
+@media (max-width:700px){.xtypes{grid-template-columns:repeat(2,1fr)}}
+.xtg{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid var(--edge)}
+.xtg>span{width:100%;font:600 .64rem Manrope;letter-spacing:.2em;color:var(--faint)}
+.xtype{flex:1;min-width:58px;font:700 .78rem Unbounded;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:10px;padding:8px 4px;cursor:pointer;transition:.25s}
+.xtype:hover{border-color:rgba(255,255,255,.3);transform:translateY(-2px)}
+.xtype.yours{border-color:#a78bfa;box-shadow:0 0 16px -4px #a78bfa}
+.xtype.on{background:linear-gradient(120deg,#67e8f9,#a78bfa);color:#07051a;border-color:transparent}
+.xpanel{margin-top:12px;padding:18px 20px;border-radius:18px;background:rgba(255,255,255,.025);border:1px solid var(--edge);min-height:90px;transition:opacity .15s}
+.xintro{color:var(--muted);font-size:.92rem;line-height:1.6;text-align:center}
+.xp-h{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.xdot{width:30px;height:30px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 30%,#fff,var(--c) 40%,color-mix(in srgb,var(--c) 40%,#000));box-shadow:0 0 18px var(--c)}
+.xp-t{font:700 1.15rem Unbounded}.xp-t span{font:500 .85rem Manrope;color:var(--muted);margin-left:6px}
+.xp-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.xp-tags span{font-size:.72rem;padding:3px 9px;border-radius:999px;border:1px solid var(--edge);color:var(--muted)}
+.xp-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:700px){.xp-grid{grid-template-columns:1fr}}
+.xpanel p{margin:4px 0 10px;color:#d6d8f2;font-size:.9rem;line-height:1.6}
+.xk{font:700 .66rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:8px}
+.xsubs,.xcombo{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.xsub{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--edge);border-left:3px solid var(--c);background:rgba(255,255,255,.03);color:var(--ink);font:500 .82rem Manrope;cursor:pointer;flex:1;min-width:180px;transition:.25s}
+.xsub b{font:700 .85rem Unbounded}.xsub i{font-style:normal;color:var(--muted);font-size:.76rem}
+.xsub:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.3)}
+.xhint{margin-top:12px;font-size:.78rem;color:var(--faint)}
+.xlead{color:var(--muted)!important}
+.xc{flex:1;min-width:240px;padding:14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-top:3px solid var(--c)}
+.xc-t{font:700 1.1rem Unbounded}.xc-t span{font:500 .82rem Manrope;color:var(--muted);margin-left:6px}
+.xc-m{font-size:.78rem;color:var(--muted);margin-top:4px}
+.xc-tr{font-size:.9rem;margin-top:6px;color:#d6d8f2}
+.stack{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.stack span{display:flex;align-items:center;gap:5px;font:700 .8rem Unbounded;padding:5px 9px;border-radius:9px;border:1px solid color-mix(in srgb,var(--c) 40%,transparent);color:var(--c)}
+.stack span i{font:600 .62rem Manrope;font-style:normal;color:var(--faint)}
+.stack span.sv{background:color-mix(in srgb,var(--c) 18%,transparent)}
+.stack.big{margin:4px 0 14px}.stack.big span{flex:1;min-width:120px;flex-direction:column;align-items:flex-start;font-size:1.05rem;padding:10px 12px}
+.xopen{margin-top:12px;background:none;border:1px solid var(--edge);color:var(--ink);border-radius:999px;padding:7px 14px;font:600 .78rem Manrope;cursor:pointer}
+.xopen:hover{border-color:rgba(255,255,255,.35)}
 @media (max-width:600px){.card{padding:24px 18px 18px;border-radius:22px}.side .hint{display:none}.brand span.x{display:none}.opt{padding:14px 14px;font-size:.93rem}.side .orbit-wrap{width:130px!important}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -899,6 +966,101 @@ function wireFeedback(){
   });
 }
 
+/* ================= FUNCTION EXPLORER ================= */
+const XPOS = { Si:[150,150], Ni:[300,150], Se:[150,390], Ne:[300,390], Ti:[500,150], Fi:[650,150], Te:[500,390], Fe:[650,390] };
+const PARTNER = { Ni:'Se', Se:'Ni', Si:'Ne', Ne:'Si', Fi:'Te', Te:'Fi', Ti:'Fe', Fe:'Ti' };
+const KIND = f=>FN[f].kind==='O'?'Observer':'Decider';
+const ATT = f=>FN[f].att==='i'?'Introverted':'Extroverted';
+const LETTERW = { N:'Intuition', S:'Sensing', T:'Thinking', F:'Feeling' };
+function explorerSvg(you){
+  const axis = (a,b)=>`<line class="xaxis" data-ax="${a}${b}" x1="${XPOS[a][0]}" y1="${XPOS[a][1]}" x2="${XPOS[b][0]}" y2="${XPOS[b][1]}"/>`;
+  const node = f=>{ const [x,y]=XPOS[f], mine=you.includes(f);
+    return `<g class="xnode${mine?' mine':''}" data-f="${f}" tabindex="0" role="button" aria-label="${FNAME[f]}" transform="translate(${x},${y})" style="--c:${FCOLOR[f]}">
+      <g class="sz"><circle class="halo" r="58"/><circle class="ring" r="50"/><circle class="body" r="42"/>
+      <text class="rk" y="-19"></text><text class="fx" y="4">${f}</text><text class="fk" y="24">${KIND(f).toUpperCase()}</text><text class="you" y="-60">YOUR SAVIOR</text></g></g>`; };
+  return `<svg viewBox="0 0 800 540" class="xsvg">
+    <defs><radialGradient id="xg" cx="35%" cy="30%"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".35" stop-color="#fff" stop-opacity=".15"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs>
+    <rect x="20" y="40" width="370" height="460" rx="22" class="xq"/><rect x="410" y="40" width="370" height="460" rx="22" class="xq"/>
+    <line x1="20" y1="270" x2="780" y2="270" class="xmid"/>
+    <text x="205" y="28" class="xh">OBSERVERS · information</text><text x="595" y="28" class="xh">DECIDERS · values & logic</text>
+    <text x="34" y="66" class="xs">INTROVERTED</text><text x="34" y="490" class="xs">EXTROVERTED</text>
+    <text x="424" y="66" class="xs">INTROVERTED</text><text x="424" y="490" class="xs">EXTROVERTED</text>
+    <text x="150" y="526" class="xl">Sensing</text><text x="300" y="526" class="xl">Intuition</text><text x="500" y="526" class="xl">Thinking</text><text x="650" y="526" class="xl">Feeling</text>
+    ${axis('Ni','Se')}${axis('Si','Ne')}${axis('Fi','Te')}${axis('Ti','Fe')}
+    ${Object.keys(XPOS).map(node).join('')}</svg>`;
+}
+const SIZES=[1.28,1.04,.84,.68], OFF=.5;
+function stackOrder(type,subKey){ const st=STACKS[type]; const s=SUBTYPES.find(x=>x.key===subKey&&x.type===type)||SUBTYPES.find(x=>x.type===type&&x.pos==='aux');
+  return s.pos==='tert' ? [st[0],st[2],st[1],st[3]] : st.slice(); }
+function applySizing(root,type,subKey,isYou){
+  const order=stackOrder(type,subKey), saviors=order.slice(0,2);
+  root.querySelectorAll('.xnode').forEach(n=>{ const f=n.dataset.f, i=order.indexOf(f), s=i<0?OFF:SIZES[i];
+    n.querySelector('.sz').style.transform=`scale(${s})`;
+    n.classList.toggle('offstack',i<0); n.classList.toggle('mine',isYou&&saviors.includes(f)); n.classList.toggle('savior',saviors.includes(f));
+    n.querySelector('.rk').textContent = i<0?'':'#'+(i+1)+(i<2?' · SAVIOR':''); });
+  const lab=root.querySelector('.xsizing'); const sub=SUBTYPES.find(x=>x.type===type&&x.dom===order[0]&&x.other===order[1]);
+  lab.innerHTML = `${isYou?'Sized to <b>your result</b>':'Sized to'}: <b>${type}</b> ${order[0]}–${order[1]} (${sub.pos==='aux'?'Dom + Aux, balanced':'Dom + Tert, looping'}). Bigger means further up the stack. #1 and #2 are the saviors.${isYou?'':' <button class="xback">Back to my result</button>'}`;
+  const bb=lab.querySelector('.xback'); if(bb) bb.addEventListener('click',()=>root.dispatchEvent(new Event('xreset')));
+}
+function typesUsing(f){ return SUBTYPES.filter(s=>s.dom===f||s.other===f); }
+function funcPanel(f){
+  const g=GUIDE[f], d=FDESC[f], p=PARTNER[f], lead=SUBTYPES.filter(s=>s.dom===f);
+  return `<div class="xp-h" style="--c:${FCOLOR[f]}"><span class="xdot"></span><div><div class="xp-t">${FNAME[f]} <span>(${f})</span></div>
+    <div class="xp-tags"><span>${ATT(f)}</span><span>${KIND(f)}</span><span>${LETTERW[f[0]]}</span><span>Axis partner: <b style="color:${FCOLOR[p]}">${p}</b></span></div></div></div>
+    <div class="xp-grid"><div><div class="xk">Core mechanism</div><p>${d.core}</p><div class="xk">The void it leaves</div><p>${d.void}</p><div class="xk">Biggest fear</div><p>${d.fear}</p></div>
+    <div><div class="xk">As someone's #1</div><p>${g.first.real}</p><div class="chips2" style="--c:${FCOLOR[f]}">${g.first.strengths.map(s=>`<span>${s}</span>`).join('')}</div>
+      <div class="xk">As someone's #4 (blind spot)</div><p>${g.last.struggle}</p></div></div>
+    <div class="xk">Leads these subtypes</div><div class="xsubs">${lead.map(s=>subChip(s)).join('')}</div>
+    <div class="xhint">Tip: pick one observer and one decider to see what that combination makes.</div>`;
+}
+function subChip(s){ return `<button class="xsub" data-t="${s.type}" style="--c:${FCOLOR[s.dom]}"><b>${s.type}</b> ${s.dom}–${s.other}<i>${SUBTRAITS[s.key]}</i></button>`; }
+function comboPanel(o,d){
+  const subs=SUBTYPES.filter(s=>s.obs===o&&s.dec===d), an=subs[0].animal;
+  return `<div class="xp-h"><span class="xdot" style="--c:${FCOLOR[o]}"></span><span class="xdot" style="--c:${FCOLOR[d]};margin-left:-14px"></span><div><div class="xp-t">${o} + ${d} <span>savior pair</span></div>
+    <div class="xp-tags"><span>${ANIMALS[an].icon} ${an} animal (${ANIMALS[an].pair})</span><span>${FN[o].att===FN[d].att?'Same attitude: dom + tert (looping) types':'Opposite attitudes: dom + aux (balanced) types'}</span></div></div></div>
+    <p class="xlead">${ANIMALS[an].d}</p>
+    <div class="xcombo">${subs.map(s=>{ const st=STACKS[s.type]; return `<div class="xc" style="--c:${FCOLOR[s.dom]}">
+      <div class="xc-t">${s.type} <span>${s.dom}–${s.other}</span></div><div class="xc-m">${s.dom===o?'Observer':'Decider'}-led · ${s.pos==='aux'?'Dom + Aux (balanced)':'Dom + Tert (looping)'}</div>
+      <div class="xc-tr">${SUBTRAITS[s.key]}</div>
+      <div class="stack">${st.map((f,i)=>`<span style="--c:${FCOLOR[f]}" class="${f===s.dom||f===s.other?'sv':''}"><i>${i+1}</i>${f}</span>`).join('')}</div>
+      <button class="xopen" data-t="${s.type}">Open ${s.type} →</button></div>`; }).join('')}</div>`;
+}
+function typePanel(t){
+  const st=STACKS[t], subs=SUBTYPES.filter(s=>s.type===t);
+  return `<div class="xp-h"><div><div class="xp-t">${t} <span>${st.join(' · ')}</span></div>
+    <div class="xp-tags"><span>${['IJ','EP'].includes(t[0]+t[3])?'Observer-led (single observer)':'Decider-led (single decider)'}</span><span>#1 ${st[0]} · #4 ${st[3]}</span></div></div></div>
+    <div class="stack big">${st.map((f,i)=>`<span style="--c:${FCOLOR[f]}"><i>${['#1 Dominant','#2 Auxiliary','#3 Tertiary','#4 Inferior'][i]}</i>${f}</span>`).join('')}</div>
+    <div class="xp-grid"><div><div class="xk">#1 ${st[0]} in real life</div><p>${GUIDE[st[0]].first.real}</p></div><div><div class="xk">#4 ${st[3]}, the blind spot</div><p>${GUIDE[st[3]].last.struggle}</p></div></div>
+    <div class="xk">Its two subtypes · tap one to resize the map</div><div class="xcombo">${subs.map(s=>`<div class="xc pickable" data-sub="${s.key}" data-ty="${t}" style="--c:${FCOLOR[s.dom]}"><div class="xc-t">${s.dom}–${s.other} <span>${s.pos==='aux'?'Dom + Aux':'Dom + Tert'}</span></div><div class="xc-tr">${SUBTRAITS[s.key]}</div><div class="xc-m">${ANIMALS[s.animal].icon} ${s.animal} · loop when stressed: ${st[0]} + ${st[2]}</div></div>`).join('')}</div>`;
+}
+function wireExplorer(r){
+  const root=$('#explorer'); const you=[r.top.dom,r.top.other];
+  root.querySelector('.xmap').innerHTML=explorerSvg(you);
+  const mine=()=>applySizing(root,r.top.type,r.top.key,true);
+  mine(); root.addEventListener('xreset',()=>{ selO=null; selD=null; mark(); mine(); show(introPanel()); });
+  let selO=null, selD=null;
+  const panel=root.querySelector('.xpanel');
+  const show=(html)=>{ panel.style.opacity=0; setTimeout(()=>{ panel.innerHTML=html; panel.style.opacity=1; wirePanel(); },150); };
+  const mark=()=>{ root.querySelectorAll('.xnode').forEach(n=>{ const f=n.dataset.f; n.classList.toggle('sel',f===selO||f===selD); n.classList.toggle('dim',!!(selO||selD)&&f!==selO&&f!==selD&&f!==PARTNER[selO]&&f!==PARTNER[selD]); });
+    root.querySelectorAll('.xaxis').forEach(l=>{ const ax=l.dataset.ax; l.classList.toggle('on',[selO,selD].some(f=>f&&ax.includes(f))); });
+    root.querySelectorAll('.xtype').forEach(b=>b.classList.remove('on')); };
+  function pick(f){
+    if(FN[f].kind==='O') selO = selO===f?null:f; else selD = selD===f?null:f;
+    mark();
+    if(selO&&selD) show(comboPanel(selO,selD)); else if(selO||selD) show(funcPanel(selO&&FN[f].kind==='O'?selO:(selD||selO))); else show(introPanel());
+  }
+  function openType(t){ selO=null; selD=null; mark(); applySizing(root,t,null,t===r.top.type&&false);
+    root.querySelectorAll('.xtype').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); show(typePanel(t));
+    setTimeout(()=>{ const c=panel.querySelector('.xc.pickable'); if(c) c.classList.add('on'); },200); root.querySelector('.xpanel').scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'}); }
+  function wirePanel(){ panel.querySelectorAll('[data-t]').forEach(b=>b.addEventListener('click',()=>openType(b.dataset.t)));
+    panel.querySelectorAll('.xc.pickable').forEach(c=>c.addEventListener('click',()=>{ const isYou=c.dataset.sub===r.top.key&&c.dataset.ty===r.top.type; applySizing(root,c.dataset.ty,c.dataset.sub,isYou);
+      panel.querySelectorAll('.xc.pickable').forEach(x=>x.classList.toggle('on',x===c)); })); }
+  root.querySelectorAll('.xnode').forEach(n=>{ n.addEventListener('click',()=>pick(n.dataset.f)); n.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(n.dataset.f);} }); });
+  root.querySelectorAll('.xtype').forEach(b=>b.addEventListener('click',()=>openType(b.dataset.t)));
+  const introPanel=()=>`<div class="xintro">Tap any function to read about it. Pick <b>one observer and one decider</b> to see the subtypes that pair makes. Your two saviors, <b style="color:${FCOLOR[you[0]]}">${you[0]}</b> and <b style="color:${FCOLOR[you[1]]}">${you[1]}</b>, have a ring around them.</div>`;
+  panel.innerHTML=introPanel();
+}
+
 /* ================= RESULTS ================= */
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function pct(x){ return Math.round(x*100); }
@@ -942,6 +1104,12 @@ function finish(){
     <div class="section"><h3>Your growth map</h3>
       <div class="panel"><div class="focus-k">What's on your mind right now?</div><div class="foci" id="foci">${Object.entries(FOCI).map(([k,v])=>`<button class="focus${k==='general'?' on':''}" data-f="${k}">${v}</button>`).join('')}</div>
       <div id="guide"></div></div></div>
+    <div class="section"><h3>Function explorer</h3><div class="panel" id="explorer">
+      <div class="xsizing"></div>
+      <div class="xmap"></div>
+      <div class="xcap">Lines connect axis partners: <b>Ni–Se</b>, <b>Si–Ne</b>, <b>Fi–Te</b>, <b>Ti–Fe</b>. Every type has one observer axis and one decider axis.</div>
+      <div class="xtypes">${['IJ','EP','IP','EJ'].map(g=>`<div class="xtg"><span>${{IJ:'IxxJ',EP:'ExxP',IP:'IxxP',EJ:'ExxJ'}[g]}</span>${Object.keys(STACKS).filter(t=>t[0]+t[3]===g).sort().map(t=>`<button class="xtype${t===top.type?' yours':''}" data-t="${t}">${t}</button>`).join('')}</div>`).join('')}</div>
+      <div class="xpanel"></div></div></div>
     <div class="section"><h3>Did this fit?</h3><div class="panel" id="fbPanel">
       <div class="fb-q">How well does this result fit you?</div>
       <div class="fit" id="fit">${[1,2,3,4,5].map(n=>`<button data-v="${n}">${n}</button>`).join('')}</div><div class="fit-l"><span>Not me at all</span><span>Spot on</span></div>
@@ -957,7 +1125,7 @@ function finish(){
     <p class="disclaimer">Built from the Objective Personality framework (Dave &amp; Shan Powers) and your own notes. OPS isn't peer-reviewed science, and a self-report quiz can't see your blind spots: the transcripts point out that people mostly see their middle functions, not their first and last. Treat this as a hypothesis to test against how you actually live over time, not a verdict.</p>`;
   show('results');
   currentResultId=newId(); resultSaved=false; lastRecord=buildRecord(r); doSave();
-  wireGuide(r); wireFeedback();
+  wireGuide(r); wireFeedback(); wireExplorer(r);
   const ro=new Orbit($('#orbitRes'),{labels:true}); ro.size={...r.funcs}; ro.set(r.funcs); ro.highlight=[top.dom,top.other]; orbits.push(ro);
   setAurora([g1,g2,g1,g2]);
   const panels=[...document.querySelectorAll('#results .panel')];
