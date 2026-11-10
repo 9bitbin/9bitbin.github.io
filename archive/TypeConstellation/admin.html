@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Constellation — Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#eef0ff;--muted:#9aa0c3;--faint:#5d6290;--glass:rgba(18,16,40,.55);--edge:rgba(255,255,255,.09)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:Manrope,system-ui,sans-serif;
+  background:radial-gradient(1200px 700px at 15% -10%,rgba(124,58,237,.35),transparent 60%),radial-gradient(1000px 600px at 100% 10%,rgba(8,145,178,.28),transparent 60%),radial-gradient(900px 700px at 50% 120%,rgba(219,39,119,.22),transparent 60%),#05040d}
+main{max-width:1100px;margin:0 auto;padding:32px 18px 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:26px;flex-wrap:wrap}
+h1{font:700 1.5rem Unbounded;margin:0;background:linear-gradient(100deg,#fff,#c4b5fd,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:.85rem;margin-top:4px}
+.panel{background:var(--glass);border:1px solid var(--edge);border-radius:20px;padding:22px;backdrop-filter:blur(18px)}
+.login{max-width:380px;margin:10vh auto 0}
+.login h2{font:500 1.1rem Unbounded;margin:0 0 6px}
+label{display:block;font:600 .7rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--edge);background:rgba(255,255,255,.04);color:var(--ink);font:500 .95rem Manrope;outline:0}
+input:focus{border-color:rgba(167,139,250,.6)}
+button{font:700 .85rem Manrope;border-radius:999px;padding:11px 20px;cursor:pointer;border:1px solid var(--edge);background:rgba(255,255,255,.05);color:var(--ink)}
+button.primary{border:0;color:#07051a;background:linear-gradient(110deg,#67e8f9,#a78bfa,#f472b6);width:100%;margin-top:20px;padding:13px}
+button:hover{border-color:rgba(255,255,255,.3)}
+.msg{margin-top:12px;font-size:.85rem;color:#fda4af;min-height:1.2em}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tools input{width:220px;padding:9px 14px;border-radius:999px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{text-align:left;font:600 .68rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);padding:10px 12px;border-bottom:1px solid var(--edge);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--muted)}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
+tr.row{cursor:pointer;transition:background .2s}
+tr.row:hover{background:rgba(255,255,255,.04)}
+tr.row.open{background:rgba(167,139,250,.08)}
+.type{font:700 .95rem Unbounded;letter-spacing:.04em}
+.muted{color:var(--muted)}
+.detail td{padding:0 12px 18px;background:rgba(167,139,250,.05)}
+.dgrid{display:grid;grid-template-columns:260px 1fr;gap:22px;padding-top:6px}
+@media (max-width:760px){.dgrid{grid-template-columns:1fr}.hide-sm{display:none}}
+.coin{margin-bottom:10px;font-size:.78rem}
+.coin .r{display:flex;justify-content:space-between;color:var(--muted);margin-bottom:4px}
+.coin .b{height:6px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}
+.coin .b i{display:block;height:100%;background:linear-gradient(90deg,#67e8f9,#a78bfa)}
+ol.ans{margin:0;padding-left:22px;font-size:.86rem;line-height:1.5}
+ol.ans li{margin-bottom:9px}
+ol.ans .q{color:var(--muted)}
+ol.ans .a{color:var(--ink)}
+.k{font:600 .66rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:6px 0 10px}
+.empty{text-align:center;color:var(--muted);padding:40px}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;border:1px solid var(--edge);font-size:.75rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div><h1>Constellation results</h1><div class="sub" id="who">Owner view</div></div>
+    <div class="tools" id="tools" hidden>
+      <input id="filter" placeholder="Filter by name or type">
+      <button id="refresh">Refresh</button>
+      <button id="logout">Log out</button>
+    </div>
+  </header>
+
+  <section id="loginView" class="panel login">
+    <h2>Owner login</h2>
+    <div class="sub">Use the Supabase Auth user you created for yourself.</div>
+    <form id="loginForm">
+      <label for="email">Email</label><input id="email" type="email" autocomplete="username" required>
+      <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required>
+      <button class="primary" type="submit">Log in</button>
+      <div class="msg" id="loginMsg"></div>
+    </form>
+  </section>
+
+  <section id="tableView" class="panel" hidden>
+    <table>
+      <thead><tr>
+        <th data-k="name">Name</th><th data-k="type">Type</th><th data-k="subtype">Subtype</th>
+        <th data-k="type_prob" class="hide-sm">Confidence</th><th data-k="lead" class="hide-sm">Lead</th><th data-k="created_at">Date ↓</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </section>
+</main>
+<script>
+/* ===== SUPABASE CONFIG: same values as index.html ===== */
+const SUPABASE_URL = 'https://lcbzmlsowikajunifdjt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjYnptbHNvd2lrYWp1bmlmZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1OTE4NDAsImV4cCI6MjEwOTE2Nzg0MH0.Bbc5Jndb9yj5Ar27MyYba5tIx3GL6zH99SoXkVAY630';
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const base=()=>SUPABASE_URL.replace(/\/$/,'');
+const COINL={OD:['Observer-led','Decider-led'],DI:['Self above tribe (Di)','Tribe above self (De)'],OI:['Organize (Oi)','Gather (Oe)'],N:['Intuition','Sensing'],T:['Thinking','Feeling'],FT:['Fi/Te','Ti/Fe'],NS:['Ni/Se','Si/Ne'],IE:['Introverted lead','Extroverted lead']};
+let session=null, rows=[], sortK='created_at', sortDir=-1, openId=null;
+
+function store(s){ try{ s?sessionStorage.setItem('cst_admin',JSON.stringify(s)):sessionStorage.removeItem('cst_admin'); }catch(e){} }
+function load(){ try{ return JSON.parse(sessionStorage.getItem('cst_admin')||'null'); }catch(e){ return null; } }
+
+async function login(email,password){
+  const r=await fetch(base()+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error_description||j.msg||('Login failed ('+r.status+')'));
+  return {token:j.access_token, email:j.user&&j.user.email, exp:Date.now()+(j.expires_in||3600)*1000};
+}
+async function fetchRows(){
+  const r=await fetch(base()+'/rest/v1/quiz_results?select=*&order=created_at.desc',{headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.token}});
+  if(r.status===401){ logout('Session expired. Log in again.'); return; }
+  if(!r.ok) throw new Error('Could not load results ('+r.status+')');
+  rows=await r.json(); render();
+}
+function showApp(){ $('#loginView').hidden=true; $('#tableView').hidden=false; $('#tools').hidden=false; $('#who').textContent='Signed in as '+(session.email||'owner'); }
+function logout(msg){ session=null; store(null); rows=[]; $('#loginView').hidden=false; $('#tableView').hidden=true; $('#tools').hidden=true; $('#who').textContent='Owner view'; $('#loginMsg').textContent=msg||''; }
+
+function fmtDate(d){ const x=new Date(d); return x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+x.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
+function detail(r){
+  const coins=r.coins||{};
+  const coinHtml=Object.keys(COINL).map(c=>{ const p=coins[c]; if(p==null) return ''; const left=p>=.5; return `<div class="coin"><div class="r"><span>${left?'<b style="color:var(--ink)">':''}${COINL[c][0]}${left?'</b>':''}</span><span>${left?'':'<b style="color:var(--ink)">'}${COINL[c][1]}${left?'':'</b>'}</span></div><div class="b"><i style="width:${Math.round(p*100)}%"></i></div></div>`; }).join('');
+  const ans=(Array.isArray(r.answers)?r.answers:[]).map(a=>`<li><div class="q">${esc(a.q)}</div><div class="a">${esc(a.a)}. ${esc(a.t)}</div></li>`).join('');
+  const tp=r.type_probs?Object.entries(r.type_probs).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>`<span class="pill">${esc(k)} ${Math.round(v*100)}%</span>`).join(' '):'';
+  return `<div class="dgrid"><div>
+      <div class="k">Result</div>
+      <div class="type">${esc(r.type)} <span class="muted" style="font-weight:500">${esc(r.subtype)}</span></div>
+      <div class="muted" style="font-size:.82rem;margin:6px 0 14px">${esc(r.subtype_pos==='aux'?'Dom + Aux':'Dom + Tert')} · ${esc(r.lead)}-led · ${esc(r.animal)}</div>
+      <div style="margin-bottom:14px">${tp}</div>
+      <div class="k">Coins</div>${coinHtml}
+      <div class="muted" style="font-size:.72rem;margin-top:10px">Browser ID: ${esc((r.client_id||'—').slice(0,8))} · ${esc(r.quiz_version||'')}</div>
+    </div><div><div class="k">Answers</div><ol class="ans">${ans}</ol></div></div>`;
+}
+function render(){
+  const f=$('#filter').value.trim().toLowerCase();
+  let list=rows.filter(r=>!f||(r.name||'').toLowerCase().includes(f)||(r.type||'').toLowerCase().includes(f));
+  list.sort((a,b)=>{ const x=a[sortK],y=b[sortK]; return (x>y?1:x<y?-1:0)*sortDir; });
+  document.querySelectorAll('th').forEach(th=>{ const k=th.dataset.k; th.textContent=th.textContent.replace(/ [↑↓]$/,'')+(k===sortK?(sortDir>0?' ↑':' ↓'):''); });
+  if(!list.length){ $('#tbody').innerHTML=`<tr><td colspan="6" class="empty">${rows.length?'No matches.':'No results yet. Share your quiz link!'}</td></tr>`; return; }
+  $('#tbody').innerHTML=list.map(r=>`<tr class="row${openId===r.id?' open':''}" data-id="${esc(r.id)}">
+      <td><b>${esc(r.name)}</b></td><td class="type">${esc(r.type)}</td><td>${esc(r.subtype)}</td>
+      <td class="hide-sm muted">${r.type_prob!=null?Math.round(r.type_prob*100)+'%':'—'}</td><td class="hide-sm muted">${esc(r.lead)}</td><td class="muted">${esc(fmtDate(r.created_at))}</td></tr>`
+    +(openId===r.id?`<tr class="detail"><td colspan="6">${detail(r)}</td></tr>`:'')).join('');
+  document.querySelectorAll('tr.row').forEach(tr=>tr.addEventListener('click',()=>{ openId = openId===tr.dataset.id?null:tr.dataset.id; render(); }));
+}
+document.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{ const k=th.dataset.k; if(sortK===k) sortDir*=-1; else { sortK=k; sortDir=k==='created_at'?-1:1; } render(); }));
+$('#filter').addEventListener('input',render);
+$('#refresh').addEventListener('click',()=>fetchRows().catch(e=>alertMsg(e)));
+$('#logout').addEventListener('click',()=>logout());
+function alertMsg(e){ $('#tbody').innerHTML=`<tr><td colspan="6" class="empty">${esc(e.message||e)}</td></tr>`; }
+$('#loginForm').addEventListener('submit',async e=>{
+  e.preventDefault(); $('#loginMsg').textContent='';
+  if(/YOUR-PROJECT|YOUR-ANON/.test(SUPABASE_URL+SUPABASE_ANON_KEY)){ $('#loginMsg').textContent='Add your Supabase URL and anon key at the bottom of admin.html first.'; return; }
+  try{ session=await login($('#email').value.trim(),$('#pw').value); store(session); showApp(); await fetchRows(); }
+  catch(err){ $('#loginMsg').textContent=err.message; }
+});
+const saved=load(); if(saved&&saved.exp>Date.now()){ session=saved; showApp(); fetchRows().catch(alertMsg); }
+</script>
+</body>
+</html>
