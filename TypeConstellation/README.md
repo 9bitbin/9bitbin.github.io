@@ -5,6 +5,7 @@ Files:
 - `admin.html`: your private results table (needs your login).
 - `supabase-setup.sql`: creates the results table and the security rules.
 - `supabase-update-feedback.sql`: adds the feedback table (v1.1). Run it after the setup file.
+- `supabase-update-v2.sql`: adds the v2 scenario columns. Run it after the two files above. No email to edit.
 
 ## 1. Supabase (about 5 minutes)
 1. Create a project at supabase.com.
@@ -33,6 +34,18 @@ The anon key is meant to be public. The SQL rules make it insert-only for strang
 
 ## What gets saved per take
 Name, a random browser ID (so repeat takes from one browser link together), type, subtype (dom–other, aux or tert), lead, animal, confidence, all 8 coin scores, the 16-type likelihoods, and every answer (question text + chosen option). Takers see a note before starting that the owner can see their name and answers.
+
+## v2: scenario quiz
+- **36 scenes per take.** The bank has 12 behaviors × 4 settings (work/school, friends/family, on your own, under stress). Each take shows 30 regular scenes and 6 stress scenes.
+- **6 options per scene,** with a 5-point "how much is this you?" scale. 9 scenes also ask "Why that one?"
+- **Core default:** whatever you pick consistently across settings. Stress scenes feed a separate stress profile and don't count toward your type.
+- **Admin:** Consistent % and Core default columns, a Patterns box in each row, and an **Item health** tab. It flags any scene where one option gets more than 60% of picks or "None fit" is over 25% (once a scene has 5+ answers).
+- Old v1 results still show in admin, and `quiz_version` tells them apart.
+
+### Deploying v2
+1. In pinned-v2, run `supabase-update-v2.sql` (SQL Editor → New query → paste → Run).
+2. Replace `index.html` and `admin.html` in `TypeConstellation`, then paste your Supabase URL and anon key back into both.
+3. Take it once yourself. You should see "✓ Result saved," and your row in admin should show a Consistent %.
 
 ## Feedback (v1.1)
 After their result, takers can rate the fit (1–5), tick what felt off, pick the type they think they are, and leave a short note. In `admin.html`:
