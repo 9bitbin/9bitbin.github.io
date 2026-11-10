@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Constellation — Blind Cognitive Function Diagnostic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#eef0ff; --muted:#9aa0c3; --faint:#5d6290;
+  --glass:rgba(18,16,40,.42); --glass-2:rgba(255,255,255,.04); --edge:rgba(255,255,255,.09);
+  --a1:#a78bfa; --a2:#22d3ee; --a3:#f472b6; --a4:#fcd34d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#05040d;color:var(--ink);font-family:Manrope,system-ui,sans-serif}
+html{overflow-x:clip}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 40%,rgba(3,2,10,.75) 100%)}
+main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 18px 60px}
+.topbar{width:100%;max-width:980px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.brand{font-family:Unbounded;font-weight:500;letter-spacing:.32em;font-size:.72rem;color:var(--muted);text-transform:uppercase}
+.brand b{color:var(--ink);font-weight:700}
+.iconbtn{background:var(--glass-2);border:1px solid var(--edge);color:var(--muted);border-radius:999px;padding:8px 14px;font:600 .75rem Manrope;cursor:pointer;backdrop-filter:blur(10px);transition:.3s}
+.iconbtn:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
+.iconbtn.on{color:#05040d;background:linear-gradient(120deg,var(--a2),var(--a1));border-color:transparent}
+
+.screen{width:100%;max-width:980px;display:none}
+.screen.active{display:block;animation:rise .9s cubic-bezier(.2,.9,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.985);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+
+/* ---------- intro ---------- */
+.intro{text-align:center;padding-top:0}
+.intro .orbit-wrap{width:min(440px,86vw);aspect-ratio:1/0.6}
+.orbit-wrap{position:relative;width:min(520px,92vw);aspect-ratio:1/0.72;margin:0 auto}
+.orbit-wrap canvas{width:100%;height:100%;display:block}
+h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);line-height:.95;margin:6px 0 14px;letter-spacing:-.02em;
+  background:linear-gradient(100deg,#fff 0%,#c4b5fd 30%,#67e8f9 55%,#f9a8d4 80%,#fff 100%);background-size:250% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 9s ease-in-out infinite}
+@keyframes sheen{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.lede{max-width:560px;margin:0 auto 26px;color:var(--muted);line-height:1.65;font-size:1.02rem}
+.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:30px}
+.chip{font:600 .72rem Manrope;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:8px 14px;border-radius:999px;border:1px solid var(--edge);background:var(--glass-2);backdrop-filter:blur(8px)}
+.cta{position:relative;font:700 1rem Unbounded;letter-spacing:.06em;color:#07051a;border:0;border-radius:999px;padding:18px 44px;cursor:pointer;
+  background:linear-gradient(110deg,#67e8f9,#a78bfa,#f472b6,#fcd34d,#67e8f9);background-size:300% 100%;animation:sheen 6s linear infinite;
+  box-shadow:0 0 0 1px rgba(255,255,255,.2) inset,0 12px 50px -8px rgba(167,139,250,.7);transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.cta:hover{transform:translateY(-3px) scale(1.04)}
+.cta:active{transform:scale(.97)}
+.fine{margin-top:22px;font-size:.78rem;color:var(--faint)}
+
+/* ---------- quiz ---------- */
+.quiz-grid{display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start}
+@media (max-width:820px){.quiz-grid{grid-template-columns:1fr}.side{display:flex;align-items:center;gap:16px}.side .orbit-wrap{width:150px;margin:0}.side .side-text{text-align:left}}
+.side{position:sticky;top:24px;text-align:center}
+.side .orbit-wrap{width:100%}
+.side-text .k{font:500 .68rem Manrope;letter-spacing:.24em;text-transform:uppercase;color:var(--faint)}
+.side-text .v{font-family:Unbounded;font-weight:300;font-size:2.4rem;margin:4px 0 2px}
+.side-text .v span{color:var(--faint);font-size:1.1rem}
+.side-text .hint{color:var(--muted);font-size:.82rem;line-height:1.5;max-width:240px;margin:8px auto 0}
+.card{position:relative;background:var(--glass);border:1px solid var(--edge);border-radius:28px;padding:34px 34px 26px;backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03) inset;overflow:hidden}
+.card::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;
+  background:conic-gradient(from var(--ang,0deg),transparent 0 20%,rgba(103,232,249,.6),rgba(167,139,250,.6),rgba(244,114,182,.6),transparent 70% 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 10s linear infinite;opacity:.7}
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes spin{to{--ang:360deg}}
+.progress{height:3px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:26px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#67e8f9,#a78bfa,#f472b6);box-shadow:0 0 18px #a78bfa;transition:width .8s cubic-bezier(.2,.9,.2,1)}
+.qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.qnum{font:500 .72rem Manrope;letter-spacing:.24em;text-transform:uppercase;color:var(--faint)}
+.back{background:none;border:0;color:var(--muted);font:600 .8rem Manrope;cursor:pointer;padding:4px 8px;border-radius:8px}
+.back:hover{color:var(--ink);background:var(--glass-2)}
+.back:disabled{opacity:.25;cursor:default}
+.qtext{font-family:Unbounded;font-weight:300;font-size:clamp(1.15rem,2.3vw,1.55rem);line-height:1.38;margin:0 0 26px;letter-spacing:-.005em}
+.qbody{transition:opacity .35s, transform .45s cubic-bezier(.2,.9,.2,1), filter .35s}
+.qbody.out{opacity:0;transform:translateX(-30px);filter:blur(6px)}
+.qbody.in{opacity:0;transform:translateX(30px);filter:blur(6px)}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt{--mx:50%;--my:50%;--c:#a78bfa;position:relative;display:flex;gap:16px;align-items:flex-start;text-align:left;width:100%;
+  background:rgba(255,255,255,.025);border:1px solid var(--edge);color:var(--ink);border-radius:18px;padding:17px 20px;
+  font:500 .98rem/1.5 Manrope;cursor:pointer;overflow:hidden;transition:transform .45s cubic-bezier(.3,1.5,.5,1),border-color .3s,background .3s;
+  opacity:0;transform:translateY(14px);animation:optIn .6s cubic-bezier(.2,.9,.2,1) forwards}
+.opt::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(260px circle at var(--mx) var(--my),color-mix(in srgb,var(--c) 28%,transparent),transparent 70%)}
+.opt:hover{border-color:color-mix(in srgb,var(--c) 55%,transparent);transform:translateY(-2px) scale(1.008)}
+.opt:hover::after{opacity:1}
+.opt:active{transform:scale(.985)}
+.opt.picked{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.opt .key{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font:700 .75rem Unbounded;color:var(--muted);border:1px solid var(--edge);margin-top:1px;transition:.3s}
+.opt:hover .key{color:#07051a;background:var(--c);border-color:var(--c);box-shadow:0 0 18px var(--c)}
+.opt span.t{position:relative;z-index:1}
+@keyframes optIn{to{opacity:1;transform:none}}
+.kbd{margin-top:18px;font-size:.74rem;color:var(--faint);text-align:right}
+
+/* ---------- results ---------- */
+.res-hero{text-align:center;padding:10px 0 6px}
+.res-hero .eyebrow{font:600 .72rem Manrope;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+.typecode{font-family:Unbounded;font-weight:900;font-size:clamp(4rem,16vw,9.5rem);line-height:.9;margin:10px 0 6px;letter-spacing:-.03em;
+  background:linear-gradient(100deg,var(--g1),var(--g2),#fff,var(--g1));background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:sheen 7s ease-in-out infinite;filter:drop-shadow(0 0 40px color-mix(in srgb,var(--g1) 45%,transparent))}
+.subline{font-family:Unbounded;font-weight:500;font-size:1.05rem;margin:4px 0}
+.subline .dot{color:var(--faint);margin:0 10px}
+.traits{color:var(--muted);font-size:1rem;margin:6px 0 0}
+.conf{display:inline-flex;gap:8px;align-items:center;margin-top:16px;padding:8px 16px;border-radius:999px;border:1px solid var(--edge);background:var(--glass-2);font-size:.82rem;color:var(--muted)}
+.conf b{color:var(--ink)}
+.section{margin-top:26px}
+.section h3{font:600 .72rem Manrope;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin:0 0 14px;display:flex;align-items:center;gap:12px}
+.section h3::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--edge),transparent)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--glass);border:1px solid var(--edge);border-radius:22px;padding:22px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s cubic-bezier(.2,.9,.2,1)}
+.panel.show{opacity:1;transform:none}
+.savior .fh{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.orb{width:46px;height:46px;border-radius:50%;flex:none;background:radial-gradient(circle at 32% 30%,#fff 0,var(--c) 30%,color-mix(in srgb,var(--c) 30%,#000) 100%);box-shadow:0 0 30px var(--c);animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.08);box-shadow:0 0 50px var(--c)}}
+.savior .fn{font-family:Unbounded;font-weight:700;font-size:1.25rem}
+.savior .fl{color:var(--muted);font-size:.82rem}
+.savior p{margin:8px 0;color:#d6d8f2;line-height:1.6;font-size:.93rem}
+.savior .lbl{font:700 .66rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--c)}
+.coin{margin-bottom:16px}
+.coin .row{display:flex;justify-content:space-between;font-size:.84rem;margin-bottom:7px;gap:10px}
+.coin .row span{color:var(--muted)} .coin .row span.win{color:var(--ink);font-weight:700}
+.coin .bar{position:relative;height:8px;border-radius:8px;background:rgba(255,255,255,.06);overflow:hidden}
+.coin .bar i{position:absolute;top:0;bottom:0;border-radius:8px;transition:all 1.4s cubic-bezier(.2,.9,.2,1)}
+.coin .bar::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:rgba(255,255,255,.3)}
+.coin .sub{font-size:.74rem;color:var(--faint);margin-top:5px}
+.types{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:620px){.types{grid-template-columns:repeat(2,1fr)}}
+.tc{position:relative;border-radius:16px;padding:14px 12px 12px;background:rgba(255,255,255,.025);border:1px solid var(--edge);overflow:hidden;transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+.tc:hover{transform:translateY(-3px) scale(1.03)}
+.tc .code{font:700 1.02rem Unbounded;letter-spacing:.04em}
+.tc .pct{font-size:.78rem;color:var(--muted);margin-top:3px}
+.tc .fill{position:absolute;left:0;bottom:0;height:3px;width:0;transition:width 1.6s cubic-bezier(.2,.9,.2,1)}
+.tc.top{border-color:var(--g1);box-shadow:0 0 30px -6px var(--g1);background:color-mix(in srgb,var(--g1) 12%,transparent)}
+.alt{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.9rem;gap:10px}
+.alt:last-child{border:0}
+.alt .k{font:600 .9rem Unbounded}
+.alt .m{color:var(--muted);font-size:.8rem;flex:1;margin-left:12px}
+.alt .p{font-weight:700}
+.animal{display:flex;gap:18px;align-items:center}
+.animal .glyph{font-size:2.6rem;width:72px;height:72px;flex:none;border-radius:20px;display:grid;place-items:center;background:linear-gradient(140deg,rgba(103,232,249,.18),rgba(244,114,182,.18));border:1px solid var(--edge)}
+.animal .an{font:700 1.3rem Unbounded}
+.animal p{margin:6px 0 0;color:#d6d8f2;font-size:.92rem;line-height:1.55}
+.minis{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.mini{font-size:.74rem;color:var(--muted);padding:5px 10px;border-radius:999px;border:1px solid var(--edge)}
+.letter{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05);color:#d6d8f2;font-size:.92rem;line-height:1.6}
+.letter:last-child{border:0}
+.letter b{font-family:Unbounded;color:var(--ink)}
+.actions{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+.ghost{font:600 .9rem Manrope;color:var(--ink);background:var(--glass-2);border:1px solid var(--edge);border-radius:999px;padding:14px 26px;cursor:pointer;transition:.3s}
+.ghost:hover{border-color:rgba(255,255,255,.3);transform:translateY(-2px)}
+.disclaimer{max-width:720px;margin:34px auto 0;text-align:center;font-size:.78rem;line-height:1.65;color:var(--faint)}
+@media (max-width:600px){.card{padding:24px 18px 18px;border-radius:22px}.side .hint{display:none}.brand span.x{display:none}.opt{padding:14px 14px;font-size:.93rem}.side .orbit-wrap{width:130px!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas><div class="vignette"></div><div class="grain"></div>
+<main>
+  <div class="topbar">
+    <div class="brand"><b>Constellation</b><span class="x"> · OPS diagnostic</span></div>
+    <button class="iconbtn" id="soundBtn" aria-pressed="false">♪ Ambient off</button>
+  </div>
+
+  <!-- INTRO -->
+  <section class="screen active intro" id="intro">
+    <div class="orbit-wrap"><canvas id="orbitIntro"></canvas></div>
+    <h1 class="title">Map your<br>constellation</h1>
+    <p class="lede">32 blind questions about how you actually live. Nothing is labeled, so just answer from your real habits, not the person you wish you were. Your saviors take shape as you go.</p>
+    <div class="chips"><span class="chip">32 questions</span><span class="chip">~6 minutes</span><span class="chip">32 subtypes</span><span class="chip">8 coins</span></div>
+    <button class="cta" id="startBtn">Begin</button>
+    <div class="fine">Keys 1–4 to answer · ← to go back</div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="quiz">
+    <div class="quiz-grid">
+      <aside class="side">
+        <div class="orbit-wrap"><canvas id="orbitQuiz"></canvas></div>
+        <div class="side-text">
+          <div class="k">Question</div>
+          <div class="v" id="qcount">01<span> / 32</span></div>
+          <div class="hint">Unlabeled orbs grow as your answers lean toward them. Names appear at the end.</div>
+        </div>
+      </aside>
+      <div class="card">
+        <div class="progress"><i id="pfill"></i></div>
+        <div class="qmeta"><span class="qnum" id="qnum">Signal 01</span><button class="back" id="backBtn" disabled>← Back</button></div>
+        <div class="qbody" id="qbody"></div>
+        <div class="kbd">Press 1–4</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="results"></section>
+</main>
+
+<script>
+// ===== OPS-inspired scoring engine (shared by page + tests) =====
+// Coins (+ side / - side):
+// OD: + observer-led  | - decider-led
+// DI: + Di (self above tribe) | - De (tribe above self)
+// OI: + Oi (organize / return to known) | - Oe (gather new)
+// N : + intuition savior | - sensing savior
+// T : + thinking savior  | - feeling savior
+// FT: + Fi/Te axis | - Ti/Fe axis
+// NS: + Ni/Se axis | - Si/Ne axis
+// IE: + introverted lead | - extroverted lead
+const FN = {
+  Ni:{OI:1,NS:1,N:1,  kind:'O',att:'i'}, Se:{OI:-1,NS:1,N:-1, kind:'O',att:'e'},
+  Si:{OI:1,NS:-1,N:-1,kind:'O',att:'i'}, Ne:{OI:-1,NS:-1,N:1, kind:'O',att:'e'},
+  Fi:{DI:1,FT:1,T:-1, kind:'D',att:'i'}, Te:{DI:-1,FT:1,T:1,  kind:'D',att:'e'},
+  Ti:{DI:1,FT:-1,T:1, kind:'D',att:'i'}, Fe:{DI:-1,FT:-1,T:-1,kind:'D',att:'e'}
+};
+const STACKS = {
+  ISTJ:["Si","Te","Fi","Ne"], ISFJ:["Si","Fe","Ti","Ne"], INFJ:["Ni","Fe","Ti","Se"], INTJ:["Ni","Te","Fi","Se"],
+  ISTP:["Ti","Se","Ni","Fe"], ISFP:["Fi","Se","Ni","Te"], INFP:["Fi","Ne","Si","Te"], INTP:["Ti","Ne","Si","Fe"],
+  ESTP:["Se","Ti","Fe","Ni"], ESFP:["Se","Fi","Te","Ni"], ENFP:["Ne","Fi","Te","Si"], ENTP:["Ne","Ti","Fe","Si"],
+  ESTJ:["Te","Si","Ne","Fi"], ESFJ:["Fe","Si","Ne","Ti"], ENFJ:["Fe","Ni","Se","Ti"], ENTJ:["Te","Ni","Se","Fi"]
+};
+const COINS = ['OD','DI','OI','N','T','FT','NS','IE'];
+
+function animalOf(o, d){ // savior observer + savior decider
+  const oi = FN[o].att==='i', di = FN[d].att==='i';
+  if (oi && di) return 'Sleep';
+  if (!oi && di) return 'Consume';
+  if (oi && !di) return 'Blast';
+  return 'Play';
+}
+
+// Build the 32 subtypes (dom + one other savior)
+const SUBTYPES = [];
+for (const o of ['Ni','Ne','Si','Se']) for (const d of ['Fi','Fe','Ti','Te']) for (const lead of ['O','D']) {
+  const dom = lead==='O'? o : d, other = lead==='O'? d : o;
+  let type=null, pos=null;
+  for (const t in STACKS){ const s=STACKS[t]; if (s[0]===dom && (s[1]===other||s[2]===other)) { type=t; pos = s[1]===other? 'aux':'tert'; } }
+  const sign = {OD: lead==='O'?1:-1, IE: FN[dom].att==='i'?1:-1};
+  for (const c of ['DI','FT','T']) sign[c]=FN[d][c];
+  for (const c of ['OI','NS','N']) sign[c]=FN[o][c];
+  SUBTYPES.push({key:dom+'-'+other, dom, other, obs:o, dec:d, type, pos, sign, animal: animalOf(o,d)});
+}
+
+function emptyEvidence(){ const e={}; COINS.forEach(c=>e[c]=0); e.animal={Sleep:0,Consume:0,Blast:0,Play:0}; return e; }
+
+function applyOption(ev, sc, dir=1){
+  for (const k in sc){
+    if (k==='fn'){ for (const f in sc.fn){ const w=sc.fn[f]*0.7; for (const c of ['OI','NS','N','DI','FT','T']) if (FN[f][c]) ev[c]+=dir*w*FN[f][c]; } }
+    else if (k==='animal'){ for (const a in sc.animal) ev.animal[a]+=dir*sc.animal[a]; }
+    else ev[k]+=dir*sc[k];
+  }
+}
+
+function solve(ev, tau=2.2){
+  const raw = SUBTYPES.map(s=>{ let v=ev.animal[s.animal]||0; for (const c of COINS) v+=ev[c]*s.sign[c]; return v; });
+  const m = Math.max(...raw); const ex = raw.map(v=>Math.exp((v-m)/tau)); const Z = ex.reduce((a,b)=>a+b,0);
+  const subs = SUBTYPES.map((s,i)=>({...s, score:raw[i], p:ex[i]/Z})).sort((a,b)=>b.p-a.p);
+  const types = {}; for (const t in STACKS) types[t]=0; subs.forEach(s=>types[s.type]+=s.p);
+  const funcs = {}; for (const f in FN) funcs[f]=0; subs.forEach(s=>{funcs[s.obs]+=s.p; funcs[s.dec]+=s.p;});
+  const coins = {}; for (const c of COINS) coins[c]= 1/(1+Math.exp(-ev[c]/3)); // prob of + side
+  const animals={Sleep:0,Consume:0,Blast:0,Play:0}; subs.forEach(s=>animals[s.animal]+=s.p);
+  return {subs, types, funcs, coins, animals, top:subs[0]};
+}
+
+if (typeof module!=='undefined') module.exports={FN,STACKS,SUBTYPES,COINS,emptyEvidence,applyOption,solve};
+
+// 32 blinded questions. Sources: user's Google Doc ("explaining the functions") + Objective Personality playlist transcripts.
+const QUESTIONS = [
+ { q:"It's 2 a.m. and your brain won't shut off. What's it most likely replaying?",
+   o:[ {t:"A conversation: what someone said, how it came across, whether things are okay between you.", s:{OD:-2}},
+       {t:"Something slipping out of control: a plan falling apart, information you might be missing, where things are headed.", s:{OD:2}},
+       {t:"Whether the life you're living is actually yours, or the one everyone expected of you.", s:{OD:-1,DI:1}},
+       {t:"Whether you're stuck in a rut while everything new passes you by.", s:{OD:1,OI:-1}} ]},
+ { q:"Your morning, as you'd naturally describe it to a friend:",
+   o:[ {t:"\"I get up, drink some water, check email, shower, then eat breakfast. Pretty efficient.\"", s:{N:-2}},
+       {t:"\"I do all my morning stuff and I'm out the door. I get more done than a racehorse.\"", s:{N:2}} ]},
+ { q:"You pick up a book that grabs you three pages in. What happens next?",
+   o:[ {t:"I want to disappear with it and keep going, and I don't really tell anyone until I'm done.", s:{animal:{Consume:2},DI:0.5,OI:-0.5}},
+       {t:"I have to tell someone right now. I'm bursting to share what I just learned.", s:{animal:{Blast:2},DI:-0.5,OI:0.5}} ]},
+ { q:"Someone asks you to describe 10 people in your life, with 10 real details about each. Honestly?",
+   o:[ {t:"Easy. I could go all day. Talking about myself for that long would be the weird part.", s:{DI:-2}},
+       {t:"I'd get through a few, then drift back to my own story, my own projects, my own take.", s:{DI:2}} ]},
+ { q:"Which of these would actually knock you down for longer?",
+   o:[ {t:"Being misunderstood or rejected by people who matter to you.", s:{OD:-2}},
+       {t:"Your home, plans, or stability being thrown into chaos with no warning.", s:{OD:2}} ]},
+ { q:"You're making a big decision, like a car, an apartment, or a job offer. Be honest about how it goes.",
+   o:[ {t:"I already kind of know what I want, but I don't let myself decide until I've asked a few people.", s:{DI:-2}},
+       {t:"I decide from my own reasoning or gut. Other people's input is optional, and usually comes after.", s:{DI:2}} ]},
+ { q:"After a rough week, what usually happens to you?",
+   o:[ {t:"I keep working through it, figure things out, and then crash emotionally days later out of nowhere.", s:{T:2}},
+       {t:"I feel it fully. I cry, vent, sit in it, and then I'm surprisingly able to walk away from it.", s:{T:-2}} ]},
+ { q:"When you're trying to make a point in a debate, you naturally lead with…",
+   o:[ {t:"What actually happened: the evidence, the examples, the record. Guessing without proof feels wrong.", s:{N:-2}},
+       {t:"The bigger picture: the pattern, an analogy, the bottom line. The facts can come later.", s:{N:2}},
+       {t:"Whether the logic holds together at all.", s:{T:1}},
+       {t:"What this means for the people involved.", s:{T:-1}} ]},
+ { q:"Over the years, your life looks more like…",
+   o:[ {t:"A castle getting a little taller each year: the same core interests, deepened and refined.", s:{OI:2}},
+       {t:"A string of chapters: new cities, new hobbies, new directions. It never stays the same for long.", s:{OI:-2}} ]},
+ { q:"You get smartest when you…",
+   o:[ {t:"Talk it out with other people. My ideas sharpen as I explain them and see what actually works.", s:{FT:2}},
+       {t:"Get quiet time alone to think it through my own way, without anyone interrupting.", s:{FT:-2}} ]},
+ { q:"Someone asks: \"How does everyone feel about this? What does the group actually want?\"",
+   o:[ {t:"I genuinely want to know, and I'm usually trying to figure it out even if I'm bad at it.", s:{FT:-2}},
+       {t:"Honestly? I don't know and don't really care. I know what I like.", s:{FT:2}} ]},
+ { q:"You're given a pile of messy information. Your mind naturally wants to…",
+   o:[ {t:"Boil it all down to one underlying theme, the single thing it's all really about.", s:{NS:2}},
+       {t:"Spin it outward into more possibilities, what-ifs, and connections to other things.", s:{NS:-2}} ]},
+ { q:"Picture a friend's struggling café. Which part of fixing it would you enjoy most?",
+   o:[ {t:"Walking in and just taking everything in: the sights, the customers, what's actually happening.", s:{fn:{Se:1}}},
+       {t:"Going over the numbers, the costs, and how they've done things up to now.", s:{fn:{Si:1}}},
+       {t:"Brainstorming how all the parts connect and simulating ten ways it could be redone.", s:{fn:{Ne:1}}},
+       {t:"Narrowing all of it down to one clear plan and the path forward.", s:{fn:{Ni:1}}} ]},
+ { q:"When you're stuck on a hard choice, the question that settles it is…",
+   o:[ {t:"\"Does this feel right to me? Is it true to who I am?\"", s:{fn:{Fi:1}}},
+       {t:"\"Will the people involved be okay with this?\"", s:{fn:{Fe:1}}},
+       {t:"\"Does this actually make sense to me, logically?\"", s:{fn:{Ti:1}}},
+       {t:"\"Will this get results? Does it work?\"", s:{fn:{Te:1}}} ]},
+ { q:"Your room or workspace gets messy. A friend has also been cold to you this week. Which do you shrug off with \"I'll deal with it later\"?",
+   o:[ {t:"The mess. Things can wait. The friend thing is what's really on my mind.", s:{OD:-2}},
+       {t:"The friend. People are people. The mess is what's bugging me.", s:{OD:2}} ]},
+ { q:"When things finally break down for you, it usually looks like…",
+   o:[ {t:"Getting convinced something bad is coming and spiraling into worst-case research.", s:{OD:1,OI:1}},
+       {t:"Feeling boxed in and controlled. I need out, now.", s:{OD:1,OI:-1}},
+       {t:"Burning out from giving to everyone, then realizing I don't know who I am.", s:{OD:-1,DI:-1}},
+       {t:"Feeling like nobody actually gets me, and like I'm outside the group.", s:{OD:-1,DI:1}} ]},
+ { q:"It's the end of a hard year. What actually went wrong?",
+   o:[ {t:"I was going too hard: too much doing, too many people. What fixes it is quiet, sleep, and processing.", s:{IE:-2}},
+       {t:"Everyone kept pushing me to produce, show up, and stop perfecting. What fixes it is going out and taking action.", s:{IE:2}} ]},
+ { q:"Which phrase do you catch yourself saying more?",
+   o:[ {t:"\"Wait, I don't understand. Can you show me exactly what happened?\"", s:{N:-2}},
+       {t:"\"Oh, this reminds me of…\"", s:{N:2}} ]},
+ { q:"Your partner loves the idea of a big family dinner at 5pm. You're more likely the one who…",
+   o:[ {t:"Makes it actually happen: checks schedules, counts the chairs, figures out the new crockpot.", s:{T:2}},
+       {t:"Knows why it matters and what would make it special, even if the logistics fall apart.", s:{T:-2}} ]},
+ { q:"When you get creative, your ideas tend to…",
+   o:[ {t:"Circle back toward the same core vision I keep returning to and sharpening.", s:{NS:1,OI:0.5}},
+       {t:"Go somewhere new every time. I rarely say the same thing twice.", s:{NS:-1,OI:-0.5}},
+       {t:"Stay grounded in what I've actually seen work before.", s:{NS:-1,N:-1}},
+       {t:"Come from what's right in front of me in the moment.", s:{NS:1,N:-1}} ]},
+ { q:"When someone asks about your own plan, your own way of doing things…",
+   o:[ {t:"I have one, and I'll happily walk you through it.", s:{OI:2}},
+       {t:"I feel a little cornered, like I'm being pinned down. I'd rather keep my options open.", s:{OI:-2}} ]},
+ { q:"Talking about emotions, you tend to…",
+   o:[ {t:"Analyze them: why I feel this, what the logic is, how to fix it. I walk around the puddle.", s:{T:2}},
+       {t:"Jump right in: express it, name it, feel it out loud.", s:{T:-2}} ]},
+ { q:"Your feelings about things usually come out as…",
+   o:[ {t:"Pretty simple and personal: I love it, I hate it, it's mine.", s:{FT:1,T:-0.5}},
+       {t:"Tangled up with how everyone else feels, and what the room feels.", s:{FT:-1,T:-0.5}},
+       {t:"Thoughts about why people feel what they feel.", s:{FT:-1,T:0.5}},
+       {t:"Something I'll get to after the work is done.", s:{FT:1,T:0.5}} ]},
+ { q:"What drains you more over a long stretch?",
+   o:[ {t:"Being on all the time: always out, always talking, always doing.", s:{IE:-1,animal:{Play:-1,Sleep:1}}},
+       {t:"Being stuck in all the time, with no outlet and nothing happening.", s:{IE:1,animal:{Sleep:-1,Play:1}}} ]},
+ { q:"Which fear hits closest to home?",
+   o:[ {t:"That new facts come along and collapse the worldview I've spent years building.", s:{fn:{Ni:1.4}}},
+       {t:"That everything that felt new was really just me running in the same circle.", s:{fn:{Se:1.4}}},
+       {t:"That someone locks me down, controls my options, and won't let me explore.", s:{fn:{Ne:1.4}}},
+       {t:"That random chaos drops out of the sky and wrecks everything I've built.", s:{fn:{Si:1.4}}} ]},
+ { q:"And which of these fears stings more?",
+   o:[ {t:"Being told what I love is stupid, and that I have to do work I hate to be worth anything.", s:{fn:{Fi:1.4}}},
+       {t:"Getting all the hard work done for everyone, and still not being loved.", s:{fn:{Te:1.4}}},
+       {t:"Spending years building something brilliant, only to find nobody cares.", s:{fn:{Ti:1.4}}},
+       {t:"Realizing all those years of caring for others left me unable to make things work for myself.", s:{fn:{Fe:1.4}}} ]},
+ { q:"Working on a group project, you're the one who says…",
+   o:[ {t:"\"Let's talk it through, make a plan, and build a system.\"", s:{FT:1.5,DI:-0.5}},
+       {t:"\"Hold on, I need to go think about this my own way.\"", s:{FT:-1.5,DI:0.5}} ]},
+ { q:"When someone pushes back on your idea with \"prove it\"…",
+   o:[ {t:"Fair. I'll come back with the details and the examples.", s:{N:-1.5}},
+       {t:"\"Yeah, totally, I'll get you the specifics later.\" I rarely do.", s:{N:1.5}} ]},
+ { q:"On a free Saturday with zero obligations, you'd rather…",
+   o:[ {t:"Go back to favorite places, comfort shows, or the hobby I'm always refining.", s:{OI:1.5}},
+       {t:"Try something I've never done, go somewhere new, chase whatever pops up.", s:{OI:-1.5}} ]},
+ { q:"At a social event, you end up mostly…",
+   o:[ {t:"Catching up on everyone: what they're doing, who's dating who, how they're all feeling.", s:{DI:-1.5}},
+       {t:"Sharing what I've been into, or having one deep conversation about my ideas.", s:{DI:1.5}} ]},
+ { q:"When you overdo it under pressure, it looks like…",
+   o:[ {t:"Taking over and organizing everyone so it gets done.", s:{fn:{Te:0.8},IE:-0.5}},
+       {t:"Bending over backwards so nobody's upset.", s:{fn:{Fe:0.8},IE:-0.5}},
+       {t:"Throwing myself into action, sensation, anything physical.", s:{fn:{Se:0.8},IE:-0.5}},
+       {t:"Jumping between ten new ideas at once.", s:{fn:{Ne:0.8},IE:-0.5}} ]},
+ { q:"…or more often, it looks like…",
+   o:[ {t:"Locking onto one doom scenario and becoming sure of it.", s:{fn:{Ni:0.8},IE:0.5}},
+       {t:"Clinging hard to my routine and how things have always been done.", s:{fn:{Si:0.8},IE:0.5}},
+       {t:"Retreating into what I personally care about and shutting everything else out.", s:{fn:{Fi:0.8},IE:0.5}},
+       {t:"Over-thinking alone until it's perfect in my head.", s:{fn:{Ti:0.8},IE:0.5}} ]}
+];
+if (typeof module!=='undefined') module.exports={QUESTIONS};
+
+// Content drawn from the user's Google Doc + OPS transcripts (lightly edited)
+const FCOLOR = { Ni:'#a78bfa', Ne:'#f0abfc', Si:'#60a5fa', Se:'#22d3ee', Ti:'#fb923c', Te:'#fcd34d', Fi:'#f472b6', Fe:'#34d399' };
+const FNAME = { Ni:'Introverted Intuition', Ne:'Extroverted Intuition', Si:'Introverted Sensing', Se:'Extroverted Sensing',
+  Ti:'Introverted Thinking', Te:'Extroverted Thinking', Fi:'Introverted Feeling', Fe:'Extroverted Feeling' };
+const FDESC = {
+  Ni:{ core:"Keeps stacking patterns onto a personal worldview, and pushes away new facts that don't connect back to it. Narrows everything down to one concept.", void:"Leaves others asking for the facts and details, and wondering whether you've seen the new information.", fear:"New facts collapse the abstract worldview you've built in your head."},
+  Se:{ core:"Constantly scanning, taking it all in and giving the facts and examples. Has a hard time narrowing down to one topic.", void:"Leaves others to make the guesses, draw the conclusions, and simplify it into a category.", fear:"Finding out that what felt new was really the same circle all along."},
+  Ne:{ core:"Scans for new concepts, understandings, and possibilities. Jumps from category to category and rarely says the same thing twice.", void:"Leaves others to create the physical structure and control.", fear:"Some control freak locks up your options and information."},
+  Si:{ core:"Keeps going over and refining known, personal facts. Controls things physically inside the box and returns to the comforting routine.", void:"Leaves others asking why, trying to understand, and showing you new possibilities.", fear:"Random chaos drops out of the sky and wrecks everything you've built."},
+  Fi:{ core:"Goes all in on what you love, hoping others will see the passion. Shoves away the work the tribe needs help with.", void:"Leaves others asking how it works and what's actually going to get done.", fear:"The tribe says what you love is stupid, and you have to do work you hate to be valuable."},
+  Te:{ core:"Does all the tribe work so everyone will love you. Has a hard time picking the one thing that matters most to you personally.", void:"Leaves others asking what's important to you and how you're feeling.", fear:"You get all the hard work done and still no one loves you."},
+  Ti:{ core:"Works on what you know is true for you, and builds something amazing so the tribe will have to love you. Gets smarter alone.", void:"Leaves the room emotionally uncomfortable while you go on about what you're working on.", fear:"You spend years figuring out the truth, and the tribe doesn't even care."},
+  Fe:{ core:"Tries to make everyone happy so they'll help you with your personal work. Talks out the values and emotions of the group.", void:"Leaves others to go with what's logically true, even if people hate it.", fear:"Years of caring for others leave you insecure and unable to make things work for yourself."}
+};
+const LETTERS = {
+  S:"Savior Sensory: obligated to prove, ground, and give the facts of what actually happened. Only once the facts are in are you \"allowed\" to guess. Often heard saying: \"I don't understand.\"",
+  N:"Savior Intuitive: obligated to give the summary, the overview, and the understanding of why. You make whole points on a pattern and promise the facts \"later.\" Often heard saying: \"This reminds me of…\"",
+  T:"Savior Thinker: obligated to figure it out, get it done, and solve the hard thing. You jump into the work, miss the vibe in the room, and crash emotionally later.",
+  F:"Savior Feeler: goes straight after what's valuable, liked, and wanted. You know exactly what's worth loving, but fumble the hard work of forcing it to happen."
+};
+const SUBTRAITS = {
+ 'Fi-Ne':'Creative, exploratory, imaginative','Fi-Si':'Nostalgic, sentimental, inward',
+ 'Ni-Fe':'Insightful, empathetic, counselor-like','Ni-Ti':'Detached, analytical, symbolic',
+ 'Ti-Ne':'Inventive, theoretical, curious','Ti-Si':'Precise, routine-oriented, archival',
+ 'Ni-Te':'Strategic, visionary, execution-focused','Ni-Fi':'Philosophical, private, idealistic',
+ 'Fi-Se':'Artistic, adventurous, expressive','Fi-Ni':'Symbolic, introspective, dreamy',
+ 'Si-Fe':'Caring, protective, socially attentive','Si-Ti':'Reserved, analytical, methodical',
+ 'Ti-Se':'Tactical, adaptable, action-oriented','Ti-Ni':'Minimalistic, predictive, withdrawn',
+ 'Si-Te':'Organized, disciplined, efficient','Si-Fi':'Quiet moralist, internally value-driven',
+ 'Ne-Fi':'Passionate, expressive, idealistic','Ne-Te':'Productive, entrepreneurial, driven',
+ 'Fe-Ni':'Inspirational, insightful, mentoring','Fe-Se':'Energetic, charismatic, socially bold',
+ 'Ne-Ti':'Intellectual, inventive, debater','Ne-Fe':'Charismatic, provocative, people-oriented',
+ 'Te-Ni':'Strategic commander, visionary leader','Te-Se':'Aggressive executor, forceful achiever',
+ 'Se-Fi':'Authentic, emotional, artistic','Se-Te':'Competitive, pragmatic, dominant',
+ 'Fe-Si':'Traditional caretaker, community-focused','Fe-Ne':'Enthusiastic, adaptive, socially expansive',
+ 'Se-Ti':'Tactical realist, sharp opportunist','Se-Fe':'Charming, persuasive, socially strategic',
+ 'Te-Si':'Structured leader, conventional executive','Te-Ne':'Expansive organizer, adaptable strategist'
+};
+const ANIMALS = {
+  Consume:{icon:'◐', d:"Gathering in new information and experiences for yourself. You want to be alone with the good book and keep going.", pair:'Oe + Di'},
+  Blast:{icon:'✦', d:"Taking what you already know and teaching it to the tribe. Three pages in, you have to go tell someone.", pair:'Oi + De'},
+  Sleep:{icon:'☾', d:"Conserving energy. You process inward and preserve, then spend it later. Introverted on both saviors.", pair:'Oi + Di'},
+  Play:{icon:'☀', d:"Expending energy outward, on the world and the people in it, then needing to recover later. Extroverted on both saviors.", pair:'Oe + De'}
+};
+const COINLABELS = {
+  OD:['Observer-led','Decider-led','Fear of chaos & control (IxxJ / ExxP)','Pain around identity & the tribe (IxxP / ExxJ)'],
+  DI:['Self above tribe (Di)','Tribe above self (De)','',''],
+  OI:['Organize & return (Oi)','Gather the new (Oe)','',''],
+  N: ['Intuition','Sensing','',''],
+  T: ['Thinking','Feeling','',''],
+  FT:['Fi / Te axis','Ti / Fe axis','',''],
+  NS:['Ni / Se axis','Si / Ne axis','',''],
+  IE:['Introverted lead','Extroverted lead','','']
+};
+
+</script>
+<script>
+(()=>{
+const $ = s=>document.querySelector(s);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ORDER_O = ['Ni','Se','Si','Ne'], ORDER_D = ['Fi','Te','Ti','Fe'];
+const hex2rgb = h=>{const n=parseInt(h.slice(1),16);return [n>>16&255,n>>8&255,n&255];};
+const lerp=(a,b,t)=>a+(b-a)*t;
+
+/* ================= SKY: aurora + stars + bursts ================= */
+const sky = $('#sky'), sx = sky.getContext('2d');
+let W=0,H=0,DPR=1, mouse={x:.5,y:.5,tx:.5,ty:.5};
+const stars=[], bursts=[];
+let auroraTarget = ['#7c3aed','#0891b2','#db2777','#4f46e5'].map(hex2rgb);
+let aurora = auroraTarget.map(c=>c.slice());
+function resize(){
+  DPR=Math.min(2,devicePixelRatio||1); W=innerWidth; H=innerHeight;
+  sky.width=W*DPR; sky.height=H*DPR; sx.setTransform(DPR,0,0,DPR,0,0);
+  stars.length=0; const n=Math.round(W*H/5200);
+  for(let i=0;i<n;i++) stars.push({x:Math.random()*W,y:Math.random()*H,z:Math.random(),tw:Math.random()*6.28,s:Math.random()*.9+.2});
+}
+addEventListener('resize',resize); resize();
+addEventListener('pointermove',e=>{mouse.tx=e.clientX/W;mouse.ty=e.clientY/H;});
+function setAurora(colors){ auroraTarget = colors.map(hex2rgb); }
+function burst(x,y,color,n=34){
+  const c=hex2rgb(color);
+  for(let i=0;i<n;i++){const a=Math.random()*6.283,v=1.5+Math.random()*5.5;
+    bursts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1,life:1,r:1+Math.random()*2.6,c});}
+}
+let t0=performance.now();
+function drawSky(now){
+  const t=(now-t0)/1000;
+  mouse.x+= (mouse.tx-mouse.x)*.04; mouse.y+=(mouse.ty-mouse.y)*.04;
+  sx.globalCompositeOperation='source-over';
+  sx.fillStyle='#05040d'; sx.fillRect(0,0,W,H);
+  // aurora blobs
+  sx.globalCompositeOperation='lighter';
+  for(let i=0;i<4;i++){
+    for(let k=0;k<3;k++) aurora[i][k]=lerp(aurora[i][k],auroraTarget[i][k],.012);
+    const [r,g,b]=aurora[i];
+    const px = W*(.5+.38*Math.sin(t*.07*(i+1)+i*1.7)) + (mouse.x-.5)*-60*(i+1);
+    const py = H*(.42+.32*Math.cos(t*.055*(i+1.3)+i)) + (mouse.y-.5)*-40*(i+1);
+    const rad = Math.max(W,H)*(.42+.08*Math.sin(t*.2+i));
+    const gr=sx.createRadialGradient(px,py,0,px,py,rad);
+    gr.addColorStop(0,`rgba(${r|0},${g|0},${b|0},.30)`); gr.addColorStop(.45,`rgba(${r|0},${g|0},${b|0},.10)`); gr.addColorStop(1,'rgba(0,0,0,0)');
+    sx.fillStyle=gr; sx.fillRect(0,0,W,H);
+  }
+  // aurora ribbons
+  for(let j=0;j<2;j++){
+    const [r,g,b]=aurora[j+1];
+    sx.beginPath();
+    for(let x=0;x<=W;x+=24){
+      const y=H*(.3+j*.18)+Math.sin(x*.004+t*.35+j*2)*60+Math.sin(x*.011-t*.22)*24;
+      x===0?sx.moveTo(x,y):sx.lineTo(x,y);
+    }
+    sx.strokeStyle=`rgba(${r|0},${g|0},${b|0},.07)`; sx.lineWidth=90; sx.stroke();
+  }
+  // stars
+  for(const s of stars){
+    const ox=(mouse.x-.5)*-24*s.z, oy=(mouse.y-.5)*-24*s.z;
+    const a=.25+.55*(.5+.5*Math.sin(t*1.4*s.s+s.tw));
+    sx.fillStyle=`rgba(230,232,255,${a*s.z})`;
+    sx.fillRect(s.x+ox,s.y+oy,s.s*1.4*s.z+.3,s.s*1.4*s.z+.3);
+    s.y-=.03*s.z; if(s.y<0) s.y=H;
+  }
+  // bursts
+  for(let i=bursts.length-1;i>=0;i--){
+    const p=bursts[i]; p.x+=p.vx; p.y+=p.vy; p.vx*=.95; p.vy=p.vy*.95+.04; p.life-=.016;
+    if(p.life<=0){bursts.splice(i,1);continue;}
+    const [r,g,b]=p.c; sx.fillStyle=`rgba(${r},${g},${b},${p.life})`;
+    sx.beginPath(); sx.arc(p.x,p.y,p.r*(.5+p.life),0,6.283); sx.fill();
+  }
+  sx.globalCompositeOperation='source-over';
+}
+
+/* ================= ORBIT: 8 function planets ================= */
+class Orbit{
+  constructor(cv,{labels=false}={}){ this.cv=cv; this.c=cv.getContext('2d'); this.labels=labels; this.size={}; this.target={}; this.highlight=[];
+    for(const f in FN){ this.size[f]=.25; this.target[f]=.25; } this.trail={}; }
+  set(funcs){ for(const f in funcs) this.target[f]=funcs[f]; }
+  draw(t){
+    const cv=this.cv, r=cv.getBoundingClientRect(); if(!r.width) return;
+    const w=r.width,h=r.height; if(cv.width!==Math.round(w*DPR)){cv.width=w*DPR;cv.height=h*DPR;}
+    const c=this.c; c.setTransform(DPR,0,0,DPR,0,0); c.clearRect(0,0,w,h);
+    const cx=w/2, cy=h/2, R=Math.min(w,h*1.38)*.44;
+    // core
+    const pulse=1+.06*Math.sin(t*1.6);
+    let g=c.createRadialGradient(cx,cy,0,cx,cy,R*.36*pulse);
+    g.addColorStop(0,'rgba(255,255,255,.95)'); g.addColorStop(.15,'rgba(200,190,255,.55)'); g.addColorStop(.5,'rgba(140,110,255,.15)'); g.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=g; c.beginPath(); c.arc(cx,cy,R*.36*pulse,0,6.283); c.fill();
+    const rings=[{fs:ORDER_O,rx:R*.56,ry:R*.2,tilt:-.28,sp:.22},{fs:ORDER_D,rx:R*.98,ry:R*.34,tilt:.16,sp:-.14}];
+    const items=[];
+    rings.forEach((ring,ri)=>{
+      c.save(); c.translate(cx,cy); c.rotate(ring.tilt);
+      c.strokeStyle='rgba(255,255,255,.10)'; c.lineWidth=1; c.setLineDash(ri?[2,6]:[]);
+      c.beginPath(); c.ellipse(0,0,ring.rx,ring.ry,0,0,6.283); c.stroke(); c.restore();
+      ring.fs.forEach((f,i)=>{
+        this.size[f]=lerp(this.size[f],this.target[f],.05);
+        const a=t*ring.sp+i*Math.PI/2+ri*.6;
+        const ex=Math.cos(a)*ring.rx, ey=Math.sin(a)*ring.ry;
+        const x=cx+ex*Math.cos(ring.tilt)-ey*Math.sin(ring.tilt), y=cy+ex*Math.sin(ring.tilt)+ey*Math.cos(ring.tilt);
+        const depth=(Math.sin(a)+1)/2; // 0 back,1 front
+        items.push({f,x,y,depth,a,ring});
+      });
+    });
+    items.sort((p,q)=>p.depth-q.depth);
+    for(const it of items){
+      const p=Math.max(0,this.size[it.f]); const rad=(3+R*.12*Math.sqrt(p))*(.7+.45*it.depth);
+      const col=FCOLOR[it.f]; const [r_,g_,b_]=hex2rgb(col); const hi=this.highlight.includes(it.f);
+      // glow
+      const gg=c.createRadialGradient(it.x,it.y,0,it.x,it.y,rad*(hi?5:3.4));
+      gg.addColorStop(0,`rgba(${r_},${g_},${b_},${.55*(.5+.5*it.depth)})`); gg.addColorStop(1,'rgba(0,0,0,0)');
+      c.fillStyle=gg; c.beginPath(); c.arc(it.x,it.y,rad*(hi?5:3.4),0,6.283); c.fill();
+      // body
+      const bg=c.createRadialGradient(it.x-rad*.35,it.y-rad*.35,rad*.1,it.x,it.y,rad);
+      bg.addColorStop(0,'#fff'); bg.addColorStop(.35,col); bg.addColorStop(1,`rgba(${r_*.3|0},${g_*.3|0},${b_*.3|0},1)`);
+      c.fillStyle=bg; c.beginPath(); c.arc(it.x,it.y,rad,0,6.283); c.fill();
+      if(hi){ c.strokeStyle=`rgba(${r_},${g_},${b_},.8)`; c.lineWidth=1.2; c.beginPath(); c.arc(it.x,it.y,rad+5+2*Math.sin(t*3),0,6.283); c.stroke(); }
+      if(this.labels){ c.fillStyle=`rgba(238,240,255,${.45+.55*it.depth})`; c.font=`700 ${Math.max(10,R*.075)}px Unbounded`; c.textAlign='center'; c.fillText(it.f,it.x,it.y-rad-8); }
+    }
+  }
+}
+const orbits=[ new Orbit($('#orbitIntro')), new Orbit($('#orbitQuiz')) ];
+// intro: gently randomize sizes
+setInterval(()=>{ if($('#intro').classList.contains('active')){ const o=orbits[0]; for(const f in FN) o.target[f]=.08+Math.random()*.5; } },2200);
+
+function loop(now){ drawSky(now); const t=now/1000; orbits.forEach(o=>o.draw(t)); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+
+/* ================= SOUND (optional ambient) ================= */
+let AC=null, master=null, soundOn=false;
+function initAudio(){
+  if(AC) return; AC=new (window.AudioContext||window.webkitAudioContext)();
+  master=AC.createGain(); master.gain.value=0; master.connect(AC.destination);
+  const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=800; lp.Q.value=.6; lp.connect(master);
+  const lfo=AC.createOscillator(), lfoG=AC.createGain(); lfo.frequency.value=.05; lfoG.gain.value=380; lfo.connect(lfoG); lfoG.connect(lp.frequency); lfo.start();
+  [110,164.81,246.94,329.63].forEach((f,i)=>{ for(const d of [-6,6]){ const o=AC.createOscillator(); o.type=i%2?'sine':'triangle'; o.frequency.value=f; o.detune.value=d; const g=AC.createGain(); g.gain.value=.05/(i+1); o.connect(g); g.connect(lp); o.start(); } });
+  // echo bus for chimes
+  const dl=AC.createDelay(); dl.delayTime.value=.42; const fb=AC.createGain(); fb.gain.value=.42; dl.connect(fb); fb.connect(dl); dl.connect(master);
+  AC.echo=dl;
+}
+function chime(i){
+  if(!soundOn||!AC) return; const notes=[523.25,587.33,659.25,783.99,880,1046.5];
+  const o=AC.createOscillator(), g=AC.createGain(); o.type='sine'; o.frequency.value=notes[i%notes.length]*(Math.random()<.5?1:.5);
+  g.gain.setValueAtTime(0,AC.currentTime); g.gain.linearRampToValueAtTime(.09,AC.currentTime+.01); g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+1.8);
+  o.connect(g); g.connect(master); g.connect(AC.echo); o.start(); o.stop(AC.currentTime+2);
+}
+$('#soundBtn').addEventListener('click',()=>{
+  try{ initAudio(); AC.resume(); soundOn=!soundOn;
+    master.gain.cancelScheduledValues(AC.currentTime); master.gain.linearRampToValueAtTime(soundOn?.55:0,AC.currentTime+1.2);
+    $('#soundBtn').classList.toggle('on',soundOn); $('#soundBtn').textContent=soundOn?'♪ Ambient on':'♪ Ambient off'; $('#soundBtn').setAttribute('aria-pressed',soundOn);
+  }catch(e){ $('#soundBtn').textContent='♪ Unavailable'; }
+});
+
+/* ================= QUIZ FLOW ================= */
+let idx=0, answers=[], ev=emptyEvidence();
+const N=QUESTIONS.length;
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $('#'+id).classList.add('active'); scrollTo({top:0,behavior:reduce?'auto':'smooth'}); }
+const OPT_COLORS=['#67e8f9','#a78bfa','#f472b6','#fcd34d'];
+function renderQ(dir='in'){
+  const q=QUESTIONS[idx], body=$('#qbody');
+  body.innerHTML = `<h2 class="qtext">${q.q}</h2><div class="opts">${q.o.map((o,i)=>
+    `<button class="opt${answers[idx]===i?' picked':''}" data-i="${i}" style="--c:${OPT_COLORS[(i+idx)%4]};animation-delay:${.06+i*.07}s"><span class="key">${i+1}</span><span class="t">${o.t}</span></button>`).join('')}</div>`;
+  body.querySelectorAll('.opt').forEach(b=>{
+    b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect(); b.style.setProperty('--mx',(e.clientX-r.left)+'px'); b.style.setProperty('--my',(e.clientY-r.top)+'px');});
+    b.addEventListener('click',e=>choose(+b.dataset.i,e));
+  });
+  $('#qcount').innerHTML=String(idx+1).padStart(2,'0')+`<span> / ${N}</span>`;
+  $('#qnum').textContent='Signal '+String(idx+1).padStart(2,'0');
+  $('#pfill').style.width=(idx/N*100)+'%';
+  $('#backBtn').disabled = idx===0;
+  body.classList.remove('out'); body.classList.add(dir); requestAnimationFrame(()=>requestAnimationFrame(()=>body.classList.remove('in')));
+}
+function recompute(){
+  ev=emptyEvidence(); answers.forEach((a,i)=>{ if(a!=null) applyOption(ev,QUESTIONS[i].o[a].s); });
+  const r=solve(ev); orbits[1].set(r.funcs);
+  const top=Object.entries(r.funcs).sort((a,b)=>b[1]-a[1]).slice(0,4).map(x=>FCOLOR[x[0]]);
+  setAurora(top); return r;
+}
+let busy=false;
+function choose(i,e){
+  if(busy) return; busy=true;
+  answers[idx]=i;
+  const btn=$(`.opt[data-i="${i}"]`); btn.classList.add('picked');
+  const r=btn.getBoundingClientRect(); const x=e&&e.clientX?e.clientX:r.left+r.width/2, y=e&&e.clientY?e.clientY:r.top+r.height/2;
+  burst(x,y,OPT_COLORS[(i+idx)%4],reduce?0:38); chime(idx+i);
+  recompute();
+  setTimeout(()=>{
+    $('#qbody').classList.add('out');
+    setTimeout(()=>{ idx++; busy=false; if(idx<N) renderQ('in'); else finish(); },reduce?0:320);
+  },reduce?0:260);
+}
+$('#backBtn').addEventListener('click',()=>{ if(idx>0&&!busy){ idx--; recompute(); renderQ('in'); } });
+addEventListener('keydown',e=>{
+  if(!$('#quiz').classList.contains('active')) return;
+  const n=parseInt(e.key,10); if(n>=1&&n<=QUESTIONS[idx].o.length){ const b=$(`.opt[data-i="${n-1}"]`); const r=b.getBoundingClientRect(); choose(n-1,{clientX:r.left+r.width/2,clientY:r.top+r.height/2}); }
+  if(e.key==='ArrowLeft'||e.key==='Backspace') $('#backBtn').click();
+});
+$('#startBtn').addEventListener('click',e=>{ burst(e.clientX,e.clientY,'#a78bfa',60); idx=0; answers=[]; recompute(); show('quiz'); renderQ('in'); });
+
+/* ================= RESULTS ================= */
+function pct(x){ return Math.round(x*100); }
+function finish(){
+  $('#pfill').style.width='100%';
+  const r=recompute(), top=r.top, sorted=Object.entries(r.types).sort((a,b)=>b[1]-a[1]);
+  const g1=FCOLOR[top.dom], g2=FCOLOR[top.other];
+  const posLabel = top.pos==='aux' ? 'Growth / Balanced subtype · Dom + Aux' : 'Internal / Looping subtype · Dom + Tert';
+  const lead = top.sign.OD>0 ? 'Observer' : 'Decider';
+  const sN = FN[top.obs].N>0?'N':'S', sT = FN[top.dec].T>0?'T':'F';
+  const coinArr = COINS.map(c=>{
+    const p=r.coins[c], L=COINLABELS[c]; const leftWin=p>=.5; const d=Math.abs(p-.5);
+    const colL='#67e8f9', colR='#f472b6';
+    const bar = leftWin ? `<i style="right:50%;width:0;background:linear-gradient(270deg,${colL},transparent)" data-w="${d*100}"></i>` : `<i style="left:50%;width:0;background:linear-gradient(90deg,${colR},transparent)" data-w="${d*100}"></i>`;
+    return `<div class="coin"><div class="row"><span class="${leftWin?'win':''}">${L[0]} · ${pct(p)}%</span><span class="${leftWin?'':'win'}">${pct(1-p)}% · ${L[1]}</span></div><div class="bar">${bar}</div>${L[2]?`<div class="sub">${leftWin?L[2]:L[3]}</div>`:''}</div>`;
+  });
+  const typeCards = sorted.map(([t,p],i)=>`<div class="tc${i===0?' top':''}"><div class="code">${t}</div><div class="pct">${(p*100).toFixed(1)}% likelihood</div><div class="fill" data-w="${p/sorted[0][1]*100}" style="background:linear-gradient(90deg,${FCOLOR[STACKS[t][0]]},${FCOLOR[STACKS[t][1]]})"></div></div>`).join('');
+  const alts = r.subs.slice(0,6).map(s=>`<div class="alt"><span class="k" style="color:${FCOLOR[s.dom]}">${s.type}</span><span class="m">${s.dom}–${s.other} · ${SUBTRAITS[s.key]}</span><span class="p">${(s.p*100).toFixed(1)}%</span></div>`).join('');
+  const an = top.animal, A=ANIMALS[an];
+  const savior = f=>`<div class="panel savior" style="--c:${FCOLOR[f]}"><div class="fh"><div class="orb"></div><div><div class="fn">${f} Savior</div><div class="fl">${FNAME[f]} · ${pct(r.funcs[f])}% signal</div></div></div>
+    <p>${FDESC[f].core}</p><div class="lbl">The void you leave</div><p>${FDESC[f].void}</p><div class="lbl">Biggest fear</div><p>${FDESC[f].fear}</p></div>`;
+  const conf = top.p;
+  const confWord = conf>.5?'Strong read':conf>.25?'Moderate read':'Loose read: retake later or compare runners-up';
+  $('#results').innerHTML = `
+    <div class="res-hero" style="--g1:${g1};--g2:${g2}">
+      <div class="orbit-wrap" style="width:min(460px,90vw)"><canvas id="orbitRes"></canvas></div>
+      <div class="eyebrow">Your constellation reads as</div>
+      <div class="typecode" style="--g1:${g1};--g2:${g2}">${top.type}</div>
+      <div class="subline"><span style="color:${g1}">${top.dom}</span>–<span style="color:${g2}">${top.other}</span><span class="dot">·</span>${lead}-led<span class="dot">·</span>${A.icon} ${an}</div>
+      <div class="traits">${SUBTRAITS[top.key]} — ${posLabel}</div>
+      <div class="conf">${confWord} · top subtype <b>${pct(conf)}%</b> · type <b>${pct(r.types[top.type])}%</b></div>
+    </div>
+    <div class="section"><h3>Your two saviors</h3><div class="grid2">${savior(top.dom)}${savior(top.other)}</div></div>
+    <div class="section"><h3>The coins</h3><div class="grid2"><div class="panel">${coinArr.slice(0,4).join('')}</div><div class="panel">${coinArr.slice(4).join('')}</div></div>
+    <div class="section"><h3>Lead animal & runners-up</h3><div class="grid2">
+      <div class="panel"><div class="animal"><div class="glyph">${A.icon}</div><div><div class="an">${an} <span style="font:500 .8rem Manrope;color:var(--muted)">${A.pair}</span></div><p>${A.d}</p></div></div>
+        <div class="minis">${Object.entries(r.animals).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="mini">${ANIMALS[k].icon} ${k} ${pct(v)}%</span>`).join('')}</div></div>
+      <div class="panel">${alts}</div></div></div>
+    <div class="section"><h3>All 16 types</h3><div class="panel"><div class="types" style="--g1:${g1}">${typeCards}</div></div></div>
+    <div class="section"><h3>Your savior letters</h3><div class="panel"><div class="letter"><b>${sN}</b> — ${LETTERS[sN]}</div><div class="letter"><b>${sT}</b> — ${LETTERS[sT]}</div></div></div>
+    <div class="actions"><button class="cta" id="retake">Retake</button><button class="ghost" id="copyBtn">Copy my result</button></div>
+    <p class="disclaimer">Built from the Objective Personality framework (Dave &amp; Shan Powers) and your own notes. OPS isn't peer-reviewed science, and a self-report quiz can't see your blind spots: the transcripts point out that people mostly see their middle functions, not their first and last. Treat this as a hypothesis to test against how you actually live over time, not a verdict.</p>`;
+  show('results');
+  const ro=new Orbit($('#orbitRes'),{labels:true}); ro.size={...r.funcs}; ro.set(r.funcs); ro.highlight=[top.dom,top.other]; orbits.push(ro);
+  setAurora([g1,g2,g1,g2]);
+  const panels=[...document.querySelectorAll('#results .panel')];
+  panels.forEach((p,i)=>setTimeout(()=>p.classList.add('show'),250+i*140));
+  setTimeout(()=>{ document.querySelectorAll('#results [data-w]').forEach(el=>el.style.width=el.dataset.w+'%'); },700);
+  if(!reduce) for(let k=0;k<5;k++) setTimeout(()=>burst(W*(.2+Math.random()*.6),H*(.2+Math.random()*.3),[g1,g2][k%2],50),k*220);
+  chime(3); setTimeout(()=>chime(5),300);
+  $('#retake').addEventListener('click',()=>{ orbits.splice(2); idx=0; answers=[]; recompute(); show('quiz'); renderQ('in'); });
+  $('#copyBtn').addEventListener('click',async()=>{
+    const txt=`My constellation: ${top.type} (${top.dom}–${top.other}, ${SUBTRAITS[top.key]}) · ${lead}-led · ${an} · type likelihood ${pct(r.types[top.type])}%`;
+    try{ await navigator.clipboard.writeText(txt); $('#copyBtn').textContent='Copied ✓'; }catch(e){ $('#copyBtn').textContent=txt; }
+  });
+}
+})();
+
+</script>
+</body>
+</html>
