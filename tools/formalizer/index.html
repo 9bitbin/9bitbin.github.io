@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IT Support AI Assistant — OpenRouter Edition</title>
+  <title>IT Message Formalizer | 9BITBIN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Barlow:wght@400;500;600&family=DotGothic16&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/theme.css">
   <style>
     /* Reset & Design Tokens */
     *, *::before, *::after {
@@ -13,31 +17,31 @@
     }
 
     :root {
-      --bg-body: #070b14;
-      --bg-header: rgba(15, 23, 42, 0.88);
-      --bg-surface: #0f172a;
-      --bg-surface-elevated: #1e293b;
-      --bg-input: #060a12;
-      --border-subtle: #1e293b;
-      --border-strong: #334155;
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --accent: #4f46e5;
-      --accent-hover: #6366f1;
-      --accent-active: #4338ca;
-      --accent-soft: rgba(79, 70, 229, 0.14);
-      --accent-border: rgba(99, 102, 241, 0.45);
-      --success-bg: rgba(16, 185, 129, 0.12);
-      --success-border: rgba(16, 185, 129, 0.35);
-      --success-text: #6ee7b7;
-      --warning-bg: rgba(245, 158, 11, 0.12);
-      --warning-border: rgba(245, 158, 11, 0.35);
-      --warning-text: #fcd34d;
-      --danger-bg: rgba(159, 18, 57, 0.25);
-      --danger-border: rgba(244, 63, 94, 0.45);
-      --danger-text: #fecdd3;
-      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg-body: #11130F;
+      --bg-header: rgba(26, 28, 22, 0.94);
+      --bg-surface: #1A1C16;
+      --bg-surface-elevated: #22251C;
+      --bg-input: #0E100C;
+      --border-subtle: #3A3A2C;
+      --border-strong: #7A5A26;
+      --text-primary: #E8E0C8;
+      --text-secondary: #B5AD91;
+      --text-muted: #9A9478;
+      --accent: #C49A4E;
+      --accent-hover: #E2BE73;
+      --accent-active: #7A5A26;
+      --accent-soft: rgba(196, 154, 78, 0.14);
+      --accent-border: rgba(196, 154, 78, 0.55);
+      --success-bg: rgba(109, 255, 142, 0.1);
+      --success-border: rgba(109, 255, 142, 0.35);
+      --success-text: #6DFF8E;
+      --warning-bg: rgba(196, 154, 78, 0.12);
+      --warning-border: rgba(196, 154, 78, 0.4);
+      --warning-text: #E2BE73;
+      --danger-bg: rgba(224, 102, 74, 0.14);
+      --danger-border: rgba(224, 102, 74, 0.45);
+      --danger-text: #F0A08C;
+      --font-sans: "Barlow", system-ui, sans-serif;
       --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
 
@@ -58,14 +62,14 @@
       height: 8px;
     }
     ::-webkit-scrollbar-track {
-      background: #0b1120;
+      background: #11130F;
     }
     ::-webkit-scrollbar-thumb {
-      background: #334155;
+      background: #3A3A2C;
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #475569;
+      background: #7A5A26;
     }
 
     /* Utilities */
@@ -116,7 +120,7 @@
       border-radius: 10px;
       background: var(--accent-soft);
       border: 1px solid var(--accent-border);
-      color: #818cf8;
+      color: #E2BE73;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -179,7 +183,7 @@
     }
 
     .status-badge.ready .status-dot {
-      background-color: #34d399;
+      background-color: #6DFF8E;
     }
 
     /* Buttons */
@@ -204,13 +208,13 @@
     }
 
     .btn-secondary:hover:not(:disabled) {
-      background-color: #293548;
-      border-color: #475569;
+      background-color: #303126;
+      border-color: #7A5A26;
     }
 
     .btn-secondary.active-drawer {
       border-color: var(--accent-border);
-      background-color: #253047;
+      background-color: rgba(196, 154, 78, 0.14);
     }
 
     .btn-secondary:disabled {
@@ -230,7 +234,7 @@
       background-color: var(--accent);
       color: #ffffff;
       border: 1px solid transparent;
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+      box-shadow: 0 4px 12px rgba(196, 154, 78, 0.2);
       transition: background-color 0.15s, transform 0.05s;
     }
 
@@ -248,15 +252,15 @@
     }
 
     .btn-danger-ghost:hover {
-      background-color: rgba(159, 18, 57, 0.35);
-      border-color: rgba(244, 63, 94, 0.5);
-      color: #fda4af;
+      background-color: rgba(224, 102, 74, 0.12);
+      border-color: rgba(224, 102, 74, 0.5);
+      color: #F0A08C;
     }
 
     /* Settings Drawer */
     .settings-drawer {
       border-top: 1px solid var(--border-subtle);
-      background-color: #0b1120;
+      background-color: #0E100C;
       padding: 1.25rem 0;
     }
 
@@ -312,7 +316,7 @@
 
     .text-input:focus {
       border-color: var(--accent-hover);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22);
+      box-shadow: 0 0 0 1px #275C36, inset 0 0 10px rgba(109, 255, 142, 0.08);
     }
 
     .text-input.with-eye {
@@ -343,12 +347,12 @@
     }
 
     .field-help code {
-      color: #cbd5e1;
+      color: #E8E0C8;
       font-family: var(--font-mono);
     }
 
     .field-help a {
-      color: #818cf8;
+      color: #E2BE73;
       text-decoration: none;
     }
 
@@ -375,13 +379,13 @@
 
     .preset-btn:hover {
       color: var(--text-primary);
-      background-color: #293548;
+      background-color: #303126;
     }
 
     .preset-btn.active {
-      color: #a5b4fc;
-      border-color: var(--accent-border);
-      background-color: var(--accent-soft);
+      color: #E2BE73;
+      border-color: #C49A4E;
+      background-color: rgba(196, 154, 78, 0.14);
     }
 
     .settings-btn-group {
@@ -460,13 +464,13 @@
 
     .workflow-tab:hover {
       color: var(--text-primary);
-      background-color: rgba(30, 41, 59, 0.6);
+      background-color: rgba(196, 154, 78, 0.1);
     }
 
     .workflow-tab.active {
       background-color: var(--accent);
       color: #ffffff;
-      box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+      box-shadow: 0 2px 8px rgba(196, 154, 78, 0.25);
     }
 
     .mode-pill {
@@ -482,7 +486,7 @@
     }
 
     .mode-pill strong {
-      color: #818cf8;
+      color: #E2BE73;
       font-weight: 600;
     }
 
@@ -520,7 +524,7 @@
     .dismiss-btn {
       background: transparent;
       border: none;
-      color: #fda4af;
+      color: #F0A08C;
       padding: 0.25rem;
       border-radius: 6px;
       flex-shrink: 0;
@@ -578,7 +582,7 @@
     .sample-btn {
       font-size: 0.75rem;
       font-weight: 500;
-      color: #a5b4fc;
+      color: #E2BE73;
       background-color: var(--accent-soft);
       border: 1px solid var(--accent-border);
       padding: 0.38rem 0.7rem;
@@ -588,7 +592,7 @@
     }
 
     .sample-btn:hover {
-      background-color: rgba(79, 70, 229, 0.25);
+      background-color: rgba(196, 154, 78, 0.14);
     }
 
     .editor-textarea {
@@ -614,7 +618,7 @@
 
     .editor-textarea:focus {
       border-color: var(--accent-hover);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+      box-shadow: 0 0 0 1px #275C36, inset 0 0 10px rgba(109, 255, 142, 0.08);
     }
 
     .editor-textarea.mono-mode {
@@ -668,7 +672,7 @@
     kbd {
       padding: 0.15rem 0.4rem;
       background-color: var(--bg-surface-elevated);
-      color: #cbd5e1;
+      color: #E2BE73;
       border: 1px solid var(--border-strong);
       border-radius: 5px;
       font-family: var(--font-mono);
@@ -717,11 +721,431 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background-color: #34d399;
+      background-color: #6DFF8E;
+      box-shadow: 0 0 8px rgba(109, 255, 142, 0.6);
+    }
+
+    .theme-page {
+      background-color: var(--soot);
+      background-image:
+        radial-gradient(circle at 20% 0%, rgba(196, 154, 78, 0.1), transparent 45%),
+        radial-gradient(circle at 90% 60%, rgba(109, 255, 142, 0.05), transparent 40%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.012) 0 2px, transparent 2px 4px);
+      background-attachment: fixed;
+      color: var(--paper);
+      font-family: var(--f-body);
+    }
+
+    .app-header {
+      background: linear-gradient(var(--plate-2), var(--plate));
+      border-bottom: 3px solid var(--brass-dk);
+      box-shadow: inset 0 -1px 0 var(--brass), 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-icon {
+      border-radius: 4px;
+      background: rgba(196, 154, 78, 0.12);
+      border-color: var(--brass-dk);
+      color: var(--brass-lt);
+    }
+
+    .brand-title,
+    .panel-title {
+      font-family: var(--f-head);
+      color: var(--brass);
+      letter-spacing: 0.03em;
+    }
+
+    .btn-primary {
+      border: 1px solid #3B2B10;
+      border-radius: 3px;
+      background: linear-gradient(180deg, var(--brass-lt), var(--brass) 45%, var(--brass-dk));
+      color: #1A1408;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 0 #2A1E0A;
+      font-family: var(--f-head);
+      letter-spacing: 0.04em;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(180deg, #F0D18F, var(--brass-lt) 45%, var(--brass));
+    }
+
+    .btn-primary:active:not(:disabled) {
+      background: linear-gradient(180deg, var(--brass), var(--brass-dk));
+    }
+
+    .btn-secondary,
+    .preset-btn,
+    .workflow-tab,
+    .sample-btn {
+      border-radius: 3px;
+      border-color: var(--seam);
+      background-color: var(--plate-2);
+      color: var(--paper);
+    }
+
+    .btn-secondary:hover:not(:disabled),
+    .preset-btn:hover,
+    .sample-btn:hover {
+      background-color: #303126;
+      border-color: var(--brass-dk);
+    }
+
+    .settings-drawer {
+      background-color: rgba(14, 16, 12, 0.96);
+      border-color: var(--seam);
+    }
+
+    .workflow-tab.active {
+      border: 1px solid var(--brass-dk);
+      background: linear-gradient(180deg, var(--brass-lt), var(--brass) 45%, var(--brass-dk));
+      color: #1A1408;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 0 #2A1E0A;
+      font-family: var(--f-head);
+    }
+
+    .preset-btn.active,
+    .btn-secondary.active-drawer {
+      border-color: var(--brass);
+      background-color: rgba(196, 154, 78, 0.14);
+      color: var(--brass-lt);
+    }
+
+    .mode-pill strong,
+    .sample-btn {
+      color: var(--brass-lt);
+    }
+
+    .tab-list,
+    .panel-card {
+      border-color: var(--brass-dk);
+      border-radius: 6px;
+      background: linear-gradient(160deg, var(--plate-2), var(--plate));
+      box-shadow: inset 0 0 0 1px rgba(196, 154, 78, 0.15), inset 0 0 30px rgba(0, 0, 0, 0.35), 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .mode-pill {
+      border-color: var(--seam);
+      border-radius: 3px;
+      background: var(--plate);
+    }
+
+    .text-input,
+    .editor-textarea {
+      border-radius: 3px;
+      border-color: var(--seam);
+      background-color: var(--well);
+      color: var(--paper);
+      font-family: var(--f-body);
+    }
+
+    .text-input:focus,
+    .editor-textarea:focus {
+      border-color: var(--led);
+      box-shadow: 0 0 0 1px var(--led-dim), inset 0 0 10px rgba(109, 255, 142, 0.08);
+    }
+
+    .field-label,
+    .panel-hint,
+    .field-help,
+    .char-count,
+    .meta-footer {
+      color: var(--dim);
+    }
+
+    .field-help code {
+      color: var(--brass-lt);
+    }
+
+    .field-help a,
+    .sample-btn {
+      color: var(--brass-lt);
+    }
+
+    .panel-footer,
+    .meta-footer {
+      border-color: var(--seam);
+    }
+
+    .status-badge {
+      border-radius: 3px;
+    }
+
+    .status-badge.ready {
+      color: var(--led);
+      text-shadow: var(--led-glow);
+    }
+
+    .status-badge.ready .status-dot {
+      background-color: var(--led);
+      box-shadow: var(--led-glow);
+    }
+
+    .workflow-tab {
+      border-radius: 3px;
+    }
+
+    .workflow-tab:hover {
+      background-color: rgba(196, 154, 78, 0.1);
+      color: var(--brass-lt);
+    }
+
+    .status-dot {
+      background-color: var(--brass);
+    }
+
+    .dismiss-btn {
+      color: var(--danger);
+    }
+
+    .dismiss-btn:hover {
+      color: var(--paper);
+      background: rgba(224, 102, 74, 0.12);
+    }
+
+    .btn-danger-ghost:hover {
+      background-color: rgba(224, 102, 74, 0.12);
+      border-color: var(--danger);
+      color: #F0A08C;
+    }
+
+    kbd {
+      border-color: var(--seam);
+      background-color: var(--plate-2);
+      color: var(--brass-lt);
+    }
+
+    .error-banner {
+      border-radius: 4px;
+      background: rgba(224, 102, 74, 0.12);
+      border-color: var(--danger);
+      color: #F0A08C;
+    }
+
+    .error-title {
+      color: #FFD0C2;
+    }
+
+    .error-message {
+      color: #F0A08C;
+    }
+
+    .work-status {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      min-height: 76px;
+      margin: 0 0 0.85rem;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--seam);
+      border-radius: 4px;
+      background: linear-gradient(90deg, rgba(196, 154, 78, 0.07), rgba(0, 0, 0, 0.16));
+    }
+
+    .work-machine {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      width: 90px;
+      height: 54px;
+      flex: 0 0 90px;
+      border-right: 1px solid var(--seam);
+    }
+
+    .work-gear {
+      width: 30px;
+      height: 30px;
+      fill: var(--brass-dk);
+      color: var(--brass-lt);
+      transform-origin: 50% 50%;
+    }
+
+    .work-gear.small {
+      width: 22px;
+      height: 22px;
+      margin-top: 15px;
+      fill: var(--copper);
+    }
+
+    .work-mailbox {
+      position: relative;
+      width: 42px;
+      height: 28px;
+      margin: 11px 4px 0 0;
+    }
+
+    .mailbox-body {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 39px;
+      height: 22px;
+      border: 2px solid var(--brass-dk);
+      border-radius: 4px 4px 2px 2px;
+      background: linear-gradient(145deg, var(--plate-2), #10120D);
+      box-shadow: inset 0 1px 0 rgba(226, 190, 115, 0.18);
+    }
+
+    .mailbox-light {
+      position: absolute;
+      top: 7px;
+      left: 7px;
+      width: 7px;
+      height: 7px;
+      border: 1px solid var(--brass-dk);
+      border-radius: 50%;
+      background: #4B3920;
+    }
+
+    .mailbox-slot {
+      position: absolute;
+      right: 6px;
+      bottom: 5px;
+      width: 15px;
+      height: 3px;
+      border-radius: 3px;
+      background: var(--well);
+      box-shadow: 0 1px 0 var(--brass-dk);
+    }
+
+    .mailbox-post {
+      position: absolute;
+      top: 10px;
+      left: 17px;
+      width: 16px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--brass-dk), var(--brass-lt), var(--brass-dk));
+      transform-origin: left center;
+      transform: rotate(70deg);
+      transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .mailbox-flag {
+      position: absolute;
+      top: -5px;
+      right: -1px;
+      width: 9px;
+      height: 7px;
+      border: 1px solid var(--copper);
+      border-radius: 1px 4px 1px 1px;
+      background: var(--copper);
+      transition: background-color 0.25s, border-color 0.25s;
+    }
+
+    .work-status[data-state="generating"] .work-gear {
+      animation: gear-turn 1.4s linear infinite;
+    }
+
+    .work-status[data-state="generating"] .work-gear.small {
+      animation-direction: reverse;
+      animation-duration: 1s;
+    }
+
+    .work-status[data-state="generating"] .mailbox-post {
+      transform: rotate(70deg);
+    }
+
+    .work-status[data-state="ready"] .mailbox-post {
+      transform: rotate(-90deg);
+    }
+
+    .work-status[data-state="ready"] .mailbox-flag {
+      border-color: var(--led);
+      background: var(--led);
+      box-shadow: var(--led-glow);
+    }
+
+    .work-status[data-state="ready"] .mailbox-light {
+      border-color: var(--led);
+      background: var(--led);
+      box-shadow: var(--led-glow);
+    }
+
+    .work-status[data-state="error"] .mailbox-light {
+      border-color: var(--danger);
+      background: var(--danger);
+      box-shadow: 0 0 8px rgba(224, 102, 74, 0.55);
+    }
+
+    .work-status[data-state="generating"] .mailbox-light {
+      background: var(--brass);
+      box-shadow: 0 0 8px rgba(196, 154, 78, 0.6);
+      animation: signal-pulse 0.9s ease-in-out infinite alternate;
+    }
+
+    .work-state-label {
+      display: block;
+      color: var(--brass-lt);
+      font-family: var(--f-led);
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      text-shadow: 0 0 8px rgba(226, 190, 115, 0.25);
+    }
+
+    .work-state-detail {
+      display: block;
+      margin-top: 0.15rem;
+      color: var(--dim);
+      font-size: 0.78rem;
+    }
+
+    .work-status[data-state="ready"] .work-state-label {
+      color: var(--led);
+      text-shadow: var(--led-glow);
+    }
+
+    .work-status[data-state="error"] .work-state-label {
+      color: var(--danger);
+      text-shadow: none;
+    }
+
+    @keyframes gear-turn {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes signal-pulse {
+      to { opacity: 0.45; }
+    }
+
+    @media (max-width: 520px) {
+      .header-bar {
+        height: auto;
+        min-height: 64px;
+        padding-top: 0.55rem;
+        padding-bottom: 0.55rem;
+      }
+
+      .header-actions {
+        gap: 0.35rem;
+      }
+
+      .status-badge {
+        padding: 0.3rem 0.45rem;
+      }
+
+      .status-badge span:last-child {
+        max-width: 5.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .header-actions .btn-secondary {
+        padding: 0.45rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .work-status[data-state="generating"] .work-gear,
+      .work-status[data-state="generating"] .mailbox-light {
+        animation: none;
+      }
     }
   </style>
 </head>
-<body>
+<body class="theme-page">
 
   <!-- Top Header & Settings Bar -->
   <header class="app-header">
@@ -733,7 +1157,7 @@
           </svg>
         </div>
         <div>
-          <h1 class="brand-title">IT Support AI Assistant</h1>
+          <h1 class="brand-title">Formalizer</h1>
           <p class="brand-subtitle">Workstation Communication &amp; Ticket Documentation</p>
         </div>
       </div>
@@ -849,7 +1273,7 @@
     <!-- Error / Notice Banner -->
     <div id="error-banner" class="error-banner hidden" role="alert">
       <div class="error-banner-left">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px; color:#fb7185;">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px; color:#E0664A;">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <div>
@@ -894,8 +1318,8 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             <svg id="loading-spinner" class="hidden spinner" width="16" height="16" fill="none" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle>
-              <path fill="currentColor" opacity="0.85" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <path fill="currentColor" d="M9.8 2h4.4l.5 2.1a8 8 0 0 1 1.4.8l2-.8 2.2 3.8-1.6 1.4a8 8 0 0 1 0 1.6l1.6 1.4-2.2 3.8-2-.8a8 8 0 0 1-1.4.8l-.5 2.1H9.8l-.5-2.1a8 8 0 0 1-1.4-.8l-2 .8-2.2-3.8 1.6-1.4a8 8 0 0 1 0-1.6L3.7 7.9 5.9 4.1l2 .8a8 8 0 0 1 1.4-.8z" />
+              <circle cx="12" cy="10.1" r="2.7" fill="#C49A4E" />
             </svg>
             <span id="generate-btn-text">Polish Teams Message</span>
           </button>
@@ -914,11 +1338,35 @@
             <svg id="copy-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
-            <svg id="check-icon" class="hidden" width="14" height="14" fill="none" stroke="#34d399" stroke-width="2.5" viewBox="0 0 24 24">
+            <svg id="check-icon" class="hidden" width="14" height="14" fill="none" stroke="#6DFF8E" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
             <span id="copy-btn-text">Copy</span>
           </button>
+        </div>
+
+        <div id="work-status" class="work-status" data-state="idle" role="status" aria-live="polite">
+          <div class="work-machine" aria-hidden="true">
+            <svg class="work-gear" viewBox="0 0 24 24">
+              <path d="M9.8 2h4.4l.5 2.1a8 8 0 0 1 1.4.8l2-.8 2.2 3.8-1.6 1.4a8 8 0 0 1 0 1.6l1.6 1.4-2.2 3.8-2-.8a8 8 0 0 1-1.4.8l-.5 2.1H9.8l-.5-2.1a8 8 0 0 1-1.4-.8l-2 .8-2.2-3.8 1.6-1.4a8 8 0 0 1 0-1.6L3.7 7.9 5.9 4.1l2 .8a8 8 0 0 1 1.4-.8z" />
+              <circle cx="12" cy="10.1" r="2.7" fill="#1A1C16" />
+            </svg>
+            <svg class="work-gear small" viewBox="0 0 24 24">
+              <path d="M9.8 2h4.4l.5 2.1a8 8 0 0 1 1.4.8l2-.8 2.2 3.8-1.6 1.4a8 8 0 0 1 0 1.6l1.6 1.4-2.2 3.8-2-.8a8 8 0 0 1-1.4.8l-.5 2.1H9.8l-.5-2.1a8 8 0 0 1-1.4-.8l-2 .8-2.2-3.8 1.6-1.4a8 8 0 0 1 0-1.6L3.7 7.9 5.9 4.1l2 .8a8 8 0 0 1 1.4-.8z" />
+              <circle cx="12" cy="10.1" r="2.7" fill="#1A1C16" />
+            </svg>
+            <div class="work-mailbox">
+              <span class="mailbox-post"><span class="mailbox-flag"></span></span>
+              <div class="mailbox-body">
+                <span class="mailbox-light"></span>
+                <span class="mailbox-slot"></span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <span id="work-state-label" class="work-state-label">STANDING BY</span>
+            <span id="work-state-detail" class="work-state-detail">Your finished message will be marked here.</span>
+          </div>
         </div>
 
         <textarea
@@ -1084,6 +1532,9 @@ Rules:
         outputPanelTitle: document.getElementById('output-panel-title'),
         outputPanelHint: document.getElementById('output-panel-hint'),
         aiOutput: document.getElementById('ai-output'),
+        workStatus: document.getElementById('work-status'),
+        workStateLabel: document.getElementById('work-state-label'),
+        workStateDetail: document.getElementById('work-state-detail'),
         copyOutputBtn: document.getElementById('copy-output-btn'),
         copyIcon: document.getElementById('copy-icon'),
         checkIcon: document.getElementById('check-icon'),
@@ -1179,6 +1630,12 @@ Rules:
         els.errorBanner.classList.add('hidden');
       }
 
+      function setWorkStatus(state, label, detail) {
+        els.workStatus.dataset.state = state;
+        els.workStateLabel.textContent = label;
+        els.workStateDetail.textContent = detail;
+      }
+
       function showToast(message) {
         els.toastMessage.textContent = message;
         els.toast.classList.add('visible');
@@ -1224,6 +1681,7 @@ Rules:
         }
 
         setLoadingState(true);
+        setWorkStatus('generating', 'GEARS IN MOTION', 'Polishing your message...');
         els.aiOutput.value = '';
         els.copyOutputBtn.disabled = true;
         updateActiveModelLabel(model);
@@ -1267,7 +1725,9 @@ Rules:
           els.aiOutput.value = generatedText;
           els.copyOutputBtn.disabled = false;
           updateActiveModelLabel(model, data?.model);
+          setWorkStatus('ready', 'MESSAGE READY', 'Your polished message is ready to copy.');
         } catch (err) {
+          setWorkStatus('error', 'CYCLE INTERRUPTED', 'Check the notice above, then try again.');
           showError('OpenRouter API Error', err.message || 'An unexpected network error occurred.');
         } finally {
           setLoadingState(false);
