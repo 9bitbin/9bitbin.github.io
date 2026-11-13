@@ -292,6 +292,17 @@ h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);
 .meter{height:6px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden;margin:12px 0 6px}.meter i{display:block;height:100%;background:linear-gradient(90deg,#67e8f9,#a78bfa,#f472b6)}
 .pm{font-size:.78rem;color:var(--muted)}
 @media (max-width:600px){.strength,.why{padding-left:16px}.opt .opick{padding:13px 14px}}
+.rankhelp{font-size:.82rem;color:var(--muted);margin:-14px 0 16px}.rankhelp b{color:var(--ink)}
+.opt.rk1{border-color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent);box-shadow:0 0 0 1px var(--c) inset,0 0 28px -10px var(--c)}
+.opt.rk2{border-color:color-mix(in srgb,var(--c) 70%,transparent);background:color-mix(in srgb,var(--c) 8%,transparent)}
+.opt.rk1 .key,.opt.rk2 .key{width:auto;padding:0 8px;color:#07051a;background:var(--c);border-color:var(--c);font-size:.72rem}
+.opt.rk2 .key{background:color-mix(in srgb,var(--c) 70%,#fff 0%);opacity:.85}
+.opt .rkb{margin-left:auto;align-self:center;font:700 .62rem Manrope;letter-spacing:.14em;text-transform:uppercase;color:var(--c);white-space:nowrap;padding-left:8px}
+.opt.dismissed{opacity:.28;transform:scale(.985);filter:saturate(.4)}
+.opt.dismissed:hover{opacity:.6}
+.opt{transition:opacity .35s,transform .45s cubic-bezier(.3,1.5,.5,1),border-color .3s,background .3s,filter .35s}
+.why{padding:6px 4px 2px;animation:optIn .35s ease forwards}
+@media (max-width:600px){.opt .rkb{display:none}.why .srow{flex-direction:column}.why .wbtn{justify-content:flex-start}}
 @media (max-width:600px){.card{padding:24px 18px 18px;border-radius:22px}.side .hint{display:none}.brand span.x{display:none}.opt{padding:14px 14px;font-size:.93rem}.side .orbit-wrap{width:130px!important}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -308,14 +319,14 @@ h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);
   <section class="screen active intro" id="intro">
     <div class="orbit-wrap"><canvas id="orbitIntro"></canvas></div>
     <h1 class="title">Map your<br>constellation</h1>
-    <p class="lede">36 everyday scenes at work, with people, on your own, and under stress. Pick what you'd actually do, then say how much it's you. Nothing is labeled. Your core default takes shape as you go.</p>
-    <div class="chips"><span class="chip">36 scenes</span><span class="chip">~9 minutes</span><span class="chip">32 subtypes</span><span class="chip">core default</span></div>
+    <p class="lede">36 everyday scenes at work, with people, on your own, and under stress. Pick the option that's most you, then your next most, and say why. Nothing is labeled. Your core default takes shape as you go.</p>
+    <div class="chips"><span class="chip">36 scenes</span><span class="chip">~10 minutes</span><span class="chip">32 subtypes</span><span class="chip">core default</span></div>
     <form class="namegate" id="nameForm" autocomplete="off">
       <label for="nameInput" class="nlabel">What should we call you?</label>
       <div class="nrow"><input id="nameInput" maxlength="40" placeholder="Your name or nickname" required><button class="cta" id="startBtn" type="submit" disabled>Begin</button></div>
       <div class="consent">Your name, your answers, and your result are saved and visible to the quiz owner.</div>
     </form>
-    <div class="fine">Keys 1–6 pick · 1–5 strength · Enter next · ← back</div>
+    <div class="fine">Keys 1–6 rank · 1–5 why · Enter next · Esc reset · ← back</div>
   </section>
 
   <!-- QUIZ -->
@@ -333,7 +344,7 @@ h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);
         <div class="progress"><i id="pfill"></i></div>
         <div class="qmeta"><span class="qnum" id="qnum">Signal 01</span><button class="back" id="backBtn" disabled>← Back</button></div>
         <div class="qbody" id="qbody"></div>
-        <div class="kbd" id="stageHint">Press 1–6 to pick</div>
+        <div class="kbd" id="stageHint">Tap the option that's most you (1–6)</div>
       </div>
     </div>
   </section>
@@ -346,7 +357,7 @@ h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);
 /* ===== SUPABASE CONFIG: paste your project values (Project Settings -> API) ===== */
 const SUPABASE_URL = 'https://lcbzmlsowikajunifdjt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjYnptbHNvd2lrYWp1bmlmZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1OTE4NDAsImV4cCI6MjEwOTE2Nzg0MH0.Bbc5Jndb9yj5Ar27MyYba5tIx3GL6zH99SoXkVAY630';
-const QUIZ_VERSION = 'constellation-v2';
+const QUIZ_VERSION = 'constellation-v2.1';
 </script>
 <script>
 // ===== OPS-inspired scoring engine (shared by page + tests) =====
@@ -467,7 +478,7 @@ const BANK = [
      "Deal with what's needed right now and adjust on the fly.",
      "Rethink the problem until the new direction makes sense to me.",
      "Re-plan the timeline and reassign tasks.",
-     "Ask myself if I still believe in where this is going.",
+     "Check in with myself about whether it still feels right.",
      "Check how the team is taking it and get everyone on board." ]},
    social:{ q:"A trip with friends or family falls through at the last minute. What do you do?", o:[
      "Accept it and think about what it means for the bigger picture.",
@@ -504,7 +515,7 @@ const BANK = [
      "Which one I can start on right now.",
      "Which one makes the most logical sense to me.",
      "Which one gets the best measurable result.",
-     "Which one I actually believe in.",
+     "Which one I feel right about.",
      "Which one works best for the people involved." ]},
    social:{ q:"Your friends can't agree on where to go and they look to you. How do you choose?", o:[
      "Pick the one that fits the feel of the night.",
@@ -531,7 +542,7 @@ const BANK = [
      "Acting on what's in front of me.",
      "My own reasoning, even if others disagree.",
      "Whatever gets results fastest.",
-     "What I can live with, value-wise.",
+     "Whatever sits right with me inside.",
      "What others need from me." ]} } },
  { probe:'free', label:'Free time', items:{
    work:{ q:"You have a free hour at work or school with nothing due. What do you usually do with it?", o:[
@@ -541,7 +552,7 @@ const BANK = [
      "Get up, move around, see what's going on.",
      "Dig into a problem I'm curious about.",
      "Get ahead on upcoming work.",
-     "Work on something that matters to me personally.",
+     "Work on my own personal side project.",
      "Chat with people and catch up." ]},
    social:{ q:"A free weekend with friends or family. What kind of plan do you push for?", o:[
      "Something meaningful we'll remember.",
@@ -560,7 +571,7 @@ const BANK = [
      "Learning how something works in depth.",
      "Knocking out a project and seeing real progress.",
      "Creating or doing something I love.",
-     "Calling or texting people I care about." ]},
+     "Calling or texting people to catch up." ]},
    stress:{ q:"You're burnt out and finally get a break. What do you actually end up doing?", o:[
      "Withdrawing to think things over.",
      "Starting a bunch of new things.",
@@ -596,8 +607,8 @@ const BANK = [
      "Whatever I'm seeing or hearing right now.",
      "Ideas I'm trying to make sense of.",
      "Plans and things I need to do.",
-     "What I want and what matters to me.",
-     "People I care about." ]},
+     "What I actually want.",
+     "How the people around me are doing." ]},
    stress:{ q:"It's late and you can't sleep because of something stressful. What keeps you up?", o:[
      "One outcome I can't stop predicting.",
      "Too many possibilities spinning at once.",
@@ -652,7 +663,7 @@ const BANK = [
      "Show it live or with real examples.",
      "Lay out the logic so it holds together.",
      "Focus on what to do and the results.",
-     "Share why it matters to me.",
+     "Share my personal take on it.",
      "Read the room and adjust so everyone follows." ]},
    social:{ q:"A friend asks how your week went. What do you naturally share?", o:[
      "The theme of the week and what it meant.",
@@ -670,7 +681,7 @@ const BANK = [
      "Things I saw and experienced.",
      "Questions I'm working out.",
      "Goals and to-dos.",
-     "Feelings and what matters to me.",
+     "How I feel and why.",
      "The people in my life." ]},
    stress:{ q:"Someone asks what's wrong when you're stressed. What comes out?", o:[
      "\"I just know where this is going.\"",
@@ -689,7 +700,7 @@ const BANK = [
      "Just start building and adjust as I go.",
      "Figure out how it all works first.",
      "Set milestones and assign tasks.",
-     "Make sure it's something I care about.",
+     "Make sure it feels right to me before I commit.",
      "Get everyone aligned and excited." ]},
    social:{ q:"You're planning an event for people you care about. Where do you start?", o:[
      "With the feeling or meaning I want it to have.",
@@ -763,7 +774,7 @@ const BANK = [
      "Hands-on practice right away.",
      "Figuring out why it works on my own.",
      "Learning what I need to get results.",
-     "Connecting it to what I care about.",
+     "Making it personal and doing it my way.",
      "Learning with or from other people." ]},
    social:{ q:"A friend is teaching you something, like a game, a recipe, or a skill. How do you learn it best?", o:[
      "Get the gist and the point of it.",
@@ -790,7 +801,7 @@ const BANK = [
      "Learn by doing, mistakes included.",
      "Insist on understanding it fully first.",
      "Focus only on what's needed to pass or deliver.",
-     "Focus on the parts I care about.",
+     "Follow whatever parts click for me personally.",
      "Ask others to help me." ]} } },
  { probe:'others', label:'Showing up for others', items:{
    work:{ q:"A coworker or classmate is struggling. How do you naturally help?", o:[
@@ -837,7 +848,7 @@ const BANK = [
      "I handle things as they come up.",
      "A system I designed that makes sense to me.",
      "Lists, deadlines, and checking things off.",
-     "I focus on what I care about first.",
+     "I go by what feels right to work on in the moment.",
      "I stay in sync with what others need from me." ]},
    social:{ q:"Planning with a group: what role do you tend to take?", o:[
      "Setting the overall direction.",
@@ -849,7 +860,7 @@ const BANK = [
      "Making sure it feels right.",
      "Keeping everyone happy and included." ]},
    alone:{ q:"How would you describe your personal space?", o:[
-     "Arranged around what matters most to me now.",
+     "Arranged around whatever I'm focused on lately.",
      "Full of half-started projects and ideas.",
      "Set up the way I like it, the same way each time.",
      "Whatever's practical for what I'm doing that day.",
@@ -864,31 +875,110 @@ const BANK = [
      "I let it go and deal with it later.",
      "I keep re-sorting things in my head.",
      "I over-organize everything.",
-     "I only handle what matters to me.",
-     "I prioritize other people's needs." ]} } }
+     "I only deal with what feels right to deal with.",
+     "I prioritize other people's needs." ]} } },
+ { probe:'nervous', label:'When a conversation gets uncomfortable', items:{
+   work:{ q:"A conversation at work or school gets awkward or tense. What do you steer it toward?", o:[
+     "A bigger-picture topic, like where things are heading.",
+     "A random tangent or a new idea to change the subject.",
+     "Someone we both know and what they've been up to lately.",
+     "What the people around us are doing right now.",
+     "A question about how something works.",
+     "A task or plan we need to sort out.",
+     "A joke about people, myself included.",
+     "Asking about their life and the people in it." ], od:[-1,-1,1,1,-1,-1,1,1]},
+   social:{ q:"You're hanging out and the conversation suddenly feels uncomfortable. What do you do?", o:[
+     "Shift to something deeper or more meaningful.",
+     "Jump to a funny what-if or a new topic.",
+     "Bring up a funny memory about people we both know.",
+     "Point out what the people around us are doing.",
+     "Start a debate about an idea or how something works.",
+     "Bring up a plan or something we need to get done.",
+     "Make a self-deprecating joke to lighten it.",
+     "Check in on how everyone's doing and catch up on people." ], od:[-1,-1,1,1,-1,-1,1,1]},
+   alone:{ q:"After an awkward conversation, what do you find yourself thinking about on your own?", o:[
+     "What it all says about where things are going.",
+     "Other ways the conversation could have gone.",
+     "Replaying exactly what each person said, in order.",
+     "How everyone was acting in the moment.",
+     "Whether my points actually made sense.",
+     "What needs to happen next to fix it.",
+     "Whether I came across like myself.",
+     "How the other person felt about it." ], od:[-1,-1,1,1,-1,-1,1,1]},
+   stress:{ q:"You're stressed and someone asks you about something personal. What do you do?", o:[
+     "Give a short, vague answer and change direction.",
+     "Ramble about ten other things instead.",
+     "Bring up a story about someone we know instead.",
+     "Comment on what the people around us are doing.",
+     "Talk about a problem I'm trying to figure out instead.",
+     "Turn it to a task I need to get done.",
+     "Say I'm fine and pull inward.",
+     "Ask how they're doing instead." ], od:[-1,-1,1,1,-1,-1,1,1]} } },
+ { probe:'smarter', label:'Where you think and feel best', items:{
+   work:{ q:"You're stuck on a hard problem at work or school. Where does the breakthrough usually come?", o:[
+     "When I step back and it suddenly clicks into one idea.",
+     "When I bounce between ideas, often out loud.",
+     "When I go back over notes and sources I trust.",
+     "When I just try something and see what happens.",
+     "When I get quiet time alone to work it out my way.",
+     "When I talk it through with someone. I get sharper out loud.",
+     "When I figure out where I personally stand on it.",
+     "When I hear how everyone else sees it." ]},
+   social:{ q:"Something emotional happened with a friend or family member. How do you work through it?", o:[
+     "Think about what it really means underneath.",
+     "Look at it from a bunch of different angles.",
+     "Go back over what happened, step by step.",
+     "Do something physical to shake it off.",
+     "Think it through quietly until it makes sense.",
+     "Talk it out and decide what to do about it.",
+     "Sort out my own feelings on my own first. They're my responsibility.",
+     "Talk with others about how everyone's feeling." ]},
+   alone:{ q:"On your own, how do you work through something confusing?", o:[
+     "Let it sit until one clear idea comes to me.",
+     "Brainstorm possibilities, maybe on paper.",
+     "Look back at what I already know about it.",
+     "Get hands-on with it.",
+     "Think it through quietly, step by step.",
+     "Talk it out loud, record a voice memo, or text someone.",
+     "Check how I feel about it.",
+     "Think about how it affects the people around me." ]},
+   stress:{ q:"You're overwhelmed and need to think clearly. What do you do?", o:[
+     "Withdraw until I see the one thing that matters.",
+     "Talk in circles through every possibility.",
+     "Retreat to familiar comforts until I calm down.",
+     "Move my body or get outside.",
+     "Shut everyone out to think.",
+     "Call someone and talk it through.",
+     "Be alone with my feelings.",
+     "Reach out to people and see how they're doing." ]} } }
+
 ];
 if (typeof module!=='undefined') module.exports={BANK,FORDER,SCEN};
 
 // ===== Constellation v2 engine: take builder + scenario scoring =====
 // Depends on engine.js (FN, STACKS, SUBTYPES) and bank.js (BANK, FORDER, SCEN).
 const V2 = (()=>{
-  const WHY = { default:{m:1.2,label:"It's just what I do"}, ideal:{m:0.5,label:"It's what I should do"},
-                fear:{m:0.8,label:"It avoids something bad"}, context:{m:0.6,label:"Depends on the day"} };
-  const STRENGTHS = [0.4,0.6,0.8,1.0,1.2], DEFAULT_STRENGTH = 0.8;
-  const N_STRESS = 6, WHY_COUNT = 9;
+  const WHY = { default:{m:1.2,label:"It's just what I do"}, learned:{m:0.5,label:"I worked hard to get good at this"},
+                ideal:{m:0.5,label:"It's what I should do"}, fear:{m:0.8,label:"It avoids something bad"}, context:{m:0.6,label:"Depends on the day"} };
+  const WHY_ORDER = ['default','learned','ideal','fear','context'];
+  const RANK_W = [1.0, 0.5];
+  const N_STRESS = 6, N_ITEMS = 36;
 
   function rngFrom(seed){ let s = seed>>>0 || 1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }
   function shuffle(a,r){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
   function buildTake(seed){
     const r = rngFrom(seed ?? Math.floor(Math.random()*2**31));
-    const probes = BANK.map((p,i)=>i);
-    const stressSet = new Set(shuffle(probes.slice(),r).slice(0,N_STRESS));
+    const probes = shuffle(BANK.map((p,i)=>i), r);
+    const nThree = N_ITEMS - 2*BANK.length;           // 36 - 28 = 8 probes get a 3rd scene
+    const three = new Set(probes.slice(0,nThree));
+    const stressSet = new Set(probes.slice(0,N_STRESS)); // stress only on 3-scene probes, so 2 regular scenes remain
     let items=[];
     BANK.forEach((p,pi)=>{
-      let sc = ['work','social','alone'];
-      if (stressSet.has(pi)) { sc = shuffle(sc,r).slice(0,2).concat('stress'); }
-      sc.forEach(s=>items.push({ probe:p.probe, pi, scen:s, id:p.probe+'-'+s, q:p.items[s].q, opts:p.items[s].o }));
+      let sc = shuffle(['work','social','alone'],r);
+      if (stressSet.has(pi)) sc = sc.slice(0,2).concat('stress');
+      else if (!three.has(pi)) sc = sc.slice(0,2);
+      sc.forEach(s=>items.push({ probe:p.probe, pi, scen:s, id:p.probe+'-'+s, q:p.items[s].q, opts:p.items[s].o, od:p.items[s].od||null }));
     });
     // order: no same probe back to back
     for (let tries=0; tries<500; tries++){
@@ -909,36 +999,39 @@ const V2 = (()=>{
       it.shown = shuffle(shown.slice(),r);                 // display order
       it.text = Object.fromEntries(FORDER.map((f,k)=>[f,it.opts[k]]));
     });
-    // which items ask "why": spread across the take, non-stress and stress both allowed
-    const idx = shuffle(items.map((_,i)=>i),r).slice(0,WHY_COUNT); idx.forEach(i=>items[i].askWhy=true);
+    items.forEach(it=>{ it.askWhy=true; it.odMap = it.od ? Object.fromEntries(FORDER.map((f,k)=>[f,it.od[k]])) : null; });
     return items;
   }
 
-  // picks: array aligned with take: {picked:f|null, strength, why}
+  // picks: array aligned with take: {rank1:f|null, rank2:f|null, why:key|null, none:bool}
   function score(take, picks, tau){
-    const E={}, Econs={}, Estress={}, fearSig={}, idealCnt={}, defaultCnt={};
-    FORDER.forEach(f=>{E[f]=0;Econs[f]=0;Estress[f]=0;fearSig[f]=0;idealCnt[f]=0;defaultCnt[f]=0;});
-    // consistency per probe (non-stress only)
+    const E={}, Econs={}, Estress={}, fearSig={}, idealCnt={}, defaultCnt={}, learnedCnt={};
+    FORDER.forEach(f=>{E[f]=0;Econs[f]=0;Estress[f]=0;fearSig[f]=0;idealCnt[f]=0;defaultCnt[f]=0;learnedCnt[f]=0;});
+    let odE=0;
     const byProbe={};
-    take.forEach((it,i)=>{ const p=picks[i]; if(!p||!p.picked||it.scen==='stress') return; (byProbe[it.probe]=byProbe[it.probe]||[]).push(p.picked); });
+    take.forEach((it,i)=>{ const p=picks[i]; if(!p||!p.rank1||it.scen==='stress') return; (byProbe[it.probe]=byProbe[it.probe]||[]).push(p.rank1); });
     const consFn={}; let consistentProbes=0, probesCounted=0;
     BANK.forEach(b=>{ const arr=byProbe[b.probe]||[]; if(arr.length<2) return; probesCounted++;
       const c={}; arr.forEach(f=>c[f]=(c[f]||0)+1); const best=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];
       if(best[1]>=2){ consFn[b.probe]=best[0]; consistentProbes++; } });
     const perScen={work:{},social:{},alone:{}};
     take.forEach((it,i)=>{
-      const p=picks[i]; if(!p||!p.picked) return;
-      const s=(p.strength??DEFAULT_STRENGTH), wm=p.why?WHY[p.why].m:1, w=s*wm, f=p.picked;
-      if(p.why==='fear') fearSig[f]+=0.5;
-      if(p.why==='ideal') idealCnt[f]++; if(p.why==='default') defaultCnt[f]++;
-      if(it.scen==='stress'){ Estress[f]+=s; return; }
-      const cons = consFn[it.probe]===f;
-      E[f]+= w*(cons?1.5:0.75); if(cons) Econs[f]+=w;
-      perScen[it.scen][f]=(perScen[it.scen][f]||0)+w;
+      const p=picks[i]; if(!p||!p.rank1) return;
+      const wm=p.why?WHY[p.why].m:1;
+      if(p.why==='fear') fearSig[p.rank1]+=0.5;
+      if(p.why==='ideal') idealCnt[p.rank1]++; if(p.why==='default') defaultCnt[p.rank1]++; if(p.why==='learned') learnedCnt[p.rank1]++;
+      [[p.rank1,RANK_W[0]*wm],[p.rank2,RANK_W[1]]].forEach(([f,w])=>{
+        if(!f) return;
+        if(it.scen==='stress'){ Estress[f]+=w; return; }
+        const cons = consFn[it.probe]===f;
+        E[f]+= w*(cons?1.5:0.75); if(cons) Econs[f]+=w;
+        perScen[it.scen][f]=(perScen[it.scen][f]||0)+w;
+        if(it.odMap) odE += 0.6*w*it.odMap[f];
+      });
     });
     const total=FORDER.reduce((a,f)=>a+E[f],0);
     const T = tau ?? Math.max(0.6, 0.045*total);
-    const raw = SUBTYPES.map(s=>E[s.dom] + 0.7*E[s.other]);
+    const raw = SUBTYPES.map(s=>E[s.dom] + 0.7*E[s.other] + odE*s.sign.OD);
     const m=Math.max(...raw), ex=raw.map(v=>Math.exp((v-m)/T)), Z=ex.reduce((a,b)=>a+b,0);
     const subs=SUBTYPES.map((s,i)=>({...s,score:raw[i],p:ex[i]/Z})).sort((a,b)=>b.p-a.p);
     const types={}; for(const t in STACKS) types[t]=0; subs.forEach(s=>types[s.type]+=s.p);
@@ -956,11 +1049,12 @@ const V2 = (()=>{
     const context = Object.entries(perScen).map(([sc,o])=>({scen:sc, fn:topIn(o)})).filter(x=>x.fn && !core.includes(x.fn));
     const stressTop = FORDER.slice().sort((a,b)=>Estress[b]-Estress[a]).filter(f=>Estress[f]>0).slice(0,2);
     const idealGap = FORDER.filter(f=>idealCnt[f]>0 && idealCnt[f]>defaultCnt[f]);
+    const learned = FORDER.filter(f=>learnedCnt[f]>0).sort((a,b)=>learnedCnt[b]-learnedCnt[a]).slice(0,3);
     const loose = consistency<0.35 || subs[0].p<0.25;
     return {subs, types, funcs, coins, animals, top:subs[0], E, Econs, Estress, fearSig, consistency, core, steady, context, stressTop, idealGap,
-            idealCnt, defaultCnt, loose, consFn};
+            idealCnt, defaultCnt, learnedCnt, learned, odE, loose, consFn};
   }
-  return { WHY, STRENGTHS, DEFAULT_STRENGTH, buildTake, score, rngFrom };
+  return { WHY, WHY_ORDER, RANK_W, buildTake, score, rngFrom };
 })();
 if (typeof module!=='undefined') module.exports={V2};
 
@@ -1252,36 +1346,32 @@ let idx=0, take=[], picks=[], stage='pick';
 const N=36;
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $('#'+id).classList.add('active'); scrollTo({top:0,behavior:reduce?'auto':'smooth'}); }
 const OPT_COLORS=['#67e8f9','#a78bfa','#f472b6','#fcd34d','#34d399','#fb923c'];
-const STR_LABELS=['A little','Somewhat','Mostly','Very','Exactly me'];
-const WHY_KEYS=['default','ideal','fear','context'];
+const WHY_KEYS=V2.WHY_ORDER;
 function startTake(){ take=V2.buildTake(); picks=take.map(()=>null); idx=0; stage='pick'; recompute(); show('quiz'); renderQ('in'); }
-function minsLeft(){ return Math.max(1,Math.round((take.length-idx)*15/60)); }
+function minsLeft(){ return Math.max(1,Math.round((take.length-idx)*17/60)); }
+function stageOf(p){ if(!p||!p.rank1) return 'pick'; if(!p.rank2) return 'pick2'; if(!p.why) return 'why'; return 'done'; }
 function optHtml(it,p,anim){
-  return it.shown.map((f,i)=>{ const on=p&&p.picked===f; const c=OPT_COLORS[(i+idx)%6];
-    let extra='';
-    if(on){ const sIdx=p.strength==null?-1:V2.STRENGTHS.indexOf(p.strength);
-      extra=`<div class="strength" role="group" aria-label="How much is this you?"><div class="sl">How much is this you?</div><div class="srow">${STR_LABELS.map((l,k)=>`<button class="sbtn${k===sIdx?' on':''}" data-s="${k}" aria-pressed="${k===sIdx}"><i>${k+1}</i>${l}</button>`).join('')}</div></div>`;
-      if(it.askWhy && p.strength!=null) extra+=`<div class="why" role="group" aria-label="Why that one?"><div class="sl">Why that one? <span>(optional)</span></div><div class="srow">${WHY_KEYS.map((w,k)=>`<button class="wbtn${p.why===w?' on':''}" data-w="${w}"><i>${k+1}</i>${V2.WHY[w].label}</button>`).join('')}</div></div>`;
-    }
-    return `<div class="opt${on?' picked':''}${anim?'':' static'}" data-f="${f}" style="--c:${c};animation-delay:${anim?.05+i*.05:0}s">
-      <button class="opick" data-f="${f}"><span class="key">${i+1}</span><span class="t">${it.text[f]}</span></button>${extra}</div>`; }).join('');
+  const r1=p&&p.rank1, r2=p&&p.rank2, full=!!(r1&&r2);
+  return it.shown.map((f,i)=>{ const c=OPT_COLORS[(i+idx)%6], rk=f===r1?1:f===r2?2:0, dis=full&&!rk;
+    return `<div class="opt${rk?' picked rk'+rk:''}${dis?' dismissed':''}${anim?'':' static'}" data-f="${f}" style="--c:${c};animation-delay:${anim?.05+i*.05:0}s">
+      <button class="opick" data-f="${f}" aria-pressed="${!!rk}" aria-label="${rk?'Ranked #'+rk+': ':''}${it.text[f].replace(/"/g,'&quot;')}"><span class="key">${rk?'#'+rk:i+1}</span><span class="t">${it.text[f]}</span>${rk?`<span class="rkb">${rk===1?'Most me':'Next most'}</span>`:''}</button></div>`; }).join('')
+  + (full ? `<div class="why" role="group" aria-label="Why your #1?"><div class="sl">Why your #1? <span>(tap to continue)</span></div><div class="srow">${WHY_KEYS.map((w,k)=>`<button class="wbtn${p.why===w?' on':''}" data-w="${w}"><i>${k+1}</i>${V2.WHY[w].label}</button>`).join('')}</div></div>` : '');
 }
 function drawOpts(anim){
   const it=take[idx], p=picks[idx], box=$('#opts'); box.innerHTML=optHtml(it,p,anim);
   box.querySelectorAll('.opt').forEach(o=>o.addEventListener('pointermove',e=>{const r=o.getBoundingClientRect(); o.style.setProperty('--mx',(e.clientX-r.left)+'px'); o.style.setProperty('--my',(e.clientY-r.top)+'px');}));
   box.querySelectorAll('.opick').forEach(b=>b.addEventListener('click',e=>pickOpt(b.dataset.f,e)));
-  box.querySelectorAll('.sbtn').forEach(b=>b.addEventListener('click',()=>setStrength(+b.dataset.s)));
   box.querySelectorAll('.wbtn').forEach(b=>b.addEventListener('click',()=>setWhy(b.dataset.w)));
-  $('#nextBtn').disabled = !p;
-  $('#stageHint').textContent = !p ? 'Press 1–6 to pick' : stage==='strength' ? 'Press 1–5 for strength · Enter for next' : stage==='why' ? 'Press 1–4 for why · Enter to skip' : 'Enter for next';
+  stage=stageOf(p);
+  $('#nextBtn').disabled = !(p&&p.rank1&&p.rank2);
+  $('#stageHint').textContent = stage==='pick' ? 'Tap the option that\'s most you (1–6)' : stage==='pick2' ? 'Now tap your #2 (1–6) · tap #1 again to undo' : stage==='why' ? 'Why your #1? (1–5) · Enter to skip' : 'Enter for next · tap a pick to change it';
 }
 function renderQ(dir='in'){
   const it=take[idx], body=$('#qbody');
-  body.innerHTML=`<div class="scen">${SCEN[it.scen]}</div><h2 class="qtext">${it.q}</h2><div class="opts" id="opts"></div>
+  body.innerHTML=`<div class="scen">${SCEN[it.scen]}</div><h2 class="qtext">${it.q}</h2><div class="rankhelp">Pick the one that's <b>most you</b>, then your <b>next most</b>. The other four drop away.</div><div class="opts" id="opts"></div>
     <div class="qfoot"><button class="nonefit" id="noneBtn">None of these fit me</button><button class="nextb" id="nextBtn" disabled>Next →</button></div>`;
-  stage = picks[idx] ? (picks[idx].strength==null?'strength':(it.askWhy&&!picks[idx].why?'why':'done')) : 'pick';
   drawOpts(true);
-  $('#noneBtn').addEventListener('click',()=>{ picks[idx]={picked:null,strength:null,why:null,none:true}; advance(); });
+  $('#noneBtn').addEventListener('click',()=>{ picks[idx]={rank1:null,rank2:null,why:null,none:true}; advance(true); });
   $('#nextBtn').addEventListener('click',()=>advance());
   $('#qcount').innerHTML=String(idx+1).padStart(2,'0')+`<span> / ${N}</span>`;
   $('#qnum').textContent='Scene '+String(idx+1).padStart(2,'0')+' · about '+minsLeft()+' min left';
@@ -1296,19 +1386,21 @@ function recompute(){
 }
 function pickOpt(f,e){
   if(busy) return;
-  const prev=picks[idx]; picks[idx]={picked:f,strength:null,why:null};
-  if(prev&&prev.picked===f){ picks[idx]=prev; }
-  stage='strength'; drawOpts(false);
-  const el=$(`.opt[data-f="${f}"]`); if(el){ const r=el.getBoundingClientRect(); burst(e&&e.clientX?e.clientX:r.left+r.width/2, e&&e.clientY?e.clientY:r.top+20, el.style.getPropertyValue('--c')||'#a78bfa', reduce?0:24); }
-  chime(idx); recompute();
+  let p=picks[idx]; if(!p||p.none) p=picks[idx]={rank1:null,rank2:null,why:null};
+  if(p.rank1===f){ p.rank1=p.rank2; p.rank2=null; p.why=null; }           // undo #1: #2 moves up
+  else if(p.rank2===f){ p.rank2=null; p.why=null; }                          // undo #2
+  else if(!p.rank1){ p.rank1=f; }
+  else if(!p.rank2){ p.rank2=f; }
+  else { p.rank2=f; }                                                        // both set: tapping a dismissed one swaps it in as #2
+  drawOpts(false);
+  const el=$(`.opt[data-f="${f}"]`); if(el&&el.classList.contains('picked')){ const r=el.getBoundingClientRect(); burst(e&&e.clientX?e.clientX:r.left+r.width/2, e&&e.clientY?e.clientY:r.top+20, el.style.getPropertyValue('--c')||'#a78bfa', reduce?0:22); chime(idx+(p.rank2===f?2:0)); }
+  recompute();
 }
-function setStrength(k){ const p=picks[idx]; if(!p||!p.picked) return; p.strength=V2.STRENGTHS[k];
-  if(take[idx].askWhy){ stage='why'; drawOpts(false); } else { stage='done'; drawOpts(false); setTimeout(()=>advance(),220); } recompute(); }
-function setWhy(w){ const p=picks[idx]; if(!p||!p.picked) return; p.why = p.why===w?null:w; stage='done'; drawOpts(false); recompute(); setTimeout(()=>advance(),260); }
+function setWhy(w){ const p=picks[idx]; if(!p||!p.rank1||!p.rank2) return; p.why=w; drawOpts(false); recompute(); setTimeout(()=>advance(),260); }
 let busy=false;
-function advance(){
+function advance(force){
   if(busy) return; const p=picks[idx]; if(!p) return;
-  if(p.picked && p.strength==null) p.strength=V2.DEFAULT_STRENGTH;
+  if(!force && !(p.rank1&&p.rank2)) return;
   busy=true; recompute();
   $('#qbody').classList.add('out');
   setTimeout(()=>{ idx++; busy=false; if(idx<N) renderQ('in'); else finish(); },reduce?0:300);
@@ -1317,16 +1409,14 @@ $('#backBtn').addEventListener('click',()=>{ if(idx>0&&!busy){ idx--; recompute(
 addEventListener('keydown',e=>{
   if(!$('#quiz').classList.contains('active') || busy) return;
   if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
-  const n=parseInt(e.key,10), it=take[idx];
-  if(e.key==='Enter'){ if(picks[idx]){ e.preventDefault(); advance(); } return; }
-  if(e.key==='Escape'){ stage='pick'; drawOpts(false); return; }
+  const n=parseInt(e.key,10), it=take[idx], st=stageOf(picks[idx]);
+  if(e.key==='Enter'){ const p=picks[idx]; if(p&&p.rank1&&p.rank2){ e.preventDefault(); advance(); } return; }
+  if(e.key==='Escape'){ picks[idx]=null; drawOpts(false); recompute(); return; }
   if(!isNaN(n)){
-    if(stage==='pick' && n>=1 && n<=6) return pickOpt(it.shown[n-1]);
-    if(stage==='strength' && n>=1 && n<=5) return setStrength(n-1);
-    if(stage==='why' && n>=1 && n<=4) return setWhy(WHY_KEYS[n-1]);
-    if(stage==='done' && n>=1 && n<=6){ stage='pick'; return pickOpt(it.shown[n-1]); }
+    if((st==='pick'||st==='pick2') && n>=1 && n<=6) return pickOpt(it.shown[n-1]);
+    if(st==='why' && n>=1 && n<=5) return setWhy(WHY_KEYS[n-1]);
   }
-  if((e.key==='ArrowLeft'||e.key==='Backspace') && stage!=='strength' && stage!=='why') $('#backBtn').click();
+  if((e.key==='ArrowLeft'||e.key==='Backspace') && st==='pick') $('#backBtn').click();
 });
 /* ---------- name gate ---------- */
 let takerName='';
@@ -1360,8 +1450,9 @@ function buildRecord(r){
     lead: t.sign.OD>0?'Observer':'Decider', animal:t.animal,
     type_prob:round(r.types[t.type]), subtype_prob:round(t.p), coins, type_probs:tp,
     answers: take.map((it,i)=>{ const p=picks[i]||{}; return { n:i+1, probe:it.probe, scenario:it.scen, item_id:it.id, q:it.q, shown:it.shown,
-      picked:p.picked||null, t:p.picked?it.text[p.picked]:null, strength:p.picked?(p.strength??V2.DEFAULT_STRENGTH):null, why:p.why||null, none_fit:!!p.none }; }),
-    consistency: round(r.consistency), core_default: r.core, context_fns: r.context, ideal_gap: r.idealGap, stress_profile: r.stressTop };
+      picked:p.rank1||null, t:p.rank1?it.text[p.rank1]:null, second:p.rank2||null, t2:p.rank2?it.text[p.rank2]:null,
+      dismissed:(p.rank1&&p.rank2)?it.shown.filter(f=>f!==p.rank1&&f!==p.rank2):[], why:p.why||null, none_fit:!!p.none }; }),
+    consistency: round(r.consistency), core_default: r.core, learned_fns: r.learned, context_fns: r.context, ideal_gap: r.idealGap, stress_profile: r.stressTop };
 }
 function renderSave(state,msg){
   const el=$('#saveChip'); if(!el) return;
@@ -1382,7 +1473,7 @@ async function doSave(){
 const unp=s=>String(s).replace(/[.。!?…]+$/,'');
 function weakestScenario(r){
   let worst=null, low=2;
-  ['work','social','alone'].forEach(sc=>{ let n=0,c=0; take.forEach((it,i)=>{ const p=picks[i]; if(it.scen!==sc||!p||!p.picked) return; n++; if(r.core.includes(p.picked)) c++; });
+  ['work','social','alone'].forEach(sc=>{ let n=0,c=0; take.forEach((it,i)=>{ const p=picks[i]; if(it.scen!==sc||!p||!p.rank1) return; n++; if(r.core.includes(p.rank1)) c++; });
     if(n>=3 && c/n<low){ low=c/n; worst=sc; } });
   return low<0.6?worst:null;
 }
@@ -1398,7 +1489,7 @@ function patternsHtml(r){
       <div class="meter"><i style="width:${Math.round(r.consistency*100)}%"></i></div><div class="pm">${Math.round(r.consistency*100)}% consistent across scenes${r.loose?' · loose read':''}</div>
       ${steady.length?`<p>Held steady in: ${steady.join(', ')}.</p>`:''}</div>
     <div class="panel pat"><div class="pk">You adapt when…</div><ul>${ctx}</ul></div>
-    <div class="panel pat"><div class="pk">Who you think you should be</div><p>${ideal}</p>${dfltTxt?`<p class="muted2">${dfltTxt}</p>`:''}</div>
+    <div class="panel pat"><div class="pk">Automatic vs. built up</div>${dfltTxt?`<p>${dfltTxt}</p>`:''}${r.learned.length?`<p>You've <b>worked hard</b> to build ${r.learned.map(fc2).join(', ')}. Effort like that usually points at functions further down your stack, not your default.</p>`:''}<p class="muted2">${ideal}</p></div>
     <div class="panel pat"><div class="pk">Under stress you go to</div><div class="pv">${stress}</div><p class="muted2">Taken from the ${take.filter(t=>t.scen==='stress').length} stress scenes. These don't count toward your type.</p></div></div>`;
 }
 function guideHtml(r, focus){
@@ -1496,17 +1587,20 @@ function explorerSvg(you){
     ${axis('Ni','Se')}${axis('Si','Ne')}${axis('Fi','Te')}${axis('Ti','Fe')}
     ${Object.keys(XPOS).map(node).join('')}</svg>`;
 }
-const SIZES=[1.28,1.04,.84,.68], OFF=.5;
-function stackOrder(type,subKey){ const st=STACKS[type]; const s=SUBTYPES.find(x=>x.key===subKey&&x.type===type)||SUBTYPES.find(x=>x.type===type&&x.pos==='aux');
-  return s.pos==='tert' ? [st[0],st[2],st[1],st[3]] : st.slice(); }
+const SIZES=[1.28,1.04,.84,.62], OFF=.46;
+// Stack size always follows position: 1st biggest, 2nd, 3rd, then a big drop to the 4th.
+// A jumper (dom + tert subtype) uses the 3rd as a savior, but the 2nd stays naturally bigger,
+// and the drop to the 4th is steeper.
+function subOf(type,subKey){ return SUBTYPES.find(x=>x.key===subKey&&x.type===type)||SUBTYPES.find(x=>x.type===type&&x.pos==='aux'); }
 function applySizing(root,type,subKey,isYou){
-  const order=stackOrder(type,subKey), saviors=order.slice(0,2);
-  root.querySelectorAll('.xnode').forEach(n=>{ const f=n.dataset.f, i=order.indexOf(f), s=i<0?OFF:SIZES[i];
+  const st=STACKS[type], sub=subOf(type,subKey), saviors=[sub.dom,sub.other], jumper=sub.pos==='tert';
+  root.querySelectorAll('.xnode').forEach(n=>{ const f=n.dataset.f, i=st.indexOf(f);
+    const s = i<0 ? OFF : (i===3 && jumper ? .52 : SIZES[i]);
     n.querySelector('.sz').style.transform=`scale(${s})`;
     n.classList.toggle('offstack',i<0); n.classList.toggle('mine',isYou&&saviors.includes(f)); n.classList.toggle('savior',saviors.includes(f));
-    n.querySelector('.rk').textContent = i<0?'':'#'+(i+1)+(i<2?' · SAVIOR':''); });
-  const lab=root.querySelector('.xsizing'); const sub=SUBTYPES.find(x=>x.type===type&&x.dom===order[0]&&x.other===order[1]);
-  lab.innerHTML = `${isYou?'Sized to <b>your result</b>':'Sized to'}: <b>${type}</b> ${order[0]}–${order[1]} (${sub.pos==='aux'?'Dom + Aux, balanced':'Dom + Tert, looping'}). Bigger means further up the stack. #1 and #2 are the saviors.${isYou?'':' <button class="xback">Back to my result</button>'}`;
+    n.querySelector('.rk').textContent = i<0?'':'#'+(i+1)+(saviors.includes(f)?' · SAVIOR':''); });
+  const lab=root.querySelector('.xsizing');
+  lab.innerHTML = `${isYou?'Sized to <b>your result</b>':'Sized to'}: <b>${type}</b> ${sub.dom}–${sub.other} (${jumper?'Dom + Tert, a jumper':'Dom + Aux, balanced'}). Bigger means higher in the stack, and rings mark the two saviors.${jumper?' Jumpers lean on their #3, but their #2 is still naturally bigger, and the drop to #4 is steeper.':''}${isYou?'':' <button class="xback">Back to my result</button>'}`;
   const bb=lab.querySelector('.xback'); if(bb) bb.addEventListener('click',()=>root.dispatchEvent(new Event('xreset')));
 }
 function typesUsing(f){ return SUBTYPES.filter(s=>s.dom===f||s.other===f); }
