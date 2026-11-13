@@ -1,12 +1,12 @@
 # Constellation — setup (GitHub Pages + Supabase)
 
+
 Files:
 - `index.html`: the quiz. Takers enter a name, take the quiz, and their result is saved.
 - `admin.html`: your private results table (needs your login).
 - `supabase-setup.sql`: creates the results table and the security rules.
 - `supabase-update-feedback.sql`: adds the feedback table (v1.1). Run it after the setup file.
 - `supabase-update-v2.sql`: adds the v2 scenario columns. Run it after the two files above. No email to edit.
-- `supabase-update-v2_1.sql`: adds the "worked hard to build" column for ranking (v2.1). Run it after v2. No email to edit.
 
 ## 1. Supabase (about 5 minutes)
 1. Create a project at supabase.com.
@@ -42,13 +42,6 @@ Name, a random browser ID (so repeat takes from one browser link together), type
 - **Core default:** whatever you pick consistently across settings. Stress scenes feed a separate stress profile and don't count toward your type.
 - **Admin:** Consistent % and Core default columns, a Patterns box in each row, and an **Item health** tab. It flags any scene where one option gets more than 60% of picks or "None fit" is over 25% (once a scene has 5+ answers).
 - Old v1 results still show in admin, and `quiz_version` tells them apart.
-
-### v2.1: ranking
-- Each scene: tap the option that's **most you (#1)**, then your **next most (#2)**. The other four drop away and are saved as dismissed. Tap a pick again to undo it.
-- "Why your #1?" on every scene: just what I do / **I worked hard to get good at this** / what I should do / avoids something bad / depends on the day.
-- No strength scale. #1 counts fully, #2 counts half.
-- 14 behaviors now, including "when a conversation gets uncomfortable" and "where you think and feel best."
-- Deploy: run `supabase-update-v2_1.sql`, then replace `index.html` and `admin.html` and paste your keys back in.
 
 ### Deploying v2
 1. In pinned-v2, run `supabase-update-v2.sql` (SQL Editor → New query → paste → Run).
