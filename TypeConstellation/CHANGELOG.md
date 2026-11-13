@@ -1,5 +1,24 @@
 # Changelog
 
+## v2.1 (constellation-v2.1) — ranking + full playlist pass
+**Source:** all 14 videos in the "important." playlist, read in full (including Se-ExxPs and Te-ExxJs, which now have transcripts, and the new Fe-ExxJs).
+
+**Quiz**
+- Ranking: tap #1 (most you), then #2 (next most). The other 4 are dismissed. Tap a pick again to undo it, and Esc resets the scene. The strength scale is removed.
+- "Why your #1?" on every scene, with a new option, "I worked hard to get good at this." Dave's core tell is whether a behavior is automatic (savior) or worked up to (demon).
+- 2 new behaviors (14 total, 56 scenes): "When a conversation gets uncomfortable" (people vs things, a direct observer/decider tell) and "Where you think and feel best" (talk it out = Te, alone = Ti, own feelings = Fi, everyone's feelings = Fe).
+- Rewrote 15 options that said "what I care about / what matters to me." Per the transcripts, everyone cares about their 4th function, so caring isn't savior evidence.
+- A take is still 36 scenes: 8 behaviors get 3 scenes and 6 get 2. Every behavior keeps at least 2 regular scenes for consistency, plus 6 stress scenes.
+
+**Scoring:** #1 = 1.0 × why weight, #2 = 0.5. "Worked hard" = ×0.5 and feeds a new "Automatic vs. built up" card. The uncomfortable-conversation behavior also adds observer/decider evidence, balanced 4/4 so random answers don't skew it.
+
+**Explorer fix:** bubble size now always follows stack position (1 > 2 > 3, then a big drop to 4), per Dave's Function Stacks video. Jumpers keep the #2 naturally bigger, ring the #3 as a savior, and get a steeper drop to #4. v1.3 had wrongly swapped #2 and #3 for jumpers.
+
+**Data / admin:** answers save #1, #2, the dismissed options and the why. New learned_fns column. Admin shows #1/#2/dismissed per scene, "Worked hard to build," and the top #2 per scene in Item health.
+
+**Tests run:** 32/32 subtypes and types recovered (average confidence 0.82). 20,000 random takes: every type between 5.6% and 7.1%, 98% flagged loose. 200/200 inconsistent takes flagged. Balance and structure checked across 300 takes. Browser runs by mouse (desktop, including undo and skipping the why) and by keyboard (390px) had no errors. Postgres chain v1 → v2 → v2.1: all versions coexist, the public can't read them, bad values are rejected. Admin had no overflow on desktop or phone.
+**Not tested:** your live Supabase project and real people.
+
 ## v2 (constellation-v2)
 **Quiz**
 - Replaced the 32 fixed questions with a 48-scene bank: 12 behaviors × 4 settings, 384 options. Each take draws 36 scenes: 30 regular and 6 stress.
