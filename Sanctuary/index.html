@@ -167,13 +167,13 @@
 </style>
 </head>
 <body>
-<div id="ver">v31</div>
+<div id="ver">v32</div>
 <div id="dbg"></div>
 <div id="fade"></div>
 <div id="overlay">
   <h1>SANCTUARY</h1>
   <div id="sub">preparing the sanctuary…</div>
-  <div id="verline" style="margin-top:6px;font-size:11px;letter-spacing:.22em;color:rgba(233,220,196,.45)">BUILD V31</div>
+  <div id="verline" style="margin-top:6px;font-size:11px;letter-spacing:.22em;color:rgba(233,220,196,.45)">BUILD V32</div>
   <div id="menu" style="margin-top:4px;display:none"><div style="width:180px;height:1px;margin:0 auto 26px;background:linear-gradient(to right,transparent,rgba(255,240,210,.45),transparent)"></div><div><span id="btnBegin" style="display:inline-block;padding:14px 46px;border:1px solid rgba(255,240,210,.7);font-size:14px;letter-spacing:.46em;color:#fff4dd;background:rgba(255,240,210,.04)">begin</span></div><div style="margin-top:22px;font-size:10.5px;letter-spacing:.26em;opacity:.46"><span id="btnCont" style="display:none;padding:5px 10px">continue</span><span id="btnNG" style="display:none;padding:5px 10px">new game +</span><span id="btnSkipP" style="padding:5px 10px">skip prologue</span><span style="opacity:.35">&nbsp;/&nbsp;</span><span id="btnSkip" style="padding:5px 10px">skip to the awakening</span></div><div style="margin-top:18px"><span id="btnTrailer" style="font-size:11px;letter-spacing:.3em;padding:6px 16px;color:#ffd9a8;border:1px solid rgba(255,200,140,.28)">&#9654; watch trailer</span></div><!--<span id="btnBegin" style="padding:6px 14px;border:1px solid rgba(255,240,210,.55);margin:0 6px">begin</span><span id="btnSkipP" style="padding:6px 14px;border:1px solid rgba(255,240,210,.35);margin:0 6px">skip prologue</span><span id="btnCont" style="display:none;padding:6px 14px;border:1px solid rgba(255,240,210,.35);margin:0 6px">continue</span><span id="btnNG" style="display:none;padding:6px 14px;border:1px solid rgba(255,240,210,.35);margin:0 6px">new game +</span><span id="btnSkip" style="padding:6px 14px;border:1px solid rgba(255,240,210,.35);margin:0 6px">skip to the awakening</span>--></div>
   <div id="settings">
     <h3>SOUND</h3>
@@ -219,7 +219,7 @@
 <div id="hurt"></div><div id="timer"></div><div id="memory"></div><div id="hud"><div>you</div><div class="bar"><div id="hp"></div></div><div id="count"></div></div>
 <div id="foeWrap"><div id="foeName"></div><div class="bar"><div id="foe"></div></div></div>
 <div id="qte"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" class="bg"/><circle id="qteRing" cx="50" cy="50" r="44"/></svg><div id="qteK"></div><div id="qteSub"></div><div id="dodgeTag">DODGE</div></div>
-<div id="black"></div><div id="achBox"></div><div id="tcard"></div><div id="trskip">any key — skip trailer</div>
+<div id="black"></div><div id="achBox"></div><div id="tcard"></div><div id="trskip">ESC — skip trailer</div>
 <div id="reticle"></div>
 <div id="prompt"></div>
 <div id="caption"></div><div id="combo"></div><div id="mhint">hold left click — finish</div><div id="wave"></div><div id="journal"><div class="jp"><div class="jl" id="jList"></div><div class="jr"><h3 id="jTitle"></h3><div class="jb" id="jBody"></div><div class="jh">J — close &nbsp;·&nbsp; 1–9 — turn to a page</div></div></div></div>
@@ -759,22 +759,11 @@ const roseDir = new T.Vector3(0.12, -0.78, 0.6).normalize();
 const leftWinZ = [14.5, 9.5, 4.5, -0.5, -13, -22];
 
 async function buildWorld(setStatus) {
-  // environment map (soft studio of warm window glow) for glistening speculars
-  const envScene = new T.Scene();
-  envScene.add(new T.Mesh(new T.SphereGeometry(50, 32, 16), new T.ShaderMaterial({
-    side: T.BackSide,
-    vertexShader: 'varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
-    fragmentShader: 'varying vec3 vP; void main(){ float h = vP.y; vec3 c = mix(vec3(0.05,0.045,0.04), vec3(0.2,0.16,0.12), smoothstep(-0.2,0.8,h)); c = mix(vec3(0.012,0.01,0.009), c, smoothstep(-0.6,-0.05,h)); gl_FragColor = vec4(c,1.0); }'
-  })));
-  const hot = new T.MeshBasicMaterial({ color: new T.Color(5, 3.8, 2.6), side: T.DoubleSide });
-  for (let i = 0; i < 6; i++) {
-    const p = new T.Mesh(new T.PlaneGeometry(4, 9), hot);
-    p.position.set(-40, 16, -30 + i * 12); p.lookAt(0, 0, 0); envScene.add(p);
-  }
-  const rp = new T.Mesh(new T.CircleGeometry(6, 24), new T.MeshBasicMaterial({ color: new T.Color(3, 2.4, 2.8), side: T.DoubleSide }));
-  rp.position.set(0, 18, -42); rp.lookAt(0, 0, 0); envScene.add(rp);
-  // (environment kept as a reference scene only; PMREM output proved unreliable on some GPUs)
-  envScene.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+  // An environment scene used to be assembled here for PMREM speculars. Its
+  // output proved unreliable on some GPUs, so it was disposed on the line
+  // after it was built and never read again - dead weight on every load.
+  // Removed in v32. The envMapIntensity values below are unaffected: there
+  // was no environment map on the materials either way.
 
   setStatus('polishing the marble…'); await nextFrame();
   const fl = makeFloor(1024);
@@ -1683,13 +1672,35 @@ function requestLock() {
     if (p && typeof p.catch === 'function') p.catch(() => { if (!hadLock) enterDrag(); else sub.textContent = 'click again to return'; });
   } catch (e) { enterDrag(); }
 }
+// What a title-screen button does. Split out of the click handler so boot
+// can replay it when someone presses a button before the world is built.
+// Returns true if it handled everything itself (the trailer).
+function startFrom(tid) {
+  if (tid === 'btnTrailer') { started = true; $('fade').style.opacity = 0; $('menu').style.display = 'none'; overlay.classList.add('hidden'); trailerStart(); return true; }
+  started = true; $('fade').style.opacity = 0; $('menu').style.display = 'none';
+  if (tid !== 'btnCont') resetRun();          // a new run forgets everything a run can remember
+  if (tid === 'btnNG') { story.ngplus = true; caption('new game +', 3000); }
+  if (tid === 'btnCont' || tid === 'btnSkip') jumpTo(tid === 'btnCont' ? loadSave() : { phase: 'awake', restored: [] });
+  else if (tid !== 'btnSkipP') prologueStart();
+  return false;
+}
+// Set when a button is pressed while the world is still being built.
+const PEND = { tid: null };
 overlay.addEventListener('click', e => {
-  if (!ready || halted) return;
-  audioInit();
+  if (halted) return;
+  audioInit();   // in the gesture, so the audio context is unlocked either way
   const tid = e.target && e.target.id;
-  if (!started && tid === 'btnTrailer') { started = true; $('fade').style.opacity = 0; $('menu').style.display = 'none'; overlay.classList.add('hidden'); trailerStart(); return; }
-  if (!started) { started = true; $('fade').style.opacity = 0; $('menu').style.display = 'none'; if (tid !== 'btnCont') resetRun();          // a new run forgets everything a run can remember
-    if (tid === 'btnNG') { story.ngplus = true; caption('new game +', 3000); } if (tid === 'btnCont' || tid === 'btnSkip') jumpTo(tid === 'btnCont' ? loadSave() : { phase: 'awake', restored: [] }); else if (tid !== 'btnSkipP') prologueStart(); }
+  if (!ready) {
+    // The world is not finished. Remember the choice and go the moment it is.
+    if (!started && !PEND.tid) {
+      PEND.tid = tid || 'btnBegin';
+      sub.textContent = 'opening the doors…';
+      $('menu').style.opacity = '.3';
+      $('menu').style.pointerEvents = 'none';
+    }
+    return;
+  }
+  if (!started && startFrom(tid)) return;
   requestLock();
 });
 document.addEventListener('pointerlockchange', () => {
@@ -7170,6 +7181,12 @@ const BUSK = [220, 262, 330, 392, 330, 262, 294, 349, 440, 349, 294, 262, 247, 1
     if (!onTitle) document.body.classList.remove('showSet', 'showKeys');
   };
   setInterval(sync, 150); sync();
+  // The menu can now appear within a frame of load, sooner than the poll
+  // above would notice, so watch for it directly and lay the gate out at
+  // once. Without this the ungated layout can flash on screen first.
+  if (window.MutationObserver && mn) {
+    new MutationObserver(sync).observe(mn, { attributes: true, attributeFilter: ['style'] });
+  }
   const hook = (id, cls) => {
     const el = $(id); if (!el) return;
     el.addEventListener('click', e => {
@@ -7671,13 +7688,21 @@ function trailerStart() {
   document.body.classList.add('trailer', 'cine');
   audioInit(); trPadInit();
   TOWN.trGate = 0;
-  const end = e => { if (performance.now() - TR.t0 < 700) return; e.preventDefault(); e.stopPropagation(); trailerEnd(); };
+  // ESC and nothing else. Any key used to do this, so a stray click or a
+  // leaned-on key cut the trailer short; mouse and touch no longer end it.
+  const end = e => {
+    if (e.code !== 'Escape' && e.key !== 'Escape') return;
+    if (performance.now() - TR.t0 < 400) return;
+    e.preventDefault(); e.stopPropagation(); trailerEnd();
+  };
   TR.t0 = performance.now();
-  window.addEventListener('keydown', end, true); window.addEventListener('mousedown', end, true); window.addEventListener('touchstart', end, true);
+  TR.endKey = end;
+  window.addEventListener('keydown', end, true);
   trailerRun().catch(e => { console.error(e); trailerEnd(); });
 }
 function trailerEnd() {
   if (TR.ending) return; TR.ending = true;
+  if (TR.endKey) { window.removeEventListener('keydown', TR.endKey, true); TR.endKey = null; }
   try { speechSynthesis.cancel(); } catch (e) {}
   trBlack(1, 0.6); if (A.master) pset(A.master.gain, 0, 0.2);
   setTimeout(() => location.reload(), 750);
@@ -8170,8 +8195,16 @@ function frame() {
    ========================================================= */
 (async function boot() {
   try {
+    // The title screen is pure HTML over a black fade - none of the church is
+    // visible behind it - so it does not have to wait for the world. Show it
+    // on the first frame and build behind it. Reading the title takes longer
+    // than the build, so in practice nothing is ever waited on.
+    $('menu').style.display = 'block'; overlay.classList.add('ready');
+    try { if (localStorage.getItem('sanctuary_ngplus')) $('btnNG').style.display = 'inline-block'; } catch (e) {}
+    if (loadSave()) $('btnCont').style.display = 'inline-block';
     await nextFrame();
-    await buildWorld(t => { sub.textContent = t; });
+    // An early click overwrites the status line, so stop reporting progress.
+    await buildWorld(t => { if (!PEND.tid) sub.textContent = t; });
     applySize();
     player.pos.set(0, 0, 40);
     camera.position.set(0, 1.7, 40);
@@ -8179,10 +8212,15 @@ function frame() {
     renderer.compile(scene, camera);
     storyAfterCompile();
     ready = true;
-    sub.textContent = 'click to enter';
-    $('menu').style.display = 'block'; overlay.classList.add('ready');
-    try { if (localStorage.getItem('sanctuary_ngplus')) $('btnNG').style.display = 'inline-block'; } catch (e) {} if (loadSave()) $('btnCont').style.display = 'inline-block';
     requestAnimationFrame(frame);
+    if (PEND.tid) {
+      // They already chose. Go, without making them click a second time.
+      const tid = PEND.tid; PEND.tid = null;
+      $('menu').style.opacity = ''; $('menu').style.pointerEvents = '';
+      if (!startFrom(tid)) requestLock();
+    } else {
+      sub.textContent = 'click to enter';
+    }
   } catch (e) {
     console.error(e);
     fatal('The sanctuary could not be built: ' + (e && e.message ? e.message : e));
