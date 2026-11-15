@@ -283,9 +283,9 @@ section.gs{scroll-margin-top:140px;margin-bottom:34px}
 <canvas id="sky" aria-hidden="true"></canvas><div class="vignette"></div>
 <main>
   <div class="topbar">
-    <a class="brand" href="index_v8.html"><b>Constellation</b> · Glossary</a>
+    <a class="brand" href="index.html"><b>Constellation</b> · Glossary</a>
     <nav class="navlinks" aria-label="Glossary sections">
-      <a class="pillbtn" href="index_v8.html">← Back to quiz</a>
+      <a class="pillbtn" href="index.html">← Back to quiz</a>
     </nav>
   </div>
 
@@ -1077,7 +1077,7 @@ function renderLast(){
   const s=subOf(last.type,last.subtype), when=last.date?new Date(last.date).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'';
   box.innerHTML=`<div>${miniStack(last.type,last.subtype)}</div><div class="lt">${esc(last.type)}</div>
     <div class="lm">${isLatest()?'Your latest result':'Saved result'}${when?` · ${esc(when)}`:''}: <b>${s.dom}–${s.other}</b> (${s.pos==='aux'?'balanced':'jumper'}), saviors ${fnLink(s.dom)} + ${fnLink(s.other)}${last.typeProb!=null?` · ${Math.round(last.typeProb*100)}% likelihood`:''}. Saved only on this device.</div>
-    <div class="acts">${last.full&&last.id?`<a class="pillbtn" href="index_v8.html?r=${encodeURIComponent(last.id)}">View full results</a>`:''}<button class="pillbtn" id="lastMap">Show on map</button><a class="pillbtn" href="#you">Coins &amp; growth map</a><a class="pillbtn" href="#${esc(last.subtype)}">Read ${esc(last.subtype)}</a><button class="pillbtn" id="lastForget">Forget this result</button></div>`;
+    <div class="acts">${last.full&&last.id?`<a class="pillbtn" href="index.html?r=${encodeURIComponent(last.id)}">View full results</a>`:''}<button class="pillbtn" id="lastMap">Show on map</button><a class="pillbtn" href="#you">Coins &amp; growth map</a><a class="pillbtn" href="#${esc(last.subtype)}">Read ${esc(last.subtype)}</a><button class="pillbtn" id="lastForget">Forget this result</button></div>`;
   box.classList.add('show');
   $('#lastMap').addEventListener('click',()=>{ highlightFn(null); sizeMap(last.type,last.subtype,true); $('#map').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); });
   $('#lastForget').addEventListener('click',()=>{ forgetLast(); last=readLast(); renderLast(); sizeMap(last?last.type:null,last?last.subtype:null,!!last); });

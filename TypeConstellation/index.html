@@ -459,7 +459,7 @@ body.authopen{overflow:hidden}
       <div class="nrow"><input id="nameInput" maxlength="40" placeholder="Your name or nickname" required><button class="cta" id="startBtn" type="submit" disabled>Begin</button></div>
       <div class="consent">Your name and answers are saved so I can improve the quiz.</div>
     </form>
-    <a class="ghost homeg rainbow" href="glossary_v8.html"><span>✦ Glossary: functions, types &amp; subtypes</span></a>
+    <a class="ghost homeg rainbow" href="glossary.html"><span>✦ Glossary: functions, types &amp; subtypes</span></a>
     <div class="fine">Keys 1–6 rank · 1–5 why · Enter next · Esc reset · ← back</div>
   </section>
 
@@ -1807,7 +1807,7 @@ function funcPanel(f){
     <div><div class="xk">As someone's #1</div><p>${g.first.real}</p><div class="chips2" style="--c:${FCOLOR[f]}">${g.first.strengths.map(s=>`<span>${s}</span>`).join('')}</div>
       <div class="xk">As someone's #4 (blind spot)</div><p>${g.last.struggle}</p></div></div>
     <div class="xk">Leads these subtypes</div><div class="xsubs">${lead.map(s=>subChip(s)).join('')}</div>
-    <div class="xhint">Now tap a <b>${other}</b> to see what ${f} pairs into. <a class="glink" href="glossary_v8.html#${f}">Read ${f} in the glossary</a></div>`;
+    <div class="xhint">Now tap a <b>${other}</b> to see what ${f} pairs into. <a class="glink" href="glossary.html#${f}">Read ${f} in the glossary</a></div>`;
 }
 function subChip(s){ return `<button class="xsub" data-t="${s.type}" data-k="${s.key}" style="--c:${FCOLOR[s.dom]}"><b>${s.type}</b> ${s.dom}–${s.other}<i>${SUBTRAITS[s.key]}</i></button>`; }
 // first = the function picked first (it leads, #1); second = the one picked after it.
@@ -1832,7 +1832,7 @@ function typePanel(t){
     <div class="stack big">${st.map((f,i)=>`<span style="--c:${FCOLOR[f]}"><i>${['#1 Dominant','#2 Auxiliary','#3 Tertiary','#4 Inferior'][i]}</i>${f}</span>`).join('')}</div>
     <div class="xp-grid"><div><div class="xk">#1 ${st[0]} in real life</div><p>${GUIDE[st[0]].first.real}</p></div><div><div class="xk">#4 ${st[3]}, the blind spot</div><p>${GUIDE[st[3]].last.struggle}</p></div></div>
     <div class="xk">Its two subtypes · tap one to resize the map</div><div class="xcombo">${subs.map(s=>`<div class="xc pickable" data-sub="${s.key}" data-ty="${t}" style="--c:${FCOLOR[s.dom]}" tabindex="0"><div class="xc-t">${s.dom}–${s.other} <span>${s.pos==='aux'?'Dom + Aux · balanced':'Dom + Tert · jumper'}</span></div><div class="xc-tr">${SUBTRAITS[s.key]}</div></div>`).join('')}</div>
-    <div class="xhint"><a class="glink" href="glossary_v8.html#${t}">Read ${t} in the glossary</a></div>`;
+    <div class="xhint"><a class="glink" href="glossary.html#${t}">Read ${t} in the glossary</a></div>`;
 }
 function wireExplorer(r){
   const root=$('#explorer'); const you=[r.top.dom,r.top.other];
@@ -1911,7 +1911,7 @@ function renderLastRes(){
     ${changed?`<div class="hchange">Your type changed: <b style="color:${FCOLOR[STACKS[h[1].type][0]]}">${esc(h[1].type)}</b> → <b style="color:${FCOLOR[STACKS[h[0].type][0]]}">${esc(h[0].type)}</b></div>`:''}
     <ul class="hlist">${shown.map((v,n)=>{ const s=SUBTYPES.find(x=>x.key===v.subtype&&x.type===v.type);
       return `<li><span class="ht" style="color:${FCOLOR[s.dom]}">${esc(v.type)}</span><span class="hm"><b>${s.dom}–${s.other}</b> ${s.pos==='aux'?'balanced':'jumper'}<i>${n===0?'Latest · ':''}${esc(histDate(v.date,true))}${v.typeProb!=null?' · '+Math.round(v.typeProb*100)+'%':''}</i></span>
-        ${v.full?`<a href="index_v8.html?r=${encodeURIComponent(v.id)}" class="hview" data-id="${esc(v.id)}">View</a>`:`<a href="glossary_v8.html?r=${encodeURIComponent(v.id)}#${esc(v.subtype)}" title="This result is from before full results were saved, so only the summary is kept.">Summary</a>`}${typeof readSession==='function'&&readSession()&&isUuid(v.id)?(v.acct?`<button type="button" class="hacct on" data-id="${esc(v.id)}" title="In your account. Click to keep it on this device only." aria-label="In your account (click to keep on this device only)"><span>☁</span><span class="hat"> In account</span></button>`:`<button type="button" class="hacct" data-id="${esc(v.id)}" title="Only on this device. Click to add it to your account." aria-label="Only on this device (click to add to your account)"><span>+</span><span class="hat"> Account</span></button>`):''}<button type="button" class="hx" data-id="${esc(v.id)}" aria-label="Forget the ${esc(v.type)} result from ${esc(histDate(v.date,true))}">×</button></li>`; }).join('')}</ul>
+        ${v.full?`<a href="index_v8.html?r=${encodeURIComponent(v.id)}" class="hview" data-id="${esc(v.id)}">View</a>`:`<a href="glossary.html?r=${encodeURIComponent(v.id)}#${esc(v.subtype)}" title="This result is from before full results were saved, so only the summary is kept.">Summary</a>`}${typeof readSession==='function'&&readSession()&&isUuid(v.id)?(v.acct?`<button type="button" class="hacct on" data-id="${esc(v.id)}" title="In your account. Click to keep it on this device only." aria-label="In your account (click to keep on this device only)"><span>☁</span><span class="hat"> In account</span></button>`:`<button type="button" class="hacct" data-id="${esc(v.id)}" title="Only on this device. Click to add it to your account." aria-label="Only on this device (click to add to your account)"><span>+</span><span class="hat"> Account</span></button>`):''}<button type="button" class="hx" data-id="${esc(v.id)}" aria-label="Forget the ${esc(v.type)} result from ${esc(histDate(v.date,true))}">×</button></li>`; }).join('')}</ul>
     <div class="hfoot">${h.length>3?`<button type="button" id="histMore">${histOpen?'Show fewer':'Show all '+h.length}</button>`:'<span></span>'}<span class="hnote">${typeof readSession==='function'&&readSession()?'☁ = also in your account.':'Saved only in this browser.'} <button type="button" id="forgetLast">Forget all</button></span></div>`;
   box.classList.add('show');
   box.querySelectorAll('.hx').forEach(b=>b.addEventListener('click',()=>{ forgetOne(b.dataset.id); renderLastRes(); }));
@@ -2199,10 +2199,10 @@ const FNEED=f=>FLOW_ROWS.find(r=>r.includes(f))[0];
 function flowHtml(top){
   const st=STACKS[top.type], sv=[top.dom,top.other], jump=top.pos==='tert';
   const rows=FLOW_ROWS.map(([n,a,b])=>{ const f=st.includes(a)?a:b, i=st.indexOf(f), s=sv.includes(f), bl=i===3, d=[46,38,32,28][i]-(bl&&jump?4:0);
-    return `<li class="${s?'sv':bl?'bl':''}"><a class="pbub${FN[f].att==='e'?' e':''}" href="glossary_v8.html#${f}" style="--c:${FCOLOR[f]};--d:${d}px" aria-label="${FNAME[f]}"><span>${f}</span></a>
+    return `<li class="${s?'sv':bl?'bl':''}"><a class="pbub${FN[f].att==='e'?' e':''}" href="glossary.html#${f}" style="--c:${FCOLOR[f]};--d:${d}px" aria-label="${FNAME[f]}"><span>${f}</span></a>
       <div class="ptxt"><div class="pk">${n} · #${i+1}</div><div class="pq">${FQ[f]}</div></div>
       <span class="ptag">${s?'Savior · where you start':bl?'Blind spot · ask this more':'#'+(i+1)+' · steady'}</span></li>`; }).join('');
-  return `<ol class="fpath">${rows}</ol><p class="flownote">Function Flow walks the 4 human needs in order: <b>Identity</b>, <b>Gather</b>, <b>Organize</b>, then <b>Tribe</b>. You answer the savior questions without trying. Your blind-spot question, <b>"${FQ[st[3]]}"</b>, is the one worth asking on purpose before big decisions. <a class="glink" href="glossary_v8.html#${top.key}">See it on the glossary map</a></p>`;
+  return `<ol class="fpath">${rows}</ol><p class="flownote">Function Flow walks the 4 human needs in order: <b>Identity</b>, <b>Gather</b>, <b>Organize</b>, then <b>Tribe</b>. You answer the savior questions without trying. Your blind-spot question, <b>"${FQ[st[3]]}"</b>, is the one worth asking on purpose before big decisions. <a class="glink" href="glossary.html#${top.key}">See it on the glossary map</a></p>`;
 }
 
 function finish(){
@@ -2222,10 +2222,10 @@ function renderResults(r,replay){
     const bar = leftWin ? `<i style="right:50%;width:0;background:linear-gradient(270deg,${colL},transparent)" data-w="${d*100}"></i>` : `<i style="left:50%;width:0;background:linear-gradient(90deg,${colR},transparent)" data-w="${d*100}"></i>`;
     return `<div class="coin"><div class="row"><span class="${leftWin?'win':''}">${L[0]} · ${pct(p)}%</span><span class="${leftWin?'':'win'}">${pct(1-p)}% · ${L[1]}</span></div><div class="bar">${bar}</div>${L[2]?`<div class="sub">${leftWin?L[2]:L[3]}</div>`:''}</div>`;
   });
-  const typeCards = sorted.map(([t,p],i)=>`<div class="tc${i===0?' top':''}"><div class="code"><a class="glink" href="glossary_v8.html#${t}">${t}</a></div><div class="pct">${(p*100).toFixed(1)}% likelihood</div><div class="fill" data-w="${p/sorted[0][1]*100}" style="background:linear-gradient(90deg,${FCOLOR[STACKS[t][0]]},${FCOLOR[STACKS[t][1]]})"></div></div>`).join('');
-  const alts = r.subs.slice(0,6).map(s=>`<div class="alt"><a class="k glink" href="glossary_v8.html#${s.type}" style="color:${FCOLOR[s.dom]}">${s.type}</a><span class="m"><a class="glink" href="glossary_v8.html#${s.key}">${s.dom}–${s.other}</a> · ${SUBTRAITS[s.key]}</span><span class="p">${(s.p*100).toFixed(1)}%</span></div>`).join('');
+  const typeCards = sorted.map(([t,p],i)=>`<div class="tc${i===0?' top':''}"><div class="code"><a class="glink" href="glossary.html#${t}">${t}</a></div><div class="pct">${(p*100).toFixed(1)}% likelihood</div><div class="fill" data-w="${p/sorted[0][1]*100}" style="background:linear-gradient(90deg,${FCOLOR[STACKS[t][0]]},${FCOLOR[STACKS[t][1]]})"></div></div>`).join('');
+  const alts = r.subs.slice(0,6).map(s=>`<div class="alt"><a class="k glink" href="glossary.html#${s.type}" style="color:${FCOLOR[s.dom]}">${s.type}</a><span class="m"><a class="glink" href="glossary.html#${s.key}">${s.dom}–${s.other}</a> · ${SUBTRAITS[s.key]}</span><span class="p">${(s.p*100).toFixed(1)}%</span></div>`).join('');
   const an = top.animal, A=ANIMALS[an];
-  const savior = f=>`<div class="panel savior" style="--c:${FCOLOR[f]}"><div class="fh"><div class="orb"></div><div><div class="fn"><a class="glink" href="glossary_v8.html#${f}">${f}</a> Savior</div><div class="fl">${FNAME[f]} · ${pct(r.funcs[f])}% signal</div></div></div>
+  const savior = f=>`<div class="panel savior" style="--c:${FCOLOR[f]}"><div class="fh"><div class="orb"></div><div><div class="fn"><a class="glink" href="glossary.html#${f}">${f}</a> Savior</div><div class="fl">${FNAME[f]} · ${pct(r.funcs[f])}% signal</div></div></div>
     <p>${FDESC[f].core}</p><div class="lbl">The void you leave</div><p>${FDESC[f].void}</p><div class="lbl">Biggest fear</div><p>${FDESC[f].fear}</p></div>`;
   const conf = top.p;
   const confWord = r.loose?'Loose read: your answers shifted a lot between scenes':conf>.5?'Strong read':conf>.25?'Moderate read':'Loose read: retake later or compare runners-up';
@@ -2233,20 +2233,20 @@ function renderResults(r,replay){
     <div class="res-hero" style="--g1:${g1};--g2:${g2}">
       <div class="orbit-wrap" style="width:min(460px,90vw)"><canvas id="orbitRes"></canvas></div>
       <div class="eyebrow">${replay?'Your':esc(takerName)+', your'} constellation reads as</div>
-      <a class="typecode" href="glossary_v8.html#${top.type}" title="Read about ${top.type} in the glossary" style="--g1:${g1};--g2:${g2}">${top.type}</a>
-      <div class="subline"><a class="glink" href="glossary_v8.html#${top.dom}" style="color:${g1}">${top.dom}</a>–<a class="glink" href="glossary_v8.html#${top.other}" style="color:${g2}">${top.other}</a> <a class="glink" href="glossary_v8.html#${top.key}" style="font-size:.8em;color:var(--muted)">(subtype)</a><span class="dot">·</span>${lead}-led<span class="dot">·</span>${A.icon} ${an}</div>
-      <div class="traits"><a class="glink" href="glossary_v8.html#${top.key}">${SUBTRAITS[top.key]}</a> — ${posLabel}</div>
+      <a class="typecode" href="glossary.html#${top.type}" title="Read about ${top.type} in the glossary" style="--g1:${g1};--g2:${g2}">${top.type}</a>
+      <div class="subline"><a class="glink" href="glossary.html#${top.dom}" style="color:${g1}">${top.dom}</a>–<a class="glink" href="glossary.html#${top.other}" style="color:${g2}">${top.other}</a> <a class="glink" href="glossary.html#${top.key}" style="font-size:.8em;color:var(--muted)">(subtype)</a><span class="dot">·</span>${lead}-led<span class="dot">·</span>${A.icon} ${an}</div>
+      <div class="traits"><a class="glink" href="glossary.html#${top.key}">${SUBTRAITS[top.key]}</a> — ${posLabel}</div>
       <div class="conf">${confWord} · top subtype <b>${pct(conf)}%</b> · type <b>${pct(r.types[top.type])}%</b></div><span class="savechip" id="saveChip"></span><div class="takenote" id="takeNote"></div><div class="resacct" id="resAcct"></div>
     </div>
     <div class="section"><h3>Your two saviors</h3><div class="grid2">${savior(top.dom)}${savior(top.other)}</div></div>
     <div class="section"><h3>Your patterns</h3>${patternsHtml(r)}</div>
     <div class="section"><h3>The coins</h3>${coinsBlock(r.coins)}</div>
     <div class="section"><h3>Lead animal & runners-up</h3><div class="grid2">
-      <div class="panel"><div class="animal"><div class="glyph">${A.icon}</div><div><div class="an"><a class="glink" href="glossary_v8.html#animal-${an}">${an}</a> <span style="font:500 .8rem Manrope;color:var(--muted)">${A.pair}</span></div><p>${A.d}</p></div></div>
+      <div class="panel"><div class="animal"><div class="glyph">${A.icon}</div><div><div class="an"><a class="glink" href="glossary.html#animal-${an}">${an}</a> <span style="font:500 .8rem Manrope;color:var(--muted)">${A.pair}</span></div><p>${A.d}</p></div></div>
         <div class="minis">${Object.entries(r.animals).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="mini">${ANIMALS[k].icon} ${k} ${pct(v)}%</span>`).join('')}</div></div>
       <div class="panel">${alts}</div></div></div>
     <div class="section"><h3>All 16 types</h3><div class="panel"><div class="types" style="--g1:${g1}">${typeCards}</div></div></div>
-    <div class="section"><h3>Your savior letters</h3><div class="panel"><div class="letter"><b><a class="glink" href="glossary_v8.html#letter-SN">${sN}</a></b> — ${LETTERS[sN]}</div><div class="letter"><b><a class="glink" href="glossary_v8.html#letter-TF">${sT}</a></b> — ${LETTERS[sT]}</div></div></div>
+    <div class="section"><h3>Your savior letters</h3><div class="panel"><div class="letter"><b><a class="glink" href="glossary.html#letter-SN">${sN}</a></b> — ${LETTERS[sN]}</div><div class="letter"><b><a class="glink" href="glossary.html#letter-TF">${sT}</a></b> — ${LETTERS[sT]}</div></div></div>
     <div class="section"><h3>Your function flow</h3><div class="panel">${flowHtml(top)}</div></div>
     <div class="section"><h3>Your growth map</h3>
       <div class="panel"><div class="focus-k">What's on your mind right now?</div><div class="foci" id="foci">${Object.entries(FOCI).map(([k,v])=>`<button class="focus${k==='general'?' on':''}" data-f="${k}">${v}</button>`).join('')}</div>
@@ -2269,7 +2269,7 @@ function renderResults(r,replay){
       <textarea id="fbNote" maxlength="300" placeholder="What surprised you, or what was missing?"></textarea>
       <div class="fb-actions"><button class="ghost" id="fbSend" disabled>Send feedback</button><span id="fbMsg" class="fb-msg"></span></div>
     </div></div>
-    <div class="actions"><button class="ghost rainbow" id="retake"><span>↻ Retake</span></button><button class="ghost rainbow" id="copyBtn"><span>⧉ Copy my result</span></button><a class="ghost rainbow" id="glossBtn" href="glossary_v8.html${replay?'?r='+encodeURIComponent(replay.id):''}#${top.key}" style="text-decoration:none;display:inline-flex;align-items:center"><span>✦ Read the glossary</span></a></div>
+    <div class="actions"><button class="ghost rainbow" id="retake"><span>↻ Retake</span></button><button class="ghost rainbow" id="copyBtn"><span>⧉ Copy my result</span></button><a class="ghost rainbow" id="glossBtn" href="glossary.html${replay?'?r='+encodeURIComponent(replay.id):''}#${top.key}" style="text-decoration:none;display:inline-flex;align-items:center"><span>✦ Read the glossary</span></a></div>
     <p class="disclaimer">Built from the Objective Personality framework (Dave &amp; Shan Powers) and your own notes. OPS isn't peer-reviewed science, and a self-report quiz can't see your blind spots: the transcripts point out that people mostly see their middle functions, not their first and last. Treat this as a hypothesis to test against how you actually live over time, not a verdict.</p>`;
   show('results');
   if(replay){
