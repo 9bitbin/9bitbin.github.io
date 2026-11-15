@@ -62,6 +62,9 @@ canvas{display:block}
 /* cutscene */
 #cs{z-index:70;background:#000}
 #csCv{position:absolute;inset:0;width:100%;height:100%}
+#csNext{position:absolute;right:24px;bottom:46px;font-family:var(--mono);font-size:22px;color:#cfc3a3;opacity:0;transition:opacity .35s;pointer-events:none;letter-spacing:.06em;z-index:3}
+#csNext.show{opacity:1;animation:csBlink 1.6s ease-in-out .35s infinite}
+@keyframes csBlink{0%,100%{opacity:1}50%{opacity:.35}}
 #cap{position:absolute;left:50%;bottom:11%;transform:translateX(-50%);width:min(900px,90%);text-align:center;font-size:clamp(17px,2.4vw,26px);color:#efe6cf;text-shadow:0 2px 8px #000;min-height:1.4em}
 .skip{position:absolute;right:20px;bottom:18px;font-family:var(--mono);font-size:20px;color:#6d6452;display:flex;align-items:center;gap:8px;z-index:3}
 .skipRing{width:22px;height:22px;border-radius:50%;background:conic-gradient(#b33 0deg,#222 0deg)}
@@ -237,11 +240,11 @@ canvas{display:block}
   </div>
   <div id="menuToast"></div>
   <div id="clock">3:13</div>
-  <div id="ver">v3.5.1</div>
+  <div id="ver">v3.6</div>
   <div id="hint">Headphones. Lights off. Don't look at him for too long.</div>
 </div>
 
-<div id="cs" class="layer"><canvas id="csCv"></canvas><div id="cap"></div><div class="skip">hold SPACE to skip <div class="skipRing" id="skipRing"></div></div></div>
+<div id="cs" class="layer"><canvas id="csCv"></canvas><div id="cap"></div><div id="csNext">click to continue ▸</div><div class="skip">hold SPACE to skip <div class="skipRing" id="skipRing"></div></div></div>
 
 <div id="settingsP" class="panel"><div class="box">
   <h2>SETTINGS</h2>
@@ -2338,23 +2341,40 @@ $('endBack').onclick=()=>showMenu();
 /* ================= CUTSCENES ================= */
 let CS=null;const csc=$('csCv').getContext('2d');let skipHold=0;
 function startCutscene(shots,done){hideAllUI();$('cs').classList.add('show');state='cutscene';CS={shots,i:-1,t:0,done,tot:0};nextShot();fadeIn(1);}
-function nextShot(){CS.i++;CS.t=0;if(CS.i>=CS.shots.length){endCutscene();return;}const s=CS.shots[CS.i];CS.cap=s.cap||'';CS.capT=0;if(s.on)s.on();}
-function endCutscene(){const d=CS.done;CS=null;$('cap').textContent='';if(d)d();}
+function nextShot(){CS.i++;CS.t=0;CS.wait=false;CS.out=-1;$('csNext').classList.remove('show');if(CS.i>=CS.shots.length){endCutscene();return;}const s=CS.shots[CS.i];CS.cap=s.cap||'';CS.capT=0;if(s.on)s.on();}
+function endCutscene(){const d=CS.done;CS=null;$('csNext').classList.remove('show');$('cap').textContent='';if(d)d();}
 function drawCutscene(dt){
-  if(!CS)return;const s=CS.shots[CS.i];CS.t+=dt;const p=clamp(CS.t/s.dur,0,1);const w=$('csCv').width,h=$('csCv').height;
-  csc.save();csc.fillStyle='#000';csc.fillRect(0,0,w,h);s.draw(csc,w,h,CS.t,p);csc.restore();
+  if(!CS)return;const s=CS.shots[CS.i];
+  // v3.6: slides no longer auto-advance. Play the slide, hold its last frame, wait for a click.
+  if(!CS.wait){CS.t+=dt;if(CS.t>=s.dur){CS.t=s.dur;CS.wait=true;}}
+  if(CS.out>=0)CS.out+=dt;
+  const tt=Math.min(CS.t,s.dur),p=clamp(tt/s.dur,0,1);const w=$('csCv').width,h=$('csCv').height;
+  csc.save();csc.fillStyle='#000';csc.fillRect(0,0,w,h);s.draw(csc,w,h,tt,p);csc.restore();
   // letterbox
   csc.fillStyle='#000';csc.fillRect(0,0,w,h*.09);csc.fillRect(0,h*.91,w,h*.09);
-  // shot fades
-  const fi=clamp(CS.t/.6,0,1),fo=clamp((s.dur-CS.t)/.6,0,1);if(!s.hard){csc.fillStyle=`rgba(0,0,0,${1-Math.min(fi,fo)})`;csc.fillRect(0,0,w,h);}
+  // shot fades: fade in at the start; fade out only after the player clicks
+  const fi=clamp(CS.t/.6,0,1),fo=CS.out>=0?clamp(1-CS.out/CS_OUT,0,1):1;if(!s.hard){csc.fillStyle=`rgba(0,0,0,${1-Math.min(fi,fo)})`;csc.fillRect(0,0,w,h);}
   // typewriter caption
   CS.capT+=dt;const n=Math.floor(CS.capT*32);$('cap').textContent=CS.cap.slice(0,n);$('cap').style.color=s.capCol||'#efe6cf';
+  const capDone=n>=CS.cap.length;
+  $('csNext').classList.toggle('show',CS.wait&&capDone&&CS.out<0);
   if(keys['Space']||csHold){skipHold+=dt;}else skipHold=Math.max(0,skipHold-dt*2);
   $('skipRing').style.background=`conic-gradient(#b33 ${skipHold/1.2*360}deg,#222 0deg)`;
-  if(skipHold>1.2){skipHold=0;MUS.mbox=null;endCutscene();return;}
-  if(CS.t>=s.dur)nextShot();
+  if(skipHold>1.2){skipHold=0;csPressT=-1;MUS.mbox=null;endCutscene();return;}
+  if(CS.out>=0&&(CS.out>=CS_OUT||s.hard))nextShot();
 }
-let csHold=false;$('cs').addEventListener('mousedown',()=>csHold=true);addEventListener('mouseup',()=>csHold=false);
+const CS_OUT=.45,CS_TAP=.35;
+// tap = continue. 1st tap finishes the slide (full caption + final frame, so tape clues are shown), 2nd tap moves on.
+function csAdvance(){if(!CS||state!=='cutscene'||CS.out>=0)return;const s=CS.shots[CS.i];
+  if(!CS.wait||Math.floor(CS.capT*32)<CS.cap.length){CS.t=s.dur;CS.wait=true;CS.capT=Math.max(CS.capT,CS.cap.length/32+.01);return;}
+  CS.out=0;$('csNext').classList.remove('show');}
+let csHold=false,csPressT=-1;
+$('cs').addEventListener('mousedown',e=>{if(e.button!==0)return;csHold=true;csPressT=performance.now();});
+addEventListener('mouseup',()=>{const was=csHold;csHold=false;if(was&&csPressT>=0&&performance.now()-csPressT<CS_TAP*1000)csAdvance();csPressT=-1;});
+addEventListener('keydown',e=>{if(state!=='cutscene'||!CS)return;
+  if(e.code==='Space'){e.preventDefault();if(!e.repeat)csPressT=performance.now();}
+  else if(e.code==='Enter'||e.code==='NumpadEnter'||e.code==='ArrowRight'){e.preventDefault();if(!e.repeat)csAdvance();}});
+addEventListener('keyup',e=>{if(e.code==='Space'&&csPressT>=0){if(state==='cutscene'&&performance.now()-csPressT<CS_TAP*1000)csAdvance();csPressT=-1;}});
 
 /* painters */
 function sky(c,w,h,top,bot){const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,top);g.addColorStop(1,bot);c.fillStyle=g;c.fillRect(0,0,w,h);}

@@ -167,13 +167,13 @@
 </style>
 </head>
 <body>
-<div id="ver">v32</div>
+<div id="ver">v33</div>
 <div id="dbg"></div>
 <div id="fade"></div>
 <div id="overlay">
   <h1>SANCTUARY</h1>
   <div id="sub">preparing the sanctuary…</div>
-  <div id="verline" style="margin-top:6px;font-size:11px;letter-spacing:.22em;color:rgba(233,220,196,.45)">BUILD V32</div>
+  <div id="verline" style="margin-top:6px;font-size:11px;letter-spacing:.22em;color:rgba(233,220,196,.45)">BUILD V33</div>
   <div id="menu" style="margin-top:4px;display:none"><div style="width:180px;height:1px;margin:0 auto 26px;background:linear-gradient(to right,transparent,rgba(255,240,210,.45),transparent)"></div><div><span id="btnBegin" style="display:inline-block;padding:14px 46px;border:1px solid rgba(255,240,210,.7);font-size:14px;letter-spacing:.46em;color:#fff4dd;background:rgba(255,240,210,.04)">begin</span></div><div style="margin-top:22px;font-size:10.5px;letter-spacing:.26em;opacity:.46"><span id="btnCont" style="display:none;padding:5px 10px">continue</span><span id="btnNG" style="display:none;padding:5px 10px">new game +</span><span id="btnSkipP" style="padding:5px 10px">skip prologue</span><span style="opacity:.35">&nbsp;/&nbsp;</span><span id="btnSkip" style="padding:5px 10px">skip to the awakening</span></div><div style="margin-top:18px"><span id="btnTrailer" style="font-size:11px;letter-spacing:.3em;padding:6px 16px;color:#ffd9a8;border:1px solid rgba(255,200,140,.28)">&#9654; watch trailer</span></div><!--<span id="btnBegin" style="padding:6px 14px;border:1px solid rgba(255,240,210,.55);margin:0 6px">begin</span><span id="btnSkipP" style="padding:6px 14px;border:1px solid rgba(255,240,210,.35);margin:0 6px">skip prologue</span><span id="btnCont" style="display:none;padding:6px 14px;border:1px solid rgba(255,240,210,.35);margin:0 6px">continue</span><span id="btnNG" style="display:none;padding:6px 14px;border:1px solid rgba(255,240,210,.35);margin:0 6px">new game +</span><span id="btnSkip" style="padding:6px 14px;border:1px solid rgba(255,240,210,.35);margin:0 6px">skip to the awakening</span>--></div>
   <div id="settings">
     <h3>SOUND</h3>
@@ -183,6 +183,7 @@
     <div class="row"><span class="l">music</span><input type="range" id="s_music" min="0" max="150"><span class="v" id="v_music"></span></div>
     <div class="row"><span class="l">voices</span><input type="range" id="s_voice" min="0" max="100"><span class="v" id="v_voice"></span></div>
     <div class="row"><span class="l">effects</span><input type="range" id="s_sfx" min="0" max="150"><span class="v" id="v_sfx"></span></div>
+    <div class="row"><span class="l">rain</span><input type="range" id="s_rain" min="0" max="150"><span class="v" id="v_rain"></span></div>
     <h3 style="margin-top:18px">GAME</h3>
     <div class="row"><span class="l">voices</span><select id="s_speech"><option value="1">spoken</option><option value="0">subtitles only</option></select></div>
     <div class="row"><span class="l">graphics</span><select id="s_quality"><option value="high">high</option><option value="low">low (faster)</option></select></div>
@@ -231,7 +232,7 @@
 'use strict';
 const $ = id => document.getElementById(id);
 let halted = false;
-const SET = { debug: 0, audGlitch: 0, audRed: 0, audCaps: 0, master: 100, choir: 100, choirVerb: 100, music: 100, voice: 100, sfx: 100, speech: 1, quality: 'high', timer: 1, wHair: 'long', wHairCol: '#0a0909', wCoat: '#121318', wHalo: 'rings' };
+const SET = { debug: 0, audGlitch: 0, audRed: 0, audCaps: 0, master: 100, choir: 100, choirVerb: 100, music: 100, voice: 100, sfx: 100, rain: 100, speech: 1, quality: 'high', timer: 1, wHair: 'long', wHairCol: '#0a0909', wCoat: '#121318', wHalo: 'rings' };
 try { Object.assign(SET, JSON.parse(localStorage.getItem('sanctuary_audio') || '{}')); } catch (e) {}
 const SV = k => SET[k] / 100;
 
@@ -1415,7 +1416,7 @@ function audioUpdate(dt, env) {
   if (A.choirWet) pset(A.choirWet.gain, 1.0 * SV('choirVerb')); if (A.choirDry) pset(A.choirDry.gain, 0.35 + 0.25 * (1 - Math.min(1, SV('choirVerb'))));
   pset(A.choirLP.frequency, 320 + 4800 * Math.pow(R(0.05, 0.95), 1.3));
   pset(A.stepWet.gain, env.wet); pset(A.stepDry.gain, env.dry);
-  pset(A.rainG.gain, env.rain * 0.2); pset(A.rainLP.frequency, 700 + env.rainOpen * 6000);
+  pset(A.rainG.gain, env.rain * 0.2 * SV('rain')); pset(A.rainLP.frequency, 700 + env.rainOpen * 6000);
   pset(A.master.gain, (env.paused ? 0.6 : 0.9) * SV('master'), 0.3);
 }
 
