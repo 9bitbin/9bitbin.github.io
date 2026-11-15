@@ -1,68 +1,142 @@
-# Constellation — setup (GitHub Pages + Supabase)
+# Constellation · OPS Diagnostic
 
-Files:
-- `index.html`: the quiz. Takers enter a name, take the quiz, and their result is saved.
-- `admin.html`: your private results table (needs your login).
-- `supabase-setup.sql`: creates the results table and the security rules.
-- `supabase-update-feedback.sql`: adds the feedback table (v1.1). Run it after the setup file.
-- `supabase-update-v2.sql`: adds the v2 scenario columns. Run it after the two files above. No email to edit.
-- `supabase-update-v2_1.sql`: adds the "worked hard to build" column for ranking (v2.1). Run it after v2. No email to edit.
+A blind, scenario-based cognitive-function quiz inspired by the Objective Personality System (OPS). Takers answer everyday scenes, get their type, subtype and saviors, and can explore every type in a glossary. Results are saved to Supabase, where only the owner can read them.
 
-## 1. Supabase (about 5 minutes)
-1. Create a project at supabase.com.
-2. **SQL Editor → New query**: paste `supabase-setup.sql`, change `YOUR_EMAIL@example.com` (2 places) to your email, and click **Run**.
-3. **Authentication → Users → Add user → Create new user**: enter the same email and a strong password, and tick "Auto confirm user". This is your owner login.
-4. **Authentication → Sign In / Providers**: turn **off** "Allow new users to sign up" so nobody else can make an account. Only your email can read results anyway, but this is extra safety.
-5. **Project Settings → API**: copy the **Project URL** and the **anon public** key.
-   - Never use the `service_role` key on a web page. It bypasses all security.
+Live at **https://9bitbin.github.io/TypeConstellation/**
 
-### Already ran the setup? Adding v1.1 (growth guide + feedback)
-Run `supabase-update-feedback.sql` the same way, after changing `YOUR_EMAIL@example.com` (2 places). Then replace `index.html` and `admin.html` on GitHub, and paste your keys back in.
+> Built from the Objective Personality framework (Dave & Shan Powers) and personal notes. OPS isn't peer-reviewed science, and a self-report quiz can't see blind spots. Treat results as a starting point for reflection, not a verdict.
 
-## 2. Paste your keys
-In **both** `index.html` and `admin.html`, find these lines and paste your values:
-```js
-const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
-```
-The anon key is meant to be public. The SQL rules make it insert-only for strangers.
+---
 
-## 3. GitHub Pages
-1. Put the files in a repo (for example `9bitbin/constellation`).
-2. **Settings → Pages → Deploy from branch → main / root**.
-3. Quiz: `https://9bitbin.github.io/constellation/`
-4. Your results: `https://9bitbin.github.io/constellation/admin.html`
+## Pages
 
-## What gets saved per take
-Name, a random browser ID (so repeat takes from one browser link together), type, subtype (dom–other, aux or tert), lead, animal, confidence, all 8 coin scores, the 16-type likelihoods, and every answer (question text + chosen option). Takers see a note before starting that the owner can see their name and answers.
+| File | What it is |
+| --- | --- |
+| `index.html` | The quiz and the full results page |
+| `glossary.html` | Every letter, function, type and subtype, plus the function map, your saved result and growth maps |
+| `admin.html` | Owner-only dashboard: overview charts, every result, item health, delete |
 
-## v2: scenario quiz
-- **36 scenes per take.** The bank has 12 behaviors × 4 settings (work/school, friends/family, on your own, under stress). Each take shows 30 regular scenes and 6 stress scenes.
-- **6 options per scene,** with a 5-point "how much is this you?" scale. 9 scenes also ask "Why that one?"
-- **Core default:** whatever you pick consistently across settings. Stress scenes feed a separate stress profile and don't count toward your type.
-- **Admin:** Consistent % and Core default columns, a Patterns box in each row, and an **Item health** tab. It flags any scene where one option gets more than 60% of picks or "None fit" is over 25% (once a scene has 5+ answers).
-- Old v1 results still show in admin, and `quiz_version` tells them apart.
+Test versions (`index_v8.html`, `glossary_v8.html`) hold the newest features until they're folded into the main files.
 
-### v2.1: ranking
-- Each scene: tap the option that's **most you (#1)**, then your **next most (#2)**. The other four drop away and are saved as dismissed. Tap a pick again to undo it.
-- "Why your #1?" on every scene: just what I do / **I worked hard to get good at this** / what I should do / avoids something bad / depends on the day.
-- No strength scale. #1 counts fully, #2 counts half.
-- 14 behaviors now, including "when a conversation gets uncomfortable" and "where you think and feel best."
-- Deploy: run `supabase-update-v2_1.sql`, then replace `index.html` and `admin.html` and paste your keys back in.
+## How the quiz works
 
-### Deploying v2
-1. In pinned-v2, run `supabase-update-v2.sql` (SQL Editor → New query → paste → Run).
-2. Replace `index.html` and `admin.html` in `TypeConstellation`, then paste your Supabase URL and anon key back into both.
-3. Take it once yourself. You should see "✓ Result saved," and your row in admin should show a Consistent %.
+- **36 scenes** across four settings: work, social, alone, and 6 stress scenes. Each one is built fresh from a bank of 14 situations, so no two takes are the same.
+- Each scene shows 6 of the 8 functions as answers (2 are left out at random, balanced so every function is dropped equally often).
+- You pick your **#1** and **#2**, then say **why** you picked #1:
+  - *It's just what I do* (counts most)
+  - *I worked hard to get good at this*
+  - *It's what I should do*
+  - *It avoids something bad*
+  - *Depends on the day*
+- "None of these" is always allowed.
+- Stress scenes are scored separately and don't count toward your type.
+- Scoring weighs the why tags, rewards answers that stay consistent across settings, and ranks all 32 subtypes and 16 types.
 
-## Feedback (v1.1)
-After their result, takers can rate the fit (1–5), tick what felt off, pick the type they think they are, and leave a short note. In `admin.html`:
-- The header shows the number of takes, the average fit, and how many people think they're a different type.
-- The **Fit** column is color-coded: red is 1–2, yellow is 3, green is 4–5.
-- Click a row to see the full feedback.
+## The results page
 
-Once you have 20–30 takes, look for patterns: one type rated low, or one "felt off" box ticked a lot. That tells you which questions to fix.
+- Type, subtype (balanced = #1 + #2, jumper = #1 + #3), lead (observer or decider) and lead animal
+- Your two saviors with their core, the void you leave and the biggest fear
+- Your patterns: core functions, what you shift to in each setting, ideal vs. default, stress
+- The coins, runners-up and all 16 type likelihoods
+- Savior letters, function flow, growth map (by focus: general, work, relationships, big change, motivation, creative block)
+- Function explorer: quadrants and stack, with a type picker and observer + decider pairing
+- Feedback: fit rating, what felt off, what type you think you are, a note
+- Retake, copy result, read the glossary
 
-## Notes
-- If saving fails, the result page shows "Couldn't save. Try again". Hover it to see the error.
-- Anyone who finds the URL could submit junk rows. The table limits sizes and formats, and you can delete rows in Supabase's Table Editor.
+## The glossary
+
+- Letters & terms, the 8 functions, the 16 types, the 32 subtypes, with search and filters
+- **Function map** with four views: Quadrants, Stack, Flow and Path. Pick any type and the map rearranges; the quadrants match the 16-type chart (introverted function on the left of the top row)
+- Observer + decider pairing: pick order decides which one leads
+- **Your result**: coins and your saved results on this device
+- **Growth map** for any type: #1 function, #4 blind spot, stuck loop, relationship pattern to watch, things to try this week. Your own result adds notes from your answers. "Back to my result" switches both the map and the growth map back
+- "View full results" opens the full results page for a saved result
+
+## Results history and optional accounts
+
+- **On this device:** each take is saved in the browser (up to 20) with no name and no answers. **View** reopens the full results page; **×** forgets one; "Forget all" clears them.
+- **Optional account:** username + password, no email. Results follow you to any device.
+  - After signing in you pick which results on the device go into the account.
+  - Each result has a **☁ In account / + Account** toggle.
+  - New takes while signed in go to the account automatically.
+  - Log out removes the account's results from that device; "Delete my account" removes the account and its results.
+  - No "forgot password": the owner resets it in Supabase (Authentication → Users).
+
+## Admin
+
+- **Overview:** totals, takes per day, types, fit ratings, accuracy by type, where people disagree, lead animals
+- **Results:** searchable list with detail view: stack, quadrants, function flow, coins, insights, all 36 answers, feedback, account tag, delete with a confirm step. Arrow keys move between results; animated maps
+- **Accounts:** `@username` tags, an All / With an account / No account filter, `@username` search, and "See all takes on this account"
+- **Item health:** how each question is performing
+
+## Privacy
+
+- The public page can only **submit** results. Database rules (RLS) let only the owner email read or delete them.
+- Signed-in takers can read only their own results. Nobody can attach a result to someone else's account, and usernames on results are filled in by the database, so they can't be faked.
+- Only the public anon key is on the page. Never put the `service_role` key in any page.
+- Name and answers are never stored in the browser.
+
+## Setup (Supabase)
+
+Run these in the Supabase **SQL Editor**, in order. Each is safe to run again.
+
+1. `supabase-setup.sql`: results table and owner rules (replace the owner email first)
+2. `supabase-update-feedback.sql`: feedback table (replace the owner email first)
+3. `supabase-update-v2.sql`: scenario quiz columns
+4. `supabase-update-v2_1.sql`: #1 / #2 ranking and "worked hard" list
+5. `supabase-accounts.sql`: optional accounts, claim / release, delete account, usernames for admin
+6. `supabase-fix-signup-trigger.sql`: only needed in pinned-v2, so its new-user rule doesn't block quiz sign-ups
+
+Then in **Authentication → Sign In / Providers → Email**: keep Email on, turn **Confirm email** off.
+
+Paste your project URL and anon key into `index.html` and `admin.html` (`SUPABASE_URL`, `SUPABASE_ANON_KEY`). Full account steps are in `ACCOUNTS_SETUP.md`.
+
+---
+
+## Updates
+
+### v1 · The first quiz
+- Blind OPS cognitive-function quiz on GitHub Pages; takers enter a name first
+- Results saved to Supabase (pinned-v2 project), readable only by the owner
+- First owner results page
+
+### v1.1 · Feedback
+- "Did this fit?" panel: 1–5 fit rating, what felt off, self-reported type, a note
+- Feedback table linked to each result (deleted along with it)
+
+### v2 · Scenario quiz
+- Rebuilt as 36 scenes across work, social, alone and stress
+- Why tags, consistency scoring, core / ideal / stress / per-setting patterns
+- Personalized growth guide for the #1 and #4 functions, stuck loops and things to try
+
+### v2.1 · Ranking
+- Pick a #1 and a #2 in every scene; dismissed options recorded
+- New why tag: "I worked hard to get good at this"
+
+### v3 · Glossary and function map
+- New glossary page with letters, functions, types and subtypes, search and filters, and a new color palette
+- Function map with the stack layout from the 16-type chart; Function Flow views (all three kept); the original quadrant map kept
+- Quadrant side flip, "OBSERVERS · patterns & data" label, one idea per line formatting
+- Stack and observer + decider pairing on the results page and in the glossary, with a type picker
+
+### v4–v6 · Maps and polish
+- Quadrants arranged per type and matched to the type chart (introverted function on the left of the top row; fixes Ne placement for ENTP / ESTP)
+- Relationship patterns to watch, redesigned coins, rainbow buttons
+- Shorter privacy line: "Your name and answers are saved so I can improve the quiz."
+- Long results page kept as the main results page
+
+### Admin overhaul
+- Overview charts, results list with full detail views (stack, quadrants, flow, coins, insights, answers), delete with confirm, animated maps
+
+### v7 · Results history on the device
+- Up to 20 past results saved in the browser (no name, no answers)
+- "Your results on this device" on the home screen, "Your type changed" note, take number on the results page
+- Glossary can switch between saved results
+
+### v8 · Optional accounts and full replays
+- Username + password accounts with no email, built on Supabase Auth
+- Choose which device results go into your account; ☁ / + toggle per result
+- Admin shows `@username` tags, an account filter and "See all takes on this account"
+- **View** reopens the full results page for any saved result, including account results on other devices (rebuilt from the saved answers)
+- Glossary growth map works for every type, with "Back to my result"
+- Clearer sign-up errors; fix for the pinned-v2 new-user trigger blocking sign-ups

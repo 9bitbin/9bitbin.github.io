@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Constellation — Glossary (v8 test) of Functions, Types & Subtypes</title>
+<meta name="description" content="All 8 cognitive functions, 16 types and 32 subtypes in the Constellation OPS quiz, with interactive function bubbles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#eef0ff;--muted:#9aa0c3;--faint:#7c81b0;--glass:rgba(18,16,40,.55);--glass-2:rgba(255,255,255,.04);--edge:rgba(255,255,255,.09);--dark:#07051a}
+*{box-sizing:border-box}
+html{overflow-x:clip;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:#05040d;color:var(--ink);font-family:Manrope,system-ui,sans-serif}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 40%,rgba(3,2,10,.75) 100%)}
+a{color:inherit}
+:focus-visible{outline:2px solid #c4b5fd;outline-offset:3px;border-radius:8px}
+.skip{position:absolute;left:-999px;top:8px;z-index:10;background:#c4b5fd;color:var(--dark);padding:8px 14px;border-radius:999px;font-weight:700}
+.skip:focus{left:12px}
+main{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:22px 18px 70px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.brand{font-family:Unbounded;font-weight:500;letter-spacing:.32em;font-size:.72rem;color:var(--muted);text-transform:uppercase;text-decoration:none}
+.brand b{color:var(--ink);font-weight:700}
+.navlinks{display:flex;gap:8px;flex-wrap:wrap}
+.pillbtn{display:inline-flex;align-items:center;gap:6px;background:var(--glass-2);border:1px solid var(--edge);color:var(--ink);border-radius:999px;padding:8px 14px;font:600 .8rem Manrope;cursor:pointer;text-decoration:none;transition:.25s}
+.pillbtn:hover{border-color:rgba(255,255,255,.3);transform:translateY(-1px)}
+.hero{text-align:center;padding:24px 0 10px}
+h1{font-family:Unbounded;font-weight:900;font-size:clamp(2.2rem,6vw,4.2rem);line-height:1;margin:6px 0 12px;letter-spacing:-.02em;
+  background:linear-gradient(100deg,#fff 0%,#fde047 22%,#86efac 42%,#93c5fd 62%,#fda4af 82%,#fff 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 10s ease-in-out infinite}
+@keyframes sheen{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.lede{max-width:640px;margin:0 auto 18px;color:var(--muted);line-height:1.65}
+.legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:7px;font:600 .74rem Manrope;color:var(--muted);padding:6px 11px;border-radius:999px;border:1px solid var(--edge);background:var(--glass-2)}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;background:var(--c)}
+.dot.e{box-shadow:0 0 0 2px #fff inset}
+.toc{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0 4px}
+/* search + filters */
+.tools{position:sticky;top:0;z-index:5;margin:14px -18px 18px;padding:12px 18px;background:linear-gradient(180deg,rgba(5,4,13,.92),rgba(5,4,13,.78));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--edge)}
+.searchrow{display:flex;gap:10px;align-items:center;max-width:1240px;margin:0 auto}
+.search{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid var(--edge);background:rgba(255,255,255,.05)}
+.search input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--ink);font:500 .95rem Manrope}
+.search input::placeholder{color:var(--faint)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;max-width:1240px;margin:10px auto 0;align-items:center}
+.flabel{font:700 .62rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin:0 4px 0 6px}
+.chip{font:700 .74rem Manrope;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:999px;padding:5px 10px;cursor:pointer;transition:.2s}
+.chip:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
+.chip[aria-pressed="true"]{color:var(--dark);background:var(--c,#c4b5fd);border-color:transparent}
+.chip.fn{color:var(--c)}
+.chip.fn[aria-pressed="true"]{color:var(--dark)}
+.count{font-size:.78rem;color:var(--faint);margin-left:auto}
+/* layout */
+.layout{display:grid;grid-template-columns:minmax(380px,46%) 1fr;gap:22px;align-items:start}
+@media (max-width:980px){.layout{grid-template-columns:1fr}}
+.mapcol{position:sticky;top:132px}
+@media (max-width:980px){.mapcol{position:static}}
+.panel{background:var(--glass);border:1px solid var(--edge);border-radius:22px;padding:18px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.maphead{font:700 .66rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.sizing{font-size:.82rem;color:var(--muted);line-height:1.55;min-height:2.6em}
+.sizing b{color:var(--ink)}
+.sizing button{margin-left:6px;background:none;border:1px solid var(--edge);color:var(--ink);border-radius:999px;padding:3px 10px;font:600 .74rem Manrope;cursor:pointer}
+.mapcap{font-size:.76rem;color:var(--faint);text-align:center;margin-top:4px;line-height:1.5}
+/* svg map (shared with quiz explorer) */
+.xsvg{width:100%;height:auto;display:block;overflow:visible}
+.xq{fill:rgba(255,255,255,.02);stroke:rgba(255,255,255,.08)}
+.xmid{stroke:rgba(255,255,255,.1);stroke-dasharray:3 7}
+.xh{fill:#9aa0c3;font:700 13px Manrope;letter-spacing:.2em;text-anchor:middle}
+.xs{fill:#7c81b0;font:600 10px Manrope;letter-spacing:.22em}
+.xl{fill:#7c81b0;font:600 11px Manrope;letter-spacing:.14em;text-anchor:middle;text-transform:uppercase}
+.xaxis{stroke:rgba(255,255,255,.12);stroke-width:2;stroke-dasharray:6 8;transition:stroke .4s,stroke-width .4s}
+.xaxis.on{stroke:rgba(255,255,255,.7);stroke-width:2.5;stroke-dasharray:0}
+.xnode{cursor:pointer;outline:none;transition:opacity .45s,transform .85s cubic-bezier(.45,1.25,.5,1)}
+.xnode.gone{opacity:0;pointer-events:none}
+.quad{transition:opacity .5s}
+#map.cluster .quad{opacity:0}
+.xnode.pick .ring{opacity:1;stroke-width:3}
+#map.picking .xnode.savior:not(.pick) .ring{opacity:0}
+.xnode.dimx{opacity:.2}
+.pairl{stroke:#fff;stroke-width:3;stroke-dasharray:8 9;opacity:0;transition:opacity .35s;filter:drop-shadow(0 0 6px rgba(255,255,255,.6));animation:pairdash 1.6s linear infinite}
+.pairl.on{opacity:.9}
+@keyframes pairdash{to{stroke-dashoffset:-34}}
+.pairpanel{margin-top:10px;padding:14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--edge)}
+.pairpanel p{margin:4px 0 0;color:#d6d8f2;font-size:.88rem;line-height:1.55}
+.pairhint{color:var(--muted)!important;font-size:.84rem!important;text-align:center}
+.pairone,.pairhead{display:flex;gap:12px;align-items:flex-start}
+.pairhead{align-items:center;margin-bottom:6px}
+.pk2{font-size:.76rem;color:var(--muted);margin-left:4px}
+.linkbtn{background:none;border:0;color:var(--ink);text-decoration:underline;font:inherit;cursor:pointer;padding:0}
+.xtypes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0 4px}
+.xtg{display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:8px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid var(--edge)}
+.xtg>span{width:100%;font:600 .62rem Manrope;letter-spacing:.2em;color:var(--faint)}
+.xtype{flex:1;min-width:52px;font:700 .74rem Unbounded;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:10px;padding:7px 3px;cursor:pointer;transition:.25s}
+.xtype:hover{border-color:rgba(255,255,255,.3);transform:translateY(-2px)}
+.xtype.yours{border-color:#a78bfa;box-shadow:0 0 14px -4px #a78bfa}
+.xtype[aria-pressed="true"]{background:#c4b5fd;color:#07051a;border-color:transparent}
+.hlist{list-style:none;margin:6px 0 8px;padding:0}
+.hlist li{display:flex;align-items:center;gap:10px;padding:9px 6px;border-top:1px solid var(--edge);border-radius:10px}
+.hlist li.on{background:rgba(196,181,253,.1)}
+.hlist .ht{font:800 1rem Unbounded;min-width:52px}
+.hlist .hm{flex:1;min-width:0;font-size:.84rem;color:var(--muted);display:flex;flex-direction:column;line-height:1.35}.hlist .hm b{color:var(--ink)}.hlist .hm i{font-style:normal;font-size:.74rem;color:var(--faint)}
+.hlist .hshow{font:700 .72rem Manrope;color:#c4b5fd}
+.hlist .hx{padding:5px 10px}
+.hfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.paircard{cursor:default}
+.paircard.lead{box-shadow:0 0 0 1px var(--c) inset,0 0 26px -10px var(--c)}
+.paircard:not(.lead){opacity:.75}
+.porder{font:700 .62rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--c);margin-bottom:2px}
+.paircard:not(.lead) .porder{color:var(--faint)}
+.paircard .mini{margin-bottom:4px}
+.pairacts{display:flex;gap:6px;margin-top:6px}
+.pairacts .mapbtn{margin-top:0;text-decoration:none;color:var(--ink)}
+.youpanel .k:first-of-type{margin-top:4px}
+.growhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}.growhead .youlede{flex:1;min-width:220px;margin:0}
+.youlede{margin:0 0 6px;color:var(--muted);font-size:.88rem;line-height:1.55}.youlede a{color:var(--ink)}
+.c2how{color:var(--muted);font-size:.86rem;line-height:1.55;margin:0 0 12px}.c2how b{color:var(--ink)}
+.c2grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.c2group{padding:16px 18px}
+.c2h{font:700 .68rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+.coin2{padding:12px 0;border-bottom:1px solid var(--edge)}.coin2:last-child{border-bottom:0;padding-bottom:2px}
+.c2top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.95rem;margin-bottom:8px}.c2top b{font-weight:800}
+.c2tag{font:700 .68rem Manrope;letter-spacing:.06em;padding:3px 9px;border-radius:999px;border:1px solid var(--edge);color:var(--muted);white-space:nowrap}
+.c2tag.c2-strong{color:var(--ink);border-color:rgba(196,181,253,.6);background:rgba(196,181,253,.14)}
+.c2tag.c2-clear{color:#d6d8f2;border-color:rgba(255,255,255,.22)}
+.c2bar{display:flex;height:12px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.05);gap:2px}
+.c2bar i{display:block;height:100%;transition:width 1s cubic-bezier(.2,.9,.2,1)}
+.c2ends{display:flex;justify-content:space-between;font-size:.74rem;color:var(--faint);margin-top:5px}.c2ends .w{color:var(--ink);font-weight:700}
+.c2mean{margin:6px 0 0;color:#d6d8f2;font-size:.86rem;line-height:1.5}
+.coins{margin:8px 0 14px}
+.coin{margin-bottom:14px}
+.coin .row{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px;gap:10px}
+.coin .row span{color:var(--muted)}.coin .row span.win{color:var(--ink);font-weight:700}
+.coin .bar{position:relative;height:8px;border-radius:8px;background:rgba(255,255,255,.06);overflow:hidden}
+.coin .bar i{position:absolute;top:0;bottom:0;border-radius:8px}
+.coin .bar::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:rgba(255,255,255,.3)}
+.coin .sub{font-size:.72rem;color:var(--faint);margin-top:4px}
+.focus-k{font:600 .7rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:6px 0 10px}
+.foci{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.focus{font:600 .8rem Manrope;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:999px;padding:7px 13px;cursor:pointer;transition:.25s}
+.focus:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
+.focus.on{color:#07051a;background:#c4b5fd;border-color:transparent}
+.gblock{position:relative;padding:14px 16px 12px 18px;margin-bottom:12px;border-radius:16px;background:rgba(255,255,255,.025);border:1px solid var(--edge);border-left:3px solid var(--c)}
+.gblock p{margin:6px 0;color:#d6d8f2;line-height:1.6;font-size:.92rem}
+.gblock ul,.gblock ol{margin:6px 0 4px;padding-left:20px;color:#d6d8f2;font-size:.9rem;line-height:1.6}
+.gk{font:700 .68rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--c);margin-bottom:4px}
+.gsub{font:600 .66rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:10px 0 2px}
+.chips2{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.chips2 span{font-size:.76rem;padding:4px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);color:var(--ink)}
+.apply{list-style:none;padding-left:0!important}.apply li{margin-bottom:4px}
+.hl{background:color-mix(in srgb,var(--c) 12%,transparent);border-radius:10px;padding:10px 12px}
+.muted2{color:var(--muted);font-size:.84rem;margin-top:6px}
+.note{padding:12px 14px;border-radius:14px;margin-bottom:12px;font-size:.88rem;line-height:1.55;color:#e9d5ff;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3)}
+.note a{color:#fff}
+.care{font-size:.78rem;color:var(--faint);line-height:1.6;margin-top:6px}
+.clus{opacity:0;pointer-events:none}
+.maptop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.maptop .maphead{margin:0}
+.views{display:inline-flex;border:1px solid var(--edge);border-radius:999px;padding:3px;background:rgba(255,255,255,.03)}
+.views button{background:none;border:0;color:var(--muted);font:700 .76rem Manrope;padding:6px 13px;border-radius:999px;cursor:pointer;transition:.2s}
+.views button:hover{color:var(--ink)}
+.views button[aria-pressed="true"]{background:#c4b5fd;color:var(--dark)}
+.flowl{opacity:0;pointer-events:none;transition:opacity .5s}
+#map.flow .flowl{opacity:1;transition-delay:.25s}
+#map.flow .quad{opacity:0}
+.frow{fill:#9aa0c3;font:800 15px Manrope;letter-spacing:.14em;text-anchor:middle;dominant-baseline:central;text-transform:uppercase;transition:fill .4s}
+.frow.sv{fill:#eef0ff}
+.fblind{fill:#fda4af;font:700 12px Manrope;letter-spacing:.14em;text-anchor:middle;text-transform:uppercase;opacity:0;transition:opacity .4s}
+.fblind.on{opacity:1}
+.fq{fill:#d6d8f2;font:500 14.5px Manrope;dominant-baseline:central;transition:fill .4s,opacity .4s}
+.fqL{text-anchor:end}.fqR{text-anchor:start}
+.fq.dim{opacity:.35}
+@media (max-width:600px){.fq{display:none}}
+.fflow{font-size:.88rem!important;color:var(--muted)!important}
+.fflow b{color:var(--ink)}
+.fpath{list-style:none;margin:6px 0 0;padding:0}
+.fpath li{display:flex;align-items:center;gap:14px;padding:12px 4px;border-bottom:1px solid var(--edge)}
+.fpath li:last-child{border-bottom:0}
+.pbub{flex:none;width:58px;height:58px;display:grid;place-items:center;text-decoration:none}
+.pbub::before{content:"";grid-area:1/1;width:var(--d);height:var(--d);border-radius:50%;background:var(--c)}
+.pbub.e::before{box-shadow:0 0 0 3px #fff inset}
+.pbub{font:900 .8rem Unbounded;color:var(--dark)}
+.pbub span{grid-area:1/1;position:relative}
+.ptxt{flex:1;min-width:0}
+.pk{font:700 .66rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.pq{font:600 1rem Manrope;color:var(--ink);margin-top:2px}
+.ptag{font:700 .72rem Manrope;padding:5px 10px;border-radius:999px;border:1px solid var(--edge);color:var(--muted);white-space:nowrap}
+.fpath li.sv .ptag{color:#86efac;border-color:rgba(134,239,172,.45);background:rgba(34,197,94,.1)}
+.fpath li.bl .ptag{color:#fda4af;border-color:rgba(253,164,175,.45);background:rgba(244,63,94,.1)}
+@media (max-width:600px){.fpath li{flex-wrap:wrap;row-gap:6px}.ptxt{flex:1 1 calc(100% - 80px)}.ptag{margin-left:72px}}
+.pathempty{color:var(--muted);text-align:center;padding:30px 0}
+#map.cluster .clus{opacity:1;animation:clusin 1.1s ease both}
+@keyframes clusin{0%,55%{opacity:0}100%{opacity:1}}
+.cx{stroke:rgba(255,255,255,.4);stroke-width:2.5;stroke-dasharray:6 7}
+.svl{stroke:var(--sc,#fff);stroke-width:7;stroke-linecap:round;opacity:.8;filter:drop-shadow(0 0 10px var(--sc,#fff))}
+.ctl{fill:#9aa0c3;font:800 12px Manrope;letter-spacing:.22em;text-anchor:middle}
+.ctx{fill:#eef0ff;letter-spacing:.06em;font-size:17px}
+.xnode:focus-visible .body{stroke:#fff;stroke-width:5}
+.xnode .sz{transition:transform .7s cubic-bezier(.3,1.5,.5,1);transform-box:view-box;transform-origin:0 0}
+.xnode .body{fill:var(--c);transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
+.xnode.int .body{stroke:rgba(7,5,26,.25);stroke-width:1.5}
+.xnode.ext .body{stroke:#fff;stroke-width:4}
+.xnode .halo{fill:var(--c);opacity:.14;transition:opacity .35s}
+.xnode .ring{fill:none;stroke:var(--c);stroke-width:2.5;stroke-dasharray:4 5;opacity:0;transition:opacity .4s;animation:spinr 14s linear infinite;transform-origin:center;transform-box:fill-box}
+@keyframes spinr{to{transform:rotate(360deg)}}
+.xnode.savior .ring{opacity:1}
+.xnode .fx{fill:#07051a;font:900 24px Unbounded;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
+.xnode .fk{fill:rgba(7,5,26,.78);font:800 8.5px Manrope;letter-spacing:.14em;text-anchor:middle;pointer-events:none}
+.xnode .rk{fill:rgba(7,5,26,.85);font:800 8px Manrope;letter-spacing:.12em;text-anchor:middle;pointer-events:none}
+.xnode .you{fill:var(--c);font:800 9px Manrope;letter-spacing:.18em;text-anchor:middle;opacity:0;transition:opacity .4s}
+.xnode.mine .you{opacity:1}
+.xnode.offstack .body{opacity:.4}.xnode.offstack .fk{opacity:0}
+.xnode.sel .halo{opacity:.45}
+.xnode:hover .halo{opacity:.3}
+/* sections */
+section.gs{scroll-margin-top:140px;margin-bottom:34px}
+.gh{display:flex;align-items:baseline;gap:12px;margin:0 0 14px}
+.gh h2{font:700 1.25rem Unbounded;margin:0}
+.gh span{font-size:.82rem;color:var(--faint)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{position:relative;scroll-margin-top:150px;background:var(--glass);border:1px solid var(--edge);border-radius:18px;transition:border-color .3s,box-shadow .3s,transform .35s cubic-bezier(.3,1.5,.5,1)}
+.card:hover{border-color:rgba(255,255,255,.22)}
+.card.open{border-color:var(--c,#c4b5fd);box-shadow:0 0 0 1px var(--c,#c4b5fd) inset,0 0 36px -14px var(--c,#c4b5fd);grid-column:1/-1}
+.card.flash{animation:flash 1.2s ease}
+@keyframes flash{0%{transform:scale(1)}30%{transform:scale(1.015)}100%{transform:scale(1)}}
+.card[hidden]{display:none}
+.chead{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;color:var(--ink);padding:14px 16px;cursor:pointer;font:inherit;border-radius:18px}
+.ctitle{font:700 1.02rem Unbounded;line-height:1.2}
+.csub{font-size:.8rem;color:var(--muted);margin-top:3px;line-height:1.4}
+.chev{margin-left:auto;color:var(--faint);transition:transform .3s;flex:none}
+.card.open .chev{transform:rotate(180deg)}
+.cbody{display:none;padding:0 16px 16px}
+.card.open .cbody{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.cbody p{margin:4px 0 10px;color:#d6d8f2;font-size:.92rem;line-height:1.6}
+.k{font:800 .64rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+.tags span,.tags a{font-size:.74rem;padding:3px 9px;border-radius:999px;border:1px solid var(--edge);color:var(--muted);text-decoration:none}
+.tags a:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
+.bub{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;font:900 .78rem Unbounded;color:var(--dark);background:var(--c)}
+.bub.e{box-shadow:0 0 0 3px #fff inset}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.lnk{display:flex;flex-direction:column;gap:2px;text-align:left;padding:9px 12px;border-radius:12px;border:1px solid var(--edge);border-left:3px solid var(--c);background:rgba(255,255,255,.03);color:var(--ink);font:500 .8rem Manrope;cursor:pointer;text-decoration:none;flex:1;min-width:170px;transition:.25s}
+.lnk b{font:700 .84rem Unbounded}.lnk i{font-style:normal;color:var(--muted);font-size:.74rem}
+.lnk:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.3)}
+.mapbtn{margin-top:10px;background:none;border:1px solid var(--edge);color:var(--ink);border-radius:999px;padding:7px 14px;font:600 .78rem Manrope;cursor:pointer}
+.mapbtn:hover{border-color:rgba(255,255,255,.35)}
+/* mini stack */
+.mini{display:block;flex:none}
+.mini text{font:900 9px Unbounded;fill:#07051a;text-anchor:middle;dominant-baseline:middle}
+.mini .ring{fill:none;stroke-width:1.4;stroke-dasharray:2 2}
+.mini .mx{stroke:rgba(255,255,255,.35);stroke-width:1}
+.mini .msv{stroke-width:2.6;stroke-linecap:round;opacity:.85}
+.stackrow{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.stackrow span{display:flex;flex-direction:column;flex:1;min-width:66px;padding:8px 9px;border-radius:12px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);font:800 1rem Unbounded;color:var(--c)}
+.stackrow span i{font:700 .6rem Manrope;font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.stackrow span.sv{background:color-mix(in srgb,var(--c) 14%,transparent)}
+/* letters */
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.lcard{padding:16px;border-radius:18px;background:var(--glass);border:1px solid var(--edge);scroll-margin-top:150px}
+.lcard h3{font:700 .95rem Unbounded;margin:0 0 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lcard p{margin:0 0 8px;color:#d6d8f2;font-size:.88rem;line-height:1.6}
+.lcard p:last-child{margin-bottom:0}
+.lcard b.l{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:8px;background:rgba(255,255,255,.08);font:800 .8rem Unbounded}
+/* last result */
+.last{display:none;margin:14px auto 0;max-width:760px;padding:14px 16px;border-radius:18px;border:1px solid rgba(196,181,253,.4);background:rgba(167,139,250,.1);text-align:left}
+.last.show{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.last .lt{font:800 1.4rem Unbounded}
+.last .lm{font-size:.84rem;color:var(--muted);flex:1;min-width:200px;line-height:1.5}
+.last .lm b{color:var(--ink)}
+.last .acts{display:flex;gap:8px;flex-wrap:wrap}
+.empty{display:none;text-align:center;color:var(--muted);padding:20px}
+.empty.show{display:block}
+.foot{margin-top:40px;text-align:center;font-size:.78rem;color:var(--faint);line-height:1.65;max-width:720px;margin-inline:auto}
+@media (max-width:980px){.tools{position:static}section.gs,.card,.lcard{scroll-margin-top:14px}}
+@media (max-width:600px){main{padding:16px 12px 60px}.tools{margin:12px -12px 16px;padding:10px 12px}.grid{grid-template-columns:1fr}.chead{padding:12px 12px}.cbody{padding:0 12px 14px}.filters{gap:5px}.flabel{width:100%;margin:4px 0 0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to glossary</a>
+<canvas id="sky" aria-hidden="true"></canvas><div class="vignette"></div>
+<main>
+  <div class="topbar">
+    <a class="brand" href="index_v8.html"><b>Constellation</b> · Glossary</a>
+    <nav class="navlinks" aria-label="Glossary sections">
+      <a class="pillbtn" href="index_v8.html">← Back to quiz</a>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <h1>The Glossary</h1>
+    <p class="lede">All 8 cognitive functions, all 16 types, and all 32 subtypes. Tap any bubble or card to read about it, and watch the map resize to that type's stack.</p>
+    <div class="legend" aria-label="Color key">
+      <span><i class="dot" style="--c:#f43f5e"></i>Feeling</span><span><i class="dot" style="--c:#3b82f6"></i>Thinking</span>
+      <span><i class="dot" style="--c:#22c55e"></i>Sensing</span><span><i class="dot" style="--c:#eab308"></i>Intuition</span>
+      <span><i class="dot" style="--c:#9aa0c3"></i>Solid = introverted</span><span><i class="dot e" style="--c:#9aa0c3"></i>Outlined = extroverted</span>
+    </div>
+    <div class="last" id="lastCard" role="region" aria-label="Your last result"></div>
+    <nav class="toc" aria-label="Jump to section">
+      <a class="pillbtn" href="#letters">Letters & terms</a><a class="pillbtn" href="#functions">8 functions</a><a class="pillbtn" href="#types">16 types</a><a class="pillbtn" href="#subtypes">32 subtypes</a>
+    </nav>
+  </header>
+
+  <div class="tools" role="search">
+    <div class="searchrow">
+      <label class="search"><span aria-hidden="true">⌕</span><input id="q" type="search" placeholder='Search: "INFP", "Fi", "jumper", "Blast"…' aria-label="Search the glossary"></label>
+      <button class="pillbtn" id="clear">Clear</button>
+    </div>
+    <div class="filters" id="filters" aria-label="Filters"></div>
+  </div>
+
+  <div class="layout" id="content">
+    <aside class="mapcol" aria-label="Function map">
+      <div class="panel">
+        <div class="maptop"><div class="maphead">Function map</div>
+          <div class="views" id="views" role="group" aria-label="Map view"><button data-v="quad" aria-pressed="false">Quadrants</button><button data-v="stack" aria-pressed="true">Stack</button><button data-v="flow" aria-pressed="false">Flow</button><button data-v="path" aria-pressed="false">Path</button></div></div>
+        <div class="sizing" id="sizing" aria-live="polite"></div>
+        <div id="map"></div>
+        <div id="path" hidden></div>
+        <div class="xtypes" id="typePick" role="group" aria-label="Pick a type to resize the map"></div>
+        <div id="pairPanel" class="pairpanel" hidden aria-live="polite"></div>
+        <div class="mapcap" id="mapcap"></div>
+      </div>
+    </aside>
+
+    <div class="cols">
+      <section class="gs" id="you" aria-labelledby="h-you" hidden><div class="gh"><h2 id="h-you">Your result</h2><span>Coins and growth map</span></div><div id="youBody"></div></section>
+      <section class="gs" id="growth" aria-labelledby="h-growth"><div class="gh"><h2 id="h-growth">Growth map</h2><span id="growthFor">Follows the type on the map</span></div><div id="growthBody"></div></section>
+      <section class="gs" id="letters" aria-labelledby="h-letters"><div class="gh"><h2 id="h-letters">Letters & terms</h2><span>What everything means</span></div><div class="lgrid" id="letterGrid"></div></section>
+      <section class="gs" id="functions" aria-labelledby="h-functions"><div class="gh"><h2 id="h-functions">The 8 functions</h2><span id="fcount"></span></div><div class="grid" id="fnGrid"></div></section>
+      <section class="gs" id="types" aria-labelledby="h-types"><div class="gh"><h2 id="h-types">The 16 types</h2><span id="tcount"></span></div><div class="grid" id="typeGrid"></div></section>
+      <section class="gs" id="subtypes" aria-labelledby="h-subtypes"><div class="gh"><h2 id="h-subtypes">The 32 subtypes</h2><span id="scount"></span></div><div class="grid" id="subGrid"></div></section>
+      <div class="empty" id="empty">Nothing matches. Try a different search or clear the filters.</div>
+    </div>
+  </div>
+
+  <p class="foot">Built from the Objective Personality framework (Dave &amp; Shan Powers) and the Constellation quiz notes. OPS isn't peer-reviewed science. Treat types as hypotheses to test against how you actually live, not verdicts.</p>
+</main>
+
+<script>
+const FN = {
+  Ni:{OI:1,NS:1,N:1,  kind:'O',att:'i'}, Se:{OI:-1,NS:1,N:-1, kind:'O',att:'e'},
+  Si:{OI:1,NS:-1,N:-1,kind:'O',att:'i'}, Ne:{OI:-1,NS:-1,N:1, kind:'O',att:'e'},
+  Fi:{DI:1,FT:1,T:-1, kind:'D',att:'i'}, Te:{DI:-1,FT:1,T:1,  kind:'D',att:'e'},
+  Ti:{DI:1,FT:-1,T:1, kind:'D',att:'i'}, Fe:{DI:-1,FT:-1,T:-1,kind:'D',att:'e'}
+};
+const STACKS = {
+  ISTJ:["Si","Te","Fi","Ne"], ISFJ:["Si","Fe","Ti","Ne"], INFJ:["Ni","Fe","Ti","Se"], INTJ:["Ni","Te","Fi","Se"],
+  ISTP:["Ti","Se","Ni","Fe"], ISFP:["Fi","Se","Ni","Te"], INFP:["Fi","Ne","Si","Te"], INTP:["Ti","Ne","Si","Fe"],
+  ESTP:["Se","Ti","Fe","Ni"], ESFP:["Se","Fi","Te","Ni"], ENFP:["Ne","Fi","Te","Si"], ENTP:["Ne","Ti","Fe","Si"],
+  ESTJ:["Te","Si","Ne","Fi"], ESFJ:["Fe","Si","Ne","Ti"], ENFJ:["Fe","Ni","Se","Ti"], ENTJ:["Te","Ni","Se","Fi"]
+};
+const COINS = ['OD','DI','OI','N','T','FT','NS','IE'];
+
+function animalOf(o, d){ // savior observer + savior decider
+  const oi = FN[o].att==='i', di = FN[d].att==='i';
+  if (oi && di) return 'Sleep';
+  if (!oi && di) return 'Consume';
+  if (oi && !di) return 'Blast';
+  return 'Play';
+}
+
+// Build the 32 subtypes (dom + one other savior)
+const SUBTYPES = [];
+for (const o of ['Ni','Ne','Si','Se']) for (const d of ['Fi','Fe','Ti','Te']) for (const lead of ['O','D']) {
+  const dom = lead==='O'? o : d, other = lead==='O'? d : o;
+  let type=null, pos=null;
+  for (const t in STACKS){ const s=STACKS[t]; if (s[0]===dom && (s[1]===other||s[2]===other)) { type=t; pos = s[1]===other? 'aux':'tert'; } }
+  const sign = {OD: lead==='O'?1:-1, IE: FN[dom].att==='i'?1:-1};
+  for (const c of ['DI','FT','T']) sign[c]=FN[d][c];
+  for (const c of ['OI','NS','N']) sign[c]=FN[o][c];
+  SUBTYPES.push({key:dom+'-'+other, dom, other, obs:o, dec:d, type, pos, sign, animal: animalOf(o,d)});
+}
+const FCOLOR = { Fi:'#f43f5e', Fe:'#fda4af', Ti:'#3b82f6', Te:'#93c5fd', Si:'#22c55e', Se:'#86efac', Ni:'#eab308', Ne:'#fde047' };
+const FINK = '#07051a'; // label text color inside function bubbles (dark text passes AA on every fill)
+const FNAME = { Ni:'Introverted Intuition', Ne:'Extroverted Intuition', Si:'Introverted Sensing', Se:'Extroverted Sensing',
+  Ti:'Introverted Thinking', Te:'Extroverted Thinking', Fi:'Introverted Feeling', Fe:'Extroverted Feeling' };
+const FDESC = {
+  Ni:{ core:"Keeps stacking patterns onto a personal worldview, and pushes away new facts that don't connect back to it. Narrows everything down to one concept.", void:"Leaves others asking for the facts and details, and wondering whether you've seen the new information.", fear:"New facts collapse the abstract worldview you've built in your head."},
+  Se:{ core:"Constantly scanning, taking it all in and giving the facts and examples. Has a hard time narrowing down to one topic.", void:"Leaves others to make the guesses, draw the conclusions, and simplify it into a category.", fear:"Finding out that what felt new was really the same circle all along."},
+  Ne:{ core:"Scans for new concepts, understandings, and possibilities. Jumps from category to category and rarely says the same thing twice.", void:"Leaves others to create the physical structure and control.", fear:"Some control freak locks up your options and information."},
+  Si:{ core:"Keeps going over and refining known, personal facts. Controls things physically inside the box and returns to the comforting routine.", void:"Leaves others asking why, trying to understand, and showing you new possibilities.", fear:"Random chaos drops out of the sky and wrecks everything you've built."},
+  Fi:{ core:"Goes all in on what you love, hoping others will see the passion. Shoves away the work the tribe needs help with.", void:"Leaves others asking how it works and what's actually going to get done.", fear:"The tribe says what you love is stupid, and you have to do work you hate to be valuable."},
+  Te:{ core:"Does all the tribe work so everyone will love you. Has a hard time picking the one thing that matters most to you personally.", void:"Leaves others asking what's important to you and how you're feeling.", fear:"You get all the hard work done and still no one loves you."},
+  Ti:{ core:"Works on what you know is true for you, and builds something amazing so the tribe will have to love you. Gets smarter alone.", void:"Leaves the room emotionally uncomfortable while you go on about what you're working on.", fear:"You spend years figuring out the truth, and the tribe doesn't even care."},
+  Fe:{ core:"Tries to make everyone happy so they'll help you with your personal work. Talks out the values and emotions of the group.", void:"Leaves others to go with what's logically true, even if people hate it.", fear:"Years of caring for others leave you insecure and unable to make things work for yourself."}
+};
+const LETTERS = {
+  S:"Savior Sensory: obligated to prove, ground, and give the facts of what actually happened. Only once the facts are in are you \"allowed\" to guess. Often heard saying: \"I don't understand.\"",
+  N:"Savior Intuitive: obligated to give the summary, the overview, and the understanding of why. You make whole points on a pattern and promise the facts \"later.\" Often heard saying: \"This reminds me of…\"",
+  T:"Savior Thinker: obligated to figure it out, get it done, and solve the hard thing. You jump into the work, miss the vibe in the room, and crash emotionally later.",
+  F:"Savior Feeler: goes straight after what's valuable, liked, and wanted. You know exactly what's worth loving, but fumble the hard work of forcing it to happen."
+};
+const SUBTRAITS = {
+ 'Fi-Ne':'Creative, exploratory, imaginative','Fi-Si':'Nostalgic, sentimental, inward',
+ 'Ni-Fe':'Insightful, empathetic, counselor-like','Ni-Ti':'Detached, analytical, symbolic',
+ 'Ti-Ne':'Inventive, theoretical, curious','Ti-Si':'Precise, routine-oriented, archival',
+ 'Ni-Te':'Strategic, visionary, execution-focused','Ni-Fi':'Philosophical, private, idealistic',
+ 'Fi-Se':'Artistic, adventurous, expressive','Fi-Ni':'Symbolic, introspective, dreamy',
+ 'Si-Fe':'Caring, protective, socially attentive','Si-Ti':'Reserved, analytical, methodical',
+ 'Ti-Se':'Tactical, adaptable, action-oriented','Ti-Ni':'Minimalistic, predictive, withdrawn',
+ 'Si-Te':'Organized, disciplined, efficient','Si-Fi':'Quiet moralist, internally value-driven',
+ 'Ne-Fi':'Passionate, expressive, idealistic','Ne-Te':'Productive, entrepreneurial, driven',
+ 'Fe-Ni':'Inspirational, insightful, mentoring','Fe-Se':'Energetic, charismatic, socially bold',
+ 'Ne-Ti':'Intellectual, inventive, debater','Ne-Fe':'Charismatic, provocative, people-oriented',
+ 'Te-Ni':'Strategic commander, visionary leader','Te-Se':'Aggressive executor, forceful achiever',
+ 'Se-Fi':'Authentic, emotional, artistic','Se-Te':'Competitive, pragmatic, dominant',
+ 'Fe-Si':'Traditional caretaker, community-focused','Fe-Ne':'Enthusiastic, adaptive, socially expansive',
+ 'Se-Ti':'Tactical realist, sharp opportunist','Se-Fe':'Charming, persuasive, socially strategic',
+ 'Te-Si':'Structured leader, conventional executive','Te-Ne':'Expansive organizer, adaptable strategist'
+};
+const ANIMALS = {
+  Consume:{icon:'◐', d:"Gathering in new information and experiences for yourself. You want to be alone with the good book and keep going.", pair:'Oe + Di'},
+  Blast:{icon:'✦', d:"Taking what you already know and teaching it to the tribe. Three pages in, you have to go tell someone.", pair:'Oi + De'},
+  Sleep:{icon:'☾', d:"Conserving energy. You process inward and preserve, then spend it later. Introverted on both saviors.", pair:'Oi + Di'},
+  Play:{icon:'☀', d:"Expending energy outward, on the world and the people in it, then needing to recover later. Extroverted on both saviors.", pair:'Oe + De'}
+};
+const COINLABELS = {
+  OD:['Observer-led','Decider-led','Fear of chaos & control (IxxJ / ExxP)','Pain around identity & the tribe (IxxP / ExxJ)'],
+  DI:['Self above tribe (Di)','Tribe above self (De)','',''],
+  OI:['Organize & return (Oi)','Gather the new (Oe)','',''],
+  N: ['Intuition','Sensing','',''],
+  T: ['Thinking','Feeling','',''],
+  FT:['Fi / Te axis','Ti / Fe axis','',''],
+  NS:['Ni / Se axis','Si / Ne axis','',''],
+  IE:['Introverted lead','Extroverted lead','','']
+};
+
+// ===== Growth guide content (Option A: content blocks + rules) =====
+const GUIDE = {
+ Ni:{
+  first:{ real:"You compress everything into one throughline. You often know where something is heading before you can explain why.",
+    strengths:["Seeing the long arc","Cutting through noise to the core idea","Holding one vision steady"],
+    apply:{ work:"Strategy, planning, and roles where you set direction and others execute.", rel:"You read where a relationship is heading early, so say it out loud sooner.", change:"Write the one-sentence vision for this change and let it filter every decision.", motiv:"Tie today's task to the bigger arc, in writing.", create:"Pick one theme and go deep instead of wide." } },
+  last:{ struggle:"Losing the thread. Lots of action and new experiences, but you're unsure what any of it adds up to, and sudden gut-feeling predictions about the future spook you.",
+    signs:["Saying yes to everything, then feeling empty","Sudden dark predictions about where life is going","Not being able to answer \"where is this going?\""],
+    exp:{ general:["Once a week, write three sentences: what pattern keeps repeating in my life?","Before starting something new, name in one line what it's for."], work:"Pick one 90-day goal and drop one thing that doesn't serve it.", rel:"Ask someone close: \"What do you think I'm really after?\"", change:"Picture yourself one year after this change. Write what you see in a paragraph.", motiv:"Write your \"why\" on a sticky note where you'll see it daily.", create:"Before making more, review your last five pieces and name their common thread." } },
+  loop:"replaying the same story about how things will turn out", exit:"step back and name the one thing this is really about" },
+ Se:{
+  first:{ real:"You live in the present moment. You notice what's actually in front of you, read a room physically, and act fast.",
+    strengths:["Reacting in real time","Noticing what's really there, not what's assumed","Making things happen hands-on"],
+    apply:{ work:"Live, hands-on roles: events, operations, troubleshooting, sales, craft.", rel:"You bring people into experiences, so plan things to do together.", change:"Go see it in person: tour it, visit it, try it before deciding.", motiv:"Make the first step physical, and start within five minutes.", create:"Work from real references and materials, and test things live." } },
+  last:{ struggle:"Stuck in your head. Plans and theories pile up but you stall on actually doing, the physical side of life (body, room, money details) gets neglected, and under stress you overindulge.",
+    signs:["Weeks in planning mode with nothing started","Ignoring sleep, food, and movement","Binging on sensation when stressed (food, scrolling, spending)"],
+    exp:{ general:["Do one ten-minute thing with your hands every day: walk, cook, fix something.","Turn one plan into a same-day action."], work:"Ship a rough version this week before you perfect the plan.", rel:"Plan one real-world activity together instead of another long talk.", change:"Visit or test the new thing in person before you decide.", motiv:"Set a ten-minute timer and just start. No planning allowed.", create:"Make a fast, messy draft with real materials." } },
+  loop:"chasing the next sensation or task", exit:"do something physical and fully present right now" },
+ Si:{
+  first:{ real:"You build a reliable base. You remember how things went before, refine your routines, and make things solid.",
+    strengths:["Consistency and follow-through","Remembering details and history","Refining something until it's dependable"],
+    apply:{ work:"Process, documentation, QA, and systems that have to be reliable.", rel:"Consistency is how you show care. Name it, so people notice it.", change:"Bring your routines with you, and rebuild one anchor habit first.", motiv:"Track streaks, and let routine carry you on low days.", create:"Master a craft through repetition and refinement." } },
+  last:{ struggle:"Scattered. You chase new ideas but drop the basics (bills, sleep, follow-through, what worked last time). Routines feel like a cage until things fall apart.",
+    signs:["Lots of starts, few finishes","Losing track of basics like deadlines, bills, and keys","Feeling physically run down out of nowhere"],
+    exp:{ general:["Pick one tiny daily anchor, like the same wake time or a five-minute reset.","After each project, jot down \"what worked\" in a running log."], work:"Write a checklist for the task you redo most often.", rel:"Remember one thing someone told you last week, and follow up on it.", change:"Before moving on, list what you're keeping from before.", motiv:"Finish one existing thing before you start a new one.", create:"Revisit and polish an old piece instead of starting fresh." } },
+  loop:"clinging to the routine and the way things were", exit:"go back to a reliable routine or what worked before" },
+ Ne:{
+  first:{ real:"You see possibilities everywhere. You connect ideas nobody else links, reframe problems, and generate options fast.",
+    strengths:["Generating options quickly","Connecting unrelated ideas","Reframing a stuck problem"],
+    apply:{ work:"Brainstorming, R&D, early-stage projects, and reframing problems.", rel:"You keep things fresh. Let people know which of your ideas you actually mean.", change:"Map three to five possible paths before committing to one.", motiv:"Gamify boring tasks or add some novelty.", create:"Mashups, experiments, and variations on a theme." } },
+  last:{ struggle:"Stuck on one track. You're convinced there's only one way things can go, so setbacks feel catastrophic and new possibilities feel threatening instead of exciting.",
+    signs:["Worst-case thinking about one outcome","Rejecting alternatives before hearing them","Feeling trapped with no options"],
+    exp:{ general:["When you're stuck, list five other ways it could go, even silly ones.","Try one small new thing each week: a new route, food, or genre."], work:"Before deciding, ask a coworker: \"How else could we do this?\"", rel:"Ask \"what if…\" questions instead of predicting how they'll react.", change:"Write three versions of how this change could turn out well.", motiv:"Change the setting or format of a task to restart momentum.", create:"Do a 15-minute \"bad ideas only\" brainstorm." } },
+  loop:"jumping between ideas without landing anywhere", exit:"talk it out or try one fresh angle" },
+ Ti:{
+  first:{ real:"You build your own understanding. You need things to make sense to you and won't accept a rule until you've tested it.",
+    strengths:["Finding the flaw in a system","Precise definitions and logic","Deep, independent problem-solving"],
+    apply:{ work:"Troubleshooting, engineering, analysis, debugging.", rel:"Explain your reasoning, and then check how it landed.", change:"Build your own decision criteria instead of borrowing someone else's.", motiv:"Turn the task into a puzzle you want to solve.", create:"Design systems, rules, and structure into your work." } },
+  last:{ struggle:"Outsourcing your own judgment. You lean on what others say or what \"works\" instead of thinking it through, and get defensive when your logic is questioned.",
+    signs:["Following rules you don't actually believe","Feeling dumb when you can't explain why","Overreacting to being corrected"],
+    exp:{ general:["Before agreeing to something, write one line of your own reasoning.","Spend 20 quiet minutes understanding one thing all the way."], work:"Pick one process and figure out exactly why each step exists.", rel:"When you disagree, say \"here's how I see it\" instead of going along.", change:"Define your own criteria for the decision before you ask anyone else.", motiv:"Ask yourself \"why does this matter, logically?\" and write the answer.", create:"Learn the underlying rules of your craft: theory, structure, technique." } },
+  loop:"overthinking alone until it's perfect", exit:"pause and work out what you actually think" },
+ Te:{
+  first:{ real:"You organize the world around you. You turn plans into action, measure what works, and get things done for the group.",
+    strengths:["Turning plans into action","Organizing people and resources","Measuring what actually works"],
+    apply:{ work:"Project management, operations, leadership, and anything with deadlines.", rel:"You show care by getting things done. Also ask what they actually want.", change:"Make the timeline and the checklist. It calms the chaos.", motiv:"Set measurable targets and track progress where you can see it.", create:"Set a release schedule, then finish and ship." } },
+  last:{ struggle:"Knowing what you love but not making it real. Passion projects stay in your head, deadlines feel like attacks, and \"just get it done\" pressure makes you shut down or rebel.",
+    signs:["Lots of passions, few finished","Avoiding tasks that feel like someone else's rules","Crash moments when everyone suddenly wants something from you"],
+    exp:{ general:["Break one thing you love into three steps with dates.","Tell one person a deadline out loud, and let the outside world hold you to it."], work:"Time-box your most annoying task to 25 minutes and get it done.", rel:"Turn one \"we should\" into a calendar invite.", change:"Make a simple timeline of what has to happen by when.", motiv:"Track one number weekly: pages, songs, hours.", create:"Set a release date and work backwards from it." } },
+  loop:"piling on tasks and fixing everyone's problems", exit:"make a small plan and take one concrete step" },
+ Fi:{
+  first:{ real:"You know what you value. You have a strong inner compass, spot what's fake, and stay loyal to what's real to you.",
+    strengths:["Knowing what matters to you","Spotting what's fake or off","Deep loyalty to the people and causes you choose"],
+    apply:{ work:"Mission-driven roles, creative work, advocacy, anything you believe in.", rel:"Your honesty about what you feel is a gift. Share it in words, not just by withdrawing.", change:"Check every option against \"does this feel like me?\"", motiv:"Connect the task to a value you actually hold.", create:"Personal expression. Your taste is your edge." } },
+  last:{ struggle:"Running on everyone else's needs and metrics until you don't know what you want, then feeling unappreciated and hit by a wave of \"nobody cares about me.\"",
+    signs:["Not being able to answer \"what do you want?\"","Resentment after over-delivering","A sudden emotional crash after a productive streak"],
+    exp:{ general:["Each day, write one thing you liked and one you didn't. No reasons needed.","Say no to one request that doesn't matter to you."], work:"Pick one project you care about personally and protect time for it.", rel:"Tell someone one thing you actually want, plainly.", change:"Before deciding, ask yourself: \"What would I choose if nobody was watching?\"", motiv:"Find your personal \"why\" before working out the \"how.\"", create:"Make one thing only for yourself, not to show anyone." } },
+  loop:"withdrawing into what you feel and love", exit:"check in with what you actually feel and want" },
+ Fe:{
+  first:{ real:"You read the emotional weather. You sense how the group feels, bring people together, and make people feel seen.",
+    strengths:["Reading the room","Bringing people together","Making people feel seen"],
+    apply:{ work:"Teaching, support, HR, community, and client-facing roles.", rel:"You notice everyone's needs. Put your own on that list too.", change:"Lean on your people and tell them what you need.", motiv:"Work alongside others, or for someone you care about.", create:"Make things that move or connect an audience." } },
+  last:{ struggle:"Feeling disconnected from the group. You're unsure how people feel about you, awkward in emotional moments, and surprised when people get upset over things that made sense to you.",
+    signs:["Being shocked that someone is hurt","Avoiding emotional conversations","Feeling like the outsider who doesn't get it"],
+    exp:{ general:["Once a day, ask someone how they're doing and really listen.","Before sharing a conclusion, ask yourself: \"How will this land for them?\""], work:"Thank one person for something specific they did.", rel:"Ask \"what would make this better for you?\" and then do it.", change:"Tell the people around you what's changing and how they can help.", motiv:"Find an accountability buddy.", create:"Share a work in progress and ask how it made them feel." } },
+  loop:"bending over backwards to keep everyone happy", exit:"reach out and connect with someone" }
+};
+
+const FOCI = { general:'Just in general', work:'Work / career', rel:'Relationships', change:'Big life change', motiv:'Motivation', create:'Creative block' };
+const SCEN = { work:'Work / school', social:'Friends / family', alone:'On your own', stress:'Under stress' };
+
+</script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const FL = ['Ni','Ne','Si','Se','Ti','Te','Fi','Fe'];
+const KIND=f=>FN[f].kind==='O'?'Observer':'Decider';
+const ATT=f=>FN[f].att==='i'?'Introverted':'Extroverted';
+const LETTERW={N:'Intuition',S:'Sensing',T:'Thinking',F:'Feeling'};
+const PARTNER={Ni:'Se',Se:'Ni',Si:'Ne',Ne:'Si',Fi:'Te',Te:'Fi',Ti:'Fe',Fe:'Ti'};
+const POSN=['#1 Dominant','#2 Auxiliary','#3 Tertiary','#4 Inferior'];
+const GROUP=t=>({IJ:'IxxJ',EP:'ExxP',IP:'IxxP',EJ:'ExxJ'})[t[0]+t[3]];
+const fnLink=f=>`<a href="#${f}" style="color:${FCOLOR[f]};font-weight:800;text-decoration:none">${f}</a>`;
+
+// Relationship patterns (self-reflection prompts, not findings): what a function can draw you toward as your #1,
+// and what it can make you overlook as your #4. Tentative on purpose: no statistics, no clinical labels.
+const REL={
+  Fi:{draw:'Who someone <i>could</i> become, or the feeling of being deeply understood. You may stay loyal after it stops being returned.',
+      miss:'How you actually feel about the person. You may stay because it "makes sense" while your unhappiness builds quietly.'},
+  Fe:{draw:'People who need you. Being needed can feel like closeness, and you may keep the peace instead of naming a problem.',
+      miss:'How the other person really feels. You may pick partners who don\'t say much, then get blindsided.'},
+  Ti:{draw:'Someone who "makes sense" or feels like an interesting puzzle. You may analyse the relationship more than you live it.',
+      miss:'Whether your own reasoning about them holds up. You may go along with what friends, family or your partner say is right.'},
+  Te:{draw:'Someone who fits the plan, the timing or the checklist. You may treat problems as tasks to fix.',
+      miss:'The practical check: does this actually work day to day? Think money, plans and follow-through.'},
+  Ni:{draw:'One story locked in early ("this is the one"). You may notice the signs that fit it and skip the ones that don\'t.',
+      miss:'Where things are heading. You may react to each moment without seeing the pattern repeat.'},
+  Ne:{draw:'Excitement and possibility. You may mistake a spark of potential for real fit, or keep your options open too long.',
+      miss:'Other possibilities. You may feel stuck with what you know, even when better options exist.'},
+  Si:{draw:'What feels familiar, even when familiar was hard. History and routine can keep you loyal.',
+      miss:'Your own past experience. You may repeat something that went badly before, without stopping to compare.'},
+  Se:{draw:'Chemistry, intensity and what\'s happening right now. The spark can matter more than the track record.',
+      miss:'What the person is actually doing right now, because you\'re focused on what it means or could become.'}
+};
+// The growth-map block: shown under "Just in general" and "Relationships".
+function relBlock(f1,f4,fc){
+  if(fc&&fc!=='rel') return '';
+  return `<div class="gblock" style="--c:${FCOLOR[f1]}"><div class="gk">Relationship pattern to watch</div>
+    <p><b style="color:${FCOLOR[f1]}">${f1}, your #1, can draw you toward:</b> ${REL[f1].draw}</p>
+    <p><b style="color:${FCOLOR[f4]}">${f4}, your #4, can make you overlook:</b> ${REL[f4].miss}</p>
+    <p class="muted2">If you keep meeting the same kind of partner in a different person, these two are the first places to look. Patterns to notice, not a verdict about you or anyone else.</p></div>`;
+}
+
+/* ================= SKY ================= */
+const sky=$('#sky'), sx=sky.getContext('2d'); let W=0,H=0,DPR=1; const stars=[];
+function resize(){ DPR=Math.min(2,devicePixelRatio||1); W=innerWidth; H=innerHeight; sky.width=W*DPR; sky.height=H*DPR; sx.setTransform(DPR,0,0,DPR,0,0);
+  stars.length=0; const n=Math.round(W*H/6000); for(let i=0;i<n;i++) stars.push({x:Math.random()*W,y:Math.random()*H,z:Math.random(),tw:Math.random()*6.28,s:Math.random()*.9+.2}); }
+addEventListener('resize',resize); resize();
+const hex=h=>{const n=parseInt(h.slice(1),16);return [n>>16&255,n>>8&255,n&255];};
+let tint=['#eab308','#22c55e','#3b82f6','#f43f5e'].map(hex), tintT=tint.map(c=>c.slice());
+function setTint(cols){ tintT=cols.map(hex); }
+function drawSky(now){
+  const t=now/1000; sx.globalCompositeOperation='source-over'; sx.fillStyle='#05040d'; sx.fillRect(0,0,W,H);
+  sx.globalCompositeOperation='lighter';
+  for(let i=0;i<4;i++){ for(let k=0;k<3;k++) tint[i][k]+= (tintT[i][k]-tint[i][k])*.02; const [r,g,b]=tint[i];
+    const px=W*(.5+.4*Math.sin(t*.05*(i+1)+i*1.7)), py=H*(.45+.35*Math.cos(t*.04*(i+1.3)+i)), rad=Math.max(W,H)*.45;
+    const gr=sx.createRadialGradient(px,py,0,px,py,rad); gr.addColorStop(0,`rgba(${r|0},${g|0},${b|0},.13)`); gr.addColorStop(1,'rgba(0,0,0,0)'); sx.fillStyle=gr; sx.fillRect(0,0,W,H); }
+  for(const s of stars){ const a=.25+.55*(.5+.5*Math.sin(t*1.3*s.s+s.tw)); sx.fillStyle=`rgba(230,232,255,${a*s.z})`; sx.fillRect(s.x,s.y,s.s*1.3*s.z+.3,s.s*1.3*s.z+.3); }
+  sx.globalCompositeOperation='source-over';
+  if(!reduce) requestAnimationFrame(drawSky);
+}
+requestAnimationFrame(drawSky);
+
+/* ================= LAST RESULT (localStorage, summary only) ================= */
+// ---- Results history on this device (summaries only: never the name or the answers) ----
+const LS_HIST='constellation_history', HIST_MAX=20;
+function validRec(v){ return v&&STACKS[v.type]&&SUBTYPES.some(s=>s.key===v.subtype&&s.type===v.type); }
+function readHist(){
+  let h=[]; try{ h=JSON.parse(localStorage.getItem(LS_HIST)||'[]'); }catch(e){ return []; }
+  if(!Array.isArray(h)) h=[];
+  h=h.filter(validRec);
+  if(!h.length){ // carry over a single result saved before history existed
+    try{ const v=JSON.parse(localStorage.getItem('constellation_last')||'null'); if(validRec(v)){ v.id=v.id||('legacy-'+(v.date||'')); h=[v]; localStorage.setItem(LS_HIST,JSON.stringify(h)); } }catch(e){}
+  }
+  return h;
+}
+function writeHist(h){
+  try{ localStorage.setItem(LS_HIST,JSON.stringify(h.slice(0,HIST_MAX)));
+    if(h.length) localStorage.setItem('constellation_last',JSON.stringify(h[0])); else localStorage.removeItem('constellation_last'); }catch(e){}
+}
+function forgetOne(id){ writeHist(readHist().filter(x=>x.id!==id)); }
+function forgetAll(){ try{ localStorage.removeItem(LS_HIST); localStorage.removeItem('constellation_last'); }catch(e){} }
+const histDate=(d,yr)=>d?new Date(d).toLocaleDateString(undefined,yr?{month:'short',day:'numeric',year:'numeric'}:{month:'short',day:'numeric'}):'';
+const LS_KEY='constellation_last';
+// Which saved result to show: ?r=<id> from the home page's history, otherwise the latest.
+let activeId=null; try{ activeId=new URLSearchParams(location.search).get('r'); }catch(e){}
+function readLastOld(){ try{ const v=JSON.parse(localStorage.getItem(LS_KEY)||'null'); return v&&STACKS[v.type]&&SUBTYPES.some(s=>s.key===v.subtype)?v:null; }catch(e){ return null; } }
+function readLast(){ const h=readHist(); if(!h.length) return null; return h.find(x=>x.id===activeId)||h[0]; }
+function forgetLast(){ if(last) forgetOne(last.id); activeId=null; }
+let last=readLast();
+
+/* ================= MAP ================= */
+// Function Flow (Dave Powers): the 4 human needs as rows, with one question per function.
+const FLOW_ROWS=[['Identity','Fi','Ti'],['Gather','Se','Ne'],['Organize','Ni','Si'],['Tribe','Te','Fe']];
+const FQ={Fi:'What is valuable to me?',Ti:'What works for me?',Se:'What is the data?',Ne:'What are the patterns?',Ni:'Which pattern is best for me?',Si:'How is the data organized?',Te:'Does this work for everyone?',Fe:'Do people actually like this?'};
+const FNEED=f=>FLOW_ROWS.find(r=>r.includes(f))[0];
+const FLOW_Y=[95,205,315,425], FLOWPOS={}; FLOW_ROWS.forEach(([n,a,b],k)=>{ FLOWPOS[a]=[278,FLOW_Y[k]]; FLOWPOS[b]=[522,FLOW_Y[k]]; });
+const NEED_ANIMAL={'Identity+Gather':'Consume','Identity+Organize':'Sleep','Organize+Tribe':'Blast','Gather+Tribe':'Play'};
+// Quadrant layouts. The side holding the selected type's #1 function goes on the left.
+// Default (nothing picked) is deciders-left: Feeling · Thinking | Intuition · Sensing (a mirror of observers-left).
+const QUAD={
+  O:{pos:{ Si:[150,150], Ni:[300,150], Se:[150,390], Ne:[300,390], Ti:[500,150], Fi:[650,150], Te:[500,390], Fe:[650,390] },
+     heads:['OBSERVERS · patterns & data','DECIDERS · values & logic'], cols:['Sensing','Intuition','Thinking','Feeling']},
+  D:{pos:{ Fi:[150,150], Ti:[300,150], Fe:[150,390], Te:[300,390], Ni:[500,150], Si:[650,150], Ne:[500,390], Se:[650,390] },
+     heads:['DECIDERS · values & logic','OBSERVERS · patterns & data'], cols:['Feeling','Thinking','Intuition','Sensing']}
+};
+let QSIDE='D', XPOS=QUAD.D.pos;
+function setQuadSide(side){
+  QSIDE=side; XPOS=QUAD[side].pos; const q=QUAD[side];
+  ['qrLT','qrRT'].forEach(id=>{ $('#'+id).textContent='INTROVERTED'; }); ['qrLB','qrRB'].forEach(id=>{ $('#'+id).textContent='EXTROVERTED'; });
+  $('#qhL').textContent=q.heads[0]; $('#qhR').textContent=q.heads[1]; q.cols.forEach((c,i)=>{ $('#qc'+i).textContent=c; });
+  $$('.xaxis').forEach(l=>{ const a=l.dataset.ax.slice(0,2), b=l.dataset.ax.slice(2); l.setAttribute('x1',XPOS[a][0]); l.setAttribute('y1',XPOS[a][1]); l.setAttribute('x2',XPOS[b][0]); l.setAttribute('y2',XPOS[b][1]); });
+}
+// Type-arranged quadrants: the Observers and Deciders boxes stay, but their corners follow the picked type (like the chart).
+// Like the type chart: the box holding the INTROVERTED one of #1/#2 goes left (so ENTP shows Ti left, Ne right). In each box the type's top function (#1 or #2) takes the top OUTER corner,
+// its axis partner (#3 or #4) the bottom INNER corner, and the two unused functions fill the other two corners.
+// So #1 and #2 sit on the far edges of the top row, #3 and #4 meet in the middle of the bottom row,
+// and each axis still crosses its own box in an X. Column and row labels follow the bubbles.
+const LETTERWORD={N:'Intuition',S:'Sensing',T:'Thinking',F:'Feeling'}, OTHERL={N:'S',S:'N',T:'F',F:'T'};
+function kindLayout(type){
+  const st=STACKS[type], leftKind=FN[[st[0],st[1]].find(f=>FN[f].att==='i')].kind, kinds=[leftKind, leftKind==='O'?'D':'O'];
+  const pos={}, labels={cols:[],rows:[]};
+  kinds.forEach((K,bi)=>{
+    const topFn=[st[0],st[1]].find(f=>FN[f].kind===K), outerL=topFn[0], innerL=OTHERL[outerL], topAtt=topFn[1];
+    const outerX=bi===0?150:650, innerX=bi===0?300:500;
+    FL.filter(f=>FN[f].kind===K).forEach(f=>{ pos[f]=[f[0]===outerL?outerX:innerX, f[1]===topAtt?150:390]; });
+    const cols=bi===0?[outerL,innerL]:[innerL,outerL]; labels.cols.push(...cols.map(l=>LETTERWORD[l]));
+    labels.rows.push(topAtt==='i'?['INTROVERTED','EXTROVERTED']:['EXTROVERTED','INTROVERTED']);
+  });
+  return {pos,labels,heads:kinds.map(K=>K==='O'?'OBSERVERS · patterns & data':'DECIDERS · values & logic')};
+}
+function setKindLayout(type){
+  const L=kindLayout(type); XPOS=L.pos;
+  $('#qhL').textContent=L.heads[0]; $('#qhR').textContent=L.heads[1];
+  L.labels.cols.forEach((c,i)=>{ $('#qc'+i).textContent=c; });
+  $('#qrLT').textContent=L.labels.rows[0][0]; $('#qrLB').textContent=L.labels.rows[0][1]; $('#qrRT').textContent=L.labels.rows[1][0]; $('#qrRB').textContent=L.labels.rows[1][1];
+  $$('.xaxis').forEach(l=>{ const a=l.dataset.ax.slice(0,2), b=l.dataset.ax.slice(2); l.setAttribute('x1',XPOS[a][0]); l.setAttribute('y1',XPOS[a][1]); l.setAttribute('x2',XPOS[b][0]); l.setAttribute('y2',XPOS[b][1]); });
+}
+function mapSvg(){
+  const axis=(a,b)=>`<line class="xaxis" data-ax="${a}${b}" x1="${XPOS[a][0]}" y1="${XPOS[a][1]}" x2="${XPOS[b][0]}" y2="${XPOS[b][1]}"/>`;
+  const node=f=>{ const [x,y]=XPOS[f];
+    return `<g class="xnode ${FN[f].att==='i'?'int':'ext'}" data-f="${f}" tabindex="0" role="button" aria-label="${FNAME[f]} (${f}), ${ATT(f).toLowerCase()} ${KIND(f).toLowerCase()}. Open entry." style="--c:${FCOLOR[f]};transform:translate(${x}px,${y}px)">
+      <g class="sz"><circle class="halo" r="58"/><circle class="ring" r="51"/><circle class="body" r="42"/>
+      <text class="rk" y="-19"></text><text class="fx" y="4">${f}</text><text class="fk" y="24">${KIND(f).toUpperCase()}</text><text class="you" y="-62">YOUR SAVIOR</text></g></g>`; };
+  return `<svg viewBox="0 0 800 540" class="xsvg" role="group" aria-label="Map of the 8 cognitive functions"><g class="quad">
+    <rect x="20" y="40" width="370" height="460" rx="22" class="xq"/><rect x="410" y="40" width="370" height="460" rx="22" class="xq"/>
+    <line x1="20" y1="270" x2="780" y2="270" class="xmid"/>
+    <text x="205" y="28" class="xh" id="qhL">${QUAD.D.heads[0]}</text><text x="595" y="28" class="xh" id="qhR">${QUAD.D.heads[1]}</text>
+    <text x="34" y="66" class="xs" id="qrLT">INTROVERTED</text><text x="34" y="490" class="xs" id="qrLB">EXTROVERTED</text><text x="424" y="66" class="xs" id="qrRT">INTROVERTED</text><text x="424" y="490" class="xs" id="qrRB">EXTROVERTED</text>
+    ${QUAD.D.cols.map((c,i)=>`<text x="${[150,300,500,650][i]}" y="526" class="xl" id="qc${i}">${c}</text>`).join('')}
+    ${axis('Ni','Se')}${axis('Si','Ne')}${axis('Fi','Te')}${axis('Ti','Fe')}</g>
+    <g class="clus" aria-hidden="true"><line class="cx" id="cx1"/><line class="cx" id="cx2"/><line class="svl" id="svl"/>
+      <text class="ctl" id="ctTop" x="400" y="60">#1 + #2</text><text class="ctl" id="ctBot" x="400" y="482">#3 + #4</text><text class="ctl ctx" id="ctNote" x="400" y="515"></text></g>
+    <g class="flowl" aria-hidden="true">${FLOW_ROWS.map(([n,a,b],k)=>{ const y=FLOW_Y[k];
+      return `<text class="frow" data-row="${n}" x="400" y="${y}">${n}</text><text class="fblind" data-row="${n}" x="400" y="${y+28}">blind spot</text>
+      <text class="fq fqL" data-f="${a}" x="208" y="${y}">${FQ[a]}</text><text class="fq fqR" data-f="${b}" x="592" y="${y}">${FQ[b]}</text>`; }).join('')}</g>
+    <line class="pairl" id="pairl"/>
+    ${FL.map(node).join('')}</svg>`;
+}
+$('#map').innerHTML=mapSvg();
+// Type picker (from the results page's Function explorer): tap any type to resize the map.
+$('#typePick').innerHTML=['IJ','EP','IP','EJ'].map(g=>`<div class="xtg"><span>${{IJ:'IxxJ',EP:'ExxP',IP:'IxxP',EJ:'ExxJ'}[g]}</span>${Object.keys(STACKS).filter(t=>t[0]+t[3]===g).sort().map(t=>`<button class="xtype" data-t="${t}" aria-pressed="false">${t}</button>`).join('')}</div>`).join('');
+$('#typePick').addEventListener('click',e=>{ const b=e.target.closest('.xtype'); if(!b) return; const t=b.dataset.t;
+  if(mapState&&mapState.type===t&&!mapState.key) return;
+  sizeMap(t,last&&last.type===t?last.subtype:null,!!last&&last.type===t); });
+const SIZES=[1.28,1.04,.84,.62], OFF=.46;
+const subOf=(type,key)=>SUBTYPES.find(s=>s.type===type&&s.key===key)||SUBTYPES.find(s=>s.type===type&&s.pos==='aux');
+// Stack cluster (from the reference chart): #1 and #2 on top with the introverted one on the left,
+// #3 and #4 below, each diagonal from its axis partner, so the two axis lines cross in an X.
+const CL={TL:[285,195],TR:[515,195],BL:[345,390],BR:[455,390]}, CSCALE=1.35;
+function clusterPos(type){
+  const st=STACKS[type], top=[st[0],st[1]], L=top.find(f=>FN[f].att==='i'), R=top.find(f=>f!==L);
+  return {[L]:CL.TL,[R]:CL.TR,[PARTNER[R]]:CL.BL,[PARTNER[L]]:CL.BR};
+}
+const moveNode=(n,[x,y])=>{ n.style.transform=`translate(${x}px,${y}px)`; };
+const setLine=(id,a,b)=>{ const l=document.getElementById(id); l.setAttribute('x1',a[0]); l.setAttribute('y1',a[1]); l.setAttribute('x2',b[0]); l.setAttribute('y2',b[1]); };
+let mapState=null; // {type, key, isYou}
+let VIEW='stack'; // 'quad' | 'stack' | 'flow' | 'path'
+function sizeMap(type,key,isYou){
+  PO=null; PD=null; PORDER=[];
+  if(!type){ mapState=null; }
+  else { const sub=subOf(type,key); mapState={type,key:sub.key,isYou:!!isYou}; }
+  renderMap(); renderGrowth();
+}
+function setNode(n,{pos,scale,gone,savior,mine,rank}){
+  moveNode(n,pos); n.querySelector('.sz').style.transform=`scale(${scale})`;
+  n.classList.toggle('gone',!!gone); n.classList.toggle('offstack',rank===-1); n.classList.toggle('savior',!!savior); n.classList.toggle('mine',!!mine);
+  if(gone){ n.setAttribute('tabindex','-1'); n.setAttribute('aria-hidden','true'); } else { n.setAttribute('tabindex','0'); n.removeAttribute('aria-hidden'); }
+  n.querySelector('.rk').textContent=rank>=0?'#'+(rank+1)+(savior?' · SAVIOR':''):'';
+}
+function renderMap(){
+  $$('#typePick .xtype').forEach(b=>{ b.setAttribute('aria-pressed',!!mapState&&mapState.type===b.dataset.t); b.classList.toggle('yours',!!last&&last.type===b.dataset.t); });
+  const map=$('#map'), path=$('#path'), S=mapState;
+  if(S) setKindLayout(S.type); else setQuadSide('D');
+  map.classList.toggle('flow',VIEW==='flow'); map.hidden=VIEW==='path'; path.hidden=VIEW!=='path';
+  map.querySelector('svg').setAttribute('viewBox',VIEW==='flow'&&matchMedia('(max-width:600px)').matches?'170 30 460 460':'0 0 800 540');
+  $$('#views button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===VIEW));
+  $('#mapcap').innerHTML=VIEW==='quad'&&S?`Arranged for ${S.type} like the type chart: the top row has the introverted function on the left and the extroverted one on the right. #1 and #2 take the top outer corners, #3 and #4 meet in the middle of the bottom row, and each axis crosses its own box in an X. Column and row labels move with the bubbles.<br>Bigger = higher in the stack, faded = not in the stack, rings = the two saviors. Tap one observer and one decider to see the subtypes that pair makes.`
+    :VIEW==='quad'?`The original map: deciders (values & logic) on one side, observers (patterns &amp; data) on the other. Top = introverted, bottom = extroverted. The side with the type's #1 function moves to the left${S?` (${KIND(STACKS[S.type][0]).toLowerCase()}s for ${S.type})`:'; with nothing picked, deciders lead'}.<br>Pick a type and the bubbles resize in place: bigger = higher in the stack, faded = not in the stack, rings = the two saviors. Lines connect axis partners. Tap one observer and one decider to see the subtypes that pair makes.`
+    :VIEW==='stack'?'Deciders (values & logic) and observers (patterns &amp; data) sit on opposite sides. Top = introverted, bottom = extroverted.<br>Pick a type and its 4 functions gather into a stack: #1 and #2 on top (introverted on the left), #3 and #4 below. The crossed lines join axis partners, and the glowing line joins the two saviors.'
+    :VIEW==='flow'?'Function Flow: the 4 human needs, each asked two ways. Every type uses exactly one function per row, sized here by its place in the stack. The two savior rows make your animal.'
+    :'Your 4 functions in life-flow order: Identity, then Gather, Organize, and Tribe. Saviors are where you start, and the blind spot is the question to ask more often.';
+  if(!S){ // nothing picked
+    map.classList.remove('cluster');
+    $$('.xnode').forEach(n=>setNode(n,{pos:(VIEW==='flow'?FLOWPOS:XPOS)[n.dataset.f],scale:VIEW==='flow'?.8:1,rank:-2}));
+    $$('.fq').forEach(t=>t.classList.remove('dim')); $$('.frow').forEach(t=>t.classList.remove('sv')); $$('.fblind').forEach(t=>t.classList.remove('on'));
+    path.innerHTML='<p class="pathempty">Pick a type or subtype to see its path.</p>';
+    $$('.xaxis').forEach(l=>l.classList.remove('on'));
+    $('#sizing').innerHTML=VIEW==='stack'?'Tap any type or subtype to gather its 4 functions into a stack. Tap a bubble to read about that function.':'Tap any type or subtype to light up its 4 functions. Tap a bubble to read about that function.';
+    setTint(['#eab308','#22c55e','#3b82f6','#f43f5e']); applyPicks(); return;
+  }
+  const {type,isYou}=S, st=STACKS[type], sub=subOf(type,S.key), sv=[sub.dom,sub.other], jumper=sub.pos==='tert';
+  const sizeOf=i=>i<0?OFF:(i===3&&jumper?.52:SIZES[i]);
+  if(VIEW==='quad'){
+    map.classList.remove('cluster');
+    $$('.xnode').forEach(n=>{ const f=n.dataset.f, i=st.indexOf(f); setNode(n,{pos:XPOS[f],scale:sizeOf(i),savior:sv.includes(f),mine:isYou&&sv.includes(f),rank:i}); });
+    $$('.xaxis').forEach(l=>l.classList.toggle('on',sv.some(f=>l.dataset.ax.includes(f))));
+  } else if(VIEW==='flow'){
+    map.classList.remove('cluster');
+    $$('.xnode').forEach(n=>{ const f=n.dataset.f, i=st.indexOf(f); setNode(n,{pos:FLOWPOS[f],scale:i<0?.42:sizeOf(i)*.92,savior:sv.includes(f),mine:isYou&&sv.includes(f),rank:i}); });
+    $$('.fq').forEach(t=>t.classList.toggle('dim',!st.includes(t.dataset.f)));
+    const svRows=sv.map(FNEED), blind=FNEED(st[3]);
+    $$('.frow').forEach(t=>t.classList.toggle('sv',svRows.includes(t.dataset.row)));
+    $$('.fblind').forEach(t=>t.classList.toggle('on',t.dataset.row===blind));
+  } else {
+    const pos=clusterPos(type); map.classList.add('cluster');
+    $$('.xnode').forEach(n=>{ const f=n.dataset.f, i=st.indexOf(f); setNode(n,{pos:i<0?XPOS[f]:pos[f],scale:sizeOf(i)*CSCALE,gone:i<0,savior:sv.includes(f),mine:isYou&&sv.includes(f),rank:i}); });
+    const ax=st.filter(f=>pos[f]===CL.TL||pos[f]===CL.TR);
+    setLine('cx1',pos[ax[0]],pos[PARTNER[ax[0]]]); setLine('cx2',pos[ax[1]],pos[PARTNER[ax[1]]]);
+    setLine('svl',pos[sub.dom],pos[sub.other]); $('#svl').style.setProperty('--sc',FCOLOR[sub.dom]);
+    $('#ctNote').textContent=jumper?`Jumper: ${sub.dom} (#1) + ${sub.other} (#3), skipping #2`:`Balanced: ${sub.dom} (#1) + ${sub.other} (#2)`;
+    const clus=map.querySelector('.clus'); clus.style.animation='none'; void clus.getBoundingClientRect(); clus.style.animation='';
+  }
+  path.innerHTML=pathHtml(type,sub.key);
+  const animal=NEED_ANIMAL[sv.map(FNEED).sort((a,b)=>FLOW_ROWS.findIndex(r=>r[0]===a)-FLOW_ROWS.findIndex(r=>r[0]===b)).join('+')];
+  $('#sizing').innerHTML=`${isYou?('Sized to <b>'+(isLatest()?'your latest result':'your saved result')+'</b>'):'Showing'}: <a href="#${type}" style="color:var(--ink);font-weight:800">${type}</a> <a href="#${sub.key}" style="color:var(--muted)">${sub.dom}–${sub.other}</a> (${jumper?'Dom + Tert, a jumper':'Dom + Aux, balanced'}).${(VIEW==='stack'||VIEW==='quad')&&jumper?' Jumpers lean on their #3, but their #2 is still naturally bigger, and the drop to #4 is steeper.':''}${(VIEW==='flow'||VIEW==='path')?` Savior rows: ${sv.map(FNEED).join(' + ')} = ${animal}.`:''} <button id="resetMap">${last&&!isYou?'Back to my result':'Clear'}</button>`;
+  $('#resetMap').addEventListener('click',()=>{ if(last&&!isYou) sizeMap(last.type,last.subtype,true); else sizeMap(null); });
+  setTint([FCOLOR[st[0]],FCOLOR[st[1]],FCOLOR[st[2]],FCOLOR[sub.other]]);
+  applyPicks();
+}
+/* ---- Observer + decider pairing (Quadrants view) ---- */
+let PO=null, PD=null, PORDER=[];
+function togglePick(f){ const k=FN[f].kind, was=k==='O'?PO:PD; PORDER=PORDER.filter(x=>FN[x].kind!==k);
+  if(was===f){ if(k==='O') PO=null; else PD=null; } else { if(k==='O') PO=f; else PD=f; PORDER.push(f); } renderMap(); }
+function clearPicks(){ PO=null; PD=null; PORDER=[]; renderMap(); }
+function applyPicks(){
+  const map=$('#map'), on=VIEW==='quad'&&!!(PO||PD), pair=VIEW==='quad'&&!!(PO&&PD);
+  map.classList.toggle('picking',on);
+  $$('.xnode').forEach(n=>{ const f=n.dataset.f, p=on&&(f===PO||f===PD); n.classList.toggle('pick',p); n.classList.toggle('dimx',pair&&!p);
+    if(p){ const z=n.querySelector('.sz'), cur=parseFloat((z.style.transform.match(/scale\(([\d.]+)/)||[0,1])[1]); if(cur<1) z.style.transform='scale(1)'; } });
+  if(on) $$('.xaxis').forEach(l=>l.classList.remove('on'));
+  const pl=$('#pairl'); if(pair){ setLine('pairl',XPOS[PO],XPOS[PD]); pl.classList.add('on'); } else pl.classList.remove('on');
+  const box=$('#pairPanel');
+  if(VIEW!=='quad'){ box.hidden=true; return; }
+  box.hidden=false; box.innerHTML=pair?pairHtml(PORDER[0],PORDER[1]):(PO||PD)?singleHtml(PO||PD):`<p class="pairhint">Tap one <b>observer</b> and one <b>decider</b> to see the 2 subtypes that savior pair makes.</p>`;
+}
+function singleHtml(f){
+  const other=FN[f].kind==='O'?'decider':'observer';
+  return `<div class="pairone">${bub(f)}<div><b>${FNAME[f]}</b> <span class="pk2">${f} · ${KIND(f)}</span><p>${FQ[f]} ${firstSent(FDESC[f].core)}</p>
+    <p class="pairhint">Now tap a <b>${other}</b> to pair it. <a href="#${f}">Read ${f}</a> · <button class="linkbtn" data-act="clearpick">Clear</button></p></div></div>`;
+}
+const firstSent=t=>(String(t).match(/^.*?[.!?](\s|$)/)||[t])[0].trim();
+// first = picked first (it leads, #1); second = picked after it.
+function pairHtml(first,second){
+  const o=FN[first].kind==='O'?first:second, d=o===first?second:first;
+  const subs=SUBTYPES.filter(s=>s.obs===o&&s.dec===d).sort((a,b)=>a.dom===first?-1:1), an=subs[0].animal, A=ANIMALS[an];
+  return `<div class="pairhead"><span class="bub${FN[first].att==='e'?' e':''}" style="--c:${FCOLOR[first]}">${first}</span><span class="bub${FN[second].att==='e'?' e':''}" style="--c:${FCOLOR[second]};margin-left:-10px">${second}</span>
+    <div><b>${first} + ${second}</b> <span class="pk2">savior pair · ${first} leads · ${A.icon} ${an} (${A.pair})</span>
+    <p>${FN[o].att===FN[d].att?'Same attitude, so both subtypes are jumpers (Dom + Tert).':'Opposite attitudes, so both subtypes are balanced (Dom + Aux).'} Tap them in the other order to flip which one leads. <button class="linkbtn" data-act="clearpick">Clear</button></p></div></div>
+    <div class="links">${subs.map((s,n)=>`<div class="lnk paircard${n===0?' lead':''}" style="--c:${FCOLOR[s.dom]}"><span class="porder">${n===0?`Your order · ${first} first`:`Reverse order · ${second} first`}</span>${miniStack(s.type,s.key)}<b>${s.type} · ${s.dom}–${s.other}</b><i>${s.dom===o?'Observer':'Decider'}-led · ${SUBTRAITS[s.key]}</i>
+      <span class="pairacts"><button class="mapbtn pairshow" data-type="${s.type}" data-key="${s.key}">Show stack</button><a class="mapbtn" href="#${s.key}">Read</a></span></div>`).join('')}</div>`;
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-act="clearpick"]'); if(c){ clearPicks(); return; }
+  const sh=e.target.closest('.pairshow'); if(sh){ clearPicks(); sizeMap(sh.dataset.type,sh.dataset.key,isLast(sh.dataset.type,sh.dataset.key)); }
+});
+
+function pathHtml(type,key){
+  const st=STACKS[type], sub=subOf(type,key), sv=[sub.dom,sub.other];
+  return `<ol class="fpath">${FLOW_ROWS.map(([n,a,b])=>{ const f=st.includes(a)?a:b, i=st.indexOf(f), s=sv.includes(f), blind=i===3;
+    const d=[46,38,32,28][i]-(i===3&&sub.pos==='tert'?4:0);
+    return `<li class="${s?'sv':blind?'bl':''}"><a class="pbub${FN[f].att==='e'?' e':''}" href="#${f}" style="--c:${FCOLOR[f]};--d:${d}px" aria-label="${FNAME[f]}"><span>${f}</span></a>
+      <div class="ptxt"><div class="pk">${n} · #${i+1}</div><div class="pq">${FQ[f]}</div></div>
+      <span class="ptag">${s?'Savior · where you start':blind?'Blind spot · ask this more':'#'+(i+1)+' · steady'}</span></li>`; }).join('')}</ol>`;
+}
+function highlightFn(f){
+  $$('.xnode').forEach(n=>n.classList.toggle('sel',n.dataset.f===f));
+  $$('.xaxis').forEach(l=>l.classList.toggle('on',!!f&&l.dataset.ax.includes(f)));
+}
+$$('.xnode').forEach(n=>{ const go=()=>VIEW==='quad'?togglePick(n.dataset.f):openEntry(n.dataset.f,{fromMap:true});
+  n.addEventListener('click',go); n.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } }); });
+
+/* ================= MINI STACK SVG ================= */
+function miniStack(type,key){
+  // Mini version of the stack cluster: #1/#2 on top (introverted left), #3/#4 below on the diagonals.
+  const st=STACKS[type], sub=key?subOf(type,key):null, jumper=sub&&sub.pos==='tert';
+  const P={TL:[13,13],TR:[40,13],BL:[17,35],BR:[36,35]}, top=[st[0],st[1]], L=top.find(f=>FN[f].att==='i'), R=top.find(f=>f!==L);
+  const pos={[L]:P.TL,[R]:P.TR,[PARTNER[R]]:P.BL,[PARTNER[L]]:P.BR}, rad=[11,8.6,6.4,jumper?4.2:5];
+  const ln=(a,b,cls)=>`<line class="${cls}" x1="${pos[a][0]}" y1="${pos[a][1]}" x2="${pos[b][0]}" y2="${pos[b][1]}"/>`;
+  let out=ln(L,PARTNER[L],'mx')+ln(R,PARTNER[R],'mx');
+  if(sub) out+=`<line class="msv" style="stroke:${FCOLOR[sub.dom]}" x1="${pos[sub.dom][0]}" y1="${pos[sub.dom][1]}" x2="${pos[sub.other][0]}" y2="${pos[sub.other][1]}"/>`;
+  [3,2,1,0].forEach(i=>{ const f=st[i], [x,y]=pos[f], r=rad[i], sv=sub&&(f===sub.dom||f===sub.other);
+    out+=`${sv?`<circle class="ring" cx="${x}" cy="${y}" r="${r+2.4}" stroke="${FCOLOR[f]}"/>`:''}<circle cx="${x}" cy="${y}" r="${r}" fill="${FCOLOR[f]}" ${FN[f].att==='e'?'stroke="#fff" stroke-width="1.4"':''}/>${i<2?`<text x="${x}" y="${y+.5}" font-size="${i===0?8:6.4}">${f}</text>`:''}`; });
+  return `<svg class="mini" width="54" height="46" viewBox="0 0 54 46" role="img" aria-label="${type} stack: ${st.map((f,i)=>`#${i+1} ${f}`).join(', ')}${sub?`; saviors ${sub.dom} and ${sub.other}`:''}">${out}</svg>`;
+}
+const bub=f=>`<span class="bub${FN[f].att==='e'?' e':''}" style="--c:${FCOLOR[f]}" aria-hidden="true">${f}</span>`;
+
+/* ================= LETTERS & TERMS ================= */
+const LETTER_CARDS=[
+ {id:'letter-IE', t:'<b class="l">I</b> / <b class="l">E</b> Introverted or extroverted lead', s:'introvert extrovert ie lead',
+  b:`<p>The first letter tells you whether your <b>#1 function</b> is introverted or extroverted. It isn't "do you like parties."</p><p>In OPS, an extrovert's end-of-year crash comes from going too hard and needing quiet. An introvert's crash comes from being pushed to produce, and what helps is getting out and acting.</p>`},
+ {id:'letter-SN', t:'<b class="l">S</b> / <b class="l">N</b> Sensing or Intuition', s:'sensing intuition sn observer letter',
+  b:`<p><b>S</b>: ${LETTERS.S}</p><p><b>N</b>: ${LETTERS.N}</p>`},
+ {id:'letter-TF', t:'<b class="l">T</b> / <b class="l">F</b> Thinking or Feeling', s:'thinking feeling tf decider letter',
+  b:`<p><b>T</b>: ${LETTERS.T}</p><p><b>F</b>: ${LETTERS.F}</p>`},
+ {id:'letter-JP', t:'<b class="l">J</b> / <b class="l">P</b> Which side is introverted', s:'judging perceiving jp',
+  b:`<p>In OPS this isn't "organized vs. spontaneous." J/P tells you which of your two function kinds faces outward.</p><p><b>J</b>: your <b>decider is extroverted</b> (Te or Fe) and your <b>observer is introverted</b> (Si or Ni).</p><p><b>P</b>: your <b>observer is extroverted</b> (Se or Ne) and your <b>decider is introverted</b> (Ti or Fi).</p>`},
+ {id:'observer-decider', t:'Observers & Deciders', s:'observer decider od information values logic single double',
+  b:`<p><b>Observers</b> take in information: ${fnLink('Si')}, ${fnLink('Se')}, ${fnLink('Ni')}, ${fnLink('Ne')}.</p><p><b>Deciders</b> handle values and logic: ${fnLink('Ti')}, ${fnLink('Te')}, ${fnLink('Fi')}, ${fnLink('Fe')}.</p><p><b>Observer-led</b> types (IxxJ, ExxP) fear chaos and losing control.</p><p><b>Decider-led</b> types (IxxP, ExxJ) feel pain around identity and the tribe.</p>`},
+ {id:'savior-demon', t:'Saviors & Demons', s:'savior demon growth fixed automatic',
+  b:`<p>Your two <b>saviors</b> are what you do automatically, without thinking. Your <b>demons</b> are what you avoid, or only do after working your way up to it.</p><p>The tell isn't <i>whether</i> you do something, but whether it's automatic or effortful.</p>`},
+ {id:'stack', t:'The stack: #1 to #4', s:'stack dominant auxiliary tertiary inferior dom aux tert inf position',
+  b:`<p><b>#1 Dominant</b> is the biggest, <b>#2 Auxiliary</b> second, <b>#3 Tertiary</b> third, and then it drops way off to <b>#4 Inferior</b>.</p><p>The middle two are balanced with no strong trigger. The swing between #1 and #4 is where people get triggered.</p>`},
+ {id:'jumper', t:'Balanced vs. Jumper subtypes', s:'jumper balanced dom aux tert looping subtype',
+  b:`<p>Every type has two subtypes. <b>Balanced (Dom + Aux)</b>: your saviors are #1 and #2. <b>Jumper (Dom + Tert)</b>: your saviors are #1 and #3.</p><p>A jumper leans on their #3, but their #2 is still naturally bigger, like a right arm that's stronger in a left-handed person. Jumpers get a steeper drop to #4.</p>`},
+ {id:'axes', t:'The axes', s:'axis axes ni se si ne fi te ti fe partner',
+  b:`<p>Functions come in fixed pairs. If you have ${fnLink('Ni')} you also have ${fnLink('Se')}, and ${fnLink('Si')} always comes with ${fnLink('Ne')}. The same goes for ${fnLink('Fi')}–${fnLink('Te')} and ${fnLink('Ti')}–${fnLink('Fe')}.</p><p>Every type has exactly one observer axis and one decider axis.</p>`},
+ {id:'animals', t:'The 4 animals', s:'animals sleep consume blast play energy information',
+  b:Object.entries(ANIMALS).map(([k,a])=>`<p id="animal-${k}"><b>${a.icon} ${k}</b> (${a.pair}): ${a.d}</p>`).join('')},
+ {id:'colors', t:'Colors', s:'colors colour red blue green yellow legend',
+  b:`<p><span style="color:#f43f5e;font-weight:800">Red = Feeling</span></p><p><span style="color:#3b82f6;font-weight:800">Blue = Thinking</span></p><p><span style="color:#22c55e;font-weight:800">Green = Sensing</span></p><p><span style="color:#eab308;font-weight:800">Yellow = Intuition</span></p><p>The deeper shade is introverted (solid bubble).</p><p>The lighter shade is extroverted (white outline).</p>`}
+];
+// One sentence per line in the Letters & terms cards (skips "vs." so it doesn't split mid-sentence).
+const oneSentencePerLine=html=>html.replace(/(?<!\bvs)([.!?]["”]?)\s+(?=["“]?(?:[A-Z#]|<b|<span|<a))/g,'$1</p><p>');
+LETTER_CARDS.forEach(c=>c.b=oneSentencePerLine(c.b));
+$('#letterGrid').innerHTML=LETTER_CARDS.map(c=>`<article class="lcard" id="${c.id}" data-search="${esc((c.s+' '+c.t.replace(/<[^>]+>/g,' ')).toLowerCase())}"><h3>${c.t}</h3>${c.b}</article>`).join('');
+
+/* ================= FUNCTION CARDS ================= */
+$('#fnGrid').innerHTML=FL.map(f=>{
+  const d=FDESC[f], g=GUIDE[f], lead=SUBTYPES.filter(s=>s.dom===f), inTypes=Object.keys(STACKS).filter(t=>STACKS[t].includes(f));
+  const search=[f,FNAME[f],ATT(f),KIND(f),LETTERW[f[0]],'function',FNEED(f),FQ[f],d.core,g.first.real].join(' ').toLowerCase();
+  return `<article class="card fncard" id="${f}" data-kind="fn" data-f="${f}" style="--c:${FCOLOR[f]}" data-search="${esc(search)}">
+    <button class="chead" aria-expanded="false" aria-controls="${f}-body">${bub(f)}<span><span class="ctitle">${FNAME[f]}</span><span class="csub" style="display:block">${f} · ${ATT(f)} ${KIND(f)} · ${LETTERW[f[0]]}</span></span><span class="chev" aria-hidden="true">▾</span></button>
+    <div class="cbody" id="${f}-body">
+      <div class="tags"><span>${ATT(f)}</span><span>${KIND(f)}</span><span>${LETTERW[f[0]]}</span><span>Need: ${FNEED(f)}</span><a href="#${PARTNER[f]}">Axis partner: ${PARTNER[f]}</a></div>
+      <p class="fflow">Function Flow question: <b>${FQ[f]}</b></p>
+      <div class="two"><div><div class="k">Core mechanism</div><p>${d.core}</p><div class="k">The void it leaves</div><p>${d.void}</p><div class="k">Biggest fear</div><p>${d.fear}</p></div>
+      <div><div class="k">As someone's #1</div><p>${g.first.real}</p><div class="tags">${g.first.strengths.map(s=>`<span>${s}</span>`).join('')}</div>
+        <div class="k">As someone's #4 (blind spot)</div><p>${g.last.struggle}</p></div></div>
+      <div class="two"><div><div class="k">Relationships · as #1, can draw you toward</div><p>${REL[f].draw}</p></div><div><div class="k">Relationships · as #4, can make you overlook</div><p>${REL[f].miss}</p></div></div>
+      <div class="k">Leads these subtypes</div><div class="links">${lead.map(s=>`<a class="lnk" href="#${s.key}" style="--c:${FCOLOR[s.dom]}"><b>${s.type} · ${s.dom}–${s.other}</b><i>${SUBTRAITS[s.key]}</i></a>`).join('')}</div>
+      <div class="k">In the stack of</div><div class="tags">${inTypes.map(t=>`<a href="#${t}">${t} #${STACKS[t].indexOf(f)+1}</a>`).join('')}</div>
+    </div></article>`; }).join('');
+
+/* ================= TYPE CARDS ================= */
+const TYPES=['IJ','EP','IP','EJ'].flatMap(g=>Object.keys(STACKS).filter(t=>t[0]+t[3]===g).sort());
+$('#typeGrid').innerHTML=TYPES.map(t=>{
+  const st=STACKS[t], subs=SUBTYPES.filter(s=>s.type===t).sort((a,b)=>a.pos==='aux'?-1:1);
+  const search=[t,GROUP(t),st.join(' '),...subs.map(s=>SUBTRAITS[s.key]),'type'].join(' ').toLowerCase();
+  return `<article class="card tcard" id="${t}" data-kind="type" data-type="${t}" style="--c:${FCOLOR[st[0]]}" data-search="${esc(search)}">
+    <button class="chead" aria-expanded="false" aria-controls="${t}-body">${miniStack(t)}<span><span class="ctitle">${t}</span><span class="csub" style="display:block">${GROUP(t)} · ${st.join(' · ')}</span></span><span class="chev" aria-hidden="true">▾</span></button>
+    <div class="cbody" id="${t}-body">
+      <div class="tags"><span>${['IJ','EP'].includes(t[0]+t[3])?'Observer-led':'Decider-led'}</span><span>${FN[st[0]].att==='i'?'Introverted':'Extroverted'} lead</span><span>${t[3]==='J'?'J: extroverted decider, introverted observer':'P: extroverted observer, introverted decider'}</span></div>
+      <div class="stackrow">${st.map((f,i)=>`<span style="--c:${FCOLOR[f]}"><i>${POSN[i]}</i>${fnLink(f)}</span>`).join('')}</div>
+      <div class="two"><div><div class="k">#1 ${st[0]} in real life</div><p>${GUIDE[st[0]].first.real}</p></div><div><div class="k">#4 ${st[3]}, the blind spot</div><p>${GUIDE[st[3]].last.struggle}</p></div></div>
+      <div class="k">Relationship pattern to watch</div><p><b style="color:${FCOLOR[st[0]]}">${st[0]} (#1) can draw ${t}s toward:</b> ${REL[st[0]].draw}</p><p><b style="color:${FCOLOR[st[3]]}">${st[3]} (#4) can make them overlook:</b> ${REL[st[3]].miss}</p>
+      <div class="k">Its two subtypes · tap to resize the map</div>
+      <div class="links">${subs.map(s=>`<button class="lnk subpick" data-type="${t}" data-key="${s.key}" style="--c:${FCOLOR[s.dom]}"><b>${s.dom}–${s.other} · ${s.pos==='aux'?'Balanced':'Jumper'}</b><i>${SUBTRAITS[s.key]}</i></button>`).join('')}</div>
+      <div class="links">${subs.map(s=>`<a class="pillbtn" href="#${s.key}">Read ${s.dom}–${s.other} →</a>`).join('')}</div>
+    </div></article>`; }).join('');
+
+/* ================= SUBTYPE CARDS ================= */
+const SUBS=TYPES.flatMap(t=>SUBTYPES.filter(s=>s.type===t).sort((a,b)=>a.pos==='aux'?-1:1));
+$('#subGrid').innerHTML=SUBS.map(s=>{
+  const st=STACKS[s.type], jumper=s.pos==='tert', A=ANIMALS[s.animal], f1=st[0], aux=st[1], tert=st[2], intro=FN[f1].att==='i';
+  const search=[s.type,s.key,s.dom,s.other,SUBTRAITS[s.key],s.animal,jumper?'jumper dom tert looping':'balanced dom aux',s.sign.OD>0?'observer-led':'decider-led','subtype'].join(' ').toLowerCase();
+  return `<article class="card scard" id="${s.key}" data-kind="sub" data-type="${s.type}" data-key="${s.key}" data-pos="${s.pos}" data-sv="${s.dom} ${s.other}" style="--c:${FCOLOR[s.dom]}" data-search="${esc(search)}">
+    <button class="chead" aria-expanded="false" aria-controls="${s.key}-body">${miniStack(s.type,s.key)}<span><span class="ctitle">${s.type} · ${s.dom}–${s.other}</span><span class="csub" style="display:block">${jumper?'Jumper':'Balanced'} · ${SUBTRAITS[s.key]}</span></span><span class="chev" aria-hidden="true">▾</span></button>
+    <div class="cbody" id="${s.key}-body">
+      <div class="tags"><a href="#${s.type}">Type: ${s.type}</a><span>${jumper?'Dom + Tert (jumper)':'Dom + Aux (balanced)'}</span><span>${s.sign.OD>0?'Observer-led':'Decider-led'}</span><a href="#animal-${s.animal}">${A.icon} ${s.animal}</a></div>
+      <div class="k">Savior pair</div><p>${fnLink(s.dom)} (#1) and ${fnLink(s.other)} (#${st.indexOf(s.other)+1}). ${SUBTRAITS[s.key]}.</p>
+      <div class="k">${jumper?'What being a jumper means':'What balanced means'}</div><p>${jumper?`Your saviors skip the #2 (${aux}). You lean on ${s.other} more, but ${aux} is still naturally bigger, and the drop to #4 (${st[3]}) is steeper.`:`Your saviors are your top two functions, so your strengths sit where the stack is biggest. The trap is under-using #3 (${tert}).`}</p>
+      <div class="k">Animal</div><p>${A.icon} <b>${s.animal}</b> (${A.pair}): ${A.d}</p>
+      <div class="k">Loop under stress</div><p>${intro?'Retreating inward into':'Going full speed outward with'} ${fnLink(f1)} + ${fnLink(tert)}: ${GUIDE[f1].loop}, and ${GUIDE[tert].loop}. The way out is ${fnLink(aux)}: ${GUIDE[aux].exit}.</p>
+      <button class="mapbtn showmap" data-type="${s.type}" data-key="${s.key}">Show on map</button>
+    </div></article>`; }).join('');
+
+/* ================= OPEN / CLOSE ================= */
+function setOpen(card,open){
+  card.classList.toggle('open',open); const b=card.querySelector('.chead'); if(b) b.setAttribute('aria-expanded',open);
+}
+function applyCardToMap(card){
+  const k=card.dataset.kind;
+  if(k==='fn'){ if(mapState&&!STACKS[mapState.type].includes(card.dataset.f)) sizeMap(null); highlightFn(card.dataset.f); }
+  else if(k==='type'){ highlightFn(null); sizeMap(card.dataset.type,null,isLast(card.dataset.type,null)); }
+  else if(k==='sub'){ highlightFn(null); sizeMap(card.dataset.type,card.dataset.key,isLast(card.dataset.type,card.dataset.key)); }
+}
+const isLast=(type,key)=>!!last&&last.type===type&&(!key||last.subtype===key);
+function openEntry(id,{fromMap=false,scroll=true,push=true,instant=false}={}){
+  const beh=(reduce||instant)?'instant':'smooth';
+  const el=document.getElementById(id); if(!el) return false;
+  if(el.classList.contains('card')||el.classList.contains('lcard')){
+    if(el.hidden){ clearFilters(); }
+    if(el.classList.contains('card')){ setOpen(el,true); applyCardToMap(el); }
+    if(scroll) el.scrollIntoView({behavior:beh,block:'start'});
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  } else if(scroll){ el.scrollIntoView({behavior:beh,block:'start'}); }
+  if(push) try{ history.replaceState(null,'','#'+id); }catch(e){}
+  return true;
+}
+document.addEventListener('click',e=>{
+  const head=e.target.closest('.chead');
+  if(head){ const card=head.closest('.card'); const open=!card.classList.contains('open'); setOpen(card,open);
+    if(open){ applyCardToMap(card); try{ history.replaceState(null,'','#'+card.id); }catch(_){} } return; }
+  const sp=e.target.closest('.subpick, .showmap');
+  if(sp){ highlightFn(null); sizeMap(sp.dataset.type,sp.dataset.key,isLast(sp.dataset.type,sp.dataset.key));
+    sp.closest('.cbody')?.querySelectorAll('.subpick').forEach(x=>x.style.boxShadow=x===sp?'0 0 0 1px var(--c) inset':'');
+    if(matchMedia('(max-width:980px)').matches) $('#map').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); return; }
+  const a=e.target.closest('a[href^="#"]');
+  if(a){ const id=decodeURIComponent(a.getAttribute('href').slice(1)); if(id && document.getElementById(id)){ e.preventDefault(); openEntry(id); } }
+});
+addEventListener('hashchange',()=>{ const id=decodeURIComponent(location.hash.slice(1)); if(id) openEntry(id,{push:false}); });
+
+/* ================= SEARCH + FILTERS ================= */
+const F={q:'',letters:new Set(),fns:new Set(),pos:null};
+const chip=(group,val,label,style='')=>`<button class="chip${group==='fn'?' fn':''}" data-g="${group}" data-v="${val}" aria-pressed="false" ${style?`style="${style}"`:''}>${label}</button>`;
+$('#filters').innerHTML=`<span class="flabel">Letters</span>${'IESNTFJP'.split('').map(l=>chip('letter',l,l)).join('')}
+  <span class="flabel">Functions</span>${FL.map(f=>chip('fn',f,f,`--c:${FCOLOR[f]}`)).join('')}
+  <span class="flabel">Subtype</span>${chip('pos','aux','Balanced')}${chip('pos','tert','Jumper')}<span class="count" id="count" aria-live="polite"></span>`;
+$('#filters').addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return; const g=b.dataset.g, v=b.dataset.v;
+  if(g==='letter'){ F.letters.has(v)?F.letters.delete(v):F.letters.add(v); }
+  else if(g==='fn'){ F.fns.has(v)?F.fns.delete(v):F.fns.add(v); }
+  else { F.pos = F.pos===v?null:v; }
+  syncChips(); applyFilters(); });
+function syncChips(){ $$('.chip').forEach(b=>{ const g=b.dataset.g,v=b.dataset.v; b.setAttribute('aria-pressed', g==='letter'?F.letters.has(v):g==='fn'?F.fns.has(v):F.pos===v); }); }
+let qT=null; $('#q').addEventListener('input',e=>{ clearTimeout(qT); qT=setTimeout(()=>{ F.q=e.target.value.trim().toLowerCase(); applyFilters(); },120); });
+$('#clear').addEventListener('click',()=>{ clearFilters(); $('#q').focus(); });
+function clearFilters(){ F.q=''; F.letters.clear(); F.fns.clear(); F.pos=null; $('#q').value=''; syncChips(); applyFilters(); }
+function applyFilters(){
+  const toks=F.q.split(/\s+/).filter(Boolean), anyFilter=F.letters.size||F.fns.size||F.pos;
+  const textOk=el=>toks.every(t=>el.dataset.search.includes(t));
+  let shown={letters:0,fn:0,type:0,sub:0};
+  $$('.lcard').forEach(el=>{ const ok=!anyFilter&&textOk(el); el.hidden=!ok; if(ok) shown.letters++; });
+  $$('.fncard').forEach(el=>{ const f=el.dataset.f; const ok=textOk(el)&&!F.pos&&(!F.letters.size||[...F.letters].every(l=>'SNTF'.includes(l)?f[0]===l:false))&&(!F.fns.size||F.fns.has(f)); el.hidden=!ok; if(ok) shown.fn++; });
+  $$('.tcard').forEach(el=>{ const t=el.dataset.type; const ok=textOk(el)&&!F.pos&&[...F.letters].every(l=>t.includes(l))&&[...F.fns].every(f=>STACKS[t].includes(f)); el.hidden=!ok; if(ok) shown.type++; });
+  $$('.scard').forEach(el=>{ const t=el.dataset.type, sv=el.dataset.sv.split(' '); const ok=textOk(el)&&[...F.letters].every(l=>t.includes(l))&&[...F.fns].every(f=>sv.includes(f))&&(!F.pos||el.dataset.pos===F.pos); el.hidden=!ok; if(ok) shown.sub++; });
+  $('#letters').hidden=!shown.letters; $('#functions').hidden=!shown.fn; $('#types').hidden=!shown.type; $('#subtypes').hidden=!shown.sub;
+  $('#fcount').textContent=`${shown.fn} of 8`; $('#tcount').textContent=`${shown.type} of 16`; $('#scount').textContent=`${shown.sub} of 32`;
+  const total=shown.letters+shown.fn+shown.type+shown.sub;
+  $('#count').textContent=(toks.length||anyFilter)?`${total} match${total===1?'':'es'}`:'';
+  $('#empty').classList.toggle('show',total===0);
+}
+
+/* ================= YOUR RESULT: coins + growth map (moved here from the results page) ================= */
+const pct=x=>Math.round(x*100);
+// ---- The coins, redesigned: each one is a tug-of-war between two sides, read as "You lean X" ----
+// p = share for the LEFT side (0..1). Groups make them readable; plain-language lines say what the winning side means.
+const COINPLAIN={
+  N: {L:'Intuition', R:'Sensing', cL:'#eab308', cR:'#22c55e', mL:'You start from patterns and the big picture.', mR:'You start from facts and what\'s actually in front of you.'},
+  T: {L:'Thinking', R:'Feeling', cL:'#3b82f6', cR:'#f43f5e', mL:'You decide by what works and makes sense.', mR:'You decide by what matters and who it affects.'},
+  IE:{L:'Introverted lead', R:'Extroverted lead', mL:'Your #1 function turns inward first: you process before you act.', mR:'Your #1 function turns outward first: you act, then process.'},
+  OD:{L:'Observer-led', R:'Decider-led', mL:'Your #1 takes in information, so chaos and losing control sting most.', mR:'Your #1 makes judgements, so identity and belonging sting most.'},
+  DI:{L:'Self first', R:'Tribe first', mL:'You check what you think or value before the group\'s view.', mR:'You check what the group thinks or needs before your own view.'},
+  OI:{L:'Organize', R:'Gather', mL:'You recharge by sorting and returning to what you already know.', mR:'You recharge by going out and taking in something new.'},
+  FT:{L:'Fi / Te axis', R:'Ti / Fe axis', mL:'Personal values (Fi) paired with practical results (Te).', mR:'Personal logic (Ti) paired with group harmony (Fe).'},
+  NS:{L:'Ni / Se axis', R:'Si / Ne axis', mL:'One focused vision (Ni) paired with the present moment (Se).', mR:'Past experience (Si) paired with new possibilities (Ne).'}
+};
+const COINGROUPS=[['Your letters',['N','T','IE']],['What drives you',['OD','DI','OI']],['Your axes',['FT','NS']]];
+function coinRow(c,p){
+  const P=COINPLAIN[c], leftWin=p>=.5, win=leftWin?P.L:P.R, share=Math.round((leftWin?p:1-p)*100), m=Math.abs(p-.5);
+  const strength=m<.1?'slight':m<.25?'clear':'strong';
+  const cL=P.cL||'#a5b4fc', cR=P.cR||'#e9d5ff', cW=leftWin?cL:cR, pl=Math.round(p*100);
+  return `<div class="coin2"><div class="c2top"><span>You lean <b style="color:${cW}">${win}</b></span><span class="c2tag c2-${strength}">${strength} · ${share}%</span></div>
+    <div class="c2bar" role="img" aria-label="${P.L} ${pl}%, ${P.R} ${100-pl}%"><i style="width:${pl}%;background:${cL};opacity:${leftWin?1:.25}"></i><i style="width:${100-pl}%;background:${cR};opacity:${leftWin?.25:1}"></i></div>
+    <div class="c2ends"><span class="${leftWin?'w':''}">${P.L} ${pl}%</span><span class="${leftWin?'':'w'}">${100-pl}% ${P.R}</span></div>
+    <p class="c2mean">${leftWin?P.mL:P.mR}</p></div>`;
+}
+function coinsBlock(coins){
+  return `<p class="c2how">Each bar is a tug-of-war between two sides of your answers. The brighter, bigger side is where you lean. <b>Slight</b> means nearly even, <b>strong</b> means a clear pull.</p>
+  <div class="c2grid">${COINGROUPS.map(([name,keys])=>`<div class="panel c2group"><div class="c2h">${name}</div>${keys.filter(c=>coins[c]!=null).map(c=>coinRow(c,coins[c])).join('')}</div>`).join('')}</div>`;
+}
+function coinsHtml(v){
+  if(!v.coins||!Object.keys(v.coins).length) return '';
+  return `<div class="k">Your coins</div>${coinsBlock(v.coins)}`;
+}
+function coinsHtmlOld(v){
+  if(!v.coins||!Object.keys(v.coins).length) return '';
+  const rows=COINS.filter(c=>v.coins[c]!=null).map(c=>{ const p=v.coins[c], L=COINLABELS[c], leftWin=p>=.5, d=Math.abs(p-.5)*100;
+    const bar=leftWin?`<i style="right:50%;width:${d}%;background:linear-gradient(270deg,#a5b4fc,transparent)"></i>`:`<i style="left:50%;width:${d}%;background:linear-gradient(90deg,#e9d5ff,transparent)"></i>`;
+    return `<div class="coin"><div class="row"><span class="${leftWin?'win':''}">${L[0]} · ${pct(p)}%</span><span class="${leftWin?'':'win'}">${pct(1-p)}% · ${L[1]}</span></div><div class="bar">${bar}</div>${L[2]?`<div class="sub">${leftWin?L[2]:L[3]}</div>`:''}</div>`; });
+  const h=Math.ceil(rows.length/2);
+  return `<div class="k">Your coins</div><div class="two coins"><div>${rows.slice(0,h).join('')}</div><div>${rows.slice(h).join('')}</div></div>`;
+}
+function growthHtml(v,focus,mine=true){
+  const sub=subOf(v.type,v.subtype), st=STACKS[v.type], f1=st[0], aux=st[1], tert=st[2], f4=st[3], G1=GUIDE[f1], G4=GUIDE[f4], intro=FN[f1].att==='i', I=v.insights||{};
+  const fc=focus==='general'?null:focus, fc2=n=>`<b style="color:${FCOLOR[n]}">${n}</b>`;
+  const applyList=fc?`<p class="hl">→ <b>${FOCI[fc]}:</b> ${G1.first.apply[fc]}</p>`:`<ul class="apply">${Object.entries(G1.first.apply).map(([k,x])=>`<li><b>${FOCI[k]}:</b> ${x}</li>`).join('')}</ul>`;
+  const loopPair=`${fc2(f1)} + ${fc2(tert)}`;
+  const loopCore=intro?`When you're stressed, you tend to retreat inward into ${loopPair}: ${GUIDE[f1].loop}, and ${GUIDE[tert].loop}. It feels safe because it skips your ${fc2(aux)}, the outward function that actually moves you forward.`
+    :`When you're stressed, you tend to go full speed outward with ${loopPair}: ${GUIDE[f1].loop}, and ${GUIDE[tert].loop}. It skips your ${fc2(aux)}, the inward pause that gives you direction.`;
+  const lead=mine?'Your result is':'This is';
+  const loopFrame=sub.pos==='tert'?`${lead} the <b>${f1}–${tert}</b> subtype, so this pairing is ${mine?'your':'its'} home base, not a flaw. The trap is staying there too long.`:`${lead} the balanced <b>${f1}–${aux}</b> subtype, so the loop mostly shows up under pressure.`;
+  const quotes=[];
+  if(I.fear&&I.fear.length) quotes.push(`You tagged ${I.fear.map(fc2).join(' and ')} answers as <i>"it avoids something bad."</i> Choices driven by fear often point at a blind spot.`+(I.fear.includes(f4)?` That matches your #4, ${fc2(f4)}.`:''));
+  if(I.ideal&&I.ideal.length) quotes.push(`You picked ${I.ideal.map(fc2).join(' and ')} answers mostly because they're what you <i>"should"</i> do. That's who you're aiming to be, not your default, so it was weighted lower.`);
+  if(I.stress&&I.stress.length){ const loopHit=I.stress.some(f=>f===f1||f===tert);
+    quotes.push(`Under stress you reached for ${I.stress.map(fc2).join(' and ')}.`+(loopHit?` That lines up with your ${f1} + ${tert} loop.`:I.stress.includes(f4)?` That's your #4 taking over, the classic "grip" pattern.`:` Worth noticing, since it's outside your usual stack order.`)); }
+  const ex=[fc?G4.last.exp[fc]:G4.last.exp.general[0], fc?G4.last.exp.general[0]:G4.last.exp.general[1], `When you catch yourself in the loop: <b>${GUIDE[aux].exit}</b>.`];
+  if(I.weak) ex.push(`You were least like yourself in <b>${SCEN[I.weak].toLowerCase()}</b> scenes. Try one of these there first.`);
+  const notes=[];
+  if(I.f4share>.35) notes.push(`Your answers show more ${f4} than most ${v.type}s, so it may be less of a blind spot for you. Read the section below as "things to keep an eye on."`);
+  if(I.runnerUp&&I.topTypeProb<.45){ const [alt,ap]=I.runnerUp; notes.push(`Your result was close. <b>${alt}</b> came in second at ${pct(ap)}%. If this doesn't land, try reading it as <a href="#${alt}">${alt}</a>, with ${STACKS[alt][0]} first and ${STACKS[alt][3]} last.`); }
+  return `${notes.map(n=>`<div class="note">${n}</div>`).join('')}
+   <div class="gblock" style="--c:${FCOLOR[f1]}"><div class="gk">${mine?'Your':v.type} #1 function · ${f1} · ${FNAME[f1]}</div><p>${G1.first.real}</p><div class="chips2">${G1.first.strengths.map(x=>`<span>${x}</span>`).join('')}</div><div class="gsub">Where to use it</div>${applyList}</div>
+   <div class="gblock" style="--c:${FCOLOR[f4]}"><div class="gk">${mine?'Your':v.type} #4 function · ${f4} · the blind spot</div><p>${G4.last.struggle}</p><div class="gsub">Early warning signs</div><ul>${G4.last.signs.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+   <div class="gblock" style="--c:${FCOLOR[tert]}"><div class="gk">${mine?'Your':v.type} stuck loop</div><p>${loopCore}</p><p class="muted2">${loopFrame}</p></div>
+   ${quotes.length?`<div class="gblock" style="--c:#c4b5fd"><div class="gk">From your own answers</div>${quotes.map(q=>`<p>${q}</p>`).join('')}</div>`:''}
+   ${relBlock(f1,f4,fc)}
+   <div class="gblock" style="--c:#c4b5fd"><div class="gk">Try this week${fc?` · ${FOCI[fc]}`:''}</div><ol>${ex.map(e=>`<li>${e}</li>`).join('')}</ol><div class="muted2">Small experiments, not rules. Notice what changes after a week, then retake if you like.</div></div>
+   <div class="care">These are self-reflection ideas, not therapy. If you're dealing with something heavy, talking it through with someone you trust or a professional helps more than any type description.</div>`;
+}
+let growthFocus='general';
+const isLatest=()=>{ const h=readHist(); return !!last&&!!h.length&&h[0].id===last.id; };
+function histHtml(){
+  const h=readHist(); if(h.length<2) return '';
+  return `<div class="k">Your results on this device · ${h.length}</div><ul class="hlist">${h.map((v,n)=>{ const s=subOf(v.type,v.subtype), on=last&&v.id===last.id;
+    return `<li class="${on?'on':''}"><span class="ht" style="color:${FCOLOR[s.dom]}">${esc(v.type)}</span><span class="hm"><b>${s.dom}–${s.other}</b> ${s.pos==='aux'?'balanced':'jumper'}<i>${n===0?'Latest · ':''}${esc(histDate(v.date,true))}${v.typeProb!=null?' · '+Math.round(v.typeProb*100)+'%':''}</i></span>
+      ${on?'<span class="hshow">Showing</span>':`<button class="pillbtn hpick" data-id="${esc(v.id)}">Show</button>`}<button class="pillbtn hx" data-id="${esc(v.id)}" aria-label="Forget the ${esc(v.type)} result from ${esc(histDate(v.date,true))}">×</button></li>`; }).join('')}</ul>
+    <div class="hfoot"><span class="muted2">Saved only in this browser.</span><button class="pillbtn" id="histForgetAll">Forget all</button></div>`;
+}
+function showSaved(id){ activeId=id; last=readLast(); try{ const u=new URL(location.href); if(id) u.searchParams.set('r',id); else u.searchParams.delete('r'); history.replaceState(null,'',u); }catch(e){}
+  renderLast(); sizeMap(last?last.type:null,last?last.subtype:null,!!last); }
+function renderYou(){
+  const sec=$('#you'); if(!sec) return;
+  if(!last){ sec.hidden=true; $('#youBody').innerHTML=''; return; }
+  sec.hidden=false; const sub=subOf(last.type,last.subtype);
+  $('#youBody').innerHTML=`<div class="panel youpanel">
+    <p class="youlede">${isLatest()?'Your latest result':'Saved result from '+esc(histDate(last.date,true))}: <a href="#${last.type}"><b>${esc(last.type)}</b></a> · <a href="#${sub.key}">${sub.dom}–${sub.other}</a> (${sub.pos==='aux'?'balanced':'jumper'}). This section only lives on this device.</p>
+    ${coinsHtml(last)}
+    <p class="muted2" style="margin-top:12px">Your growth map is in the <a href="#growth">Growth map</a> section below.</p>
+    ${histHtml()}</div>`;
+  $$('#youBody .hpick').forEach(b=>b.addEventListener('click',()=>{ showSaved(b.dataset.id); $('#you').scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'}); }));
+  $$('#youBody .hx').forEach(b=>b.addEventListener('click',()=>{ forgetOne(b.dataset.id); if(last&&last.id===b.dataset.id) activeId=null; showSaved(activeId); }));
+  const fa=$('#histForgetAll'); if(fa) fa.addEventListener('click',()=>{ forgetAll(); activeId=null; showSaved(null); });
+}
+/* ---- Growth map for any type: follows the map. Your own result adds notes from your answers. ---- */
+function growthSubject(){
+  const S=mapState;
+  if(S&&!(S.isYou&&last)) return {v:{type:S.type,subtype:S.key,insights:null},mine:false};
+  if(last) return {v:last,mine:true};
+  return null;
+}
+function renderGrowth(){
+  const body=$('#growthBody'); if(!body) return; const g=growthSubject();
+  if(!g){ $('#growthFor').textContent='Pick a type'; body.innerHTML=`<div class="panel youpanel"><p class="youlede">Pick any type on the function map (or tap a type name) to see its growth map: what its #1 function is good at, its blind spot, its stuck loop and small things to try.</p></div>`; return; }
+  const sub=subOf(g.v.type,g.v.subtype);
+  $('#growthFor').textContent=g.mine?'Your result':`${g.v.type} · ${sub.dom}–${sub.other}`;
+  body.innerHTML=`<div class="panel youpanel">
+    <div class="growhead">${g.mine
+      ?`<p class="youlede">For ${isLatest()?'your latest result':'your saved result'}: <b>${esc(g.v.type)}</b> · ${sub.dom}–${sub.other} (${sub.pos==='aux'?'balanced':'jumper'}). Pick another type on the map to compare.</p>`
+      :`<p class="youlede">Showing <b>${esc(g.v.type)}</b> · ${sub.dom}–${sub.other} (${sub.pos==='aux'?'balanced':'jumper'}), written as if you were this type.${last?'':' Take the quiz to get notes drawn from your own answers.'}</p>${last?`<button class="pillbtn" id="growMine"><span>← Back to my result</span></button>`:''}`}</div>
+    <div class="focus-k">What's on your mind right now?</div>
+    <div class="foci" id="foci">${Object.entries(FOCI).map(([k,x])=>`<button class="focus${k===growthFocus?' on':''}" data-f="${k}" aria-pressed="${k===growthFocus}">${x}</button>`).join('')}</div>
+    <div id="guide">${growthHtml(g.v,growthFocus,g.mine)}</div>
+    ${g.mine&&!g.v.insights?'<p class="muted2">Retake the quiz to add the notes drawn from your own answers.</p>':''}</div>`;
+  $$('#foci .focus').forEach(b=>b.addEventListener('click',()=>{ growthFocus=b.dataset.f; $$('#foci .focus').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-pressed',x===b); }); $('#guide').innerHTML=growthHtml(g.v,growthFocus,g.mine); }));
+  const bm=$('#growMine'); if(bm) bm.addEventListener('click',()=>sizeMap(last.type,last.subtype,true));
+}
+
+/* ================= LAST RESULT CARD ================= */
+function renderLast(){
+  const box=$('#lastCard'); last=readLast();
+  renderYou();
+  if(!last){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const s=subOf(last.type,last.subtype), when=last.date?new Date(last.date).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'';
+  box.innerHTML=`<div>${miniStack(last.type,last.subtype)}</div><div class="lt">${esc(last.type)}</div>
+    <div class="lm">${isLatest()?'Your latest result':'Saved result'}${when?` · ${esc(when)}`:''}: <b>${s.dom}–${s.other}</b> (${s.pos==='aux'?'balanced':'jumper'}), saviors ${fnLink(s.dom)} + ${fnLink(s.other)}${last.typeProb!=null?` · ${Math.round(last.typeProb*100)}% likelihood`:''}. Saved only on this device.</div>
+    <div class="acts">${last.full&&last.id?`<a class="pillbtn" href="index_v8.html?r=${encodeURIComponent(last.id)}">View full results</a>`:''}<button class="pillbtn" id="lastMap">Show on map</button><a class="pillbtn" href="#you">Coins &amp; growth map</a><a class="pillbtn" href="#${esc(last.subtype)}">Read ${esc(last.subtype)}</a><button class="pillbtn" id="lastForget">Forget this result</button></div>`;
+  box.classList.add('show');
+  $('#lastMap').addEventListener('click',()=>{ highlightFn(null); sizeMap(last.type,last.subtype,true); $('#map').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); });
+  $('#lastForget').addEventListener('click',()=>{ forgetLast(); last=readLast(); renderLast(); sizeMap(last?last.type:null,last?last.subtype:null,!!last); });
+}
+
+let rzT=null; addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(()=>{ if(VIEW==='flow') renderMap(); },200); });
+$('#views').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; VIEW=b.dataset.v; renderMap(); });
+/* ================= INIT ================= */
+renderLast();
+if(last) sizeMap(last.type,last.subtype,true); else sizeMap(null);
+applyFilters();
+const startId=decodeURIComponent(location.hash.slice(1));
+if(startId) requestAnimationFrame(()=>openEntry(startId,{push:false,instant:true}));
+window.__glossary={openEntry,sizeMap,applyFilters,F,readLast}; // for tests
+})();
+
+</script>
+</body>
+</html>

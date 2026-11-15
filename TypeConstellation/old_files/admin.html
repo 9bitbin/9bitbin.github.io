@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Constellation — Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#eef0ff;--muted:#9aa0c3;--faint:#5d6290;--glass:rgba(18,16,40,.55);--edge:rgba(255,255,255,.09)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:Manrope,system-ui,sans-serif;
+  background:radial-gradient(1200px 700px at 15% -10%,rgba(124,58,237,.35),transparent 60%),radial-gradient(1000px 600px at 100% 10%,rgba(8,145,178,.28),transparent 60%),radial-gradient(900px 700px at 50% 120%,rgba(219,39,119,.22),transparent 60%),#05040d}
+main{max-width:1100px;margin:0 auto;padding:32px 18px 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:26px;flex-wrap:wrap}
+h1{font:700 1.5rem Unbounded;margin:0;background:linear-gradient(100deg,#fff,#c4b5fd,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:.85rem;margin-top:4px}
+.panel{background:var(--glass);border:1px solid var(--edge);border-radius:20px;padding:22px;backdrop-filter:blur(18px)}
+.login{max-width:380px;margin:10vh auto 0}
+.login h2{font:500 1.1rem Unbounded;margin:0 0 6px}
+label{display:block;font:600 .7rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--edge);background:rgba(255,255,255,.04);color:var(--ink);font:500 .95rem Manrope;outline:0}
+input:focus{border-color:rgba(167,139,250,.6)}
+button{font:700 .85rem Manrope;border-radius:999px;padding:11px 20px;cursor:pointer;border:1px solid var(--edge);background:rgba(255,255,255,.05);color:var(--ink)}
+button.primary{border:0;color:#07051a;background:linear-gradient(110deg,#67e8f9,#a78bfa,#f472b6);width:100%;margin-top:20px;padding:13px}
+button:hover{border-color:rgba(255,255,255,.3)}
+.msg{margin-top:12px;font-size:.85rem;color:#fda4af;min-height:1.2em}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tools input{width:220px;padding:9px 14px;border-radius:999px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{text-align:left;font:600 .68rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);padding:10px 12px;border-bottom:1px solid var(--edge);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--muted)}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
+tr.row{cursor:pointer;transition:background .2s}
+tr.row:hover{background:rgba(255,255,255,.04)}
+tr.row.open{background:rgba(167,139,250,.08)}
+.type{font:700 .95rem Unbounded;letter-spacing:.04em}
+.muted{color:var(--muted)}
+.detail td{padding:0 12px 18px;background:rgba(167,139,250,.05)}
+.dgrid{display:grid;grid-template-columns:260px 1fr;gap:22px;padding-top:6px}
+@media (max-width:760px){.dgrid{grid-template-columns:1fr}.hide-sm{display:none}}
+.coin{margin-bottom:10px;font-size:.78rem}
+.coin .r{display:flex;justify-content:space-between;color:var(--muted);margin-bottom:4px}
+.coin .b{height:6px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}
+.coin .b i{display:block;height:100%;background:linear-gradient(90deg,#67e8f9,#a78bfa)}
+ol.ans{margin:0;padding-left:22px;font-size:.86rem;line-height:1.5}
+ol.ans li{margin-bottom:9px}
+ol.ans .q{color:var(--muted)}
+ol.ans .a{color:var(--ink)}
+.k{font:600 .66rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:6px 0 10px}
+.empty{text-align:center;color:var(--muted);padding:40px}
+.fitb{display:inline-block;padding:2px 9px;border-radius:999px;font-weight:700;font-size:.78rem}.f1,.f2{background:rgba(253,164,175,.15);color:#fda4af}.f3{background:rgba(252,211,77,.15);color:#fcd34d}.f4,.f5{background:rgba(110,231,183,.15);color:#6ee7b7}
+.fbbox{font-size:.82rem;line-height:1.7;margin-bottom:14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--edge)}.fbnote{margin-top:4px;color:#d6d8f2;font-style:italic}
+.tabs{display:flex;gap:8px;margin-bottom:14px}.tab{padding:9px 18px}.tab.on{background:linear-gradient(110deg,#67e8f9,#a78bfa);color:#07051a;border-color:transparent}
+.fn{font-weight:800;font-family:Unbounded;font-size:.82rem}tr.flag td{background:rgba(253,164,175,.05)}.pill.warn{color:#fda4af;border-color:rgba(253,164,175,.4)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;border:1px solid var(--edge);font-size:.75rem;color:var(--muted)}
+
+/* ===== responsive ===== */
+html{-webkit-text-size-adjust:100%}
+.c-date{white-space:nowrap}
+#tableView{overflow-x:auto}
+#sortSel{display:none;padding:9px 14px;border-radius:999px;border:1px solid var(--edge);background:rgba(255,255,255,.04);color:var(--ink);font:600 .85rem Manrope}
+#sortSel option{background:#120f28}
+@media (max-width:1100px){ th,td{padding:10px 8px} }
+@media (max-width:900px){
+  main{padding:20px 12px 40px}
+  header{margin-bottom:18px}
+  .tools{width:100%}
+  .tools input{flex:1 1 160px;width:auto;min-width:0}
+  #sortSel{display:block;flex:1 1 140px}
+  .panel{padding:14px;border-radius:16px}
+  .cardable table,.cardable tbody,.cardable tr,.cardable td{display:block;width:100%}
+  .cardable thead{display:none}
+  .cardable tr.row,.cardable #itbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;padding:14px 6px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .cardable td{padding:0;border:0;min-width:0;overflow-wrap:anywhere}
+  .cardable td.hide-sm{display:block}
+  .cardable td[data-l]::before{content:attr(data-l);display:block;font:600 .62rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+  .cardable td.c-name{grid-column:1;grid-row:1;font-size:1.05rem}
+  .cardable td.c-fit{grid-column:2;grid-row:1;justify-self:end;text-align:right}
+  .cardable td.c-name::before,.cardable td.c-fit::before{display:none}
+  .cardable td.c-date{grid-column:1/-1;white-space:normal}
+  .cardable tr.detail td{padding:6px 2px 16px}
+  .cardable tr.detail td::before{display:none}
+  .cardable tr.row.open{border-bottom:0}
+  .cardable #itbody tr.flag{background:rgba(253,164,175,.05);border-radius:12px}
+  .cardable #itbody tr.flag td{background:none}
+  .cardable #itbody td.i-q{grid-column:1/-1}
+  .cardable #itbody td.i-flag{grid-column:1/-1}
+  .cardable td.empty{padding:30px 6px}
+  .dgrid{grid-template-columns:1fr;gap:14px}
+  ol.ans{padding-left:18px}
+  .login{margin-top:4vh}
+}
+@media (max-width:360px){ .cardable tr.row,.cardable #itbody tr{grid-template-columns:1fr} .cardable td.c-fit{grid-column:1;grid-row:auto;justify-self:start;text-align:left} .cardable td.c-fit::before{display:block} }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div><h1>Constellation results</h1><div class="sub" id="who">Owner view</div></div>
+    <div class="tools" id="tools" hidden>
+      <input id="filter" placeholder="Filter by name or type">
+      <select id="sortSel" aria-label="Sort results"><option value="created_at:-1">Newest first</option><option value="created_at:1">Oldest first</option><option value="name:1">Name A–Z</option><option value="type:1">Type</option><option value="fit:-1">Best fit</option><option value="fit:1">Worst fit</option><option value="consistency:-1">Most consistent</option></select>
+      <button id="refresh">Refresh</button>
+      <button id="logout">Log out</button>
+    </div>
+  </header>
+
+  <section id="loginView" class="panel login">
+    <h2>Owner login</h2>
+    <div class="sub">Use the Supabase Auth user you created for yourself.</div>
+    <form id="loginForm">
+      <label for="email">Email</label><input id="email" type="email" autocomplete="username" required>
+      <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required>
+      <button class="primary" type="submit">Log in</button>
+      <div class="msg" id="loginMsg"></div>
+    </form>
+  </section>
+
+  <div id="summary" class="sub" style="margin:-12px 0 14px"></div>
+  <div class="tabs" id="tabs" hidden><button class="tab on" data-v="results">Results</button><button class="tab" data-v="items">Item health</button></div>
+  <section id="itemsView" class="panel cardable" hidden><div class="sub" id="itemsSum" style="margin-bottom:12px"></div><table><thead><tr><th>Item</th><th>Scene</th><th>Takes</th><th>Top #1 pick</th><th>None fit</th><th>"Should"</th><th>Flags</th></tr></thead><tbody id="itbody"></tbody></table></section>
+  <section id="tableView" class="panel cardable" hidden>
+    <table>
+      <thead><tr>
+        <th data-k="name">Name</th><th data-k="type">Type</th><th data-k="subtype">Subtype</th>
+        <th data-k="type_prob" class="hide-sm">Confidence</th><th data-k="consistency" class="hide-sm">Consistent</th><th data-k="core_s" class="hide-sm">Core default</th><th data-k="fit">Fit</th><th data-k="lead" class="hide-sm">Lead</th><th data-k="created_at">Date ↓</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </section>
+</main>
+<script>
+/* ===== SUPABASE CONFIG: same values as index.html ===== */
+const SUPABASE_URL = 'https://lcbzmlsowikajunifdjt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjYnptbHNvd2lrYWp1bmlmZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1OTE4NDAsImV4cCI6MjEwOTE2Nzg0MH0.Bbc5Jndb9yj5Ar27MyYba5tIx3GL6zH99SoXkVAY630';
+
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const base=()=>SUPABASE_URL.replace(/\/$/,'');
+const FC={Ni:'#a78bfa',Ne:'#f0abfc',Si:'#60a5fa',Se:'#22d3ee',Ti:'#fb923c',Te:'#fcd34d',Fi:'#f472b6',Fe:'#34d399'};
+function itemHealth(){
+  const st={}; let takes=0;
+  rows.filter(r=>Array.isArray(r.answers)&&r.answers.length&&r.answers[0].scenario!==undefined).forEach(r=>{ takes++;
+    r.answers.forEach(a=>{ const s=st[a.item_id]=st[a.item_id]||{id:a.item_id,scen:a.scenario,q:a.q,n:0,none:0,should:0,picks:{}};
+      s.n++; if(a.none_fit) s.none++; else if(a.picked){ s.picks[a.picked]=(s.picks[a.picked]||0)+1; } if(a.second){ s.seconds=s.seconds||{}; s.seconds[a.second]=(s.seconds[a.second]||0)+1; } if(a.why==='ideal') s.should++; }); });
+  const list=Object.values(st).map(s=>{ const answered=s.n-s.none; const top=Object.entries(s.picks).sort((a,b)=>b[1]-a[1])[0]||['—',0];
+    const topShare=answered?top[1]/answered:0, noneShare=s.n?s.none/s.n:0, flags=[];
+    if(s.n>=5 && topShare>0.6) flags.push(`One option gets ${Math.round(topShare*100)}%`);
+    if(s.n>=5 && noneShare>0.25) flags.push(`"None fit" at ${Math.round(noneShare*100)}%`);
+    return {...s, top:top[0], topShare, noneShare, flags}; }).sort((a,b)=>b.flags.length-a.flags.length || b.n-a.n);
+  const SC={work:'Work / school',social:'Friends / family',alone:'On your own',stress:'Under stress'};
+  $('#itemsSum').textContent = takes? `${takes} v2 takes · ${list.length} items seen · ${list.filter(x=>x.flags.length).length} flagged (flags need 5+ answers)` : 'No v2 takes yet.';
+  $('#itbody').innerHTML = list.map(s=>`<tr class="${s.flags.length?'flag':''}"><td class="i-q" data-l="Item"><div style="font-size:.84rem">${esc(s.q)}</div><div class="muted" style="font-size:.72rem">${esc(s.id)}</div></td>
+    <td class="i-scen muted" data-l="Scene">${esc(SC[s.scen]||s.scen)}</td><td class="i-n" data-l="Takes">${s.n}</td><td class="i-top" data-l="Top #1 pick"><span class="fn" style="color:${FC[s.top]||'#ccc'}">${esc(s.top)}</span> ${Math.round(s.topShare*100)}%${s.seconds?`<div class="muted" style="font-size:.72rem">Top #2: ${esc(Object.entries(s.seconds).sort((a,b)=>b[1]-a[1])[0][0])}</div>`:''}</td>
+    <td class="i-none" data-l="None fit">${Math.round(s.noneShare*100)}%</td><td class="i-should" data-l="&quot;Should&quot;">${s.should}</td><td class="i-flag" data-l="Flags">${s.flags.map(f=>`<span class="pill warn">${esc(f)}</span>`).join(' ')||'<span class="muted">OK</span>'}</td></tr>`).join('') || '<tr><td colspan="7" class="empty">Nothing yet.</td></tr>';
+}
+const OFFL={type:'Type',saviors:'Saviors',descriptions:'Descriptions',growth:'Growth tips',questions:'Questions'};
+const FOCL={general:'General',work:'Work / career',rel:'Relationships',change:'Big life change',motiv:'Motivation',create:'Creative block'};
+const COINL={OD:['Observer-led','Decider-led'],DI:['Self above tribe (Di)','Tribe above self (De)'],OI:['Organize (Oi)','Gather (Oe)'],N:['Intuition','Sensing'],T:['Thinking','Feeling'],FT:['Fi/Te','Ti/Fe'],NS:['Ni/Se','Si/Ne'],IE:['Introverted lead','Extroverted lead']};
+let session=null, rows=[], sortK='created_at', sortDir=-1, openId=null;
+
+function store(s){ try{ s?sessionStorage.setItem('cst_admin',JSON.stringify(s)):sessionStorage.removeItem('cst_admin'); }catch(e){} }
+function load(){ try{ return JSON.parse(sessionStorage.getItem('cst_admin')||'null'); }catch(e){ return null; } }
+
+async function login(email,password){
+  const r=await fetch(base()+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error_description||j.msg||('Login failed ('+r.status+')'));
+  return {token:j.access_token, email:j.user&&j.user.email, exp:Date.now()+(j.expires_in||3600)*1000};
+}
+async function fetchRows(){
+  const r=await fetch(base()+'/rest/v1/quiz_results?select=*,quiz_feedback(*)&order=created_at.desc',{headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.token}});
+  if(r.status===401){ logout('Session expired. Log in again.'); return; }
+  if(!r.ok) throw new Error('Could not load results ('+r.status+')');
+  rows=(await r.json()).map(x=>{ x.core_s=(x.core_default||[]).join('+'); const fb=(x.quiz_feedback||[]).sort((a,b)=>a.created_at<b.created_at?1:-1)[0]||null; return {...x, fb, fit: fb?fb.fit:null}; }); render();
+}
+function showApp(){ $('#loginView').hidden=true; $('#tableView').hidden=false; $('#itemsView').hidden=true; $('#tabs').hidden=false; $('#tools').hidden=false; $('#who').textContent='Signed in as '+(session.email||'owner'); }
+function logout(msg){ session=null; store(null); rows=[]; $('#summary').textContent=''; $('#loginView').hidden=false; $('#tableView').hidden=true; $('#itemsView').hidden=true; $('#tabs').hidden=true; $('#tools').hidden=true; $('#who').textContent='Owner view'; $('#loginMsg').textContent=msg||''; }
+
+function fmtDate(d){ const x=new Date(d); return x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+x.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
+function detail(r){
+  const coins=r.coins||{};
+  const coinHtml=Object.keys(COINL).map(c=>{ const p=coins[c]; if(p==null) return ''; const left=p>=.5; return `<div class="coin"><div class="r"><span>${left?'<b style="color:var(--ink)">':''}${COINL[c][0]}${left?'</b>':''}</span><span>${left?'':'<b style="color:var(--ink)">'}${COINL[c][1]}${left?'':'</b>'}</span></div><div class="b"><i style="width:${Math.round(p*100)}%"></i></div></div>`; }).join('');
+  const SC={work:'Work / school',social:'Friends / family',alone:'On your own',stress:'Under stress'}, WY={default:'just what I do',learned:'worked hard to get good at this',ideal:'what I should do',fear:'avoids something bad',context:'depends on the day'};
+  const ans=(Array.isArray(r.answers)?r.answers:[]).map(a=> a.scenario!==undefined
+    ? `<li><div class="q"><span class="pill">${esc(SC[a.scenario]||a.scenario)}</span> ${esc(a.q)}</div><div class="a">${a.none_fit?'<i class="muted">None of these fit</i>':`<div><b>#1</b> <span class="fn" style="color:${FC[a.picked]||'#ccc'}">${esc(a.picked)}</span> ${esc(a.t)}${a.why?` <span class="muted">· ${esc(WY[a.why]||a.why)}</span>`:''}${a.strength!=null&&a.second===undefined?` <span class="muted">· strength ${esc(a.strength)}</span>`:''}</div>${a.second?`<div><b>#2</b> <span class="fn" style="color:${FC[a.second]||'#ccc'}">${esc(a.second)}</span> ${esc(a.t2)}</div>`:''}${a.dismissed&&a.dismissed.length?`<div class="muted" style="font-size:.76rem">Dismissed: ${a.dismissed.map(esc).join(', ')}</div>`:''}`}</div></li>`
+    : `<li><div class="q">${esc(a.q)}</div><div class="a">${esc(a.a)}. ${esc(a.t)}</div></li>`).join('');
+  const v2box = r.consistency!=null ? `<div class="k">Patterns</div><div class="fbbox">
+      <div><b>Consistency:</b> ${Math.round(r.consistency*100)}%</div>
+      <div><b>Core default:</b> ${(r.core_default||[]).map(esc).join(' + ')||'—'}</div>
+      <div><b>Adapts:</b> ${(r.context_fns||[]).map(c=>esc((SC[c.scen]||c.scen)+' → '+c.fn)).join(', ')||'—'}</div>
+      <div><b>"Should" picks:</b> ${(r.ideal_gap||[]).map(esc).join(', ')||'—'}</div>
+      <div><b>Worked hard to build:</b> ${(r.learned_fns||[]).map(esc).join(', ')||'—'}</div>
+      <div><b>Under stress:</b> ${(r.stress_profile||[]).map(esc).join(' + ')||'—'}</div></div>` : '';
+  const tp=r.type_probs?Object.entries(r.type_probs).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>`<span class="pill">${esc(k)} ${Math.round(v*100)}%</span>`).join(' '):'';
+  return `<div class="dgrid"><div>
+      <div class="k">Result</div>
+      <div class="type">${esc(r.type)} <span class="muted" style="font-weight:500">${esc(r.subtype)}</span></div>
+      <div class="muted" style="font-size:.82rem;margin:6px 0 14px">${esc(r.subtype_pos==='aux'?'Dom + Aux':'Dom + Tert')} · ${esc(r.lead)}-led · ${esc(r.animal)}</div>
+      <div style="margin-bottom:14px">${tp}</div>
+      ${r.fb?`<div class="k">Feedback</div><div class="fbbox"><div><b>Fit:</b> <span class="fitb f${r.fb.fit}">${r.fb.fit}/5</span></div>
+        ${r.fb.off&&r.fb.off.length?`<div><b>Felt off:</b> ${r.fb.off.map(o=>esc(OFFL[o]||o)).join(', ')}</div>`:''}
+        ${r.fb.self_type?`<div><b>Thinks they are:</b> ${esc(r.fb.self_type)}${r.fb.self_type!==r.type?' <span class="pill">differs</span>':''}</div>`:''}
+        ${r.fb.focus?`<div><b>Focus:</b> ${esc(FOCL[r.fb.focus]||r.fb.focus)}</div>`:''}
+        ${r.fb.note?`<div class="fbnote">"${esc(r.fb.note)}"</div>`:''}</div>`:'<div class="k">Feedback</div><div class="muted" style="font-size:.8rem;margin-bottom:14px">None sent</div>'}
+      ${v2box}<div class="k">Coins</div>${coinHtml}
+      <div class="muted" style="font-size:.72rem;margin-top:10px">Browser ID: ${esc((r.client_id||'—').slice(0,8))} · ${esc(r.quiz_version||'')}</div>
+    </div><div><div class="k">Answers</div><ol class="ans">${ans}</ol></div></div>`;
+}
+function summarize(){ const f=rows.filter(r=>r.fit); const avg=f.length?(f.reduce((a,r)=>a+r.fit,0)/f.length).toFixed(1):'—';
+  const mism=rows.filter(r=>r.fb&&r.fb.self_type&&r.fb.self_type!==r.type).length;
+  $('#summary').textContent=`${rows.length} takes · ${f.length} with feedback · average fit ${avg}/5 · ${mism} think they're a different type`; }
+function render(){ summarize(); itemHealth();
+  const f=$('#filter').value.trim().toLowerCase();
+  let list=rows.filter(r=>!f||(r.name||'').toLowerCase().includes(f)||(r.type||'').toLowerCase().includes(f));
+  list.sort((a,b)=>{ const x=a[sortK],y=b[sortK]; if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return (x>y?1:x<y?-1:0)*sortDir; });
+  document.querySelectorAll('th').forEach(th=>{ const k=th.dataset.k; th.textContent=th.textContent.replace(/ [↑↓]$/,'')+(k===sortK?(sortDir>0?' ↑':' ↓'):''); });
+  if(!list.length){ $('#tbody').innerHTML=`<tr><td colspan="9" class="empty">${rows.length?'No matches.':'No results yet. Share your quiz link!'}</td></tr>`; return; }
+  $('#tbody').innerHTML=list.map(r=>`<tr class="row${openId===r.id?' open':''}" data-id="${esc(r.id)}">
+      <td class="c-name" data-l="Name"><b>${esc(r.name)}</b></td><td class="c-type type" data-l="Type">${esc(r.type)}</td><td class="c-sub" data-l="Subtype">${esc(r.subtype)}</td>
+      <td class="c-conf hide-sm muted" data-l="Confidence">${r.type_prob!=null?Math.round(r.type_prob*100)+'%':'—'}</td><td class="c-cons hide-sm muted" data-l="Consistent">${r.consistency!=null?Math.round(r.consistency*100)+'%':'—'}</td><td class="c-core hide-sm" data-l="Core default">${(r.core_default||[]).map(f=>`<span class="fn" style="color:${FC[f]||'#ccc'}">${esc(f)}</span>`).join(' + ')||'<span class="muted">—</span>'}</td><td class="c-fit" data-l="Fit">${r.fit?`<span class="fitb f${r.fit}">${r.fit}/5</span>`:'<span class="muted">—</span>'}</td><td class="c-lead hide-sm muted" data-l="Lead">${esc(r.lead)}</td><td class="c-date muted" data-l="Date">${esc(fmtDate(r.created_at))}</td></tr>`
+    +(openId===r.id?`<tr class="detail"><td colspan="9">${detail(r)}</td></tr>`:'')).join('');
+  document.querySelectorAll('tr.row').forEach(tr=>tr.addEventListener('click',()=>{ openId = openId===tr.dataset.id?null:tr.dataset.id; render(); }));
+}
+document.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{ const k=th.dataset.k; if(sortK===k) sortDir*=-1; else { sortK=k; sortDir=k==='created_at'?-1:1; } render(); }));
+$('#filter').addEventListener('input',render);
+$('#sortSel').addEventListener('change',e=>{ const [k,d]=e.target.value.split(':'); sortK=k; sortDir=+d; render(); });
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t)); const v=t.dataset.v; $('#tableView').hidden=v!=='results'; $('#itemsView').hidden=v!=='items'; }));
+$('#refresh').addEventListener('click',()=>fetchRows().catch(e=>alertMsg(e)));
+$('#logout').addEventListener('click',()=>logout());
+function alertMsg(e){ $('#tbody').innerHTML=`<tr><td colspan="9" class="empty">${esc(e.message||e)}</td></tr>`; }
+$('#loginForm').addEventListener('submit',async e=>{
+  e.preventDefault(); $('#loginMsg').textContent='';
+  if(/YOUR-PROJECT|YOUR-ANON/.test(SUPABASE_URL+SUPABASE_ANON_KEY)){ $('#loginMsg').textContent='Add your Supabase URL and anon key at the bottom of admin.html first.'; return; }
+  try{ session=await login($('#email').value.trim(),$('#pw').value); store(session); showApp(); await fetchRows(); }
+  catch(err){ $('#loginMsg').textContent=err.message; }
+});
+const saved=load(); if(saved&&saved.exp>Date.now()){ session=saved; showApp(); fetchRows().catch(alertMsg); }
+</script>
+</body>
+</html>

@@ -6,105 +6,179 @@
 <meta name="robots" content="noindex">
 <title>Constellation — Results</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#eef0ff;--muted:#9aa0c3;--faint:#5d6290;--glass:rgba(18,16,40,.55);--edge:rgba(255,255,255,.09)}
+:root{--ink:#eef0ff;--muted:#9aa0c3;--faint:#7c81b0;--glass:rgba(18,16,40,.6);--edge:rgba(255,255,255,.09);--dark:#07051a}
 *{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;overflow-x:clip}
 body{margin:0;min-height:100vh;color:var(--ink);font-family:Manrope,system-ui,sans-serif;
-  background:radial-gradient(1200px 700px at 15% -10%,rgba(124,58,237,.35),transparent 60%),radial-gradient(1000px 600px at 100% 10%,rgba(8,145,178,.28),transparent 60%),radial-gradient(900px 700px at 50% 120%,rgba(219,39,119,.22),transparent 60%),#05040d}
-main{max-width:1100px;margin:0 auto;padding:32px 18px 60px}
-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:26px;flex-wrap:wrap}
-h1{font:700 1.5rem Unbounded;margin:0;background:linear-gradient(100deg,#fff,#c4b5fd,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+  background:radial-gradient(1200px 700px at 15% -10%,rgba(124,58,237,.3),transparent 60%),radial-gradient(1000px 600px at 100% 10%,rgba(67,56,202,.25),transparent 60%),radial-gradient(900px 700px at 50% 120%,rgba(109,40,217,.2),transparent 60%),#05040d;background-attachment:fixed}
+main{max-width:1400px;margin:0 auto;padding:26px 18px 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+h1{font:700 1.45rem Unbounded;margin:0;background:linear-gradient(100deg,#fff,#c4b5fd,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:var(--muted);font-size:.85rem;margin-top:4px}
-.panel{background:var(--glass);border:1px solid var(--edge);border-radius:20px;padding:22px;backdrop-filter:blur(18px)}
+.panel{background:var(--glass);border:1px solid var(--edge);border-radius:18px;padding:18px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 .login{max-width:380px;margin:10vh auto 0}
 .login h2{font:500 1.1rem Unbounded;margin:0 0 6px}
 label{display:block;font:600 .7rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
-input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--edge);background:rgba(255,255,255,.04);color:var(--ink);font:500 .95rem Manrope;outline:0}
-input:focus{border-color:rgba(167,139,250,.6)}
-button{font:700 .85rem Manrope;border-radius:999px;padding:11px 20px;cursor:pointer;border:1px solid var(--edge);background:rgba(255,255,255,.05);color:var(--ink)}
-button.primary{border:0;color:#07051a;background:linear-gradient(110deg,#67e8f9,#a78bfa,#f472b6);width:100%;margin-top:20px;padding:13px}
-button:hover{border-color:rgba(255,255,255,.3)}
+input,select{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--edge);background:rgba(255,255,255,.04);color:var(--ink);font:500 .92rem Manrope;outline:0}
+select option{background:#120f28}
+input:focus,select:focus{border-color:rgba(196,181,253,.6)}
+button{font:700 .82rem Manrope;border-radius:999px;padding:9px 16px;cursor:pointer;border:1px solid var(--edge);background:rgba(255,255,255,.05);color:var(--ink);transition:.2s}
+button:hover:not(:disabled){border-color:rgba(255,255,255,.3)}
+button:disabled{opacity:.35;cursor:default}
+button.primary{border:0;color:var(--dark);background:linear-gradient(110deg,#c7d2fe,#a78bfa,#e9d5ff);width:100%;margin-top:20px;padding:13px}
+:focus-visible{outline:2px solid #c4b5fd;outline-offset:2px}
 .msg{margin-top:12px;font-size:.85rem;color:#fda4af;min-height:1.2em}
-.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.tools input{width:220px;padding:9px 14px;border-radius:999px}
-table{width:100%;border-collapse:collapse;font-size:.9rem}
-th{text-align:left;font:600 .68rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);padding:10px 12px;border-bottom:1px solid var(--edge);cursor:pointer;user-select:none;white-space:nowrap}
-th:hover{color:var(--muted)}
-td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
-tr.row{cursor:pointer;transition:background .2s}
-tr.row:hover{background:rgba(255,255,255,.04)}
-tr.row.open{background:rgba(167,139,250,.08)}
-.type{font:700 .95rem Unbounded;letter-spacing:.04em}
 .muted{color:var(--muted)}
-.detail td{padding:0 12px 18px;background:rgba(167,139,250,.05)}
-.dgrid{display:grid;grid-template-columns:260px 1fr;gap:22px;padding-top:6px}
-@media (max-width:760px){.dgrid{grid-template-columns:1fr}.hide-sm{display:none}}
-.coin{margin-bottom:10px;font-size:.78rem}
-.coin .r{display:flex;justify-content:space-between;color:var(--muted);margin-bottom:4px}
-.coin .b{height:6px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}
-.coin .b i{display:block;height:100%;background:linear-gradient(90deg,#67e8f9,#a78bfa)}
-ol.ans{margin:0;padding-left:22px;font-size:.86rem;line-height:1.5}
-ol.ans li{margin-bottom:9px}
-ol.ans .q{color:var(--muted)}
-ol.ans .a{color:var(--ink)}
-.k{font:600 .66rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:6px 0 10px}
-.empty{text-align:center;color:var(--muted);padding:40px}
-.fitb{display:inline-block;padding:2px 9px;border-radius:999px;font-weight:700;font-size:.78rem}.f1,.f2{background:rgba(253,164,175,.15);color:#fda4af}.f3{background:rgba(252,211,77,.15);color:#fcd34d}.f4,.f5{background:rgba(110,231,183,.15);color:#6ee7b7}
-.fbbox{font-size:.82rem;line-height:1.7;margin-bottom:14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--edge)}.fbnote{margin-top:4px;color:#d6d8f2;font-style:italic}
-.tabs{display:flex;gap:8px;margin-bottom:14px}.tab{padding:9px 18px}.tab.on{background:linear-gradient(110deg,#67e8f9,#a78bfa);color:#07051a;border-color:transparent}
-.fn{font-weight:800;font-family:Unbounded;font-size:.82rem}tr.flag td{background:rgba(253,164,175,.05)}.pill.warn{color:#fda4af;border-color:rgba(253,164,175,.4)}
-.pill{display:inline-block;padding:2px 9px;border-radius:999px;border:1px solid var(--edge);font-size:.75rem;color:var(--muted)}
-
-/* ===== responsive ===== */
-html{-webkit-text-size-adjust:100%}
-.c-date{white-space:nowrap}
-#tableView{overflow-x:auto}
-#sortSel{display:none;padding:9px 14px;border-radius:999px;border:1px solid var(--edge);background:rgba(255,255,255,.04);color:var(--ink);font:600 .85rem Manrope}
-#sortSel option{background:#120f28}
-@media (max-width:1100px){ th,td{padding:10px 8px} }
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.tab.on{background:#c4b5fd;color:var(--dark);border-color:transparent}
+.k{font:700 .66rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:0 0 10px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;border:1px solid var(--edge);font-size:.76rem;color:var(--muted)}
+.pill.on{color:var(--ink);border-color:#c4b5fd}
+.pill.warn{color:#fda4af;border-color:rgba(253,164,175,.45)}
+.fitb{display:inline-block;padding:2px 9px;border-radius:999px;font-weight:800;font-size:.76rem;white-space:nowrap}
+.f1,.f2{background:rgba(244,63,94,.16);color:#fda4af}.f3{background:rgba(234,179,8,.16);color:#fde047}.f4,.f5{background:rgba(34,197,94,.16);color:#86efac}
+.fchip{display:inline-block;font:800 .74rem Unbounded;color:var(--dark);background:var(--c);border-radius:999px;padding:2px 8px;vertical-align:1px}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+/* overview */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.kpi{padding:16px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--edge)}
+.kv{font:800 1.7rem Unbounded}.kl{font:700 .7rem Manrope;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px}.ks{font-size:.76rem;color:var(--faint);margin-top:4px}
+.ogrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;margin-bottom:14px}
+.ogrid.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.ocol{display:grid;gap:14px;align-content:start}
+.ph{font:700 .9rem Unbounded;margin-bottom:2px}.phs{font-size:.78rem;color:var(--muted);margin-bottom:10px;line-height:1.45}
+.chart{width:100%;height:auto;display:block}
+.chart .cl{fill:#9aa0c3;font:600 11px Manrope}.chart .cv{fill:#eef0ff;font:700 11px Manrope}.chart .axis{stroke:rgba(255,255,255,.15)}
+.mix{display:flex;flex-wrap:wrap;gap:6px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{text-align:left;font:700 .64rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);padding:8px 10px;border-bottom:1px solid var(--edge);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
+.mm{list-style:none;margin:0;padding:0}.mm li{display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid rgba(255,255,255,.05);font-size:.9rem}.mm li:last-child{border:0}
+/* results: list + detail */
+.split{display:grid;grid-template-columns:320px minmax(0,1fr);gap:14px;align-items:start}
+.listcol{position:sticky;top:14px;max-height:calc(100vh - 28px);display:flex;flex-direction:column;padding:12px}
+#listTools{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:8px}
+#listCount{font-size:.74rem;color:var(--faint);padding:0 4px 6px}
+.acb{display:inline-block;font:700 .66rem Manrope;color:#c4b5fd;background:rgba(196,181,253,.12);border:1px solid rgba(196,181,253,.35);border-radius:999px;padding:1px 7px;vertical-align:middle;margin-left:4px}
+.acb.big{font-size:.78rem;padding:3px 10px;margin:0}.acb.none{color:var(--faint);background:none;border-color:rgba(255,255,255,.12);margin:0}
+.acline{margin-top:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.84rem}
+.acall{background:none;border:0;color:var(--muted);font:600 .82rem Manrope;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:0}.acall:hover{color:var(--ink)}
+#list{overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:2px}
+.li{display:flex;align-items:center;gap:10px;text-align:left;width:100%;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.025);border:1px solid var(--edge);border-left:3px solid var(--c)}
+.li.on{background:rgba(196,181,253,.12);border-color:rgba(196,181,253,.5);border-left-color:var(--c)}
+.li .lt{font:800 .8rem Unbounded;color:var(--c);min-width:44px}
+.li .lm{flex:1;min-width:0;display:flex;flex-direction:column}.li .lm b{font-weight:700;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.li .lm i{font-style:normal;font-size:.74rem;color:var(--muted)}
+#detail{display:grid;gap:14px;min-width:0}
+.dhead{display:flex;justify-content:space-between;gap:8px}
+.back{display:none}
+.dnav{display:flex;gap:6px;margin-left:auto}
+.dtitle{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.dname{font:700 1.5rem Unbounded;overflow-wrap:anywhere}
+.dtype{font:900 2.6rem Unbounded;line-height:1}
+.dchips{display:flex;flex-wrap:wrap;gap:6px}
+.fbbox{font-size:.88rem;line-height:1.7}.fbnote{margin-top:4px;color:#d6d8f2;font-style:italic}
+.maps{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:14px}
+.dgrid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.mapsvg{width:100%;height:auto;display:block;overflow:visible}
+.xq{fill:rgba(255,255,255,.02);stroke:rgba(255,255,255,.08)}
+.xh{fill:#9aa0c3;font:700 13px Manrope;letter-spacing:.2em;text-anchor:middle}
+.xs{fill:#7c81b0;font:600 10px Manrope;letter-spacing:.22em}
+.xl{fill:#7c81b0;font:600 11px Manrope;letter-spacing:.14em;text-anchor:middle;text-transform:uppercase}
+.qaxis{stroke:rgba(255,255,255,.14);stroke-width:2;stroke-dasharray:6 8}.qaxis.on{stroke:rgba(255,255,255,.6);stroke-dasharray:0}
+.cx{stroke:rgba(255,255,255,.4);stroke-width:2.5;stroke-dasharray:6 7}
+.svl{stroke:var(--sc);stroke-width:7;stroke-linecap:round;opacity:.8;filter:drop-shadow(0 0 10px var(--sc))}
+.ctx{fill:#eef0ff;font:800 17px Manrope;letter-spacing:.06em;text-anchor:middle}
+.xnode .body{fill:var(--c)}
+.xnode.int .body{stroke:rgba(7,5,26,.25);stroke-width:1.5}.xnode.ext .body{stroke:#fff;stroke-width:4}
+.xnode .halo{fill:var(--c);opacity:.14}
+.xnode .ring{fill:none;stroke:var(--c);stroke-width:2.5;stroke-dasharray:4 5}
+.xnode.faded{opacity:.4}
+.xnode .fx{fill:#07051a;font:900 24px Unbounded;text-anchor:middle;dominant-baseline:middle}
+.xnode .fk{fill:rgba(7,5,26,.78);font:800 8.5px Manrope;letter-spacing:.14em;text-anchor:middle}
+.xnode .rk{fill:rgba(7,5,26,.85);font:800 8px Manrope;letter-spacing:.12em;text-anchor:middle}
+/* animation (matches the quiz and glossary maps) */
+.mapsvg .pop{transform-box:view-box;transform-origin:0 0;animation:popin .8s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes popin{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.mapsvg .ring{transform-box:fill-box;transform-origin:center;animation:spinr 14s linear infinite}
+@keyframes spinr{to{transform:rotate(360deg)}}
+.mapsvg .svl{stroke-dasharray:700;stroke-dashoffset:700;animation:drawl 1s .45s ease-out forwards}
+@keyframes drawl{to{stroke-dashoffset:0}}
+.mapsvg .cx,.mapsvg .qaxis,.mapsvg .ctx{animation:fadein .6s .35s both}
+@keyframes fadein{from{opacity:0}}
+.mapsvg .xnode{cursor:default}.mapsvg .xnode:hover .halo{opacity:.32}
+.c2bar{transform-origin:left;animation:grow .9s cubic-bezier(.2,.9,.2,1) both}
+@keyframes grow{from{transform:scaleX(0)}}
+.fpath .pbub::before{animation:popin .6s cubic-bezier(.3,1.5,.5,1) both}
+@media (prefers-reduced-motion:reduce){.mapsvg .pop,.mapsvg .ring,.mapsvg .svl,.mapsvg .cx,.mapsvg .qaxis,.mapsvg .ctx,.c2bar,.fpath .pbub::before{animation:none}.mapsvg .svl{stroke-dashoffset:0}}
+/* flow */
+.fpath{list-style:none;margin:0;padding:0}
+.fpath li{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid var(--edge)}.fpath li:last-child{border:0}
+.pbub{flex:none;width:52px;height:52px;display:grid;place-items:center;font:900 .76rem Unbounded;color:var(--dark)}
+.pbub::before{content:"";grid-area:1/1;width:var(--d);height:var(--d);border-radius:50%;background:var(--c)}
+.pbub.e::before{box-shadow:0 0 0 3px #fff inset}.pbub span{grid-area:1/1;position:relative}
+.ptxt{flex:1;min-width:0}.pk{font:700 .64rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}.pq{font:600 .94rem Manrope;margin-top:2px}
+.ptag{font:700 .7rem Manrope;padding:4px 9px;border-radius:999px;border:1px solid var(--edge);color:var(--muted);white-space:nowrap}
+.fpath li.sv .ptag{color:#86efac;border-color:rgba(134,239,172,.45);background:rgba(34,197,94,.1)}
+.fpath li.bl .ptag{color:#fda4af;border-color:rgba(253,164,175,.45);background:rgba(244,63,94,.1)}
+/* coins */
+.c2grid{display:grid;gap:4px}
+.c2h{font:700 .62rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:6px 0 2px}
+.coin2{padding:7px 0}
+.c2top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.86rem;margin-bottom:5px}.c2top b{font-weight:800}
+.c2tag{font:700 .64rem Manrope;padding:2px 8px;border-radius:999px;border:1px solid var(--edge);color:var(--muted);white-space:nowrap}
+.c2tag.c2-strong{color:var(--ink);border-color:rgba(196,181,253,.6);background:rgba(196,181,253,.14)}
+.c2bar{display:flex;height:9px;border-radius:999px;overflow:hidden;gap:2px}.c2bar i{display:block;height:100%}
+.c2ends{display:flex;justify-content:space-between;font-size:.7rem;color:var(--faint);margin-top:3px}
+/* insights */
+.igrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;margin-top:12px}
+.pat{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0 0 12px;font-size:.88rem}.pat dt{color:var(--muted)}.pat dd{margin:0;display:flex;flex-wrap:wrap;gap:4px}
+.notes{margin:0 0 12px;padding-left:18px;font-size:.88rem;line-height:1.6;color:#d6d8f2}.notes li{margin-bottom:4px}
+.tps{display:flex;flex-wrap:wrap;gap:6px}
+.gb{padding:10px 12px;margin-bottom:8px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid var(--edge);border-left:3px solid var(--c);font-size:.86rem;line-height:1.55;color:#d6d8f2}.gb b{display:block;color:var(--c);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
+/* answers */
+.sfil{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{padding:6px 12px;font-weight:600}.chip i{font-style:normal;color:var(--faint);margin-left:4px}.chip.on{background:rgba(196,181,253,.16);border-color:#c4b5fd}
+ol.ans{margin:0;padding-left:24px;font-size:.88rem;line-height:1.55}
+ol.ans li{margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05)}
+ol.ans .q{color:var(--muted);margin-bottom:4px}.ol.ans .a{color:var(--ink)}
+.why{font-size:.74rem;color:#e9d5ff;border:1px solid rgba(196,181,253,.35);border-radius:999px;padding:1px 8px;margin-left:4px;white-space:nowrap}
+.dis{font-size:.76rem;color:var(--faint);margin-top:3px}
+.danger{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 2px}
+.del{color:#fda4af;border-color:rgba(253,164,175,.4)}.del:hover:not(:disabled){background:rgba(244,63,94,.14)}
+/* item health */
+tr.flag td{background:rgba(253,164,175,.05)}
+/* responsive */
+@media (max-width:1100px){.maps,.dgrid2,.igrid{grid-template-columns:1fr}.ogrid,.ogrid.two{grid-template-columns:1fr}}
 @media (max-width:900px){
-  main{padding:20px 12px 40px}
-  header{margin-bottom:18px}
-  .tools{width:100%}
-  .tools input{flex:1 1 160px;width:auto;min-width:0}
-  #sortSel{display:block;flex:1 1 140px}
-  .panel{padding:14px;border-radius:16px}
+  main{padding:18px 12px 40px}
+  .split{grid-template-columns:minmax(0,1fr)}
+  #detail{grid-template-columns:minmax(0,1fr)}
+  #detail .panel{min-width:0;overflow-wrap:anywhere}
+  .listcol{position:static;max-height:none}
+  #detail{display:none}
+  #resultsView.showdetail .listcol{display:none}
+  #resultsView.showdetail #detail{display:grid}
+  .back{display:inline-flex}
+  .dtype{font-size:2rem}.dname{font-size:1.2rem}
   .cardable table,.cardable tbody,.cardable tr,.cardable td{display:block;width:100%}
   .cardable thead{display:none}
-  .cardable tr.row,.cardable #itbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;padding:14px 6px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .cardable #itbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.07)}
   .cardable td{padding:0;border:0;min-width:0;overflow-wrap:anywhere}
-  .cardable td.hide-sm{display:block}
-  .cardable td[data-l]::before{content:attr(data-l);display:block;font:600 .62rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
-  .cardable td.c-name{grid-column:1;grid-row:1;font-size:1.05rem}
-  .cardable td.c-fit{grid-column:2;grid-row:1;justify-self:end;text-align:right}
-  .cardable td.c-name::before,.cardable td.c-fit::before{display:none}
-  .cardable td.c-date{grid-column:1/-1;white-space:normal}
-  .cardable tr.detail td{padding:6px 2px 16px}
-  .cardable tr.detail td::before{display:none}
-  .cardable tr.row.open{border-bottom:0}
-  .cardable #itbody tr.flag{background:rgba(253,164,175,.05);border-radius:12px}
-  .cardable #itbody tr.flag td{background:none}
-  .cardable #itbody td.i-q{grid-column:1/-1}
-  .cardable #itbody td.i-flag{grid-column:1/-1}
-  .cardable td.empty{padding:30px 6px}
-  .dgrid{grid-template-columns:1fr;gap:14px}
-  ol.ans{padding-left:18px}
-  .login{margin-top:4vh}
+  .cardable td[data-l]::before{content:attr(data-l);display:block;font:600 .6rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:2px}
+  .cardable td.i-q,.cardable td.i-flag{grid-column:1/-1}
+  .pat{grid-template-columns:1fr}.pat dt{margin-top:4px}
+  table.mini th,table.mini td{padding:7px 6px}
 }
-@media (max-width:360px){ .cardable tr.row,.cardable #itbody tr{grid-template-columns:1fr} .cardable td.c-fit{grid-column:1;grid-row:auto;justify-self:start;text-align:left} .cardable td.c-fit::before{display:block} }
 </style>
 </head>
 <body>
 <main>
   <header>
     <div><h1>Constellation results</h1><div class="sub" id="who">Owner view</div></div>
-    <div class="tools" id="tools" hidden>
-      <input id="filter" placeholder="Filter by name or type">
-      <select id="sortSel" aria-label="Sort results"><option value="created_at:-1">Newest first</option><option value="created_at:1">Oldest first</option><option value="name:1">Name A–Z</option><option value="type:1">Type</option><option value="fit:-1">Best fit</option><option value="fit:1">Worst fit</option><option value="consistency:-1">Most consistent</option></select>
-      <button id="refresh">Refresh</button>
-      <button id="logout">Log out</button>
-    </div>
+    <div class="tools" id="tools" hidden><button id="refresh">Refresh</button><button id="logout">Log out</button></div>
   </header>
 
   <section id="loginView" class="panel login">
@@ -118,29 +192,463 @@ html{-webkit-text-size-adjust:100%}
     </form>
   </section>
 
-  <div id="summary" class="sub" style="margin:-12px 0 14px"></div>
-  <div class="tabs" id="tabs" hidden><button class="tab on" data-v="results">Results</button><button class="tab" data-v="items">Item health</button></div>
-  <section id="itemsView" class="panel cardable" hidden><div class="sub" id="itemsSum" style="margin-bottom:12px"></div><table><thead><tr><th>Item</th><th>Scene</th><th>Takes</th><th>Top #1 pick</th><th>None fit</th><th>"Should"</th><th>Flags</th></tr></thead><tbody id="itbody"></tbody></table></section>
-  <section id="tableView" class="panel cardable" hidden>
-    <table>
-      <thead><tr>
-        <th data-k="name">Name</th><th data-k="type">Type</th><th data-k="subtype">Subtype</th>
-        <th data-k="type_prob" class="hide-sm">Confidence</th><th data-k="consistency" class="hide-sm">Consistent</th><th data-k="core_s" class="hide-sm">Core default</th><th data-k="fit">Fit</th><th data-k="lead" class="hide-sm">Lead</th><th data-k="created_at">Date ↓</th>
-      </tr></thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </section>
+  <div id="app" hidden>
+    <nav class="tabs" aria-label="Views"><button class="tab on" data-v="overview">Overview</button><button class="tab" data-v="results">Results</button><button class="tab" data-v="items">Item health</button></nav>
+    <section id="overView"></section>
+    <section id="resultsView" hidden>
+      <div class="split">
+        <div class="panel listcol">
+          <div id="listTools">
+            <input id="filter" placeholder="Filter by name, type, subtype or @account" aria-label="Filter results">
+            <select id="acctSel" aria-label="Account filter"><option value="all">All results</option><option value="yes">With an account</option><option value="no">No account</option></select>
+            <select id="sortSel" aria-label="Sort results"><option value="created_at:-1">Newest first</option><option value="created_at:1">Oldest first</option><option value="name:1">Name A–Z</option><option value="type:1">Type</option><option value="fit:-1">Best fit</option><option value="fit:1">Worst fit</option><option value="consistency:-1">Most consistent</option><option value="type_prob:-1">Most confident</option></select>
+          </div>
+          <div id="listCount"></div>
+          <div id="list" role="list"></div>
+        </div>
+        <div id="detail" aria-live="polite"></div>
+      </div>
+    </section>
+    <section id="itemsView" class="panel cardable" hidden><div class="sub" id="itemsSum" style="margin:0 0 12px"></div><table><thead><tr><th>Item</th><th>Scene</th><th>Takes</th><th>Top #1 pick</th><th>None fit</th><th>"Should"</th><th>Flags</th></tr></thead><tbody id="itbody"></tbody></table></section>
+  </div>
 </main>
+<script>
+const FN = {
+  Ni:{OI:1,NS:1,N:1,  kind:'O',att:'i'}, Se:{OI:-1,NS:1,N:-1, kind:'O',att:'e'},
+  Si:{OI:1,NS:-1,N:-1,kind:'O',att:'i'}, Ne:{OI:-1,NS:-1,N:1, kind:'O',att:'e'},
+  Fi:{DI:1,FT:1,T:-1, kind:'D',att:'i'}, Te:{DI:-1,FT:1,T:1,  kind:'D',att:'e'},
+  Ti:{DI:1,FT:-1,T:1, kind:'D',att:'i'}, Fe:{DI:-1,FT:-1,T:-1,kind:'D',att:'e'}
+};
+const STACKS = {
+  ISTJ:["Si","Te","Fi","Ne"], ISFJ:["Si","Fe","Ti","Ne"], INFJ:["Ni","Fe","Ti","Se"], INTJ:["Ni","Te","Fi","Se"],
+  ISTP:["Ti","Se","Ni","Fe"], ISFP:["Fi","Se","Ni","Te"], INFP:["Fi","Ne","Si","Te"], INTP:["Ti","Ne","Si","Fe"],
+  ESTP:["Se","Ti","Fe","Ni"], ESFP:["Se","Fi","Te","Ni"], ENFP:["Ne","Fi","Te","Si"], ENTP:["Ne","Ti","Fe","Si"],
+  ESTJ:["Te","Si","Ne","Fi"], ESFJ:["Fe","Si","Ne","Ti"], ENFJ:["Fe","Ni","Se","Ti"], ENTJ:["Te","Ni","Se","Fi"]
+};
+const COINS = ['OD','DI','OI','N','T','FT','NS','IE'];
+
+function animalOf(o, d){ // savior observer + savior decider
+  const oi = FN[o].att==='i', di = FN[d].att==='i';
+  if (oi && di) return 'Sleep';
+  if (!oi && di) return 'Consume';
+  if (oi && !di) return 'Blast';
+  return 'Play';
+}
+
+// Build the 32 subtypes (dom + one other savior)
+const SUBTYPES = [];
+for (const o of ['Ni','Ne','Si','Se']) for (const d of ['Fi','Fe','Ti','Te']) for (const lead of ['O','D']) {
+  const dom = lead==='O'? o : d, other = lead==='O'? d : o;
+  let type=null, pos=null;
+  for (const t in STACKS){ const s=STACKS[t]; if (s[0]===dom && (s[1]===other||s[2]===other)) { type=t; pos = s[1]===other? 'aux':'tert'; } }
+  const sign = {OD: lead==='O'?1:-1, IE: FN[dom].att==='i'?1:-1};
+  for (const c of ['DI','FT','T']) sign[c]=FN[d][c];
+  for (const c of ['OI','NS','N']) sign[c]=FN[o][c];
+  SUBTYPES.push({key:dom+'-'+other, dom, other, obs:o, dec:d, type, pos, sign, animal: animalOf(o,d)});
+}
+const FCOLOR = { Fi:'#f43f5e', Fe:'#fda4af', Ti:'#3b82f6', Te:'#93c5fd', Si:'#22c55e', Se:'#86efac', Ni:'#eab308', Ne:'#fde047' };
+const FINK = '#07051a'; // label text color inside function bubbles (dark text passes AA on every fill)
+const FNAME = { Ni:'Introverted Intuition', Ne:'Extroverted Intuition', Si:'Introverted Sensing', Se:'Extroverted Sensing',
+  Ti:'Introverted Thinking', Te:'Extroverted Thinking', Fi:'Introverted Feeling', Fe:'Extroverted Feeling' };
+const FDESC = {
+  Ni:{ core:"Keeps stacking patterns onto a personal worldview, and pushes away new facts that don't connect back to it. Narrows everything down to one concept.", void:"Leaves others asking for the facts and details, and wondering whether you've seen the new information.", fear:"New facts collapse the abstract worldview you've built in your head."},
+  Se:{ core:"Constantly scanning, taking it all in and giving the facts and examples. Has a hard time narrowing down to one topic.", void:"Leaves others to make the guesses, draw the conclusions, and simplify it into a category.", fear:"Finding out that what felt new was really the same circle all along."},
+  Ne:{ core:"Scans for new concepts, understandings, and possibilities. Jumps from category to category and rarely says the same thing twice.", void:"Leaves others to create the physical structure and control.", fear:"Some control freak locks up your options and information."},
+  Si:{ core:"Keeps going over and refining known, personal facts. Controls things physically inside the box and returns to the comforting routine.", void:"Leaves others asking why, trying to understand, and showing you new possibilities.", fear:"Random chaos drops out of the sky and wrecks everything you've built."},
+  Fi:{ core:"Goes all in on what you love, hoping others will see the passion. Shoves away the work the tribe needs help with.", void:"Leaves others asking how it works and what's actually going to get done.", fear:"The tribe says what you love is stupid, and you have to do work you hate to be valuable."},
+  Te:{ core:"Does all the tribe work so everyone will love you. Has a hard time picking the one thing that matters most to you personally.", void:"Leaves others asking what's important to you and how you're feeling.", fear:"You get all the hard work done and still no one loves you."},
+  Ti:{ core:"Works on what you know is true for you, and builds something amazing so the tribe will have to love you. Gets smarter alone.", void:"Leaves the room emotionally uncomfortable while you go on about what you're working on.", fear:"You spend years figuring out the truth, and the tribe doesn't even care."},
+  Fe:{ core:"Tries to make everyone happy so they'll help you with your personal work. Talks out the values and emotions of the group.", void:"Leaves others to go with what's logically true, even if people hate it.", fear:"Years of caring for others leave you insecure and unable to make things work for yourself."}
+};
+const LETTERS = {
+  S:"Savior Sensory: obligated to prove, ground, and give the facts of what actually happened. Only once the facts are in are you \"allowed\" to guess. Often heard saying: \"I don't understand.\"",
+  N:"Savior Intuitive: obligated to give the summary, the overview, and the understanding of why. You make whole points on a pattern and promise the facts \"later.\" Often heard saying: \"This reminds me of…\"",
+  T:"Savior Thinker: obligated to figure it out, get it done, and solve the hard thing. You jump into the work, miss the vibe in the room, and crash emotionally later.",
+  F:"Savior Feeler: goes straight after what's valuable, liked, and wanted. You know exactly what's worth loving, but fumble the hard work of forcing it to happen."
+};
+const SUBTRAITS = {
+ 'Fi-Ne':'Creative, exploratory, imaginative','Fi-Si':'Nostalgic, sentimental, inward',
+ 'Ni-Fe':'Insightful, empathetic, counselor-like','Ni-Ti':'Detached, analytical, symbolic',
+ 'Ti-Ne':'Inventive, theoretical, curious','Ti-Si':'Precise, routine-oriented, archival',
+ 'Ni-Te':'Strategic, visionary, execution-focused','Ni-Fi':'Philosophical, private, idealistic',
+ 'Fi-Se':'Artistic, adventurous, expressive','Fi-Ni':'Symbolic, introspective, dreamy',
+ 'Si-Fe':'Caring, protective, socially attentive','Si-Ti':'Reserved, analytical, methodical',
+ 'Ti-Se':'Tactical, adaptable, action-oriented','Ti-Ni':'Minimalistic, predictive, withdrawn',
+ 'Si-Te':'Organized, disciplined, efficient','Si-Fi':'Quiet moralist, internally value-driven',
+ 'Ne-Fi':'Passionate, expressive, idealistic','Ne-Te':'Productive, entrepreneurial, driven',
+ 'Fe-Ni':'Inspirational, insightful, mentoring','Fe-Se':'Energetic, charismatic, socially bold',
+ 'Ne-Ti':'Intellectual, inventive, debater','Ne-Fe':'Charismatic, provocative, people-oriented',
+ 'Te-Ni':'Strategic commander, visionary leader','Te-Se':'Aggressive executor, forceful achiever',
+ 'Se-Fi':'Authentic, emotional, artistic','Se-Te':'Competitive, pragmatic, dominant',
+ 'Fe-Si':'Traditional caretaker, community-focused','Fe-Ne':'Enthusiastic, adaptive, socially expansive',
+ 'Se-Ti':'Tactical realist, sharp opportunist','Se-Fe':'Charming, persuasive, socially strategic',
+ 'Te-Si':'Structured leader, conventional executive','Te-Ne':'Expansive organizer, adaptable strategist'
+};
+const ANIMALS = {
+  Consume:{icon:'◐', d:"Gathering in new information and experiences for yourself. You want to be alone with the good book and keep going.", pair:'Oe + Di'},
+  Blast:{icon:'✦', d:"Taking what you already know and teaching it to the tribe. Three pages in, you have to go tell someone.", pair:'Oi + De'},
+  Sleep:{icon:'☾', d:"Conserving energy. You process inward and preserve, then spend it later. Introverted on both saviors.", pair:'Oi + Di'},
+  Play:{icon:'☀', d:"Expending energy outward, on the world and the people in it, then needing to recover later. Extroverted on both saviors.", pair:'Oe + De'}
+};
+const COINLABELS = {
+  OD:['Observer-led','Decider-led','Fear of chaos & control (IxxJ / ExxP)','Pain around identity & the tribe (IxxP / ExxJ)'],
+  DI:['Self above tribe (Di)','Tribe above self (De)','',''],
+  OI:['Organize & return (Oi)','Gather the new (Oe)','',''],
+  N: ['Intuition','Sensing','',''],
+  T: ['Thinking','Feeling','',''],
+  FT:['Fi / Te axis','Ti / Fe axis','',''],
+  NS:['Ni / Se axis','Si / Ne axis','',''],
+  IE:['Introverted lead','Extroverted lead','','']
+};
+
+// ===== Growth guide content (Option A: content blocks + rules) =====
+const GUIDE = {
+ Ni:{
+  first:{ real:"You compress everything into one throughline. You often know where something is heading before you can explain why.",
+    strengths:["Seeing the long arc","Cutting through noise to the core idea","Holding one vision steady"],
+    apply:{ work:"Strategy, planning, and roles where you set direction and others execute.", rel:"You read where a relationship is heading early, so say it out loud sooner.", change:"Write the one-sentence vision for this change and let it filter every decision.", motiv:"Tie today's task to the bigger arc, in writing.", create:"Pick one theme and go deep instead of wide." } },
+  last:{ struggle:"Losing the thread. Lots of action and new experiences, but you're unsure what any of it adds up to, and sudden gut-feeling predictions about the future spook you.",
+    signs:["Saying yes to everything, then feeling empty","Sudden dark predictions about where life is going","Not being able to answer \"where is this going?\""],
+    exp:{ general:["Once a week, write three sentences: what pattern keeps repeating in my life?","Before starting something new, name in one line what it's for."], work:"Pick one 90-day goal and drop one thing that doesn't serve it.", rel:"Ask someone close: \"What do you think I'm really after?\"", change:"Picture yourself one year after this change. Write what you see in a paragraph.", motiv:"Write your \"why\" on a sticky note where you'll see it daily.", create:"Before making more, review your last five pieces and name their common thread." } },
+  loop:"replaying the same story about how things will turn out", exit:"step back and name the one thing this is really about" },
+ Se:{
+  first:{ real:"You live in the present moment. You notice what's actually in front of you, read a room physically, and act fast.",
+    strengths:["Reacting in real time","Noticing what's really there, not what's assumed","Making things happen hands-on"],
+    apply:{ work:"Live, hands-on roles: events, operations, troubleshooting, sales, craft.", rel:"You bring people into experiences, so plan things to do together.", change:"Go see it in person: tour it, visit it, try it before deciding.", motiv:"Make the first step physical, and start within five minutes.", create:"Work from real references and materials, and test things live." } },
+  last:{ struggle:"Stuck in your head. Plans and theories pile up but you stall on actually doing, the physical side of life (body, room, money details) gets neglected, and under stress you overindulge.",
+    signs:["Weeks in planning mode with nothing started","Ignoring sleep, food, and movement","Binging on sensation when stressed (food, scrolling, spending)"],
+    exp:{ general:["Do one ten-minute thing with your hands every day: walk, cook, fix something.","Turn one plan into a same-day action."], work:"Ship a rough version this week before you perfect the plan.", rel:"Plan one real-world activity together instead of another long talk.", change:"Visit or test the new thing in person before you decide.", motiv:"Set a ten-minute timer and just start. No planning allowed.", create:"Make a fast, messy draft with real materials." } },
+  loop:"chasing the next sensation or task", exit:"do something physical and fully present right now" },
+ Si:{
+  first:{ real:"You build a reliable base. You remember how things went before, refine your routines, and make things solid.",
+    strengths:["Consistency and follow-through","Remembering details and history","Refining something until it's dependable"],
+    apply:{ work:"Process, documentation, QA, and systems that have to be reliable.", rel:"Consistency is how you show care. Name it, so people notice it.", change:"Bring your routines with you, and rebuild one anchor habit first.", motiv:"Track streaks, and let routine carry you on low days.", create:"Master a craft through repetition and refinement." } },
+  last:{ struggle:"Scattered. You chase new ideas but drop the basics (bills, sleep, follow-through, what worked last time). Routines feel like a cage until things fall apart.",
+    signs:["Lots of starts, few finishes","Losing track of basics like deadlines, bills, and keys","Feeling physically run down out of nowhere"],
+    exp:{ general:["Pick one tiny daily anchor, like the same wake time or a five-minute reset.","After each project, jot down \"what worked\" in a running log."], work:"Write a checklist for the task you redo most often.", rel:"Remember one thing someone told you last week, and follow up on it.", change:"Before moving on, list what you're keeping from before.", motiv:"Finish one existing thing before you start a new one.", create:"Revisit and polish an old piece instead of starting fresh." } },
+  loop:"clinging to the routine and the way things were", exit:"go back to a reliable routine or what worked before" },
+ Ne:{
+  first:{ real:"You see possibilities everywhere. You connect ideas nobody else links, reframe problems, and generate options fast.",
+    strengths:["Generating options quickly","Connecting unrelated ideas","Reframing a stuck problem"],
+    apply:{ work:"Brainstorming, R&D, early-stage projects, and reframing problems.", rel:"You keep things fresh. Let people know which of your ideas you actually mean.", change:"Map three to five possible paths before committing to one.", motiv:"Gamify boring tasks or add some novelty.", create:"Mashups, experiments, and variations on a theme." } },
+  last:{ struggle:"Stuck on one track. You're convinced there's only one way things can go, so setbacks feel catastrophic and new possibilities feel threatening instead of exciting.",
+    signs:["Worst-case thinking about one outcome","Rejecting alternatives before hearing them","Feeling trapped with no options"],
+    exp:{ general:["When you're stuck, list five other ways it could go, even silly ones.","Try one small new thing each week: a new route, food, or genre."], work:"Before deciding, ask a coworker: \"How else could we do this?\"", rel:"Ask \"what if…\" questions instead of predicting how they'll react.", change:"Write three versions of how this change could turn out well.", motiv:"Change the setting or format of a task to restart momentum.", create:"Do a 15-minute \"bad ideas only\" brainstorm." } },
+  loop:"jumping between ideas without landing anywhere", exit:"talk it out or try one fresh angle" },
+ Ti:{
+  first:{ real:"You build your own understanding. You need things to make sense to you and won't accept a rule until you've tested it.",
+    strengths:["Finding the flaw in a system","Precise definitions and logic","Deep, independent problem-solving"],
+    apply:{ work:"Troubleshooting, engineering, analysis, debugging.", rel:"Explain your reasoning, and then check how it landed.", change:"Build your own decision criteria instead of borrowing someone else's.", motiv:"Turn the task into a puzzle you want to solve.", create:"Design systems, rules, and structure into your work." } },
+  last:{ struggle:"Outsourcing your own judgment. You lean on what others say or what \"works\" instead of thinking it through, and get defensive when your logic is questioned.",
+    signs:["Following rules you don't actually believe","Feeling dumb when you can't explain why","Overreacting to being corrected"],
+    exp:{ general:["Before agreeing to something, write one line of your own reasoning.","Spend 20 quiet minutes understanding one thing all the way."], work:"Pick one process and figure out exactly why each step exists.", rel:"When you disagree, say \"here's how I see it\" instead of going along.", change:"Define your own criteria for the decision before you ask anyone else.", motiv:"Ask yourself \"why does this matter, logically?\" and write the answer.", create:"Learn the underlying rules of your craft: theory, structure, technique." } },
+  loop:"overthinking alone until it's perfect", exit:"pause and work out what you actually think" },
+ Te:{
+  first:{ real:"You organize the world around you. You turn plans into action, measure what works, and get things done for the group.",
+    strengths:["Turning plans into action","Organizing people and resources","Measuring what actually works"],
+    apply:{ work:"Project management, operations, leadership, and anything with deadlines.", rel:"You show care by getting things done. Also ask what they actually want.", change:"Make the timeline and the checklist. It calms the chaos.", motiv:"Set measurable targets and track progress where you can see it.", create:"Set a release schedule, then finish and ship." } },
+  last:{ struggle:"Knowing what you love but not making it real. Passion projects stay in your head, deadlines feel like attacks, and \"just get it done\" pressure makes you shut down or rebel.",
+    signs:["Lots of passions, few finished","Avoiding tasks that feel like someone else's rules","Crash moments when everyone suddenly wants something from you"],
+    exp:{ general:["Break one thing you love into three steps with dates.","Tell one person a deadline out loud, and let the outside world hold you to it."], work:"Time-box your most annoying task to 25 minutes and get it done.", rel:"Turn one \"we should\" into a calendar invite.", change:"Make a simple timeline of what has to happen by when.", motiv:"Track one number weekly: pages, songs, hours.", create:"Set a release date and work backwards from it." } },
+  loop:"piling on tasks and fixing everyone's problems", exit:"make a small plan and take one concrete step" },
+ Fi:{
+  first:{ real:"You know what you value. You have a strong inner compass, spot what's fake, and stay loyal to what's real to you.",
+    strengths:["Knowing what matters to you","Spotting what's fake or off","Deep loyalty to the people and causes you choose"],
+    apply:{ work:"Mission-driven roles, creative work, advocacy, anything you believe in.", rel:"Your honesty about what you feel is a gift. Share it in words, not just by withdrawing.", change:"Check every option against \"does this feel like me?\"", motiv:"Connect the task to a value you actually hold.", create:"Personal expression. Your taste is your edge." } },
+  last:{ struggle:"Running on everyone else's needs and metrics until you don't know what you want, then feeling unappreciated and hit by a wave of \"nobody cares about me.\"",
+    signs:["Not being able to answer \"what do you want?\"","Resentment after over-delivering","A sudden emotional crash after a productive streak"],
+    exp:{ general:["Each day, write one thing you liked and one you didn't. No reasons needed.","Say no to one request that doesn't matter to you."], work:"Pick one project you care about personally and protect time for it.", rel:"Tell someone one thing you actually want, plainly.", change:"Before deciding, ask yourself: \"What would I choose if nobody was watching?\"", motiv:"Find your personal \"why\" before working out the \"how.\"", create:"Make one thing only for yourself, not to show anyone." } },
+  loop:"withdrawing into what you feel and love", exit:"check in with what you actually feel and want" },
+ Fe:{
+  first:{ real:"You read the emotional weather. You sense how the group feels, bring people together, and make people feel seen.",
+    strengths:["Reading the room","Bringing people together","Making people feel seen"],
+    apply:{ work:"Teaching, support, HR, community, and client-facing roles.", rel:"You notice everyone's needs. Put your own on that list too.", change:"Lean on your people and tell them what you need.", motiv:"Work alongside others, or for someone you care about.", create:"Make things that move or connect an audience." } },
+  last:{ struggle:"Feeling disconnected from the group. You're unsure how people feel about you, awkward in emotional moments, and surprised when people get upset over things that made sense to you.",
+    signs:["Being shocked that someone is hurt","Avoiding emotional conversations","Feeling like the outsider who doesn't get it"],
+    exp:{ general:["Once a day, ask someone how they're doing and really listen.","Before sharing a conclusion, ask yourself: \"How will this land for them?\""], work:"Thank one person for something specific they did.", rel:"Ask \"what would make this better for you?\" and then do it.", change:"Tell the people around you what's changing and how they can help.", motiv:"Find an accountability buddy.", create:"Share a work in progress and ask how it made them feel." } },
+  loop:"bending over backwards to keep everyone happy", exit:"reach out and connect with someone" }
+};
+
+const FOCI = { general:'Just in general', work:'Work / career', rel:'Relationships', change:'Big life change', motiv:'Motivation', create:'Creative block' };
+const SCEN = { work:'Work / school', social:'Friends / family', alone:'On your own', stress:'Under stress' };
+
+</script>
 <script>
 /* ===== SUPABASE CONFIG: same values as index.html ===== */
 const SUPABASE_URL = 'https://lcbzmlsowikajunifdjt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjYnptbHNvd2lrYWp1bmlmZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1OTE4NDAsImV4cCI6MjEwOTE2Nzg0MH0.Bbc5Jndb9yj5Ar27MyYba5tIx3GL6zH99SoXkVAY630';
 
-
-const $=s=>document.querySelector(s);
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const base=()=>SUPABASE_URL.replace(/\/$/,'');
-const FC={Ni:'#a78bfa',Ne:'#f0abfc',Si:'#60a5fa',Se:'#22d3ee',Ti:'#fb923c',Te:'#fcd34d',Fi:'#f472b6',Fe:'#34d399'};
+const pct=x=>Math.round((x||0)*100);
+const FL=['Ni','Ne','Si','Se','Ti','Te','Fi','Fe'];
+const PARTNER={Ni:'Se',Se:'Ni',Si:'Ne',Ne:'Si',Fi:'Te',Te:'Fi',Ti:'Fe',Fe:'Ti'};
+const KIND=f=>FN[f].kind==='O'?'Observer':'Decider';
+const SC={work:'Work / school',social:'Friends / family',alone:'On your own',stress:'Under stress'};
+const WY={default:'just what I do',learned:'worked hard to get good at this',ideal:'what I should do',fear:'avoids something bad',context:'depends on the day'};
+const OFFL={type:'Type',saviors:'Saviors',descriptions:'Descriptions',growth:'Growth tips',questions:'Questions'};
+const FOCL={general:'General',work:'Work / career',rel:'Relationships',change:'Big life change',motiv:'Motivation',create:'Creative block'};
+const fchip=f=>f?`<span class="fchip" style="--c:${FCOLOR[f]||'#9aa0c3'}">${esc(f)}</span>`:'';
+const subOf=(type,key)=>SUBTYPES.find(s=>s.type===type&&s.key===key)||SUBTYPES.find(s=>s.type===type&&s.pos==='aux');
+
+let session=null, rows=[], sortK='created_at', sortDir=-1, selId=null, view='overview', sceneFilter='all';
+
+/* ================= AUTH + DATA ================= */
+function store(s){ try{ s?sessionStorage.setItem('cst_admin',JSON.stringify(s)):sessionStorage.removeItem('cst_admin'); }catch(e){} }
+function load(){ try{ return JSON.parse(sessionStorage.getItem('cst_admin')||'null'); }catch(e){ return null; } }
+async function login(email,password){
+  const r=await fetch(base()+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error_description||j.msg||('Login failed ('+r.status+')'));
+  return {token:j.access_token, email:j.user&&j.user.email, exp:Date.now()+(j.expires_in||3600)*1000};
+}
+const authHeaders=()=>({'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.token});
+async function fetchRows(){
+  const r=await fetch(base()+'/rest/v1/quiz_results?select=*,quiz_feedback(*)&order=created_at.desc',{headers:authHeaders()});
+  if(r.status===401){ logout('Session expired. Log in again.'); return; }
+  if(!r.ok) throw new Error('Could not load results ('+r.status+')');
+  rows=(await r.json()).map(x=>{ x.core_s=(x.core_default||[]).join('+'); const fb=(x.quiz_feedback||[]).sort((a,b)=>a.created_at<b.created_at?1:-1)[0]||null; return {...x, fb, fit: fb?fb.fit:null}; });
+  if(selId&&!rows.some(r=>r.id===selId)) selId=null;
+  render();
+}
+// Deletes feedback first (it points at the result), then the result. Asks Supabase to return the deleted row so
+// a delete that RLS silently blocks (0 rows) is reported instead of looking like it worked.
+async function deleteResult(id){
+  const h={...authHeaders(),'Prefer':'return=representation'};
+  const f=await fetch(base()+'/rest/v1/quiz_feedback?result_id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:h});
+  if(!f.ok&&f.status!==404) throw new Error('Could not delete the feedback ('+f.status+')');
+  const r=await fetch(base()+'/rest/v1/quiz_results?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:h});
+  if(!r.ok) throw new Error('Could not delete the result ('+r.status+')');
+  const gone=await r.json().catch(()=>[]);
+  if(!Array.isArray(gone)||!gone.length) throw new Error('Supabase deleted nothing. Check that quiz_results has a DELETE policy for your email.');
+}
+function showApp(){ $('#loginView').hidden=true; $('#app').hidden=false; $('#tools').hidden=false; $('#who').textContent='Signed in as '+(session.email||'owner'); setView(view); }
+function logout(msg){ session=null; store(null); rows=[]; selId=null; $('#loginView').hidden=false; $('#app').hidden=true; $('#tools').hidden=true; $('#who').textContent='Owner view'; $('#loginMsg').textContent=msg||''; }
+function fmtDate(d){ const x=new Date(d); return x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+x.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
+function fmtShort(d){ return new Date(d).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }
+
+/* ================= OVERVIEW (everyone together) ================= */
+function barsSvg(items,{title,sub,max,valueFmt=v=>v,w=560,rowH=24,labelW=64}){
+  // horizontal bars; items = [{label, value, color, hover}]
+  const m=max||Math.max(1,...items.map(i=>i.value)), H=items.length*rowH+12, bw=w-labelW-50;
+  return `<svg viewBox="0 0 ${w} ${H}" class="chart" role="img" aria-label="${esc(title)}">${items.map((it,i)=>{ const y=i*rowH+6, len=Math.max(it.value?2:0,it.value/m*bw);
+    return `<g><text x="${labelW-8}" y="${y+rowH/2+1}" class="cl" text-anchor="end">${esc(it.label)}</text>
+      <rect x="${labelW}" y="${y+4}" width="${len}" height="${rowH-9}" rx="4" fill="${it.color}"><title>${esc(it.hover||it.label+': '+valueFmt(it.value))}</title></rect>
+      <text x="${labelW+len+6}" y="${y+rowH/2+1}" class="cv">${esc(valueFmt(it.value))}</text></g>`; }).join('')}</svg>`;
+}
+function columnsSvg(items,{title,w=560,h=150}){
+  // vertical columns; items = [{label, value, color, hover, tick}]
+  const m=Math.max(1,...items.map(i=>i.value)), n=items.length, gap=2, bw=(w-20)/n-gap, base=h-22;
+  return `<svg viewBox="0 0 ${w} ${h}" class="chart" role="img" aria-label="${esc(title)}"><line x1="10" x2="${w-10}" y1="${base}" y2="${base}" class="axis"/>${items.map((it,i)=>{ const x=10+i*(bw+gap), bh=it.value/m*(base-18);
+    return `<g><rect x="${x}" y="${base-bh}" width="${bw}" height="${bh}" rx="2" fill="${it.color}"><title>${esc(it.hover)}</title></rect>
+      ${it.value&&n<=12?`<text x="${x+bw/2}" y="${base-bh-4}" class="cv" text-anchor="middle">${it.value}</text>`:''}
+      ${it.tick?`<text x="${x+bw/2}" y="${h-6}" class="cl" text-anchor="middle">${esc(it.tick)}</text>`:''}</g>`; }).join('')}</svg>`;
+}
+function renderOverview(){
+  const n=rows.length, people=new Set(rows.map(r=>r.client_id||r.id)).size;
+  const week=rows.filter(r=>Date.now()-new Date(r.created_at)<7*864e5).length;
+  const fb=rows.filter(r=>r.fit), avgFit=fb.length?(fb.reduce((a,r)=>a+r.fit,0)/fb.length):null;
+  const self=rows.filter(r=>r.fb&&r.fb.self_type), agree=self.filter(r=>r.fb.self_type===r.type).length;
+  const conf=rows.filter(r=>r.type_prob!=null), avgConf=conf.length?conf.reduce((a,r)=>a+r.type_prob,0)/conf.length:null;
+  const kpi=(v,l,s='')=>`<div class="kpi"><div class="kv">${v}</div><div class="kl">${l}</div>${s?`<div class="ks">${s}</div>`:''}</div>`;
+  if(!n){ $('#overView').innerHTML='<div class="panel empty">No results yet. Share your quiz link!</div>'; return; }
+  // type counts, coloured by each type's #1 function
+  const tc={}; rows.forEach(r=>{ if(STACKS[r.type]) tc[r.type]=(tc[r.type]||0)+1; });
+  const typeAll=Object.keys(STACKS).map(t=>({label:t,value:tc[t]||0,color:FCOLOR[STACKS[t][0]],hover:`${t}: ${tc[t]||0} take${tc[t]===1?'':'s'}`})).sort((a,b)=>b.value-a.value||a.label.localeCompare(b.label));
+  const typeItems=typeAll.filter(t=>t.value), unseen=typeAll.filter(t=>!t.value).map(t=>t.label);
+  // fit 1–5
+  const fitCols=[1,2,3,4,5].map(f=>{ const c=fb.filter(r=>r.fit===f).length; return {label:f,value:c,tick:f+'/5',color:['#f43f5e','#fb7185','#eab308','#86efac','#22c55e'][f-1],hover:`${f}/5: ${c} rating${c===1?'':'s'}`}; });
+  // takes per day, last 30 days
+  const days=[...Array(30)].map((_,i)=>{ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-29+i); return d; });
+  const dayCols=days.map((d,i)=>{ const c=rows.filter(r=>{ const x=new Date(r.created_at); return x>=d&&x<new Date(d.getTime()+864e5); }).length;
+    return {value:c,color:'#a5b4fc',hover:`${d.toLocaleDateString(undefined,{month:'short',day:'numeric'})}: ${c} take${c===1?'':'s'}`,tick:((i%7===0&&i<=21)||i===29)?fmtShort(d):''}; });
+  // fit + agreement by type
+  const byType=Object.keys(tc).map(t=>{ const rs=rows.filter(r=>r.type===t), f=rs.filter(r=>r.fit), s=rs.filter(r=>r.fb&&r.fb.self_type);
+    return {t,n:rs.length,fb:f.length,avg:f.length?f.reduce((a,r)=>a+r.fit,0)/f.length:null,agree:s.length?s.filter(r=>r.fb.self_type===t).length/s.length:null,selfN:s.length}; }).sort((a,b)=>b.n-a.n);
+  // mismatches: result -> what they think they are
+  const mm={}; self.filter(r=>r.fb.self_type!==r.type).forEach(r=>{ const k=r.type+' → '+r.fb.self_type; mm[k]=(mm[k]||0)+1; });
+  const mmList=Object.entries(mm).sort((a,b)=>b[1]-a[1]);
+  const jump=rows.filter(r=>r.subtype_pos==='tert').length, animals={}; rows.forEach(r=>{ if(r.animal) animals[r.animal]=(animals[r.animal]||0)+1; });
+  $('#overView').innerHTML=`
+    <div class="kpis">${kpi(n,'Takes',`${people} browser${people===1?'':'s'}`)}${kpi(week,'Last 7 days')}${kpi(avgFit!=null?avgFit.toFixed(1)+'/5':'—','Average fit',`${fb.length} rated`)}
+      ${kpi(self.length?pct(agree/self.length)+'%':'—','Agree with result',self.length?`${agree} of ${self.length} who named a type`:'nobody named a type yet')}${kpi(avgConf!=null?pct(avgConf)+'%':'—','Average confidence')}</div>
+    <div class="ogrid">
+      <div class="panel"><div class="ph">Types · how often each comes up</div><div class="phs">Bar colour = the type's #1 function.</div>${barsSvg(typeItems,{title:'Takes by type'})}${unseen.length?`<div class="phs" style="margin:10px 0 0">Not seen yet: ${unseen.join(', ')}</div>`:''}</div>
+      <div class="ocol">
+        <div class="panel"><div class="ph">Fit ratings</div><div class="phs">How well people said their result fit them.</div>${fb.length?columnsSvg(fitCols,{title:'Fit ratings',h:140}):'<div class="muted">No ratings yet.</div>'}</div>
+        <div class="panel"><div class="ph">Takes per day · last 30 days</div>${columnsSvg(dayCols,{title:'Takes per day',h:140})}</div>
+        <div class="panel"><div class="ph">Mix</div><div class="mix"><span class="pill">${n-jump} balanced</span><span class="pill">${jump} jumper</span>${Object.entries(animals).sort((a,b)=>b[1]-a[1]).map(([a,c])=>`<span class="pill">${esc((ANIMALS[a]||{}).icon||'')} ${esc(a)} ${c}</span>`).join('')}</div></div>
+      </div>
+    </div>
+    <div class="ogrid two">
+      <div class="panel"><div class="ph">Accuracy by type</div><div class="phs">Agree = people who named their own type and matched the result. Fewer than 5 ratings is too few to trust.</div>
+        <table class="mini"><thead><tr><th>Type</th><th>Takes</th><th>Avg fit</th><th>Agree</th></tr></thead><tbody>${byType.map(b=>`<tr><td><b style="color:${FCOLOR[STACKS[b.t][0]]}">${b.t}</b></td><td>${b.n}</td><td>${b.avg!=null?`<span class="fitb f${Math.round(b.avg)}">${b.avg.toFixed(1)}</span> <span class="muted">(${b.fb})</span>`:'<span class="muted">—</span>'}</td><td>${b.agree!=null?`${pct(b.agree)}% <span class="muted">(${b.selfN})</span>`:'<span class="muted">—</span>'}</td></tr>`).join('')}</tbody></table></div>
+      <div class="panel"><div class="ph">Where people disagree</div><div class="phs">Result → the type they think they are. Repeats here point at questions to fix.</div>
+        ${mmList.length?`<ul class="mm">${mmList.map(([k,c])=>`<li><span>${esc(k)}</span><b>${c}</b></li>`).join('')}</ul>`:'<div class="muted">No disagreements yet.</div>'}</div>
+    </div>`;
+}
+
+/* ================= RESULTS LIST ================= */
+function filtered(){
+  const f=$('#filter').value.trim().toLowerCase(), a=$('#acctSel').value;
+  const list=rows.filter(r=>(a==='all'||(a==='yes')===!!r.username)&&(!f||(f[0]==='@'?(r.username||'').toLowerCase()===f.slice(1):((r.name||'').toLowerCase().includes(f)||(r.type||'').toLowerCase().includes(f)||(r.subtype||'').toLowerCase().includes(f)||(r.username||'').toLowerCase().includes(f)))));
+  list.sort((a,b)=>{ const x=a[sortK],y=b[sortK]; if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return (x>y?1:x<y?-1:0)*sortDir; });
+  return list;
+}
+function renderList(){
+  const list=filtered();
+  $('#listCount').textContent=`${list.length} of ${rows.length}`;
+  if(!list.length){ $('#list').innerHTML=`<div class="empty">${rows.length?'No matches.':'No results yet.'}</div>`; renderDetail(); return; }
+  if(!selId||!list.some(r=>r.id===selId)) selId=matchMedia('(max-width:900px)').matches?selId:list[0].id;
+  $('#list').innerHTML=list.map(r=>{ const st=STACKS[r.type], dom=st?st[0]:null;
+    return `<button class="li${r.id===selId?' on':''}" data-id="${esc(r.id)}" style="--c:${dom?FCOLOR[dom]:'#9aa0c3'}">
+      <span class="lt">${esc(r.type||'?')}</span><span class="lm"><b>${esc(r.name||'(no name)')}${r.username?` <span class="acb">@${esc(r.username)}</span>`:''}</b><i>${esc(r.subtype||'')} · ${esc(fmtShort(r.created_at))}</i></span>
+      ${r.fit?`<span class="fitb f${r.fit}">${r.fit}/5</span>`:''}</button>`; }).join('');
+  $$('#list .li').forEach(b=>b.addEventListener('click',()=>{ selId=b.dataset.id; renderList(); openDetailMobile(); }));
+  renderDetail();
+}
+function step(d){ const list=filtered(); if(!list.length) return; let i=list.findIndex(r=>r.id===selId); i=Math.max(0,Math.min(list.length-1,i+d)); selId=list[i].id; renderList();
+  const el=$(`#list .li[data-id="${CSS.escape(selId)}"]`); if(el) el.scrollIntoView({block:'nearest'}); }
+function openDetailMobile(){ if(matchMedia('(max-width:900px)').matches){ $('#resultsView').classList.add('showdetail'); window.scrollTo(0,0); } }
+
+/* ================= DETAIL: maps ================= */
+const SIZES=[1.28,1.04,.84,.62], OFF=.46;
+function nodeSvg(f,x,y,scale,{rank=-1,savior=false,faded=false}={}){
+  const delay=rank>=0?rank*.12:.5+FL.indexOf(f)*.03;
+  return `<g class="xnode ${FN[f].att==='i'?'int':'ext'}${savior?' savior':''}${faded?' faded':''}" transform="translate(${x},${y})" style="--c:${FCOLOR[f]}"><g class="pop" style="animation-delay:${delay}s"><g transform="scale(${scale})">
+    <circle class="halo" r="58"/>${savior?'<circle class="ring" r="51"/>':''}<circle class="body" r="42"/>
+    ${rank>=0?`<text class="rk" y="-19">#${rank+1}${savior?' · SAVIOR':''}</text>`:''}<text class="fx" y="4">${f}</text>${rank>=0?`<text class="fk" y="24">${KIND(f).toUpperCase()}</text>`:''}</g></g><title>${FNAME[f]} (${f})${rank>=0?' · #'+(rank+1):' · not in stack'}</title></g>`;
+}
+// Stack cluster: #1 and #2 on top (introverted left), #3 and #4 below on the diagonals; glowing line joins the saviors.
+function stackSvg(type,key){
+  const st=STACKS[type], sub=subOf(type,key), sv=[sub.dom,sub.other], jump=sub.pos==='tert';
+  const L=[st[0],st[1]].find(f=>FN[f].att==='i'), R=[st[0],st[1]].find(f=>f!==L);
+  const P={[L]:[285,195],[R]:[515,195],[PARTNER[R]]:[345,390],[PARTNER[L]]:[455,390]};
+  const sc=i=>[1.28,1.04,.84,jump?.52:.62][i]*1.35, ln=(a,b,c,s='')=>`<line class="${c}" ${s} x1="${P[a][0]}" y1="${P[a][1]}" x2="${P[b][0]}" y2="${P[b][1]}"/>`;
+  return `<svg viewBox="160 70 480 470" class="mapsvg" role="img" aria-label="${type} stack">${ln(L,PARTNER[L],'cx')}${ln(R,PARTNER[R],'cx')}${ln(sub.dom,sub.other,'svl',`style="--sc:${FCOLOR[sub.dom]}"`)}
+    ${[3,2,1,0].map(i=>nodeSvg(st[i],P[st[i]][0],P[st[i]][1],sc(i),{rank:i,savior:sv.includes(st[i])})).join('')}
+    <text class="ctx" x="400" y="528">${jump?`Jumper: ${sub.dom} (#1) + ${sub.other} (#3)`:`Balanced: ${sub.dom} (#1) + ${sub.other} (#2)`}</text></svg>`;
+}
+// Type-arranged quadrants (same rule as the site): the box holding the introverted one of #1/#2 on the left, like the type chart; #1/#2 in the top outer corners.
+const LETTERWORD={N:'Intuition',S:'Sensing',T:'Thinking',F:'Feeling'}, OTHERL={N:'S',S:'N',T:'F',F:'T'};
+function quadSvg(type,key){
+  const st=STACKS[type], sub=subOf(type,key), sv=[sub.dom,sub.other], jump=sub.pos==='tert';
+  const leftKind=FN[[st[0],st[1]].find(f=>FN[f].att==='i')].kind, kinds=[leftKind,leftKind==='O'?'D':'O'], pos={}, cols=[], rowsL=[];
+  kinds.forEach((K,bi)=>{ const topFn=[st[0],st[1]].find(f=>FN[f].kind===K), outerL=topFn[0], innerL=OTHERL[outerL], topAtt=topFn[1];
+    const ox=bi===0?150:650, ix=bi===0?300:500;
+    FL.filter(f=>FN[f].kind===K).forEach(f=>{ pos[f]=[f[0]===outerL?ox:ix, f[1]===topAtt?150:390]; });
+    cols.push(...(bi===0?[outerL,innerL]:[innerL,outerL]).map(l=>LETTERWORD[l])); rowsL.push(topAtt==='i'?['INTROVERTED','EXTROVERTED']:['EXTROVERTED','INTROVERTED']); });
+  const head=K=>K==='O'?'OBSERVERS · patterns & data':'DECIDERS · values & logic';
+  const axis=(a,b)=>`<line class="qaxis${sv.some(f=>f===a||f===b)?' on':''}" x1="${pos[a][0]}" y1="${pos[a][1]}" x2="${pos[b][0]}" y2="${pos[b][1]}"/>`;
+  return `<svg viewBox="0 0 800 540" class="mapsvg" role="img" aria-label="${type} quadrants">
+    <rect x="20" y="40" width="370" height="460" rx="22" class="xq"/><rect x="410" y="40" width="370" height="460" rx="22" class="xq"/>
+    <text x="205" y="28" class="xh">${head(kinds[0])}</text><text x="595" y="28" class="xh">${head(kinds[1])}</text>
+    <text x="34" y="66" class="xs">${rowsL[0][0]}</text><text x="34" y="490" class="xs">${rowsL[0][1]}</text><text x="424" y="66" class="xs">${rowsL[1][0]}</text><text x="424" y="490" class="xs">${rowsL[1][1]}</text>
+    ${cols.map((c,i)=>`<text x="${[150,300,500,650][i]}" y="526" class="xl">${c}</text>`).join('')}
+    ${axis('Ni','Se')}${axis('Si','Ne')}${axis('Fi','Te')}${axis('Ti','Fe')}
+    ${FL.map(f=>{ const i=st.indexOf(f); return nodeSvg(f,pos[f][0],pos[f][1],i<0?OFF:(i===3&&jump?.52:SIZES[i]),{rank:i,savior:sv.includes(f),faded:i<0}); }).join('')}</svg>`;
+}
+/* ================= DETAIL: flow, coins, insights ================= */
+const FLOW_ROWS=[['Identity','Fi','Ti'],['Gather','Se','Ne'],['Organize','Ni','Si'],['Tribe','Te','Fe']];
+const FQ={Fi:'What is valuable to me?',Ti:'What works for me?',Se:'What is the data?',Ne:'What are the patterns?',Ni:'Which pattern is best for me?',Si:'How is the data organized?',Te:'Does this work for everyone?',Fe:'Do people actually like this?'};
+function flowHtml(type,key){
+  const st=STACKS[type], sub=subOf(type,key), sv=[sub.dom,sub.other], jump=sub.pos==='tert';
+  return `<ol class="fpath">${FLOW_ROWS.map(([n,a,b])=>{ const f=st.includes(a)?a:b, i=st.indexOf(f), s=sv.includes(f), bl=i===3, d=[46,38,32,28][i]-(bl&&jump?4:0);
+    return `<li class="${s?'sv':bl?'bl':''}"><span class="pbub${FN[f].att==='e'?' e':''}" style="--c:${FCOLOR[f]};--d:${d}px"><span>${f}</span></span>
+      <div class="ptxt"><div class="pk">${n} · #${i+1}</div><div class="pq">${FQ[f]}</div></div>
+      <span class="ptag">${s?'Savior · where they start':bl?'Blind spot':'#'+(i+1)+' · steady'}</span></li>`; }).join('')}</ol>`;
+}
+const COINPLAIN={
+  N:{L:'Intuition',R:'Sensing',cL:'#eab308',cR:'#22c55e'}, T:{L:'Thinking',R:'Feeling',cL:'#3b82f6',cR:'#f43f5e'}, IE:{L:'Introverted lead',R:'Extroverted lead'},
+  OD:{L:'Observer-led',R:'Decider-led'}, DI:{L:'Self first',R:'Tribe first'}, OI:{L:'Organize',R:'Gather'}, FT:{L:'Fi / Te axis',R:'Ti / Fe axis'}, NS:{L:'Ni / Se axis',R:'Si / Ne axis'}};
+const COINGROUPS=[['Letters',['N','T','IE']],['Drives',['OD','DI','OI']],['Axes',['FT','NS']]];
+function coinsHtml(coins){
+  if(!coins||!Object.keys(coins).length) return '<div class="muted">No coins saved.</div>';
+  return `<div class="c2grid">${COINGROUPS.map(([g,keys])=>`<div><div class="c2h">${g}</div>${keys.filter(c=>coins[c]!=null).map(c=>{ const P=COINPLAIN[c], p=coins[c], lw=p>=.5, pl=pct(p), m=Math.abs(p-.5), s=m<.1?'slight':m<.25?'clear':'strong';
+    return `<div class="coin2"><div class="c2top"><span>${lw?`<b style="color:${P.cL||'#c7d2fe'}">${P.L}</b>`:`<b style="color:${P.cR||'#e9d5ff'}">${P.R}</b>`}</span><span class="c2tag c2-${s}">${s} · ${lw?pl:100-pl}%</span></div>
+      <div class="c2bar"><i style="width:${pl}%;background:${P.cL||'#a5b4fc'};opacity:${lw?1:.25}"></i><i style="width:${100-pl}%;background:${P.cR||'#e9d5ff'};opacity:${lw?.25:1}"></i></div>
+      <div class="c2ends"><span>${P.L} ${pl}%</span><span>${100-pl}% ${P.R}</span></div></div>`; }).join('')}</div>`).join('')}</div>`;
+}
+const REL={
+  Fi:{draw:'Who someone could become, or the feeling of being deeply understood.',miss:'How they actually feel about the person.'},
+  Fe:{draw:'People who need them; being needed can feel like closeness.',miss:'How the other person really feels.'},
+  Ti:{draw:'Someone who "makes sense" or feels like an interesting puzzle.',miss:'Whether their own reasoning about the person holds up.'},
+  Te:{draw:'Someone who fits the plan, the timing or the checklist.',miss:'The practical check: does this work day to day?'},
+  Ni:{draw:'One story locked in early ("this is the one").',miss:'Where things are heading; the pattern repeating.'},
+  Ne:{draw:'Excitement and possibility; potential mistaken for fit.',miss:'Other possibilities; feeling stuck with the familiar.'},
+  Si:{draw:'What feels familiar, even when familiar was hard.',miss:'Their own past experience; repeating what went badly.'},
+  Se:{draw:'Chemistry, intensity and the moment.',miss:'What the person is actually doing right now.'}};
+function insightsHtml(r){
+  const st=STACKS[r.type], f1=st[0], aux=st[1], tert=st[2], f4=st[3], intro=FN[f1].att==='i';
+  const list=(a)=>Array.isArray(a)&&a.length?a.map(fchip).join(' '):'<span class="muted">—</span>';
+  const adapts=(r.context_fns||[]).map(c=>`<span class="pill">${esc(SC[c.scen]||c.scen)} → ${fchip(c.fn)}</span>`).join(' ')||'<span class="muted">—</span>';
+  const tp=r.type_probs?Object.entries(r.type_probs).sort((a,b)=>b[1]-a[1]).slice(0,4):[];
+  const close=tp.length>1&&tp[0][1]<.45;
+  const stressLoop=(r.stress_profile||[]).some(f=>f===f1||f===tert), grip=(r.stress_profile||[]).includes(f4);
+  const notes=[];
+  if((r.ideal_gap||[]).length) notes.push(`Picked ${r.ideal_gap.map(fchip).join(' and ')} mostly because it's what they <i>should</i> do: who they aim to be, not their default.`);
+  if((r.stress_profile||[]).length) notes.push(`Under stress they reached for ${r.stress_profile.map(fchip).join(' and ')}${stressLoop?`, which lines up with their ${f1} + ${tert} loop`:grip?`: their #4 taking over (the "grip")`:', outside their usual stack order'}.`);
+  if((r.learned_fns||[]).length) notes.push(`Worked hard to build ${r.learned_fns.map(fchip).join(' and ')}.`);
+  if(close) notes.push(`Close call: ${tp[1][0]} came second at ${pct(tp[1][1])}%.`);
+  if(r.consistency!=null&&r.consistency<.5) notes.push(`Low consistency (${pct(r.consistency)}%): answers shifted a lot between scenes.`);
+  return `<div class="igrid">
+    <div><div class="k">From their answers</div>
+      <dl class="pat"><dt>Core default</dt><dd>${list(r.core_default)}</dd><dt>Adapts</dt><dd>${adapts}</dd><dt>"Should" picks</dt><dd>${list(r.ideal_gap)}</dd><dt>Worked hard to build</dt><dd>${list(r.learned_fns)}</dd><dt>Under stress</dt><dd>${list(r.stress_profile)}</dd></dl>
+      ${notes.length?`<ul class="notes">${notes.map(n=>`<li>${n}</li>`).join('')}</ul>`:''}
+      ${tp.length?`<div class="k">Top types</div><div class="tps">${tp.map(([t,p],i)=>`<span class="pill${i===0?' on':''}">${esc(t)} ${pct(p)}%</span>`).join('')}</div>`:''}</div>
+    <div><div class="k">What the site told them</div>
+      <div class="gb" style="--c:${FCOLOR[f1]}"><b>#1 ${f1}</b> ${GUIDE[f1].first.real}</div>
+      <div class="gb" style="--c:${FCOLOR[f4]}"><b>#4 ${f4} · blind spot</b> ${GUIDE[f4].last.struggle}</div>
+      <div class="gb" style="--c:${FCOLOR[tert]}"><b>Stuck loop</b> ${intro?'Retreats inward into':'Goes full speed outward with'} ${f1} + ${tert}; the way out is ${aux}: ${GUIDE[aux].exit}.</div>
+      <div class="gb" style="--c:${FCOLOR[f1]}"><b>Relationships</b> ${f1} can draw them toward: ${REL[f1].draw} ${f4} can make them overlook: ${REL[f4].miss}</div></div></div>`;
+}
+function answersHtml(r){
+  const ans=Array.isArray(r.answers)?r.answers:[];
+  if(!ans.length) return '<div class="muted">No answers saved.</div>';
+  if(ans[0].scenario===undefined) return `<ol class="ans">${ans.map(a=>`<li><div class="q">${esc(a.q)}</div><div class="a">${esc(a.a)}. ${esc(a.t)}</div></li>`).join('')}</ol>`;
+  const counts={all:ans.length}; ans.forEach(a=>{ counts[a.scenario]=(counts[a.scenario]||0)+1; });
+  const shown=ans.filter(a=>sceneFilter==='all'||a.scenario===sceneFilter);
+  return `<div class="sfil">${['all','work','social','alone','stress'].filter(k=>counts[k]).map(k=>`<button class="chip${sceneFilter===k?' on':''}" data-s="${k}">${k==='all'?'All':SC[k]} <i>${counts[k]}</i></button>`).join('')}</div>
+    <ol class="ans">${shown.map(a=>`<li value="${a.n||''}"><div class="q"><span class="pill">${esc(SC[a.scenario]||a.scenario)}</span> ${esc(a.q)}</div>
+      ${a.none_fit?'<div class="a"><i class="muted">None of these fit</i></div>':`<div class="a"><b>#1</b> ${fchip(a.picked)} ${esc(a.t)}${a.why?` <span class="why">${esc(WY[a.why]||a.why)}</span>`:''}</div>
+      ${a.second?`<div class="a"><b>#2</b> ${fchip(a.second)} ${esc(a.t2)}</div>`:''}
+      ${a.dismissed&&a.dismissed.length?`<div class="dis">Dismissed: ${a.dismissed.map(fchip).join(' ')}</div>`:''}`}</li>`).join('')}</ol>`;
+}
+function renderDetail(){
+  const box=$('#detail'), r=rows.find(x=>x.id===selId);
+  if(!r){ box.innerHTML='<div class="empty">Pick a result on the left.</div>'; return; }
+  const list=filtered(), idx=list.findIndex(x=>x.id===r.id), ok=!!STACKS[r.type];
+  const sub=ok?subOf(r.type,r.subtype):null, dom=ok?STACKS[r.type][0]:null;
+  box.innerHTML=`<div class="dhead">
+      <button class="back" id="backBtn">← All results</button>
+      <div class="dnav"><button id="prevBtn" ${idx<=0?'disabled':''} aria-label="Previous result">↑ Prev</button><button id="nextBtn" ${idx>=list.length-1?'disabled':''} aria-label="Next result">Next ↓</button></div></div>
+    <div class="dtitle"><div><div class="dname">${esc(r.name||'(no name)')}</div><div class="muted">${esc(fmtDate(r.created_at))}</div><div class="acline">${r.username?(()=>{ const n=rows.filter(x=>x.username===r.username).length; return `<span class="acb big">👤 Account: @${esc(r.username)}</span>${n>1?`<button class="acall" id="acAll">See all ${n} takes on this account</button>`:'<span class="muted">· only take on this account</span>'}`; })():'<span class="acb none">No account</span>'}</div></div>
+      <div class="dtype" style="color:${dom?FCOLOR[dom]:'inherit'}">${esc(r.type)}</div></div>
+    <div class="dchips">${sub?`<span class="pill">${sub.dom}–${sub.other} · ${sub.pos==='aux'?'balanced':'jumper'}</span>`:''}<span class="pill">${esc(r.lead||'')}-led</span><span class="pill">${esc((ANIMALS[r.animal]||{}).icon||'')} ${esc(r.animal||'')}</span>
+      <span class="pill">Confidence ${r.type_prob!=null?pct(r.type_prob)+'%':'—'}</span><span class="pill">Consistency ${r.consistency!=null?pct(r.consistency)+'%':'—'}</span>
+      ${r.fit?`<span class="fitb f${r.fit}">Fit ${r.fit}/5</span>`:'<span class="pill">No feedback</span>'}</div>
+    ${r.fb?`<div class="panel fbbox"><div class="k">Their feedback</div><div><b>Fit:</b> <span class="fitb f${r.fb.fit}">${r.fb.fit}/5</span>${r.fb.self_type?` · <b>Thinks they are:</b> ${esc(r.fb.self_type)}${r.fb.self_type!==r.type?' <span class="pill warn">differs</span>':' <span class="pill">matches</span>'}`:''}${r.fb.focus?` · <b>Focus:</b> ${esc(FOCL[r.fb.focus]||r.fb.focus)}`:''}</div>
+      ${r.fb.off&&r.fb.off.length?`<div><b>Felt off:</b> ${r.fb.off.map(o=>esc(OFFL[o]||o)).join(', ')}</div>`:''}${r.fb.note?`<div class="fbnote">"${esc(r.fb.note)}"</div>`:''}</div>`:''}
+    ${ok?`<div class="maps"><div class="panel"><div class="k">Stack</div>${stackSvg(r.type,r.subtype)}</div><div class="panel"><div class="k">Quadrants</div>${quadSvg(r.type,r.subtype)}</div></div>
+    <div class="dgrid2"><div class="panel"><div class="k">Function flow</div>${flowHtml(r.type,r.subtype)}</div><div class="panel"><div class="k">Coins</div>${coinsHtml(r.coins)}</div></div>
+    <div class="panel"><div class="k" style="margin-bottom:0">Insights</div>${insightsHtml(r)}</div>`:'<div class="panel muted">This result has an unknown type, so maps are not available.</div>'}
+    <div class="panel"><div class="k">Answers</div>${answersHtml(r)}</div>
+    <div class="danger" id="danger"><button class="del" id="delBtn">Delete this result</button><span class="muted">Browser ID ${esc((r.client_id||'—').slice(0,8))} · ${esc(r.quiz_version||'')}</span></div>`;
+  $('#backBtn').addEventListener('click',()=>$('#resultsView').classList.remove('showdetail'));
+  const ac=$('#acAll'); if(ac) ac.addEventListener('click',()=>{ $('#filter').value='@'+r.username; $('#acctSel').value='all'; renderList(); });
+  $('#prevBtn').addEventListener('click',()=>step(-1)); $('#nextBtn').addEventListener('click',()=>step(1));
+  $$('#detail .sfil .chip').forEach(b=>b.addEventListener('click',()=>{ sceneFilter=b.dataset.s; renderDetail(); }));
+  $('#delBtn').addEventListener('click',()=>{
+    $('#danger').innerHTML=`<span>Delete <b>${esc(r.name||'this')}</b>'s result and feedback? This can't be undone.</span><button class="del" id="delYes">Delete</button><button id="delNo">Cancel</button><span class="msg" id="delMsg"></span>`;
+    $('#delNo').addEventListener('click',renderDetail);
+    $('#delYes').addEventListener('click',async()=>{ $('#delYes').disabled=true; $('#delMsg').textContent='Deleting…';
+      try{ await deleteResult(r.id); const l=filtered(), i=l.findIndex(x=>x.id===r.id); rows=rows.filter(x=>x.id!==r.id); const nl=filtered(); selId=nl.length?nl[Math.min(i,nl.length-1)].id:null; render(); }
+      catch(e){ $('#delMsg').textContent=e.message; $('#delYes').disabled=false; } });
+  });
+}
+
+/* ================= ITEM HEALTH (unchanged logic) ================= */
 function itemHealth(){
   const st={}; let takes=0;
   rows.filter(r=>Array.isArray(r.answers)&&r.answers.length&&r.answers[0].scenario!==undefined).forEach(r=>{ takes++;
@@ -151,94 +659,35 @@ function itemHealth(){
     if(s.n>=5 && topShare>0.6) flags.push(`One option gets ${Math.round(topShare*100)}%`);
     if(s.n>=5 && noneShare>0.25) flags.push(`"None fit" at ${Math.round(noneShare*100)}%`);
     return {...s, top:top[0], topShare, noneShare, flags}; }).sort((a,b)=>b.flags.length-a.flags.length || b.n-a.n);
-  const SC={work:'Work / school',social:'Friends / family',alone:'On your own',stress:'Under stress'};
   $('#itemsSum').textContent = takes? `${takes} v2 takes · ${list.length} items seen · ${list.filter(x=>x.flags.length).length} flagged (flags need 5+ answers)` : 'No v2 takes yet.';
   $('#itbody').innerHTML = list.map(s=>`<tr class="${s.flags.length?'flag':''}"><td class="i-q" data-l="Item"><div style="font-size:.84rem">${esc(s.q)}</div><div class="muted" style="font-size:.72rem">${esc(s.id)}</div></td>
-    <td class="i-scen muted" data-l="Scene">${esc(SC[s.scen]||s.scen)}</td><td class="i-n" data-l="Takes">${s.n}</td><td class="i-top" data-l="Top #1 pick"><span class="fn" style="color:${FC[s.top]||'#ccc'}">${esc(s.top)}</span> ${Math.round(s.topShare*100)}%${s.seconds?`<div class="muted" style="font-size:.72rem">Top #2: ${esc(Object.entries(s.seconds).sort((a,b)=>b[1]-a[1])[0][0])}</div>`:''}</td>
-    <td class="i-none" data-l="None fit">${Math.round(s.noneShare*100)}%</td><td class="i-should" data-l="&quot;Should&quot;">${s.should}</td><td class="i-flag" data-l="Flags">${s.flags.map(f=>`<span class="pill warn">${esc(f)}</span>`).join(' ')||'<span class="muted">OK</span>'}</td></tr>`).join('') || '<tr><td colspan="7" class="empty">Nothing yet.</td></tr>';
+    <td class="muted" data-l="Scene">${esc(SC[s.scen]||s.scen)}</td><td data-l="Takes">${s.n}</td><td data-l="Top #1 pick">${fchip(s.top)} ${Math.round(s.topShare*100)}%${s.seconds?`<div class="muted" style="font-size:.72rem">Top #2: ${esc(Object.entries(s.seconds).sort((a,b)=>b[1]-a[1])[0][0])}</div>`:''}</td>
+    <td data-l="None fit">${Math.round(s.noneShare*100)}%</td><td data-l="&quot;Should&quot;">${s.should}</td><td class="i-flag" data-l="Flags">${s.flags.map(f=>`<span class="pill warn">${esc(f)}</span>`).join(' ')||'<span class="muted">OK</span>'}</td></tr>`).join('') || '<tr><td colspan="7" class="empty">Nothing yet.</td></tr>';
 }
-const OFFL={type:'Type',saviors:'Saviors',descriptions:'Descriptions',growth:'Growth tips',questions:'Questions'};
-const FOCL={general:'General',work:'Work / career',rel:'Relationships',change:'Big life change',motiv:'Motivation',create:'Creative block'};
-const COINL={OD:['Observer-led','Decider-led'],DI:['Self above tribe (Di)','Tribe above self (De)'],OI:['Organize (Oi)','Gather (Oe)'],N:['Intuition','Sensing'],T:['Thinking','Feeling'],FT:['Fi/Te','Ti/Fe'],NS:['Ni/Se','Si/Ne'],IE:['Introverted lead','Extroverted lead']};
-let session=null, rows=[], sortK='created_at', sortDir=-1, openId=null;
 
-function store(s){ try{ s?sessionStorage.setItem('cst_admin',JSON.stringify(s)):sessionStorage.removeItem('cst_admin'); }catch(e){} }
-function load(){ try{ return JSON.parse(sessionStorage.getItem('cst_admin')||'null'); }catch(e){ return null; } }
-
-async function login(email,password){
-  const r=await fetch(base()+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
-  const j=await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(j.error_description||j.msg||('Login failed ('+r.status+')'));
-  return {token:j.access_token, email:j.user&&j.user.email, exp:Date.now()+(j.expires_in||3600)*1000};
-}
-async function fetchRows(){
-  const r=await fetch(base()+'/rest/v1/quiz_results?select=*,quiz_feedback(*)&order=created_at.desc',{headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.token}});
-  if(r.status===401){ logout('Session expired. Log in again.'); return; }
-  if(!r.ok) throw new Error('Could not load results ('+r.status+')');
-  rows=(await r.json()).map(x=>{ x.core_s=(x.core_default||[]).join('+'); const fb=(x.quiz_feedback||[]).sort((a,b)=>a.created_at<b.created_at?1:-1)[0]||null; return {...x, fb, fit: fb?fb.fit:null}; }); render();
-}
-function showApp(){ $('#loginView').hidden=true; $('#tableView').hidden=false; $('#itemsView').hidden=true; $('#tabs').hidden=false; $('#tools').hidden=false; $('#who').textContent='Signed in as '+(session.email||'owner'); }
-function logout(msg){ session=null; store(null); rows=[]; $('#summary').textContent=''; $('#loginView').hidden=false; $('#tableView').hidden=true; $('#itemsView').hidden=true; $('#tabs').hidden=true; $('#tools').hidden=true; $('#who').textContent='Owner view'; $('#loginMsg').textContent=msg||''; }
-
-function fmtDate(d){ const x=new Date(d); return x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+x.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
-function detail(r){
-  const coins=r.coins||{};
-  const coinHtml=Object.keys(COINL).map(c=>{ const p=coins[c]; if(p==null) return ''; const left=p>=.5; return `<div class="coin"><div class="r"><span>${left?'<b style="color:var(--ink)">':''}${COINL[c][0]}${left?'</b>':''}</span><span>${left?'':'<b style="color:var(--ink)">'}${COINL[c][1]}${left?'':'</b>'}</span></div><div class="b"><i style="width:${Math.round(p*100)}%"></i></div></div>`; }).join('');
-  const SC={work:'Work / school',social:'Friends / family',alone:'On your own',stress:'Under stress'}, WY={default:'just what I do',learned:'worked hard to get good at this',ideal:'what I should do',fear:'avoids something bad',context:'depends on the day'};
-  const ans=(Array.isArray(r.answers)?r.answers:[]).map(a=> a.scenario!==undefined
-    ? `<li><div class="q"><span class="pill">${esc(SC[a.scenario]||a.scenario)}</span> ${esc(a.q)}</div><div class="a">${a.none_fit?'<i class="muted">None of these fit</i>':`<div><b>#1</b> <span class="fn" style="color:${FC[a.picked]||'#ccc'}">${esc(a.picked)}</span> ${esc(a.t)}${a.why?` <span class="muted">· ${esc(WY[a.why]||a.why)}</span>`:''}${a.strength!=null&&a.second===undefined?` <span class="muted">· strength ${esc(a.strength)}</span>`:''}</div>${a.second?`<div><b>#2</b> <span class="fn" style="color:${FC[a.second]||'#ccc'}">${esc(a.second)}</span> ${esc(a.t2)}</div>`:''}${a.dismissed&&a.dismissed.length?`<div class="muted" style="font-size:.76rem">Dismissed: ${a.dismissed.map(esc).join(', ')}</div>`:''}`}</div></li>`
-    : `<li><div class="q">${esc(a.q)}</div><div class="a">${esc(a.a)}. ${esc(a.t)}</div></li>`).join('');
-  const v2box = r.consistency!=null ? `<div class="k">Patterns</div><div class="fbbox">
-      <div><b>Consistency:</b> ${Math.round(r.consistency*100)}%</div>
-      <div><b>Core default:</b> ${(r.core_default||[]).map(esc).join(' + ')||'—'}</div>
-      <div><b>Adapts:</b> ${(r.context_fns||[]).map(c=>esc((SC[c.scen]||c.scen)+' → '+c.fn)).join(', ')||'—'}</div>
-      <div><b>"Should" picks:</b> ${(r.ideal_gap||[]).map(esc).join(', ')||'—'}</div>
-      <div><b>Worked hard to build:</b> ${(r.learned_fns||[]).map(esc).join(', ')||'—'}</div>
-      <div><b>Under stress:</b> ${(r.stress_profile||[]).map(esc).join(' + ')||'—'}</div></div>` : '';
-  const tp=r.type_probs?Object.entries(r.type_probs).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>`<span class="pill">${esc(k)} ${Math.round(v*100)}%</span>`).join(' '):'';
-  return `<div class="dgrid"><div>
-      <div class="k">Result</div>
-      <div class="type">${esc(r.type)} <span class="muted" style="font-weight:500">${esc(r.subtype)}</span></div>
-      <div class="muted" style="font-size:.82rem;margin:6px 0 14px">${esc(r.subtype_pos==='aux'?'Dom + Aux':'Dom + Tert')} · ${esc(r.lead)}-led · ${esc(r.animal)}</div>
-      <div style="margin-bottom:14px">${tp}</div>
-      ${r.fb?`<div class="k">Feedback</div><div class="fbbox"><div><b>Fit:</b> <span class="fitb f${r.fb.fit}">${r.fb.fit}/5</span></div>
-        ${r.fb.off&&r.fb.off.length?`<div><b>Felt off:</b> ${r.fb.off.map(o=>esc(OFFL[o]||o)).join(', ')}</div>`:''}
-        ${r.fb.self_type?`<div><b>Thinks they are:</b> ${esc(r.fb.self_type)}${r.fb.self_type!==r.type?' <span class="pill">differs</span>':''}</div>`:''}
-        ${r.fb.focus?`<div><b>Focus:</b> ${esc(FOCL[r.fb.focus]||r.fb.focus)}</div>`:''}
-        ${r.fb.note?`<div class="fbnote">"${esc(r.fb.note)}"</div>`:''}</div>`:'<div class="k">Feedback</div><div class="muted" style="font-size:.8rem;margin-bottom:14px">None sent</div>'}
-      ${v2box}<div class="k">Coins</div>${coinHtml}
-      <div class="muted" style="font-size:.72rem;margin-top:10px">Browser ID: ${esc((r.client_id||'—').slice(0,8))} · ${esc(r.quiz_version||'')}</div>
-    </div><div><div class="k">Answers</div><ol class="ans">${ans}</ol></div></div>`;
-}
-function summarize(){ const f=rows.filter(r=>r.fit); const avg=f.length?(f.reduce((a,r)=>a+r.fit,0)/f.length).toFixed(1):'—';
-  const mism=rows.filter(r=>r.fb&&r.fb.self_type&&r.fb.self_type!==r.type).length;
-  $('#summary').textContent=`${rows.length} takes · ${f.length} with feedback · average fit ${avg}/5 · ${mism} think they're a different type`; }
-function render(){ summarize(); itemHealth();
-  const f=$('#filter').value.trim().toLowerCase();
-  let list=rows.filter(r=>!f||(r.name||'').toLowerCase().includes(f)||(r.type||'').toLowerCase().includes(f));
-  list.sort((a,b)=>{ const x=a[sortK],y=b[sortK]; if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return (x>y?1:x<y?-1:0)*sortDir; });
-  document.querySelectorAll('th').forEach(th=>{ const k=th.dataset.k; th.textContent=th.textContent.replace(/ [↑↓]$/,'')+(k===sortK?(sortDir>0?' ↑':' ↓'):''); });
-  if(!list.length){ $('#tbody').innerHTML=`<tr><td colspan="9" class="empty">${rows.length?'No matches.':'No results yet. Share your quiz link!'}</td></tr>`; return; }
-  $('#tbody').innerHTML=list.map(r=>`<tr class="row${openId===r.id?' open':''}" data-id="${esc(r.id)}">
-      <td class="c-name" data-l="Name"><b>${esc(r.name)}</b></td><td class="c-type type" data-l="Type">${esc(r.type)}</td><td class="c-sub" data-l="Subtype">${esc(r.subtype)}</td>
-      <td class="c-conf hide-sm muted" data-l="Confidence">${r.type_prob!=null?Math.round(r.type_prob*100)+'%':'—'}</td><td class="c-cons hide-sm muted" data-l="Consistent">${r.consistency!=null?Math.round(r.consistency*100)+'%':'—'}</td><td class="c-core hide-sm" data-l="Core default">${(r.core_default||[]).map(f=>`<span class="fn" style="color:${FC[f]||'#ccc'}">${esc(f)}</span>`).join(' + ')||'<span class="muted">—</span>'}</td><td class="c-fit" data-l="Fit">${r.fit?`<span class="fitb f${r.fit}">${r.fit}/5</span>`:'<span class="muted">—</span>'}</td><td class="c-lead hide-sm muted" data-l="Lead">${esc(r.lead)}</td><td class="c-date muted" data-l="Date">${esc(fmtDate(r.created_at))}</td></tr>`
-    +(openId===r.id?`<tr class="detail"><td colspan="9">${detail(r)}</td></tr>`:'')).join('');
-  document.querySelectorAll('tr.row').forEach(tr=>tr.addEventListener('click',()=>{ openId = openId===tr.dataset.id?null:tr.dataset.id; render(); }));
-}
-document.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{ const k=th.dataset.k; if(sortK===k) sortDir*=-1; else { sortK=k; sortDir=k==='created_at'?-1:1; } render(); }));
-$('#filter').addEventListener('input',render);
-$('#sortSel').addEventListener('change',e=>{ const [k,d]=e.target.value.split(':'); sortK=k; sortDir=+d; render(); });
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t)); const v=t.dataset.v; $('#tableView').hidden=v!=='results'; $('#itemsView').hidden=v!=='items'; }));
+/* ================= VIEW SWITCHING ================= */
+function setView(v){ view=v; $$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));
+  $('#overView').hidden=v!=='overview'; $('#resultsView').hidden=v!=='results'; $('#itemsView').hidden=v!=='items';
+  $('#listTools').hidden=v!=='results'; }
+function render(){ renderOverview(); renderList(); itemHealth(); }
+$$('.tab').forEach(t=>t.addEventListener('click',()=>setView(t.dataset.v)));
+$('#filter').addEventListener('input',renderList);
+$('#acctSel').addEventListener('change',renderList);
+$('#sortSel').addEventListener('change',e=>{ const [k,d]=e.target.value.split(':'); sortK=k; sortDir=+d; renderList(); });
 $('#refresh').addEventListener('click',()=>fetchRows().catch(e=>alertMsg(e)));
 $('#logout').addEventListener('click',()=>logout());
-function alertMsg(e){ $('#tbody').innerHTML=`<tr><td colspan="9" class="empty">${esc(e.message||e)}</td></tr>`; }
+document.addEventListener('keydown',e=>{ if(view!=='results'||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if(e.key==='ArrowDown'||e.key==='j'){ e.preventDefault(); step(1); } if(e.key==='ArrowUp'||e.key==='k'){ e.preventDefault(); step(-1); } });
+function alertMsg(e){ $('#overView').innerHTML=`<div class="panel empty">${esc(e.message||e)}</div>`; }
 $('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault(); $('#loginMsg').textContent='';
-  if(/YOUR-PROJECT|YOUR-ANON/.test(SUPABASE_URL+SUPABASE_ANON_KEY)){ $('#loginMsg').textContent='Add your Supabase URL and anon key at the bottom of admin.html first.'; return; }
+  if(/YOUR-PROJECT|YOUR-ANON/.test(SUPABASE_URL+SUPABASE_ANON_KEY)){ $('#loginMsg').textContent='Add your Supabase URL and anon key at the top of the script in admin.html first.'; return; }
   try{ session=await login($('#email').value.trim(),$('#pw').value); store(session); showApp(); await fetchRows(); }
   catch(err){ $('#loginMsg').textContent=err.message; }
 });
 const saved=load(); if(saved&&saved.exp>Date.now()){ session=saved; showApp(); fetchRows().catch(alertMsg); }
+window.__admin={rows:()=>rows,setView,step};
+
 </script>
 </body>
 </html>

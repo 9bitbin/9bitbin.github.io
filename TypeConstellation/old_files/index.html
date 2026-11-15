@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Constellation — Blind Cognitive Function Diagnostic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#eef0ff; --muted:#9aa0c3; --faint:#5d6290;
+  --glass:rgba(18,16,40,.42); --glass-2:rgba(255,255,255,.04); --edge:rgba(255,255,255,.09);
+  --a1:#a78bfa; --a2:#22d3ee; --a3:#f472b6; --a4:#fcd34d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#05040d;color:var(--ink);font-family:Manrope,system-ui,sans-serif}
+html{overflow-x:clip}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 40%,rgba(3,2,10,.75) 100%)}
+main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 18px 60px}
+.topbar{width:100%;max-width:980px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.brand{font-family:Unbounded;font-weight:500;letter-spacing:.32em;font-size:.72rem;color:var(--muted);text-transform:uppercase}
+.brand b{color:var(--ink);font-weight:700}
+.iconbtn{background:var(--glass-2);border:1px solid var(--edge);color:var(--muted);border-radius:999px;padding:8px 14px;font:600 .75rem Manrope;cursor:pointer;backdrop-filter:blur(10px);transition:.3s}
+.iconbtn:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
+.iconbtn.on{color:#05040d;background:linear-gradient(120deg,var(--a2),var(--a1));border-color:transparent}
+
+.screen{width:100%;max-width:980px;display:none}
+.screen.active{display:block;animation:rise .9s cubic-bezier(.2,.9,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.985);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+
+/* ---------- intro ---------- */
+.intro{text-align:center;padding-top:0}
+.intro .orbit-wrap{width:min(440px,86vw);aspect-ratio:1/0.6}
+.orbit-wrap{position:relative;width:min(520px,92vw);aspect-ratio:1/0.72;margin:0 auto}
+.orbit-wrap canvas{width:100%;height:100%;display:block}
+h1.title{font-family:Unbounded;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);line-height:.95;margin:6px 0 14px;letter-spacing:-.02em;
+  background:linear-gradient(100deg,#fff 0%,#c4b5fd 30%,#67e8f9 55%,#f9a8d4 80%,#fff 100%);background-size:250% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 9s ease-in-out infinite}
+@keyframes sheen{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.lede{max-width:560px;margin:0 auto 26px;color:var(--muted);line-height:1.65;font-size:1.02rem}
+.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:30px}
+.chip{font:600 .72rem Manrope;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:8px 14px;border-radius:999px;border:1px solid var(--edge);background:var(--glass-2);backdrop-filter:blur(8px)}
+.cta{position:relative;font:700 1rem Unbounded;letter-spacing:.06em;color:#07051a;border:0;border-radius:999px;padding:18px 44px;cursor:pointer;
+  background:linear-gradient(110deg,#67e8f9,#a78bfa,#f472b6,#fcd34d,#67e8f9);background-size:300% 100%;animation:sheen 6s linear infinite;
+  box-shadow:0 0 0 1px rgba(255,255,255,.2) inset,0 12px 50px -8px rgba(167,139,250,.7);transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.cta:hover{transform:translateY(-3px) scale(1.04)}
+.cta:active{transform:scale(.97)}
+.fine{margin-top:22px;font-size:.78rem;color:var(--faint)}
+
+/* ---------- quiz ---------- */
+.quiz-grid{display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start}
+@media (max-width:820px){.quiz-grid{grid-template-columns:1fr}.side{display:flex;align-items:center;gap:16px}.side .orbit-wrap{width:150px;margin:0}.side .side-text{text-align:left}}
+.side{position:sticky;top:24px;text-align:center}
+.side .orbit-wrap{width:100%}
+.side-text .k{font:500 .68rem Manrope;letter-spacing:.24em;text-transform:uppercase;color:var(--faint)}
+.side-text .v{font-family:Unbounded;font-weight:300;font-size:2.4rem;margin:4px 0 2px}
+.side-text .v span{color:var(--faint);font-size:1.1rem}
+.side-text .hint{color:var(--muted);font-size:.82rem;line-height:1.5;max-width:240px;margin:8px auto 0}
+.card{position:relative;background:var(--glass);border:1px solid var(--edge);border-radius:28px;padding:34px 34px 26px;backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03) inset;overflow:hidden}
+.card::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;
+  background:conic-gradient(from var(--ang,0deg),transparent 0 20%,rgba(103,232,249,.6),rgba(167,139,250,.6),rgba(244,114,182,.6),transparent 70% 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 10s linear infinite;opacity:.7}
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes spin{to{--ang:360deg}}
+.progress{height:3px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:26px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#67e8f9,#a78bfa,#f472b6);box-shadow:0 0 18px #a78bfa;transition:width .8s cubic-bezier(.2,.9,.2,1)}
+.qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.qnum{font:500 .72rem Manrope;letter-spacing:.24em;text-transform:uppercase;color:var(--faint)}
+.back{background:none;border:0;color:var(--muted);font:600 .8rem Manrope;cursor:pointer;padding:4px 8px;border-radius:8px}
+.back:hover{color:var(--ink);background:var(--glass-2)}
+.back:disabled{opacity:.25;cursor:default}
+.qtext{font-family:Unbounded;font-weight:300;font-size:clamp(1.15rem,2.3vw,1.55rem);line-height:1.38;margin:0 0 26px;letter-spacing:-.005em}
+.qbody{transition:opacity .35s, transform .45s cubic-bezier(.2,.9,.2,1), filter .35s}
+.qbody.out{opacity:0;transform:translateX(-30px);filter:blur(6px)}
+.qbody.in{opacity:0;transform:translateX(30px);filter:blur(6px)}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt{--mx:50%;--my:50%;--c:#a78bfa;position:relative;display:flex;gap:16px;align-items:flex-start;text-align:left;width:100%;
+  background:rgba(255,255,255,.025);border:1px solid var(--edge);color:var(--ink);border-radius:18px;padding:17px 20px;
+  font:500 .98rem/1.5 Manrope;cursor:pointer;overflow:hidden;transition:transform .45s cubic-bezier(.3,1.5,.5,1),border-color .3s,background .3s;
+  opacity:0;transform:translateY(14px);animation:optIn .6s cubic-bezier(.2,.9,.2,1) forwards}
+.opt::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(260px circle at var(--mx) var(--my),color-mix(in srgb,var(--c) 28%,transparent),transparent 70%)}
+.opt:hover{border-color:color-mix(in srgb,var(--c) 55%,transparent);transform:translateY(-2px) scale(1.008)}
+.opt:hover::after{opacity:1}
+.opt:active{transform:scale(.985)}
+.opt.picked{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.opt .key{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font:700 .75rem Unbounded;color:var(--muted);border:1px solid var(--edge);margin-top:1px;transition:.3s}
+.opt:hover .key{color:#07051a;background:var(--c);border-color:var(--c);box-shadow:0 0 18px var(--c)}
+.opt span.t{position:relative;z-index:1}
+@keyframes optIn{to{opacity:1;transform:none}}
+.kbd{margin-top:18px;font-size:.74rem;color:var(--faint);text-align:right}
+
+/* ---------- results ---------- */
+.res-hero{text-align:center;padding:10px 0 6px}
+.res-hero .eyebrow{font:600 .72rem Manrope;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+.typecode{font-family:Unbounded;font-weight:900;font-size:clamp(4rem,16vw,9.5rem);line-height:.9;margin:10px 0 6px;letter-spacing:-.03em;
+  background:linear-gradient(100deg,var(--g1),var(--g2),#fff,var(--g1));background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:sheen 7s ease-in-out infinite;filter:drop-shadow(0 0 40px color-mix(in srgb,var(--g1) 45%,transparent))}
+.subline{font-family:Unbounded;font-weight:500;font-size:1.05rem;margin:4px 0}
+.subline .dot{color:var(--faint);margin:0 10px}
+.traits{color:var(--muted);font-size:1rem;margin:6px 0 0}
+.conf{display:inline-flex;gap:8px;align-items:center;margin-top:16px;padding:8px 16px;border-radius:999px;border:1px solid var(--edge);background:var(--glass-2);font-size:.82rem;color:var(--muted)}
+.conf b{color:var(--ink)}
+.section{margin-top:26px}
+.section h3{font:600 .72rem Manrope;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin:0 0 14px;display:flex;align-items:center;gap:12px}
+.section h3::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--edge),transparent)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--glass);border:1px solid var(--edge);border-radius:22px;padding:22px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s cubic-bezier(.2,.9,.2,1)}
+.panel.show{opacity:1;transform:none}
+.savior .fh{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.orb{width:46px;height:46px;border-radius:50%;flex:none;background:radial-gradient(circle at 32% 30%,#fff 0,var(--c) 30%,color-mix(in srgb,var(--c) 30%,#000) 100%);box-shadow:0 0 30px var(--c);animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.08);box-shadow:0 0 50px var(--c)}}
+.savior .fn{font-family:Unbounded;font-weight:700;font-size:1.25rem}
+.savior .fl{color:var(--muted);font-size:.82rem}
+.savior p{margin:8px 0;color:#d6d8f2;line-height:1.6;font-size:.93rem}
+.savior .lbl{font:700 .66rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--c)}
+.coin{margin-bottom:16px}
+.coin .row{display:flex;justify-content:space-between;font-size:.84rem;margin-bottom:7px;gap:10px}
+.coin .row span{color:var(--muted)} .coin .row span.win{color:var(--ink);font-weight:700}
+.coin .bar{position:relative;height:8px;border-radius:8px;background:rgba(255,255,255,.06);overflow:hidden}
+.coin .bar i{position:absolute;top:0;bottom:0;border-radius:8px;transition:all 1.4s cubic-bezier(.2,.9,.2,1)}
+.coin .bar::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:rgba(255,255,255,.3)}
+.coin .sub{font-size:.74rem;color:var(--faint);margin-top:5px}
+.types{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:620px){.types{grid-template-columns:repeat(2,1fr)}}
+.tc{position:relative;border-radius:16px;padding:14px 12px 12px;background:rgba(255,255,255,.025);border:1px solid var(--edge);overflow:hidden;transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+.tc:hover{transform:translateY(-3px) scale(1.03)}
+.tc .code{font:700 1.02rem Unbounded;letter-spacing:.04em}
+.tc .pct{font-size:.78rem;color:var(--muted);margin-top:3px}
+.tc .fill{position:absolute;left:0;bottom:0;height:3px;width:0;transition:width 1.6s cubic-bezier(.2,.9,.2,1)}
+.tc.top{border-color:var(--g1);box-shadow:0 0 30px -6px var(--g1);background:color-mix(in srgb,var(--g1) 12%,transparent)}
+.alt{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.9rem;gap:10px}
+.alt:last-child{border:0}
+.alt .k{font:600 .9rem Unbounded}
+.alt .m{color:var(--muted);font-size:.8rem;flex:1;margin-left:12px}
+.alt .p{font-weight:700}
+.animal{display:flex;gap:18px;align-items:center}
+.animal .glyph{font-size:2.6rem;width:72px;height:72px;flex:none;border-radius:20px;display:grid;place-items:center;background:linear-gradient(140deg,rgba(103,232,249,.18),rgba(244,114,182,.18));border:1px solid var(--edge)}
+.animal .an{font:700 1.3rem Unbounded}
+.animal p{margin:6px 0 0;color:#d6d8f2;font-size:.92rem;line-height:1.55}
+.minis{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.mini{font-size:.74rem;color:var(--muted);padding:5px 10px;border-radius:999px;border:1px solid var(--edge)}
+.letter{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05);color:#d6d8f2;font-size:.92rem;line-height:1.6}
+.letter:last-child{border:0}
+.letter b{font-family:Unbounded;color:var(--ink)}
+.actions{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+.ghost{font:600 .9rem Manrope;color:var(--ink);background:var(--glass-2);border:1px solid var(--edge);border-radius:999px;padding:14px 26px;cursor:pointer;transition:.3s}
+.ghost:hover{border-color:rgba(255,255,255,.3);transform:translateY(-2px)}
+.disclaimer{max-width:720px;margin:34px auto 0;text-align:center;font-size:.78rem;line-height:1.65;color:var(--faint)}
+.namegate{max-width:520px;margin:0 auto}
+.nlabel{display:block;font:600 .72rem Manrope;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.nrow{display:flex;gap:10px;align-items:center;padding:6px;border-radius:999px;background:var(--glass);border:1px solid var(--edge);backdrop-filter:blur(14px);transition:border-color .3s,box-shadow .3s}
+.nrow:focus-within{border-color:rgba(167,139,250,.6);box-shadow:0 0 40px -10px #a78bfa}
+.nrow input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--ink);font:500 1rem Manrope;padding:0 18px}
+.nrow input::placeholder{color:var(--faint)}
+.nrow .cta{padding:14px 30px;font-size:.9rem}
+.cta:disabled{opacity:.35;cursor:not-allowed;transform:none;animation:none}
+.consent{margin-top:12px;font-size:.78rem;color:var(--faint)}
+.savechip{display:inline-flex;align-items:center;gap:8px;margin:12px 0 0 8px;padding:8px 14px;border-radius:999px;font-size:.8rem;border:1px solid var(--edge);color:var(--muted);background:var(--glass-2)}
+.savechip.ok{color:#6ee7b7;border-color:rgba(110,231,183,.35)}
+.savechip.err{color:#fda4af;border-color:rgba(253,164,175,.35)}
+.savechip button{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}
+@media (max-width:600px){.nrow{flex-direction:column;border-radius:22px;padding:10px}.nrow input{padding:10px 8px;text-align:center;width:100%}.nrow .cta{width:100%}}
+.focus-k{font:600 .7rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.foci{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.focus{font:600 .82rem Manrope;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:999px;padding:8px 14px;cursor:pointer;transition:.25s}
+.focus:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
+.focus.on{color:#07051a;background:linear-gradient(110deg,#67e8f9,#a78bfa);border-color:transparent}
+#guide{transition:opacity .18s}
+.gblock{position:relative;padding:16px 18px 14px 20px;margin-bottom:12px;border-radius:16px;background:rgba(255,255,255,.025);border:1px solid var(--edge);border-left:3px solid var(--c)}
+.gblock p{margin:6px 0;color:#d6d8f2;line-height:1.6;font-size:.93rem}
+.gblock ul,.gblock ol{margin:6px 0 4px;padding-left:20px;color:#d6d8f2;font-size:.92rem;line-height:1.6}
+.gk{font:700 .7rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--c);margin-bottom:4px}
+.gs{font:600 .68rem Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:12px 0 2px}
+.chips2{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.chips2 span{font-size:.78rem;padding:4px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);color:var(--ink)}
+.apply{list-style:none;padding-left:0!important}.apply li{margin-bottom:4px}
+.hl{background:color-mix(in srgb,var(--c) 12%,transparent);border-radius:10px;padding:10px 12px}
+.muted2{color:var(--muted);font-size:.84rem;margin-top:6px}
+.note{padding:12px 14px;border-radius:14px;margin-bottom:12px;font-size:.88rem;line-height:1.55;color:#e9d5ff;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3)}
+.care{font-size:.78rem;color:var(--faint);line-height:1.6;margin-top:6px}
+.fb-q{font-weight:600;font-size:.92rem;margin:16px 0 8px}.fb-q:first-child{margin-top:0}
+.opt-l{color:var(--faint);font-weight:500;font-size:.8rem}
+.fit{display:flex;gap:8px}
+.fit button{flex:1;max-width:64px;height:46px;border-radius:14px;border:1px solid var(--edge);background:rgba(255,255,255,.03);color:var(--ink);font:700 1rem Unbounded;cursor:pointer;transition:.25s}
+.fit button:hover{border-color:rgba(255,255,255,.3)}
+.fit button.on{background:linear-gradient(140deg,#67e8f9,#a78bfa);color:#07051a;border-color:transparent}
+.fit-l{display:flex;justify-content:space-between;max-width:352px;font-size:.72rem;color:var(--faint);margin-top:6px}
+.offs{display:flex;flex-wrap:wrap;gap:8px}
+.off{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;border:1px solid var(--edge);cursor:pointer;font-size:.86rem;color:#d6d8f2}
+.off input{accent-color:#a78bfa}
+#selfType,#fbNote{width:100%;max-width:420px;background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:12px;color:var(--ink);font:500 .9rem Manrope;padding:10px 12px;outline:0}
+#selfType option{background:#120f28}
+#fbNote{max-width:100%;min-height:80px;resize:vertical}
+.fb-actions{display:flex;align-items:center;gap:14px;margin-top:16px}
+.fb-msg{font-size:.84rem;color:var(--muted)}
+.ghost:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.fb-thanks{text-align:center;padding:18px;font-family:Unbounded;font-weight:300;font-size:1.05rem;color:#c4b5fd}
+.xmap{max-width:760px;margin:0 auto}
+.xcap{text-align:center;font-size:.8rem;color:var(--faint);margin-top:6px}.xcap b{color:var(--muted)}
+.xsvg{width:100%;height:auto;display:block;overflow:visible}
+.xq{fill:rgba(255,255,255,.02);stroke:rgba(255,255,255,.08)}
+.xmid{stroke:rgba(255,255,255,.1);stroke-dasharray:3 7}
+.xh{fill:#9aa0c3;font:700 13px Manrope;letter-spacing:.2em;text-anchor:middle}
+.xs{fill:#5d6290;font:600 10px Manrope;letter-spacing:.22em}
+.xl{fill:#5d6290;font:600 11px Manrope;letter-spacing:.14em;text-anchor:middle;text-transform:uppercase}
+.xaxl{fill:#5d6290;font:500 10px Manrope;letter-spacing:.1em;text-anchor:middle}
+.xaxis{stroke:rgba(255,255,255,.12);stroke-width:2;stroke-dasharray:6 8;transition:stroke .4s,stroke-width .4s}
+.xaxis.on{stroke:rgba(255,255,255,.65);stroke-width:2.5;stroke-dasharray:0;filter:drop-shadow(0 0 6px #a78bfa)}
+.xnode{cursor:pointer;outline:none;transition:opacity .35s}
+.xnode .body{fill:var(--c);stroke:rgba(255,255,255,.35);stroke-width:1.5;transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
+.xnode .halo{fill:var(--c);opacity:.12;transition:opacity .35s,transform .45s}
+.xnode .sz{transition:transform .7s cubic-bezier(.3,1.5,.5,1);transform-box:view-box;transform-origin:0 0}
+.xnode .ring{fill:none;stroke:var(--c);stroke-width:2;stroke-dasharray:4 5;animation:spinr 14s linear infinite;transform-origin:center;opacity:0;transition:opacity .4s}
+.xnode.savior .ring{opacity:1}
+.xnode .you{opacity:0;transition:opacity .4s}.xnode.mine .you{opacity:1}
+.xnode .rk{fill:rgba(255,255,255,.9);font:800 8px Manrope;letter-spacing:.12em;text-anchor:middle;pointer-events:none}
+.xnode.offstack .body{opacity:.45}.xnode.offstack .fk{opacity:0}
+.xsizing{text-align:center;font-size:.82rem;color:var(--muted);margin:0 auto 6px;max-width:680px;line-height:1.6}.xsizing b{color:var(--ink)}
+.xback{margin-left:6px;background:none;border:1px solid var(--edge);color:var(--ink);border-radius:999px;padding:3px 10px;font:600 .74rem Manrope;cursor:pointer}
+.xc.pickable{cursor:pointer;transition:transform .3s,border-color .3s}.xc.pickable:hover{transform:translateY(-2px)}.xc.pickable.on{box-shadow:0 0 0 1px var(--c) inset,0 0 24px -8px var(--c)}
+@keyframes spinr{to{transform:rotate(360deg)}}
+.xnode .fx{fill:#fff;font:900 24px Unbounded;text-anchor:middle;dominant-baseline:middle;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+.xnode .fk{fill:rgba(255,255,255,.85);font:700 8.5px Manrope;letter-spacing:.14em;text-anchor:middle;pointer-events:none}
+.xnode .you{fill:var(--c);font:800 9px Manrope;letter-spacing:.18em;text-anchor:middle}
+.xnode:hover .body,.xnode:focus-visible .body{transform:scale(1.08);transform-box:fill-box;transform-origin:center}
+.xnode:hover .halo{opacity:.28}
+.xnode.sel .body{stroke:#fff;stroke-width:3;transform:scale(1.12)}
+.xnode.sel .halo{opacity:.4;transform:scale(1.15)}
+.xnode.dim{opacity:.28}
+.xtypes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 8px}
+@media (max-width:700px){.xtypes{grid-template-columns:repeat(2,1fr)}}
+.xtg{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid var(--edge)}
+.xtg>span{width:100%;font:600 .64rem Manrope;letter-spacing:.2em;color:var(--faint)}
+.xtype{flex:1;min-width:58px;font:700 .78rem Unbounded;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:10px;padding:8px 4px;cursor:pointer;transition:.25s}
+.xtype:hover{border-color:rgba(255,255,255,.3);transform:translateY(-2px)}
+.xtype.yours{border-color:#a78bfa;box-shadow:0 0 16px -4px #a78bfa}
+.xtype.on{background:linear-gradient(120deg,#67e8f9,#a78bfa);color:#07051a;border-color:transparent}
+.xpanel{margin-top:12px;padding:18px 20px;border-radius:18px;background:rgba(255,255,255,.025);border:1px solid var(--edge);min-height:90px;transition:opacity .15s}
+.xintro{color:var(--muted);font-size:.92rem;line-height:1.6;text-align:center}
+.xp-h{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.xdot{width:30px;height:30px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 30%,#fff,var(--c) 40%,color-mix(in srgb,var(--c) 40%,#000));box-shadow:0 0 18px var(--c)}
+.xp-t{font:700 1.15rem Unbounded}.xp-t span{font:500 .85rem Manrope;color:var(--muted);margin-left:6px}
+.xp-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.xp-tags span{font-size:.72rem;padding:3px 9px;border-radius:999px;border:1px solid var(--edge);color:var(--muted)}
+.xp-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:700px){.xp-grid{grid-template-columns:1fr}}
+.xpanel p{margin:4px 0 10px;color:#d6d8f2;font-size:.9rem;line-height:1.6}
+.xk{font:700 .66rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:8px}
+.xsubs,.xcombo{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.xsub{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--edge);border-left:3px solid var(--c);background:rgba(255,255,255,.03);color:var(--ink);font:500 .82rem Manrope;cursor:pointer;flex:1;min-width:180px;transition:.25s}
+.xsub b{font:700 .85rem Unbounded}.xsub i{font-style:normal;color:var(--muted);font-size:.76rem}
+.xsub:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.3)}
+.xhint{margin-top:12px;font-size:.78rem;color:var(--faint)}
+.xlead{color:var(--muted)!important}
+.xc{flex:1;min-width:240px;padding:14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-top:3px solid var(--c)}
+.xc-t{font:700 1.1rem Unbounded}.xc-t span{font:500 .82rem Manrope;color:var(--muted);margin-left:6px}
+.xc-m{font-size:.78rem;color:var(--muted);margin-top:4px}
+.xc-tr{font-size:.9rem;margin-top:6px;color:#d6d8f2}
+.stack{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.stack span{display:flex;align-items:center;gap:5px;font:700 .8rem Unbounded;padding:5px 9px;border-radius:9px;border:1px solid color-mix(in srgb,var(--c) 40%,transparent);color:var(--c)}
+.stack span i{font:600 .62rem Manrope;font-style:normal;color:var(--faint)}
+.stack span.sv{background:color-mix(in srgb,var(--c) 18%,transparent)}
+.stack.big{margin:4px 0 14px}.stack.big span{flex:1;min-width:120px;flex-direction:column;align-items:flex-start;font-size:1.05rem;padding:10px 12px}
+.xopen{margin-top:12px;background:none;border:1px solid var(--edge);color:var(--ink);border-radius:999px;padding:7px 14px;font:600 .78rem Manrope;cursor:pointer}
+.xopen:hover{border-color:rgba(255,255,255,.35)}
+.scen{display:inline-block;font:700 .66rem Manrope;letter-spacing:.2em;text-transform:uppercase;color:#c4b5fd;padding:5px 11px;border-radius:999px;border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.08);margin-bottom:14px}
+.opt{display:block;padding:0}
+.opt .opick{display:flex;gap:16px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;color:var(--ink);font:500 .96rem/1.5 Manrope;padding:15px 18px;cursor:pointer;position:relative;z-index:1}
+.opt.static{animation:none;opacity:1;transform:none}
+.opt.picked{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent)}
+.opt.picked .key{color:#07051a;background:var(--c);border-color:var(--c)}
+.strength,.why{position:relative;z-index:1;padding:0 16px 14px 62px;animation:optIn .35s ease forwards}
+.sl{font:600 .7rem Manrope;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}.sl span{text-transform:none;letter-spacing:0;color:var(--faint)}
+.srow{display:flex;flex-wrap:wrap;gap:6px}
+.sbtn,.wbtn{display:flex;align-items:center;gap:6px;font:600 .78rem Manrope;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:999px;padding:7px 12px;cursor:pointer;transition:.2s}
+.sbtn i,.wbtn i{font-style:normal;font-size:.66rem;color:var(--faint)}
+.sbtn:hover,.wbtn:hover{border-color:var(--c)}
+.sbtn.on,.wbtn.on{background:var(--c);color:#07051a;border-color:var(--c)}.sbtn.on i,.wbtn.on i{color:#07051a}
+.qfoot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px}
+.nonefit{background:none;border:0;color:var(--faint);font:500 .82rem Manrope;text-decoration:underline;cursor:pointer;padding:6px 2px}.nonefit:hover{color:var(--muted)}
+.nextb{font:700 .85rem Manrope;color:#07051a;background:linear-gradient(110deg,#67e8f9,#a78bfa);border:0;border-radius:999px;padding:11px 22px;cursor:pointer;transition:.25s}
+.nextb:disabled{opacity:.3;cursor:not-allowed}
+.pats{gap:16px}.pat .pk{font:700 .68rem Manrope;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.pat .pv{font:700 1.4rem Unbounded}.pat p,.pat li{color:#d6d8f2;font-size:.9rem;line-height:1.55}.pat ul{margin:4px 0;padding-left:18px}
+.meter{height:6px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden;margin:12px 0 6px}.meter i{display:block;height:100%;background:linear-gradient(90deg,#67e8f9,#a78bfa,#f472b6)}
+.pm{font-size:.78rem;color:var(--muted)}
+@media (max-width:600px){.strength,.why{padding-left:16px}.opt .opick{padding:13px 14px}}
+.rankhelp{font-size:.82rem;color:var(--muted);margin:-14px 0 16px}.rankhelp b{color:var(--ink)}
+.opt.rk1{border-color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent);box-shadow:0 0 0 1px var(--c) inset,0 0 28px -10px var(--c)}
+.opt.rk2{border-color:color-mix(in srgb,var(--c) 70%,transparent);background:color-mix(in srgb,var(--c) 8%,transparent)}
+.opt.rk1 .key,.opt.rk2 .key{width:auto;padding:0 8px;color:#07051a;background:var(--c);border-color:var(--c);font-size:.72rem}
+.opt.rk2 .key{background:color-mix(in srgb,var(--c) 70%,#fff 0%);opacity:.85}
+.opt .rkb{margin-left:auto;align-self:center;font:700 .62rem Manrope;letter-spacing:.14em;text-transform:uppercase;color:var(--c);white-space:nowrap;padding-left:8px}
+.opt.dismissed{opacity:.28;transform:scale(.985);filter:saturate(.4)}
+.opt.dismissed:hover{opacity:.6}
+.opt{transition:opacity .35s,transform .45s cubic-bezier(.3,1.5,.5,1),border-color .3s,background .3s,filter .35s}
+.why{padding:6px 4px 2px;animation:optIn .35s ease forwards}
+@media (max-width:600px){.opt .rkb{display:none}.why .srow{flex-direction:column}.why .wbtn{justify-content:flex-start}}
+@media (max-width:600px){.card{padding:24px 18px 18px;border-radius:22px}.side .hint{display:none}.brand span.x{display:none}.opt{padding:14px 14px;font-size:.93rem}.side .orbit-wrap{width:130px!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas><div class="vignette"></div><div class="grain"></div>
+<main>
+  <div class="topbar">
+    <div class="brand"><b>Constellation</b><span class="x"> · OPS diagnostic</span></div>
+    <button class="iconbtn" id="soundBtn" aria-pressed="false">♪ Ambient off</button>
+  </div>
+
+  <!-- INTRO -->
+  <section class="screen active intro" id="intro">
+    <div class="orbit-wrap"><canvas id="orbitIntro"></canvas></div>
+    <h1 class="title">Map your<br>constellation</h1>
+    <p class="lede">36 everyday scenes at work, with people, on your own, and under stress. Pick the option that's most you, then your next most, and say why. Nothing is labeled. Your core default takes shape as you go.</p>
+    <div class="chips"><span class="chip">36 scenes</span><span class="chip">~10 minutes</span><span class="chip">32 subtypes</span><span class="chip">core default</span></div>
+    <form class="namegate" id="nameForm" autocomplete="off">
+      <label for="nameInput" class="nlabel">What should we call you?</label>
+      <div class="nrow"><input id="nameInput" maxlength="40" placeholder="Your name or nickname" required><button class="cta" id="startBtn" type="submit" disabled>Begin</button></div>
+      <div class="consent">Your name, your answers, and your result are saved and visible to the quiz owner.</div>
+    </form>
+    <div class="fine">Keys 1–6 rank · 1–5 why · Enter next · Esc reset · ← back</div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="quiz">
+    <div class="quiz-grid">
+      <aside class="side">
+        <div class="orbit-wrap"><canvas id="orbitQuiz"></canvas></div>
+        <div class="side-text">
+          <div class="k">Scene</div>
+          <div class="v" id="qcount">01<span> / 36</span></div>
+          <div class="hint">Unlabeled orbs grow as your answers lean toward them. Names appear at the end.</div>
+        </div>
+      </aside>
+      <div class="card">
+        <div class="progress"><i id="pfill"></i></div>
+        <div class="qmeta"><span class="qnum" id="qnum">Signal 01</span><button class="back" id="backBtn" disabled>← Back</button></div>
+        <div class="qbody" id="qbody"></div>
+        <div class="kbd" id="stageHint">Tap the option that's most you (1–6)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="results"></section>
+</main>
+
+<script>
+/* ===== SUPABASE CONFIG: paste your project values (Project Settings -> API) ===== */
+const SUPABASE_URL = 'https://lcbzmlsowikajunifdjt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjYnptbHNvd2lrYWp1bmlmZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1OTE4NDAsImV4cCI6MjEwOTE2Nzg0MH0.Bbc5Jndb9yj5Ar27MyYba5tIx3GL6zH99SoXkVAY630';
+const QUIZ_VERSION = 'constellation-v2.1';
+</script>
+<script>
+// ===== OPS-inspired scoring engine (shared by page + tests) =====
+// Coins (+ side / - side):
+// OD: + observer-led  | - decider-led
+// DI: + Di (self above tribe) | - De (tribe above self)
+// OI: + Oi (organize / return to known) | - Oe (gather new)
+// N : + intuition savior | - sensing savior
+// T : + thinking savior  | - feeling savior
+// FT: + Fi/Te axis | - Ti/Fe axis
+// NS: + Ni/Se axis | - Si/Ne axis
+// IE: + introverted lead | - extroverted lead
+const FN = {
+  Ni:{OI:1,NS:1,N:1,  kind:'O',att:'i'}, Se:{OI:-1,NS:1,N:-1, kind:'O',att:'e'},
+  Si:{OI:1,NS:-1,N:-1,kind:'O',att:'i'}, Ne:{OI:-1,NS:-1,N:1, kind:'O',att:'e'},
+  Fi:{DI:1,FT:1,T:-1, kind:'D',att:'i'}, Te:{DI:-1,FT:1,T:1,  kind:'D',att:'e'},
+  Ti:{DI:1,FT:-1,T:1, kind:'D',att:'i'}, Fe:{DI:-1,FT:-1,T:-1,kind:'D',att:'e'}
+};
+const STACKS = {
+  ISTJ:["Si","Te","Fi","Ne"], ISFJ:["Si","Fe","Ti","Ne"], INFJ:["Ni","Fe","Ti","Se"], INTJ:["Ni","Te","Fi","Se"],
+  ISTP:["Ti","Se","Ni","Fe"], ISFP:["Fi","Se","Ni","Te"], INFP:["Fi","Ne","Si","Te"], INTP:["Ti","Ne","Si","Fe"],
+  ESTP:["Se","Ti","Fe","Ni"], ESFP:["Se","Fi","Te","Ni"], ENFP:["Ne","Fi","Te","Si"], ENTP:["Ne","Ti","Fe","Si"],
+  ESTJ:["Te","Si","Ne","Fi"], ESFJ:["Fe","Si","Ne","Ti"], ENFJ:["Fe","Ni","Se","Ti"], ENTJ:["Te","Ni","Se","Fi"]
+};
+const COINS = ['OD','DI','OI','N','T','FT','NS','IE'];
+
+function animalOf(o, d){ // savior observer + savior decider
+  const oi = FN[o].att==='i', di = FN[d].att==='i';
+  if (oi && di) return 'Sleep';
+  if (!oi && di) return 'Consume';
+  if (oi && !di) return 'Blast';
+  return 'Play';
+}
+
+// Build the 32 subtypes (dom + one other savior)
+const SUBTYPES = [];
+for (const o of ['Ni','Ne','Si','Se']) for (const d of ['Fi','Fe','Ti','Te']) for (const lead of ['O','D']) {
+  const dom = lead==='O'? o : d, other = lead==='O'? d : o;
+  let type=null, pos=null;
+  for (const t in STACKS){ const s=STACKS[t]; if (s[0]===dom && (s[1]===other||s[2]===other)) { type=t; pos = s[1]===other? 'aux':'tert'; } }
+  const sign = {OD: lead==='O'?1:-1, IE: FN[dom].att==='i'?1:-1};
+  for (const c of ['DI','FT','T']) sign[c]=FN[d][c];
+  for (const c of ['OI','NS','N']) sign[c]=FN[o][c];
+  SUBTYPES.push({key:dom+'-'+other, dom, other, obs:o, dec:d, type, pos, sign, animal: animalOf(o,d)});
+}
+
+function emptyEvidence(){ const e={}; COINS.forEach(c=>e[c]=0); e.animal={Sleep:0,Consume:0,Blast:0,Play:0}; return e; }
+
+function applyOption(ev, sc, dir=1){
+  for (const k in sc){
+    if (k==='fn'){ for (const f in sc.fn){ const w=sc.fn[f]*0.7; for (const c of ['OI','NS','N','DI','FT','T']) if (FN[f][c]) ev[c]+=dir*w*FN[f][c]; } }
+    else if (k==='animal'){ for (const a in sc.animal) ev.animal[a]+=dir*sc.animal[a]; }
+    else ev[k]+=dir*sc[k];
+  }
+}
+
+function solve(ev, tau=2.2){
+  const raw = SUBTYPES.map(s=>{ let v=ev.animal[s.animal]||0; for (const c of COINS) v+=ev[c]*s.sign[c]; return v; });
+  const m = Math.max(...raw); const ex = raw.map(v=>Math.exp((v-m)/tau)); const Z = ex.reduce((a,b)=>a+b,0);
+  const subs = SUBTYPES.map((s,i)=>({...s, score:raw[i], p:ex[i]/Z})).sort((a,b)=>b.p-a.p);
+  const types = {}; for (const t in STACKS) types[t]=0; subs.forEach(s=>types[s.type]+=s.p);
+  const funcs = {}; for (const f in FN) funcs[f]=0; subs.forEach(s=>{funcs[s.obs]+=s.p; funcs[s.dec]+=s.p;});
+  const coins = {}; for (const c of COINS) coins[c]= 1/(1+Math.exp(-ev[c]/3)); // prob of + side
+  const animals={Sleep:0,Consume:0,Blast:0,Play:0}; subs.forEach(s=>animals[s.animal]+=s.p);
+  return {subs, types, funcs, coins, animals, top:subs[0]};
+}
+
+if (typeof module!=='undefined') module.exports={FN,STACKS,SUBTYPES,COINS,emptyEvidence,applyOption,solve};
+
+// ===== Constellation v2 question bank =====
+// 12 probes x 4 scenarios. Every item has all 8 options in fixed order:
+// [Ni, Ne, Si, Se, Ti, Te, Fi, Fe]. A take shows 6 of the 8, shuffled.
+const FORDER = ['Ni','Ne','Si','Se','Ti','Te','Fi','Fe'];
+const SCEN = { work:'Work / school', social:'Friends / family', alone:'On your own', stress:'Under stress' };
+const BANK = [
+ { probe:'newsit', label:'Taking in something new', items:{
+   work:{ q:"It's your first day somewhere new: a job, a class, a team. What do you naturally do first?", o:[
+     "Get a feel for what this place is really about and where it's heading.",
+     "Imagine all the different ways this could go and what's possible here.",
+     "Learn the routines and compare them to places I've been before.",
+     "Look around and take in everything happening, live.",
+     "Quietly work out how things here actually function.",
+     "Find out what's expected, who does what, and how success is measured.",
+     "Notice whether this place feels right for me.",
+     "Get to know people and sense the mood of the group." ]},
+   social:{ q:"You walk into a gathering where you only know one or two people. What do you tend to do?", o:[
+     "Read the underlying vibe and what this group is really like.",
+     "Bounce between conversations and see where they lead.",
+     "Stick near the people I know and settle into a familiar rhythm.",
+     "Jump into whatever's happening: food, music, activity.",
+     "Observe how the group works before I say much.",
+     "Find something useful to do or help get things going.",
+     "Look for the one or two people I really click with.",
+     "Make sure people feel welcomed, including the quiet ones." ]},
+   alone:{ q:"You're exploring a new neighborhood or city on your own. How do you go about it?", o:[
+     "Wander until I get a sense of the place's character.",
+     "Follow whatever looks interesting and see what I stumble on.",
+     "Find a couple of spots I like and keep going back to them.",
+     "Soak in the sights, sounds, smells, and street life.",
+     "Figure out the layout and how the area fits together.",
+     "Plan a route so I see the most in the time I have.",
+     "Go wherever feels most like me.",
+     "Watch how locals interact and what the community is like." ]},
+   stress:{ q:"You're dropped into a chaotic new situation with no time to prepare. What do you fall back on?", o:[
+     "Step back and try to see what's really going on underneath.",
+     "Throw out a bunch of ideas and see what sticks.",
+     "Hold on to what I already know works.",
+     "React to what's in front of me, moment by moment.",
+     "Get quiet and think it through in my head.",
+     "Take charge and start organizing the next steps.",
+     "Check in with myself about what I'm okay with.",
+     "Look to others and try to keep everyone steady." ]} } },
+ { probe:'plansfail', label:'When plans fall apart', items:{
+   work:{ q:"A project you've been working on suddenly changes direction. What's your first move?", o:[
+     "Figure out what this change means for where things end up.",
+     "See it as a chance to try something we hadn't considered.",
+     "Look at what worked before and adapt from there.",
+     "Deal with what's needed right now and adjust on the fly.",
+     "Rethink the problem until the new direction makes sense to me.",
+     "Re-plan the timeline and reassign tasks.",
+     "Check in with myself about whether it still feels right.",
+     "Check how the team is taking it and get everyone on board." ]},
+   social:{ q:"A trip with friends or family falls through at the last minute. What do you do?", o:[
+     "Accept it and think about what it means for the bigger picture.",
+     "Come up with three backup ideas on the spot.",
+     "Suggest something we've done before that we know we'll enjoy.",
+     "Say \"let's just go somewhere\" and make it fun right away.",
+     "Figure out what went wrong so it doesn't happen again.",
+     "Make a new plan and get people moving.",
+     "Do whatever feels right to me now, even if it's staying in.",
+     "Make sure nobody's too disappointed and smooth things over." ]},
+   alone:{ q:"A day you had planned for yourself falls apart. How do you handle it?", o:[
+     "Take a moment to think about what the day is really for.",
+     "Let it open up into something unexpected.",
+     "Fall back on my usual routine.",
+     "Go out and see what the day offers.",
+     "Use the time to dig into something I want to understand.",
+     "Rework the schedule and still get things done.",
+     "Do what I feel like doing in that moment.",
+     "Reach out to someone and see how they're doing." ]},
+   stress:{ q:"Everything is going wrong at once and you're overwhelmed. What do you catch yourself doing?", o:[
+     "Fixating on one way this is all going to turn out.",
+     "Jumping between ideas without settling on any.",
+     "Sticking hard to my usual habits.",
+     "Throwing myself into action or distraction.",
+     "Overthinking it alone in my head.",
+     "Pushing to fix everything and everyone at once.",
+     "Pulling back into my own feelings.",
+     "Trying to keep everyone around me okay." ]} } },
+ { probe:'decide', label:'Deciding when torn', items:{
+   work:{ q:"You're torn between two options on a task. What tips the decision?", o:[
+     "Which one fits where this is heading long term.",
+     "Which one opens up more possibilities later.",
+     "Which one has worked reliably before.",
+     "Which one I can start on right now.",
+     "Which one makes the most logical sense to me.",
+     "Which one gets the best measurable result.",
+     "Which one I feel right about.",
+     "Which one works best for the people involved." ]},
+   social:{ q:"Your friends can't agree on where to go and they look to you. How do you choose?", o:[
+     "Pick the one that fits the feel of the night.",
+     "Suggest a combination or something nobody thought of.",
+     "Go with the place we know is good.",
+     "Choose whatever's closest and most fun right now.",
+     "Weigh the options and pick the one that makes sense.",
+     "Decide fast so we stop wasting time.",
+     "Pick the one I'd genuinely enjoy most.",
+     "Pick what will keep the most people happy." ]},
+   alone:{ q:"You're deciding on something personal, like a big purchase or a new hobby. What settles it?", o:[
+     "A gut sense of which one fits where my life is going.",
+     "Picturing all the ways each option could play out.",
+     "Comparing it to what's worked for me before.",
+     "Trying it out or seeing it in person.",
+     "Researching until I understand it fully myself.",
+     "Comparing the facts: cost, value, results.",
+     "Asking myself which one feels like me.",
+     "Thinking about how it'll affect the people around me." ]},
+   stress:{ q:"You have to make a hard call fast, with pressure on you. What do you lean on?", o:[
+     "My gut read on where this is all heading.",
+     "Brainstorming options until one clicks.",
+     "Whatever's worked before.",
+     "Acting on what's in front of me.",
+     "My own reasoning, even if others disagree.",
+     "Whatever gets results fastest.",
+     "Whatever sits right with me inside.",
+     "What others need from me." ]} } },
+ { probe:'free', label:'Free time', items:{
+   work:{ q:"You have a free hour at work or school with nothing due. What do you usually do with it?", o:[
+     "Think through a bigger idea I've been mulling over.",
+     "Explore something unrelated that caught my interest.",
+     "Tidy up and get my usual things in order.",
+     "Get up, move around, see what's going on.",
+     "Dig into a problem I'm curious about.",
+     "Get ahead on upcoming work.",
+     "Work on my own personal side project.",
+     "Chat with people and catch up." ]},
+   social:{ q:"A free weekend with friends or family. What kind of plan do you push for?", o:[
+     "Something meaningful we'll remember.",
+     "Something new none of us has tried.",
+     "Our usual favorite thing.",
+     "Something active and spontaneous.",
+     "A good conversation or something interesting to figure out together.",
+     "A plan with a clear schedule so we fit everything in.",
+     "Something that feels genuine and personal.",
+     "Whatever brings everyone together." ]},
+   alone:{ q:"A whole free day, just you. What sounds best?", o:[
+     "Time to reflect and connect the dots in my life.",
+     "Rabbit holes: new ideas, new topics, new music.",
+     "A comfortable routine I enjoy.",
+     "Getting out: moving, eating something good, exploring.",
+     "Learning how something works in depth.",
+     "Knocking out a project and seeing real progress.",
+     "Creating or doing something I love.",
+     "Calling or texting people to catch up." ]},
+   stress:{ q:"You're burnt out and finally get a break. What do you actually end up doing?", o:[
+     "Withdrawing to think things over.",
+     "Starting a bunch of new things.",
+     "Rewatching or redoing familiar comforts.",
+     "Going out or doing something physical.",
+     "Retreating into a puzzle or deep focus.",
+     "Doing chores so at least something's under control.",
+     "Disappearing into what I love.",
+     "Checking on everyone else first." ]} } },
+ { probe:'mind', label:'Where your mind goes', items:{
+   work:{ q:"On the commute or walk home, what's usually on your mind?", o:[
+     "Where things are heading and what it all means.",
+     "New ideas and what-ifs.",
+     "What happened today, step by step.",
+     "What's around me right now.",
+     "A problem I haven't cracked yet.",
+     "Tomorrow's to-do list.",
+     "How I feel about my day.",
+     "How people were today and how they're doing." ]},
+   social:{ q:"After a long hangout, what do you find yourself replaying?", o:[
+     "The deeper meaning of what someone said.",
+     "Funny tangents and ideas that came up.",
+     "Specific moments and details, in order.",
+     "The highlights: the food, the place, the fun.",
+     "A conversation I'm still thinking through.",
+     "What we should do next time.",
+     "Whether I felt like myself.",
+     "Whether everyone had a good time." ]},
+   alone:{ q:"When your mind wanders with nothing to do, where does it go?", o:[
+     "Bigger patterns in my life.",
+     "Endless possibilities and daydreams.",
+     "Memories and familiar thoughts.",
+     "Whatever I'm seeing or hearing right now.",
+     "Ideas I'm trying to make sense of.",
+     "Plans and things I need to do.",
+     "What I actually want.",
+     "How the people around me are doing." ]},
+   stress:{ q:"It's late and you can't sleep because of something stressful. What keeps you up?", o:[
+     "One outcome I can't stop predicting.",
+     "Too many possibilities spinning at once.",
+     "Going over what happened again and again.",
+     "Feeling restless and needing to do something.",
+     "Trying to make it make sense.",
+     "Everything I still have to handle.",
+     "How it made me feel.",
+     "Whether people are upset with me." ]} } },
+ { probe:'recharge', label:'How you recharge', items:{
+   work:{ q:"After a draining day at work or school, what helps most?", o:[
+     "Quiet time to process the day.",
+     "Something new and interesting to shake it off.",
+     "My usual wind-down routine.",
+     "Movement, food, or getting outside.",
+     "Getting absorbed in something I'm figuring out.",
+     "Finishing something so I feel caught up.",
+     "Doing something just for me.",
+     "Talking it over with someone." ]},
+   social:{ q:"After a lot of time around people, how do you reset?", o:[
+     "Time alone to let it all sink in.",
+     "Jumping to a totally different activity.",
+     "Getting back to my normal routine.",
+     "A walk, a workout, or something physical.",
+     "Thinking through the conversations by myself.",
+     "Catching up on things I put off.",
+     "Being with my own feelings for a while.",
+     "A smaller, closer conversation with one person." ]},
+   alone:{ q:"Your ideal way to recharge on your own looks like…", o:[
+     "Reflecting, journaling, or sitting with my thoughts.",
+     "Exploring something I've never tried.",
+     "Comfort food, a favorite show, a familiar place.",
+     "Being active or out in the world.",
+     "A deep dive into a topic or a puzzle.",
+     "A productive day that leaves me feeling accomplished.",
+     "Music, art, or something that feels like me.",
+     "Doing something kind for someone." ]},
+   stress:{ q:"When you're completely drained, what do you reach for without thinking?", o:[
+     "Shutting everything out to think.",
+     "Distracting myself with something new.",
+     "The same comforts I always go to.",
+     "Something physical or sensory.",
+     "Getting lost in my own head.",
+     "Keeping busy with tasks.",
+     "Hiding away with what I love.",
+     "Leaning on, or looking after, other people." ]} } },
+ { probe:'explain', label:'Explaining and sharing', items:{
+   work:{ q:"You need to explain something to a group. How do you usually do it?", o:[
+     "Give the big picture and the key takeaway.",
+     "Use analogies and examples from other areas.",
+     "Walk through it step by step, the way it's done.",
+     "Show it live or with real examples.",
+     "Lay out the logic so it holds together.",
+     "Focus on what to do and the results.",
+     "Share my personal take on it.",
+     "Read the room and adjust so everyone follows." ]},
+   social:{ q:"A friend asks how your week went. What do you naturally share?", o:[
+     "The theme of the week and what it meant.",
+     "A bunch of random stories and tangents.",
+     "What happened, in order.",
+     "The best moments and the details.",
+     "Something I've been thinking about.",
+     "What I got done.",
+     "How I felt about it.",
+     "What's going on with the people in my life." ]},
+   alone:{ q:"Writing in a journal or a note to yourself, you tend to write about…", o:[
+     "Patterns and insights about my life.",
+     "Ideas and plans that just came to me.",
+     "What happened today.",
+     "Things I saw and experienced.",
+     "Questions I'm working out.",
+     "Goals and to-dos.",
+     "How I feel and why.",
+     "The people in my life." ]},
+   stress:{ q:"Someone asks what's wrong when you're stressed. What comes out?", o:[
+     "\"I just know where this is going.\"",
+     "A jumble of everything at once.",
+     "A detailed list of what happened.",
+     "\"I just need to do something about it.\"",
+     "\"I'm still figuring it out.\"",
+     "Everything that still needs fixing.",
+     "How I'm feeling, or nothing at all.",
+     "\"I'm fine, how are you?\"" ]} } },
+ { probe:'start', label:'Starting something', items:{
+   work:{ q:"You're starting a brand-new project. What's your opening move?", o:[
+     "Define the vision and the end goal.",
+     "Brainstorm every direction it could take.",
+     "Look at how similar projects were done.",
+     "Just start building and adjust as I go.",
+     "Figure out how it all works first.",
+     "Set milestones and assign tasks.",
+     "Make sure it feels right to me before I commit.",
+     "Get everyone aligned and excited." ]},
+   social:{ q:"You're planning an event for people you care about. Where do you start?", o:[
+     "With the feeling or meaning I want it to have.",
+     "With fun, unusual ideas.",
+     "With what's worked at past events.",
+     "With the place, the food, the experience.",
+     "With the logistics puzzle.",
+     "With a budget and a checklist.",
+     "With what feels personal and true to us.",
+     "With who's coming and what they'd enjoy." ]},
+   alone:{ q:"You want to start a new personal project or hobby. How do you begin?", o:[
+     "Picture where I want it to lead.",
+     "Try a few things at once and see what sticks.",
+     "Build on skills I already have.",
+     "Dive in hands-on right away.",
+     "Study the basics until I understand them.",
+     "Make a plan with steps and goals.",
+     "Pick what excites me personally.",
+     "Find a group or someone to do it with." ]},
+   stress:{ q:"You have to start something big but you're overwhelmed. What happens?", o:[
+     "I wait until I can see the whole path.",
+     "I start five things and finish none.",
+     "I stick to what I already know how to do.",
+     "I jump in without a plan.",
+     "I keep thinking instead of starting.",
+     "I make a huge to-do list.",
+     "I wait until I feel ready.",
+     "I ask others what they need first." ]} } },
+ { probe:'conflict', label:'Disagreements', items:{
+   work:{ q:"Someone disagrees with your idea in a meeting or class. How do you respond?", o:[
+     "Explain the bigger picture they might be missing.",
+     "Look for a third option that blends both.",
+     "Point to what's worked before.",
+     "Suggest we just try it and see.",
+     "Break down the logic point by point.",
+     "Focus on which idea gets better results.",
+     "Stand by what I believe is right.",
+     "Find common ground so nobody feels dismissed." ]},
+   social:{ q:"Two friends or family members are in a disagreement. What's your instinct?", o:[
+     "Point out what's really going on underneath.",
+     "Suggest new ways to look at it.",
+     "Remind them how they've worked it out before.",
+     "Change the mood with something fun.",
+     "Help each side see the logic.",
+     "Push for a practical solution.",
+     "Stay true to my own view of who's right.",
+     "Help everyone feel heard." ]},
+   alone:{ q:"You're stewing over something that bothered you. How do you work through it?", o:[
+     "Look for the deeper reason it hit me.",
+     "Imagine different ways it could have gone.",
+     "Replay exactly what happened.",
+     "Shake it off with something active.",
+     "Analyze it until it makes sense.",
+     "Decide what I'll do about it.",
+     "Sit with how I feel about it.",
+     "Think about how the other person must feel." ]},
+   stress:{ q:"An argument is heating up and you're getting overwhelmed. What do you do?", o:[
+     "Go quiet and decide how it'll end.",
+     "Jump between points.",
+     "Bring up what happened last time.",
+     "React in the moment.",
+     "Get stuck on being logically right.",
+     "Try to take control of the situation.",
+     "Shut down or get emotional.",
+     "Give in to keep the peace." ]} } },
+ { probe:'learn', label:'Learning', items:{
+   work:{ q:"You're learning a new skill for work or school. What works best for you?", o:[
+     "Understanding the core concept first.",
+     "Exploring related ideas and connections.",
+     "Repetition and clear examples.",
+     "Hands-on practice right away.",
+     "Figuring out why it works on my own.",
+     "Learning what I need to get results.",
+     "Making it personal and doing it my way.",
+     "Learning with or from other people." ]},
+   social:{ q:"A friend is teaching you something, like a game, a recipe, or a skill. How do you learn it best?", o:[
+     "Get the gist and the point of it.",
+     "Ask lots of what-if questions.",
+     "Follow their steps exactly.",
+     "Just jump in and try it.",
+     "Ask how it works until I get it.",
+     "Ask what the goal is and how to win.",
+     "Make it my own.",
+     "Enjoy the time together while learning." ]},
+   alone:{ q:"You get curious about a new topic on your own. What do you do?", o:[
+     "Look for the big idea underneath it.",
+     "Jump across links and related topics.",
+     "Go through it in order, one piece at a time.",
+     "Try it out or see it for real.",
+     "Dig into how it works.",
+     "Learn just what's useful.",
+     "Follow the parts that speak to me.",
+     "Find a community or people into it." ]},
+   stress:{ q:"You have to learn something fast under pressure. What do you default to?", o:[
+     "Grab the main idea and trust my gut.",
+     "Skim widely and connect what I can.",
+     "Memorize the steps.",
+     "Learn by doing, mistakes included.",
+     "Insist on understanding it fully first.",
+     "Focus only on what's needed to pass or deliver.",
+     "Follow whatever parts click for me personally.",
+     "Ask others to help me." ]} } },
+ { probe:'others', label:'Showing up for others', items:{
+   work:{ q:"A coworker or classmate is struggling. How do you naturally help?", o:[
+     "Help them see the bigger picture.",
+     "Suggest a bunch of options.",
+     "Share what worked for me before.",
+     "Jump in and help with the actual task.",
+     "Help them think the problem through.",
+     "Help them make a plan.",
+     "Listen and support what they want.",
+     "Check how they're doing and encourage them." ]},
+   social:{ q:"How do you usually show someone you care?", o:[
+     "Understanding them on a deeper level.",
+     "Bringing fun and new experiences.",
+     "Being consistent and remembering details.",
+     "Doing things together in the moment.",
+     "Giving honest, thought-out advice.",
+     "Handling things for them.",
+     "Being genuine and loyal.",
+     "Making them feel included and appreciated." ]},
+   alone:{ q:"Thinking about someone you love while you're apart, what do you find yourself doing?", o:[
+     "Reflecting on who they really are.",
+     "Imagining future adventures together.",
+     "Remembering specific moments.",
+     "Wanting to be with them in person.",
+     "Thinking about how to help with their problems.",
+     "Planning something for them.",
+     "Feeling how much they mean to me.",
+     "Wondering how they're feeling." ]},
+   stress:{ q:"Someone close to you is upset while you're already stressed. What do you do?", o:[
+     "Pull back to think about what it means.",
+     "Try to distract us both with ideas.",
+     "Fall back on what usually helps them.",
+     "Do something practical right away.",
+     "Try to logic through it.",
+     "Try to fix the situation.",
+     "Get overwhelmed by my own feelings.",
+     "Put their feelings ahead of mine." ]} } },
+ { probe:'order', label:'Handling details and order', items:{
+   work:{ q:"How do you keep track of your work or assignments?", o:[
+     "I keep the end goal in mind and the rest falls into place.",
+     "Loosely. I juggle many things and switch between them.",
+     "A consistent system I've used for a while.",
+     "I handle things as they come up.",
+     "A system I designed that makes sense to me.",
+     "Lists, deadlines, and checking things off.",
+     "I go by what feels right to work on in the moment.",
+     "I stay in sync with what others need from me." ]},
+   social:{ q:"Planning with a group: what role do you tend to take?", o:[
+     "Setting the overall direction.",
+     "Throwing out ideas.",
+     "Remembering what worked last time.",
+     "Getting things moving in the moment.",
+     "Working out the details that don't add up.",
+     "Organizing and assigning tasks.",
+     "Making sure it feels right.",
+     "Keeping everyone happy and included." ]},
+   alone:{ q:"How would you describe your personal space?", o:[
+     "Arranged around whatever I'm focused on lately.",
+     "Full of half-started projects and ideas.",
+     "Set up the way I like it, the same way each time.",
+     "Whatever's practical for what I'm doing that day.",
+     "Organized in a way that makes sense to me.",
+     "Efficient, with everything having a purpose.",
+     "Full of things that feel personal.",
+     "Comfortable for having people over." ]},
+   stress:{ q:"When life gets hectic, what happens to your organization?", o:[
+     "I lose track of details but hold on to the big goal.",
+     "I start new things and the rest piles up.",
+     "I double down on my routines.",
+     "I let it go and deal with it later.",
+     "I keep re-sorting things in my head.",
+     "I over-organize everything.",
+     "I only deal with what feels right to deal with.",
+     "I prioritize other people's needs." ]} } },
+ { probe:'nervous', label:'When a conversation gets uncomfortable', items:{
+   work:{ q:"A conversation at work or school gets awkward or tense. What do you steer it toward?", o:[
+     "A bigger-picture topic, like where things are heading.",
+     "A random tangent or a new idea to change the subject.",
+     "Someone we both know and what they've been up to lately.",
+     "What the people around us are doing right now.",
+     "A question about how something works.",
+     "A task or plan we need to sort out.",
+     "A joke about people, myself included.",
+     "Asking about their life and the people in it." ], od:[-1,-1,1,1,-1,-1,1,1]},
+   social:{ q:"You're hanging out and the conversation suddenly feels uncomfortable. What do you do?", o:[
+     "Shift to something deeper or more meaningful.",
+     "Jump to a funny what-if or a new topic.",
+     "Bring up a funny memory about people we both know.",
+     "Point out what the people around us are doing.",
+     "Start a debate about an idea or how something works.",
+     "Bring up a plan or something we need to get done.",
+     "Make a self-deprecating joke to lighten it.",
+     "Check in on how everyone's doing and catch up on people." ], od:[-1,-1,1,1,-1,-1,1,1]},
+   alone:{ q:"After an awkward conversation, what do you find yourself thinking about on your own?", o:[
+     "What it all says about where things are going.",
+     "Other ways the conversation could have gone.",
+     "Replaying exactly what each person said, in order.",
+     "How everyone was acting in the moment.",
+     "Whether my points actually made sense.",
+     "What needs to happen next to fix it.",
+     "Whether I came across like myself.",
+     "How the other person felt about it." ], od:[-1,-1,1,1,-1,-1,1,1]},
+   stress:{ q:"You're stressed and someone asks you about something personal. What do you do?", o:[
+     "Give a short, vague answer and change direction.",
+     "Ramble about ten other things instead.",
+     "Bring up a story about someone we know instead.",
+     "Comment on what the people around us are doing.",
+     "Talk about a problem I'm trying to figure out instead.",
+     "Turn it to a task I need to get done.",
+     "Say I'm fine and pull inward.",
+     "Ask how they're doing instead." ], od:[-1,-1,1,1,-1,-1,1,1]} } },
+ { probe:'smarter', label:'Where you think and feel best', items:{
+   work:{ q:"You're stuck on a hard problem at work or school. Where does the breakthrough usually come?", o:[
+     "When I step back and it suddenly clicks into one idea.",
+     "When I bounce between ideas, often out loud.",
+     "When I go back over notes and sources I trust.",
+     "When I just try something and see what happens.",
+     "When I get quiet time alone to work it out my way.",
+     "When I talk it through with someone. I get sharper out loud.",
+     "When I figure out where I personally stand on it.",
+     "When I hear how everyone else sees it." ]},
+   social:{ q:"Something emotional happened with a friend or family member. How do you work through it?", o:[
+     "Think about what it really means underneath.",
+     "Look at it from a bunch of different angles.",
+     "Go back over what happened, step by step.",
+     "Do something physical to shake it off.",
+     "Think it through quietly until it makes sense.",
+     "Talk it out and decide what to do about it.",
+     "Sort out my own feelings on my own first. They're my responsibility.",
+     "Talk with others about how everyone's feeling." ]},
+   alone:{ q:"On your own, how do you work through something confusing?", o:[
+     "Let it sit until one clear idea comes to me.",
+     "Brainstorm possibilities, maybe on paper.",
+     "Look back at what I already know about it.",
+     "Get hands-on with it.",
+     "Think it through quietly, step by step.",
+     "Talk it out loud, record a voice memo, or text someone.",
+     "Check how I feel about it.",
+     "Think about how it affects the people around me." ]},
+   stress:{ q:"You're overwhelmed and need to think clearly. What do you do?", o:[
+     "Withdraw until I see the one thing that matters.",
+     "Talk in circles through every possibility.",
+     "Retreat to familiar comforts until I calm down.",
+     "Move my body or get outside.",
+     "Shut everyone out to think.",
+     "Call someone and talk it through.",
+     "Be alone with my feelings.",
+     "Reach out to people and see how they're doing." ]} } }
+
+];
+if (typeof module!=='undefined') module.exports={BANK,FORDER,SCEN};
+
+// ===== Constellation v2 engine: take builder + scenario scoring =====
+// Depends on engine.js (FN, STACKS, SUBTYPES) and bank.js (BANK, FORDER, SCEN).
+const V2 = (()=>{
+  const WHY = { default:{m:1.2,label:"It's just what I do"}, learned:{m:0.5,label:"I worked hard to get good at this"},
+                ideal:{m:0.5,label:"It's what I should do"}, fear:{m:0.8,label:"It avoids something bad"}, context:{m:0.6,label:"Depends on the day"} };
+  const WHY_ORDER = ['default','learned','ideal','fear','context'];
+  const RANK_W = [1.0, 0.5];
+  const N_STRESS = 6, N_ITEMS = 36;
+
+  function rngFrom(seed){ let s = seed>>>0 || 1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }
+  function shuffle(a,r){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+  function buildTake(seed){
+    const r = rngFrom(seed ?? Math.floor(Math.random()*2**31));
+    const probes = shuffle(BANK.map((p,i)=>i), r);
+    const nThree = N_ITEMS - 2*BANK.length;           // 36 - 28 = 8 probes get a 3rd scene
+    const three = new Set(probes.slice(0,nThree));
+    const stressSet = new Set(probes.slice(0,N_STRESS)); // stress only on 3-scene probes, so 2 regular scenes remain
+    let items=[];
+    BANK.forEach((p,pi)=>{
+      let sc = shuffle(['work','social','alone'],r);
+      if (stressSet.has(pi)) sc = sc.slice(0,2).concat('stress');
+      else if (!three.has(pi)) sc = sc.slice(0,2);
+      sc.forEach(s=>items.push({ probe:p.probe, pi, scen:s, id:p.probe+'-'+s, q:p.items[s].q, opts:p.items[s].o, od:p.items[s].od||null }));
+    });
+    // order: no same probe back to back
+    for (let tries=0; tries<500; tries++){
+      shuffle(items,r);
+      let ok=true; for(let i=1;i<items.length;i++) if(items[i].probe===items[i-1].probe){ ok=false; break; }
+      if(ok) break;
+    }
+    // balanced omission: each item drops 2 functions; each function dropped equally often
+    const n=items.length, slots=[]; FORDER.forEach(f=>{ for(let k=0;k<(2*n)/8;k++) slots.push(f); });
+    let pairs=null;
+    for (let tries=0; tries<2000 && !pairs; tries++){
+      shuffle(slots,r); const pr=[]; let ok=true;
+      for(let i=0;i<slots.length;i+=2){ if(slots[i]===slots[i+1]){ ok=false; break; } pr.push([slots[i],slots[i+1]]); }
+      if(ok) pairs=pr;
+    }
+    items.forEach((it,i)=>{
+      const drop=pairs[i]; const shown=FORDER.filter(f=>!drop.includes(f));
+      it.shown = shuffle(shown.slice(),r);                 // display order
+      it.text = Object.fromEntries(FORDER.map((f,k)=>[f,it.opts[k]]));
+    });
+    items.forEach(it=>{ it.askWhy=true; it.odMap = it.od ? Object.fromEntries(FORDER.map((f,k)=>[f,it.od[k]])) : null; });
+    return items;
+  }
+
+  // picks: array aligned with take: {rank1:f|null, rank2:f|null, why:key|null, none:bool}
+  function score(take, picks, tau){
+    const E={}, Econs={}, Estress={}, fearSig={}, idealCnt={}, defaultCnt={}, learnedCnt={};
+    FORDER.forEach(f=>{E[f]=0;Econs[f]=0;Estress[f]=0;fearSig[f]=0;idealCnt[f]=0;defaultCnt[f]=0;learnedCnt[f]=0;});
+    let odE=0;
+    const byProbe={};
+    take.forEach((it,i)=>{ const p=picks[i]; if(!p||!p.rank1||it.scen==='stress') return; (byProbe[it.probe]=byProbe[it.probe]||[]).push(p.rank1); });
+    const consFn={}; let consistentProbes=0, probesCounted=0;
+    BANK.forEach(b=>{ const arr=byProbe[b.probe]||[]; if(arr.length<2) return; probesCounted++;
+      const c={}; arr.forEach(f=>c[f]=(c[f]||0)+1); const best=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];
+      if(best[1]>=2){ consFn[b.probe]=best[0]; consistentProbes++; } });
+    const perScen={work:{},social:{},alone:{}};
+    take.forEach((it,i)=>{
+      const p=picks[i]; if(!p||!p.rank1) return;
+      const wm=p.why?WHY[p.why].m:1;
+      if(p.why==='fear') fearSig[p.rank1]+=0.5;
+      if(p.why==='ideal') idealCnt[p.rank1]++; if(p.why==='default') defaultCnt[p.rank1]++; if(p.why==='learned') learnedCnt[p.rank1]++;
+      [[p.rank1,RANK_W[0]*wm],[p.rank2,RANK_W[1]]].forEach(([f,w])=>{
+        if(!f) return;
+        if(it.scen==='stress'){ Estress[f]+=w; return; }
+        const cons = consFn[it.probe]===f;
+        E[f]+= w*(cons?1.5:0.75); if(cons) Econs[f]+=w;
+        perScen[it.scen][f]=(perScen[it.scen][f]||0)+w;
+        if(it.odMap) odE += 0.6*w*it.odMap[f];
+      });
+    });
+    const total=FORDER.reduce((a,f)=>a+E[f],0);
+    const T = tau ?? Math.max(0.6, 0.045*total);
+    const raw = SUBTYPES.map(s=>E[s.dom] + 0.7*E[s.other] + odE*s.sign.OD);
+    const m=Math.max(...raw), ex=raw.map(v=>Math.exp((v-m)/T)), Z=ex.reduce((a,b)=>a+b,0);
+    const subs=SUBTYPES.map((s,i)=>({...s,score:raw[i],p:ex[i]/Z})).sort((a,b)=>b.p-a.p);
+    const types={}; for(const t in STACKS) types[t]=0; subs.forEach(s=>types[s.type]+=s.p);
+    const funcs={}; FORDER.forEach(f=>funcs[f]=0); subs.forEach(s=>{funcs[s.obs]+=s.p; funcs[s.dec]+=s.p;});
+    const animals={Sleep:0,Consume:0,Blast:0,Play:0}; subs.forEach(s=>animals[s.animal]+=s.p);
+    // coins as posterior marginals (prob of the + side)
+    const P=pred=>subs.reduce((a,s)=>a+(pred(s)?s.p:0),0);
+    const coins={ OD:P(s=>s.sign.OD>0), DI:P(s=>FN[s.dec].att==='i'), OI:P(s=>FN[s.obs].att==='i'), N:P(s=>FN[s.obs].N>0),
+      T:P(s=>FN[s.dec].T>0), FT:P(s=>['Fi','Te'].includes(s.dec)), NS:P(s=>['Ni','Se'].includes(s.obs)), IE:P(s=>s.sign.IE>0) };
+    const consistency = probesCounted? consistentProbes/probesCounted : 0;
+    let core = FORDER.slice().sort((a,b)=>Econs[b]-Econs[a]).filter(f=>Econs[f]>0).slice(0,2);
+    if(core.length<2){ const rest=FORDER.filter(f=>!core.includes(f)).sort((a,b)=>E[b]-E[a]); core=core.concat(rest.slice(0,2-core.length)); }
+    const steady = Object.entries(consFn).filter(([,f])=>core.includes(f)).map(([p,f])=>({probe:p,label:BANK.find(b=>b.probe===p).label,fn:f}));
+    const topIn = o=>{ const e=Object.entries(o).sort((a,b)=>b[1]-a[1]); return e.length?e[0][0]:null; };
+    const context = Object.entries(perScen).map(([sc,o])=>({scen:sc, fn:topIn(o)})).filter(x=>x.fn && !core.includes(x.fn));
+    const stressTop = FORDER.slice().sort((a,b)=>Estress[b]-Estress[a]).filter(f=>Estress[f]>0).slice(0,2);
+    const idealGap = FORDER.filter(f=>idealCnt[f]>0 && idealCnt[f]>defaultCnt[f]);
+    const learned = FORDER.filter(f=>learnedCnt[f]>0).sort((a,b)=>learnedCnt[b]-learnedCnt[a]).slice(0,3);
+    const loose = consistency<0.35 || subs[0].p<0.25;
+    return {subs, types, funcs, coins, animals, top:subs[0], E, Econs, Estress, fearSig, consistency, core, steady, context, stressTop, idealGap,
+            idealCnt, defaultCnt, learnedCnt, learned, odE, loose, consFn};
+  }
+  return { WHY, WHY_ORDER, RANK_W, buildTake, score, rngFrom };
+})();
+if (typeof module!=='undefined') module.exports={V2};
+
+// Content drawn from the user's Google Doc + OPS transcripts (lightly edited)
+const FCOLOR = { Ni:'#a78bfa', Ne:'#f0abfc', Si:'#60a5fa', Se:'#22d3ee', Ti:'#fb923c', Te:'#fcd34d', Fi:'#f472b6', Fe:'#34d399' };
+const FNAME = { Ni:'Introverted Intuition', Ne:'Extroverted Intuition', Si:'Introverted Sensing', Se:'Extroverted Sensing',
+  Ti:'Introverted Thinking', Te:'Extroverted Thinking', Fi:'Introverted Feeling', Fe:'Extroverted Feeling' };
+const FDESC = {
+  Ni:{ core:"Keeps stacking patterns onto a personal worldview, and pushes away new facts that don't connect back to it. Narrows everything down to one concept.", void:"Leaves others asking for the facts and details, and wondering whether you've seen the new information.", fear:"New facts collapse the abstract worldview you've built in your head."},
+  Se:{ core:"Constantly scanning, taking it all in and giving the facts and examples. Has a hard time narrowing down to one topic.", void:"Leaves others to make the guesses, draw the conclusions, and simplify it into a category.", fear:"Finding out that what felt new was really the same circle all along."},
+  Ne:{ core:"Scans for new concepts, understandings, and possibilities. Jumps from category to category and rarely says the same thing twice.", void:"Leaves others to create the physical structure and control.", fear:"Some control freak locks up your options and information."},
+  Si:{ core:"Keeps going over and refining known, personal facts. Controls things physically inside the box and returns to the comforting routine.", void:"Leaves others asking why, trying to understand, and showing you new possibilities.", fear:"Random chaos drops out of the sky and wrecks everything you've built."},
+  Fi:{ core:"Goes all in on what you love, hoping others will see the passion. Shoves away the work the tribe needs help with.", void:"Leaves others asking how it works and what's actually going to get done.", fear:"The tribe says what you love is stupid, and you have to do work you hate to be valuable."},
+  Te:{ core:"Does all the tribe work so everyone will love you. Has a hard time picking the one thing that matters most to you personally.", void:"Leaves others asking what's important to you and how you're feeling.", fear:"You get all the hard work done and still no one loves you."},
+  Ti:{ core:"Works on what you know is true for you, and builds something amazing so the tribe will have to love you. Gets smarter alone.", void:"Leaves the room emotionally uncomfortable while you go on about what you're working on.", fear:"You spend years figuring out the truth, and the tribe doesn't even care."},
+  Fe:{ core:"Tries to make everyone happy so they'll help you with your personal work. Talks out the values and emotions of the group.", void:"Leaves others to go with what's logically true, even if people hate it.", fear:"Years of caring for others leave you insecure and unable to make things work for yourself."}
+};
+const LETTERS = {
+  S:"Savior Sensory: obligated to prove, ground, and give the facts of what actually happened. Only once the facts are in are you \"allowed\" to guess. Often heard saying: \"I don't understand.\"",
+  N:"Savior Intuitive: obligated to give the summary, the overview, and the understanding of why. You make whole points on a pattern and promise the facts \"later.\" Often heard saying: \"This reminds me of…\"",
+  T:"Savior Thinker: obligated to figure it out, get it done, and solve the hard thing. You jump into the work, miss the vibe in the room, and crash emotionally later.",
+  F:"Savior Feeler: goes straight after what's valuable, liked, and wanted. You know exactly what's worth loving, but fumble the hard work of forcing it to happen."
+};
+const SUBTRAITS = {
+ 'Fi-Ne':'Creative, exploratory, imaginative','Fi-Si':'Nostalgic, sentimental, inward',
+ 'Ni-Fe':'Insightful, empathetic, counselor-like','Ni-Ti':'Detached, analytical, symbolic',
+ 'Ti-Ne':'Inventive, theoretical, curious','Ti-Si':'Precise, routine-oriented, archival',
+ 'Ni-Te':'Strategic, visionary, execution-focused','Ni-Fi':'Philosophical, private, idealistic',
+ 'Fi-Se':'Artistic, adventurous, expressive','Fi-Ni':'Symbolic, introspective, dreamy',
+ 'Si-Fe':'Caring, protective, socially attentive','Si-Ti':'Reserved, analytical, methodical',
+ 'Ti-Se':'Tactical, adaptable, action-oriented','Ti-Ni':'Minimalistic, predictive, withdrawn',
+ 'Si-Te':'Organized, disciplined, efficient','Si-Fi':'Quiet moralist, internally value-driven',
+ 'Ne-Fi':'Passionate, expressive, idealistic','Ne-Te':'Productive, entrepreneurial, driven',
+ 'Fe-Ni':'Inspirational, insightful, mentoring','Fe-Se':'Energetic, charismatic, socially bold',
+ 'Ne-Ti':'Intellectual, inventive, debater','Ne-Fe':'Charismatic, provocative, people-oriented',
+ 'Te-Ni':'Strategic commander, visionary leader','Te-Se':'Aggressive executor, forceful achiever',
+ 'Se-Fi':'Authentic, emotional, artistic','Se-Te':'Competitive, pragmatic, dominant',
+ 'Fe-Si':'Traditional caretaker, community-focused','Fe-Ne':'Enthusiastic, adaptive, socially expansive',
+ 'Se-Ti':'Tactical realist, sharp opportunist','Se-Fe':'Charming, persuasive, socially strategic',
+ 'Te-Si':'Structured leader, conventional executive','Te-Ne':'Expansive organizer, adaptable strategist'
+};
+const ANIMALS = {
+  Consume:{icon:'◐', d:"Gathering in new information and experiences for yourself. You want to be alone with the good book and keep going.", pair:'Oe + Di'},
+  Blast:{icon:'✦', d:"Taking what you already know and teaching it to the tribe. Three pages in, you have to go tell someone.", pair:'Oi + De'},
+  Sleep:{icon:'☾', d:"Conserving energy. You process inward and preserve, then spend it later. Introverted on both saviors.", pair:'Oi + Di'},
+  Play:{icon:'☀', d:"Expending energy outward, on the world and the people in it, then needing to recover later. Extroverted on both saviors.", pair:'Oe + De'}
+};
+const COINLABELS = {
+  OD:['Observer-led','Decider-led','Fear of chaos & control (IxxJ / ExxP)','Pain around identity & the tribe (IxxP / ExxJ)'],
+  DI:['Self above tribe (Di)','Tribe above self (De)','',''],
+  OI:['Organize & return (Oi)','Gather the new (Oe)','',''],
+  N: ['Intuition','Sensing','',''],
+  T: ['Thinking','Feeling','',''],
+  FT:['Fi / Te axis','Ti / Fe axis','',''],
+  NS:['Ni / Se axis','Si / Ne axis','',''],
+  IE:['Introverted lead','Extroverted lead','','']
+};
+
+// ===== Growth guide content (Option A: content blocks + rules) =====
+const FOCI = { general:'Just in general', work:'Work / career', rel:'Relationships', change:'Big life change', motiv:'Motivation', create:'Creative block' };
+
+const GUIDE = {
+ Ni:{
+  first:{ real:"You compress everything into one throughline. You often know where something is heading before you can explain why.",
+    strengths:["Seeing the long arc","Cutting through noise to the core idea","Holding one vision steady"],
+    apply:{ work:"Strategy, planning, and roles where you set direction and others execute.", rel:"You read where a relationship is heading early, so say it out loud sooner.", change:"Write the one-sentence vision for this change and let it filter every decision.", motiv:"Tie today's task to the bigger arc, in writing.", create:"Pick one theme and go deep instead of wide." } },
+  last:{ struggle:"Losing the thread. Lots of action and new experiences, but you're unsure what any of it adds up to, and sudden gut-feeling predictions about the future spook you.",
+    signs:["Saying yes to everything, then feeling empty","Sudden dark predictions about where life is going","Not being able to answer \"where is this going?\""],
+    exp:{ general:["Once a week, write three sentences: what pattern keeps repeating in my life?","Before starting something new, name in one line what it's for."], work:"Pick one 90-day goal and drop one thing that doesn't serve it.", rel:"Ask someone close: \"What do you think I'm really after?\"", change:"Picture yourself one year after this change. Write what you see in a paragraph.", motiv:"Write your \"why\" on a sticky note where you'll see it daily.", create:"Before making more, review your last five pieces and name their common thread." } },
+  loop:"replaying the same story about how things will turn out", exit:"step back and name the one thing this is really about" },
+ Se:{
+  first:{ real:"You live in the present moment. You notice what's actually in front of you, read a room physically, and act fast.",
+    strengths:["Reacting in real time","Noticing what's really there, not what's assumed","Making things happen hands-on"],
+    apply:{ work:"Live, hands-on roles: events, operations, troubleshooting, sales, craft.", rel:"You bring people into experiences, so plan things to do together.", change:"Go see it in person: tour it, visit it, try it before deciding.", motiv:"Make the first step physical, and start within five minutes.", create:"Work from real references and materials, and test things live." } },
+  last:{ struggle:"Stuck in your head. Plans and theories pile up but you stall on actually doing, the physical side of life (body, room, money details) gets neglected, and under stress you overindulge.",
+    signs:["Weeks in planning mode with nothing started","Ignoring sleep, food, and movement","Binging on sensation when stressed (food, scrolling, spending)"],
+    exp:{ general:["Do one ten-minute thing with your hands every day: walk, cook, fix something.","Turn one plan into a same-day action."], work:"Ship a rough version this week before you perfect the plan.", rel:"Plan one real-world activity together instead of another long talk.", change:"Visit or test the new thing in person before you decide.", motiv:"Set a ten-minute timer and just start. No planning allowed.", create:"Make a fast, messy draft with real materials." } },
+  loop:"chasing the next sensation or task", exit:"do something physical and fully present right now" },
+ Si:{
+  first:{ real:"You build a reliable base. You remember how things went before, refine your routines, and make things solid.",
+    strengths:["Consistency and follow-through","Remembering details and history","Refining something until it's dependable"],
+    apply:{ work:"Process, documentation, QA, and systems that have to be reliable.", rel:"Consistency is how you show care. Name it, so people notice it.", change:"Bring your routines with you, and rebuild one anchor habit first.", motiv:"Track streaks, and let routine carry you on low days.", create:"Master a craft through repetition and refinement." } },
+  last:{ struggle:"Scattered. You chase new ideas but drop the basics (bills, sleep, follow-through, what worked last time). Routines feel like a cage until things fall apart.",
+    signs:["Lots of starts, few finishes","Losing track of basics like deadlines, bills, and keys","Feeling physically run down out of nowhere"],
+    exp:{ general:["Pick one tiny daily anchor, like the same wake time or a five-minute reset.","After each project, jot down \"what worked\" in a running log."], work:"Write a checklist for the task you redo most often.", rel:"Remember one thing someone told you last week, and follow up on it.", change:"Before moving on, list what you're keeping from before.", motiv:"Finish one existing thing before you start a new one.", create:"Revisit and polish an old piece instead of starting fresh." } },
+  loop:"clinging to the routine and the way things were", exit:"go back to a reliable routine or what worked before" },
+ Ne:{
+  first:{ real:"You see possibilities everywhere. You connect ideas nobody else links, reframe problems, and generate options fast.",
+    strengths:["Generating options quickly","Connecting unrelated ideas","Reframing a stuck problem"],
+    apply:{ work:"Brainstorming, R&D, early-stage projects, and reframing problems.", rel:"You keep things fresh. Let people know which of your ideas you actually mean.", change:"Map three to five possible paths before committing to one.", motiv:"Gamify boring tasks or add some novelty.", create:"Mashups, experiments, and variations on a theme." } },
+  last:{ struggle:"Stuck on one track. You're convinced there's only one way things can go, so setbacks feel catastrophic and new possibilities feel threatening instead of exciting.",
+    signs:["Worst-case thinking about one outcome","Rejecting alternatives before hearing them","Feeling trapped with no options"],
+    exp:{ general:["When you're stuck, list five other ways it could go, even silly ones.","Try one small new thing each week: a new route, food, or genre."], work:"Before deciding, ask a coworker: \"How else could we do this?\"", rel:"Ask \"what if…\" questions instead of predicting how they'll react.", change:"Write three versions of how this change could turn out well.", motiv:"Change the setting or format of a task to restart momentum.", create:"Do a 15-minute \"bad ideas only\" brainstorm." } },
+  loop:"jumping between ideas without landing anywhere", exit:"talk it out or try one fresh angle" },
+ Ti:{
+  first:{ real:"You build your own understanding. You need things to make sense to you and won't accept a rule until you've tested it.",
+    strengths:["Finding the flaw in a system","Precise definitions and logic","Deep, independent problem-solving"],
+    apply:{ work:"Troubleshooting, engineering, analysis, debugging.", rel:"Explain your reasoning, and then check how it landed.", change:"Build your own decision criteria instead of borrowing someone else's.", motiv:"Turn the task into a puzzle you want to solve.", create:"Design systems, rules, and structure into your work." } },
+  last:{ struggle:"Outsourcing your own judgment. You lean on what others say or what \"works\" instead of thinking it through, and get defensive when your logic is questioned.",
+    signs:["Following rules you don't actually believe","Feeling dumb when you can't explain why","Overreacting to being corrected"],
+    exp:{ general:["Before agreeing to something, write one line of your own reasoning.","Spend 20 quiet minutes understanding one thing all the way."], work:"Pick one process and figure out exactly why each step exists.", rel:"When you disagree, say \"here's how I see it\" instead of going along.", change:"Define your own criteria for the decision before you ask anyone else.", motiv:"Ask yourself \"why does this matter, logically?\" and write the answer.", create:"Learn the underlying rules of your craft: theory, structure, technique." } },
+  loop:"overthinking alone until it's perfect", exit:"pause and work out what you actually think" },
+ Te:{
+  first:{ real:"You organize the world around you. You turn plans into action, measure what works, and get things done for the group.",
+    strengths:["Turning plans into action","Organizing people and resources","Measuring what actually works"],
+    apply:{ work:"Project management, operations, leadership, and anything with deadlines.", rel:"You show care by getting things done. Also ask what they actually want.", change:"Make the timeline and the checklist. It calms the chaos.", motiv:"Set measurable targets and track progress where you can see it.", create:"Set a release schedule, then finish and ship." } },
+  last:{ struggle:"Knowing what you love but not making it real. Passion projects stay in your head, deadlines feel like attacks, and \"just get it done\" pressure makes you shut down or rebel.",
+    signs:["Lots of passions, few finished","Avoiding tasks that feel like someone else's rules","Crash moments when everyone suddenly wants something from you"],
+    exp:{ general:["Break one thing you love into three steps with dates.","Tell one person a deadline out loud, and let the outside world hold you to it."], work:"Time-box your most annoying task to 25 minutes and get it done.", rel:"Turn one \"we should\" into a calendar invite.", change:"Make a simple timeline of what has to happen by when.", motiv:"Track one number weekly: pages, songs, hours.", create:"Set a release date and work backwards from it." } },
+  loop:"piling on tasks and fixing everyone's problems", exit:"make a small plan and take one concrete step" },
+ Fi:{
+  first:{ real:"You know what you value. You have a strong inner compass, spot what's fake, and stay loyal to what's real to you.",
+    strengths:["Knowing what matters to you","Spotting what's fake or off","Deep loyalty to the people and causes you choose"],
+    apply:{ work:"Mission-driven roles, creative work, advocacy, anything you believe in.", rel:"Your honesty about what you feel is a gift. Share it in words, not just by withdrawing.", change:"Check every option against \"does this feel like me?\"", motiv:"Connect the task to a value you actually hold.", create:"Personal expression. Your taste is your edge." } },
+  last:{ struggle:"Running on everyone else's needs and metrics until you don't know what you want, then feeling unappreciated and hit by a wave of \"nobody cares about me.\"",
+    signs:["Not being able to answer \"what do you want?\"","Resentment after over-delivering","A sudden emotional crash after a productive streak"],
+    exp:{ general:["Each day, write one thing you liked and one you didn't. No reasons needed.","Say no to one request that doesn't matter to you."], work:"Pick one project you care about personally and protect time for it.", rel:"Tell someone one thing you actually want, plainly.", change:"Before deciding, ask yourself: \"What would I choose if nobody was watching?\"", motiv:"Find your personal \"why\" before working out the \"how.\"", create:"Make one thing only for yourself, not to show anyone." } },
+  loop:"withdrawing into what you feel and love", exit:"check in with what you actually feel and want" },
+ Fe:{
+  first:{ real:"You read the emotional weather. You sense how the group feels, bring people together, and make people feel seen.",
+    strengths:["Reading the room","Bringing people together","Making people feel seen"],
+    apply:{ work:"Teaching, support, HR, community, and client-facing roles.", rel:"You notice everyone's needs. Put your own on that list too.", change:"Lean on your people and tell them what you need.", motiv:"Work alongside others, or for someone you care about.", create:"Make things that move or connect an audience." } },
+  last:{ struggle:"Feeling disconnected from the group. You're unsure how people feel about you, awkward in emotional moments, and surprised when people get upset over things that made sense to you.",
+    signs:["Being shocked that someone is hurt","Avoiding emotional conversations","Feeling like the outsider who doesn't get it"],
+    exp:{ general:["Once a day, ask someone how they're doing and really listen.","Before sharing a conclusion, ask yourself: \"How will this land for them?\""], work:"Thank one person for something specific they did.", rel:"Ask \"what would make this better for you?\" and then do it.", change:"Tell the people around you what's changing and how they can help.", motiv:"Find an accountability buddy.", create:"Share a work in progress and ask how it made them feel." } },
+  loop:"bending over backwards to keep everyone happy", exit:"reach out and connect with someone" }
+};
+
+// which question ids to quote back (ids set in questions.js)
+const QUOTE_IDS = { crash:'how things break down for you', fearO:'the fear that hit closest', fearD:'the fear that stung more', drain:'what drains you' };
+if (typeof module!=='undefined') module.exports={GUIDE,FOCI,QUOTE_IDS};
+
+</script>
+<script>
+(()=>{
+const $ = s=>document.querySelector(s);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ORDER_O = ['Ni','Se','Si','Ne'], ORDER_D = ['Fi','Te','Ti','Fe'];
+const hex2rgb = h=>{const n=parseInt(h.slice(1),16);return [n>>16&255,n>>8&255,n&255];};
+const lerp=(a,b,t)=>a+(b-a)*t;
+
+/* ================= SKY: aurora + stars + bursts ================= */
+const sky = $('#sky'), sx = sky.getContext('2d');
+let W=0,H=0,DPR=1, mouse={x:.5,y:.5,tx:.5,ty:.5};
+const stars=[], bursts=[];
+let auroraTarget = ['#7c3aed','#0891b2','#db2777','#4f46e5'].map(hex2rgb);
+let aurora = auroraTarget.map(c=>c.slice());
+function resize(){
+  DPR=Math.min(2,devicePixelRatio||1); W=innerWidth; H=innerHeight;
+  sky.width=W*DPR; sky.height=H*DPR; sx.setTransform(DPR,0,0,DPR,0,0);
+  stars.length=0; const n=Math.round(W*H/5200);
+  for(let i=0;i<n;i++) stars.push({x:Math.random()*W,y:Math.random()*H,z:Math.random(),tw:Math.random()*6.28,s:Math.random()*.9+.2});
+}
+addEventListener('resize',resize); resize();
+addEventListener('pointermove',e=>{mouse.tx=e.clientX/W;mouse.ty=e.clientY/H;});
+function setAurora(colors){ auroraTarget = colors.map(hex2rgb); }
+function burst(x,y,color,n=34){
+  const c=hex2rgb(color);
+  for(let i=0;i<n;i++){const a=Math.random()*6.283,v=1.5+Math.random()*5.5;
+    bursts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1,life:1,r:1+Math.random()*2.6,c});}
+}
+let t0=performance.now();
+function drawSky(now){
+  const t=(now-t0)/1000;
+  mouse.x+= (mouse.tx-mouse.x)*.04; mouse.y+=(mouse.ty-mouse.y)*.04;
+  sx.globalCompositeOperation='source-over';
+  sx.fillStyle='#05040d'; sx.fillRect(0,0,W,H);
+  // aurora blobs
+  sx.globalCompositeOperation='lighter';
+  for(let i=0;i<4;i++){
+    for(let k=0;k<3;k++) aurora[i][k]=lerp(aurora[i][k],auroraTarget[i][k],.012);
+    const [r,g,b]=aurora[i];
+    const px = W*(.5+.38*Math.sin(t*.07*(i+1)+i*1.7)) + (mouse.x-.5)*-60*(i+1);
+    const py = H*(.42+.32*Math.cos(t*.055*(i+1.3)+i)) + (mouse.y-.5)*-40*(i+1);
+    const rad = Math.max(W,H)*(.42+.08*Math.sin(t*.2+i));
+    const gr=sx.createRadialGradient(px,py,0,px,py,rad);
+    gr.addColorStop(0,`rgba(${r|0},${g|0},${b|0},.30)`); gr.addColorStop(.45,`rgba(${r|0},${g|0},${b|0},.10)`); gr.addColorStop(1,'rgba(0,0,0,0)');
+    sx.fillStyle=gr; sx.fillRect(0,0,W,H);
+  }
+  // aurora ribbons
+  for(let j=0;j<2;j++){
+    const [r,g,b]=aurora[j+1];
+    sx.beginPath();
+    for(let x=0;x<=W;x+=24){
+      const y=H*(.3+j*.18)+Math.sin(x*.004+t*.35+j*2)*60+Math.sin(x*.011-t*.22)*24;
+      x===0?sx.moveTo(x,y):sx.lineTo(x,y);
+    }
+    sx.strokeStyle=`rgba(${r|0},${g|0},${b|0},.07)`; sx.lineWidth=90; sx.stroke();
+  }
+  // stars
+  for(const s of stars){
+    const ox=(mouse.x-.5)*-24*s.z, oy=(mouse.y-.5)*-24*s.z;
+    const a=.25+.55*(.5+.5*Math.sin(t*1.4*s.s+s.tw));
+    sx.fillStyle=`rgba(230,232,255,${a*s.z})`;
+    sx.fillRect(s.x+ox,s.y+oy,s.s*1.4*s.z+.3,s.s*1.4*s.z+.3);
+    s.y-=.03*s.z; if(s.y<0) s.y=H;
+  }
+  // bursts
+  for(let i=bursts.length-1;i>=0;i--){
+    const p=bursts[i]; p.x+=p.vx; p.y+=p.vy; p.vx*=.95; p.vy=p.vy*.95+.04; p.life-=.016;
+    if(p.life<=0){bursts.splice(i,1);continue;}
+    const [r,g,b]=p.c; sx.fillStyle=`rgba(${r},${g},${b},${p.life})`;
+    sx.beginPath(); sx.arc(p.x,p.y,p.r*(.5+p.life),0,6.283); sx.fill();
+  }
+  sx.globalCompositeOperation='source-over';
+}
+
+/* ================= ORBIT: 8 function planets ================= */
+class Orbit{
+  constructor(cv,{labels=false}={}){ this.cv=cv; this.c=cv.getContext('2d'); this.labels=labels; this.size={}; this.target={}; this.highlight=[];
+    for(const f in FN){ this.size[f]=.25; this.target[f]=.25; } this.trail={}; }
+  set(funcs){ for(const f in funcs) this.target[f]=funcs[f]; }
+  draw(t){
+    const cv=this.cv, r=cv.getBoundingClientRect(); if(!r.width) return;
+    const w=r.width,h=r.height; if(cv.width!==Math.round(w*DPR)){cv.width=w*DPR;cv.height=h*DPR;}
+    const c=this.c; c.setTransform(DPR,0,0,DPR,0,0); c.clearRect(0,0,w,h);
+    const cx=w/2, cy=h/2, R=Math.min(w,h*1.38)*.44;
+    // core
+    const pulse=1+.06*Math.sin(t*1.6);
+    let g=c.createRadialGradient(cx,cy,0,cx,cy,R*.36*pulse);
+    g.addColorStop(0,'rgba(255,255,255,.95)'); g.addColorStop(.15,'rgba(200,190,255,.55)'); g.addColorStop(.5,'rgba(140,110,255,.15)'); g.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=g; c.beginPath(); c.arc(cx,cy,R*.36*pulse,0,6.283); c.fill();
+    const rings=[{fs:ORDER_O,rx:R*.56,ry:R*.2,tilt:-.28,sp:.22},{fs:ORDER_D,rx:R*.98,ry:R*.34,tilt:.16,sp:-.14}];
+    const items=[];
+    rings.forEach((ring,ri)=>{
+      c.save(); c.translate(cx,cy); c.rotate(ring.tilt);
+      c.strokeStyle='rgba(255,255,255,.10)'; c.lineWidth=1; c.setLineDash(ri?[2,6]:[]);
+      c.beginPath(); c.ellipse(0,0,ring.rx,ring.ry,0,0,6.283); c.stroke(); c.restore();
+      ring.fs.forEach((f,i)=>{
+        this.size[f]=lerp(this.size[f],this.target[f],.05);
+        const a=t*ring.sp+i*Math.PI/2+ri*.6;
+        const ex=Math.cos(a)*ring.rx, ey=Math.sin(a)*ring.ry;
+        const x=cx+ex*Math.cos(ring.tilt)-ey*Math.sin(ring.tilt), y=cy+ex*Math.sin(ring.tilt)+ey*Math.cos(ring.tilt);
+        const depth=(Math.sin(a)+1)/2; // 0 back,1 front
+        items.push({f,x,y,depth,a,ring});
+      });
+    });
+    items.sort((p,q)=>p.depth-q.depth);
+    for(const it of items){
+      const p=Math.max(0,this.size[it.f]); const rad=(3+R*.12*Math.sqrt(p))*(.7+.45*it.depth);
+      const col=FCOLOR[it.f]; const [r_,g_,b_]=hex2rgb(col); const hi=this.highlight.includes(it.f);
+      // glow
+      const gg=c.createRadialGradient(it.x,it.y,0,it.x,it.y,rad*(hi?5:3.4));
+      gg.addColorStop(0,`rgba(${r_},${g_},${b_},${.55*(.5+.5*it.depth)})`); gg.addColorStop(1,'rgba(0,0,0,0)');
+      c.fillStyle=gg; c.beginPath(); c.arc(it.x,it.y,rad*(hi?5:3.4),0,6.283); c.fill();
+      // body
+      const bg=c.createRadialGradient(it.x-rad*.35,it.y-rad*.35,rad*.1,it.x,it.y,rad);
+      bg.addColorStop(0,'#fff'); bg.addColorStop(.35,col); bg.addColorStop(1,`rgba(${r_*.3|0},${g_*.3|0},${b_*.3|0},1)`);
+      c.fillStyle=bg; c.beginPath(); c.arc(it.x,it.y,rad,0,6.283); c.fill();
+      if(hi){ c.strokeStyle=`rgba(${r_},${g_},${b_},.8)`; c.lineWidth=1.2; c.beginPath(); c.arc(it.x,it.y,rad+5+2*Math.sin(t*3),0,6.283); c.stroke(); }
+      if(this.labels){ c.fillStyle=`rgba(238,240,255,${.45+.55*it.depth})`; c.font=`700 ${Math.max(10,R*.075)}px Unbounded`; c.textAlign='center'; c.fillText(it.f,it.x,it.y-rad-8); }
+    }
+  }
+}
+const orbits=[ new Orbit($('#orbitIntro')), new Orbit($('#orbitQuiz')) ];
+// intro: gently randomize sizes
+setInterval(()=>{ if($('#intro').classList.contains('active')){ const o=orbits[0]; for(const f in FN) o.target[f]=.08+Math.random()*.5; } },2200);
+
+function loop(now){ drawSky(now); const t=now/1000; orbits.forEach(o=>o.draw(t)); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+
+/* ================= SOUND (optional ambient) ================= */
+let AC=null, master=null, soundOn=false;
+function initAudio(){
+  if(AC) return; AC=new (window.AudioContext||window.webkitAudioContext)();
+  master=AC.createGain(); master.gain.value=0; master.connect(AC.destination);
+  const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=800; lp.Q.value=.6; lp.connect(master);
+  const lfo=AC.createOscillator(), lfoG=AC.createGain(); lfo.frequency.value=.05; lfoG.gain.value=380; lfo.connect(lfoG); lfoG.connect(lp.frequency); lfo.start();
+  [110,164.81,246.94,329.63].forEach((f,i)=>{ for(const d of [-6,6]){ const o=AC.createOscillator(); o.type=i%2?'sine':'triangle'; o.frequency.value=f; o.detune.value=d; const g=AC.createGain(); g.gain.value=.05/(i+1); o.connect(g); g.connect(lp); o.start(); } });
+  // echo bus for chimes
+  const dl=AC.createDelay(); dl.delayTime.value=.42; const fb=AC.createGain(); fb.gain.value=.42; dl.connect(fb); fb.connect(dl); dl.connect(master);
+  AC.echo=dl;
+}
+function chime(i){
+  if(!soundOn||!AC) return; const notes=[523.25,587.33,659.25,783.99,880,1046.5];
+  const o=AC.createOscillator(), g=AC.createGain(); o.type='sine'; o.frequency.value=notes[i%notes.length]*(Math.random()<.5?1:.5);
+  g.gain.setValueAtTime(0,AC.currentTime); g.gain.linearRampToValueAtTime(.09,AC.currentTime+.01); g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+1.8);
+  o.connect(g); g.connect(master); g.connect(AC.echo); o.start(); o.stop(AC.currentTime+2);
+}
+$('#soundBtn').addEventListener('click',()=>{
+  try{ initAudio(); AC.resume(); soundOn=!soundOn;
+    master.gain.cancelScheduledValues(AC.currentTime); master.gain.linearRampToValueAtTime(soundOn?.55:0,AC.currentTime+1.2);
+    $('#soundBtn').classList.toggle('on',soundOn); $('#soundBtn').textContent=soundOn?'♪ Ambient on':'♪ Ambient off'; $('#soundBtn').setAttribute('aria-pressed',soundOn);
+  }catch(e){ $('#soundBtn').textContent='♪ Unavailable'; }
+});
+
+/* ================= QUIZ FLOW (v2) ================= */
+let idx=0, take=[], picks=[], stage='pick';
+const N=36;
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $('#'+id).classList.add('active'); scrollTo({top:0,behavior:reduce?'auto':'smooth'}); }
+const OPT_COLORS=['#67e8f9','#a78bfa','#f472b6','#fcd34d','#34d399','#fb923c'];
+const WHY_KEYS=V2.WHY_ORDER;
+function startTake(){ take=V2.buildTake(); picks=take.map(()=>null); idx=0; stage='pick'; recompute(); show('quiz'); renderQ('in'); }
+function minsLeft(){ return Math.max(1,Math.round((take.length-idx)*17/60)); }
+function stageOf(p){ if(!p||!p.rank1) return 'pick'; if(!p.rank2) return 'pick2'; if(!p.why) return 'why'; return 'done'; }
+function optHtml(it,p,anim){
+  const r1=p&&p.rank1, r2=p&&p.rank2, full=!!(r1&&r2);
+  return it.shown.map((f,i)=>{ const c=OPT_COLORS[(i+idx)%6], rk=f===r1?1:f===r2?2:0, dis=full&&!rk;
+    return `<div class="opt${rk?' picked rk'+rk:''}${dis?' dismissed':''}${anim?'':' static'}" data-f="${f}" style="--c:${c};animation-delay:${anim?.05+i*.05:0}s">
+      <button class="opick" data-f="${f}" aria-pressed="${!!rk}" aria-label="${rk?'Ranked #'+rk+': ':''}${it.text[f].replace(/"/g,'&quot;')}"><span class="key">${rk?'#'+rk:i+1}</span><span class="t">${it.text[f]}</span>${rk?`<span class="rkb">${rk===1?'Most me':'Next most'}</span>`:''}</button></div>`; }).join('')
+  + (full ? `<div class="why" role="group" aria-label="Why your #1?"><div class="sl">Why your #1? <span>(tap to continue)</span></div><div class="srow">${WHY_KEYS.map((w,k)=>`<button class="wbtn${p.why===w?' on':''}" data-w="${w}"><i>${k+1}</i>${V2.WHY[w].label}</button>`).join('')}</div></div>` : '');
+}
+function drawOpts(anim){
+  const it=take[idx], p=picks[idx], box=$('#opts'); box.innerHTML=optHtml(it,p,anim);
+  box.querySelectorAll('.opt').forEach(o=>o.addEventListener('pointermove',e=>{const r=o.getBoundingClientRect(); o.style.setProperty('--mx',(e.clientX-r.left)+'px'); o.style.setProperty('--my',(e.clientY-r.top)+'px');}));
+  box.querySelectorAll('.opick').forEach(b=>b.addEventListener('click',e=>pickOpt(b.dataset.f,e)));
+  box.querySelectorAll('.wbtn').forEach(b=>b.addEventListener('click',()=>setWhy(b.dataset.w)));
+  stage=stageOf(p);
+  $('#nextBtn').disabled = !(p&&p.rank1&&p.rank2);
+  $('#stageHint').textContent = stage==='pick' ? 'Tap the option that\'s most you (1–6)' : stage==='pick2' ? 'Now tap your #2 (1–6) · tap #1 again to undo' : stage==='why' ? 'Why your #1? (1–5) · Enter to skip' : 'Enter for next · tap a pick to change it';
+}
+function renderQ(dir='in'){
+  const it=take[idx], body=$('#qbody');
+  body.innerHTML=`<div class="scen">${SCEN[it.scen]}</div><h2 class="qtext">${it.q}</h2><div class="rankhelp">Pick the one that's <b>most you</b>, then your <b>next most</b>. The other four drop away.</div><div class="opts" id="opts"></div>
+    <div class="qfoot"><button class="nonefit" id="noneBtn">None of these fit me</button><button class="nextb" id="nextBtn" disabled>Next →</button></div>`;
+  drawOpts(true);
+  $('#noneBtn').addEventListener('click',()=>{ picks[idx]={rank1:null,rank2:null,why:null,none:true}; advance(true); });
+  $('#nextBtn').addEventListener('click',()=>advance());
+  $('#qcount').innerHTML=String(idx+1).padStart(2,'0')+`<span> / ${N}</span>`;
+  $('#qnum').textContent='Scene '+String(idx+1).padStart(2,'0')+' · about '+minsLeft()+' min left';
+  $('#pfill').style.width=(idx/N*100)+'%';
+  $('#backBtn').disabled = idx===0;
+  body.classList.remove('out'); body.classList.add(dir); requestAnimationFrame(()=>requestAnimationFrame(()=>body.classList.remove('in')));
+}
+function recompute(){
+  const r=V2.score(take,picks); orbits[1].set(r.funcs);
+  const top=Object.entries(r.funcs).sort((a,b)=>b[1]-a[1]).slice(0,4).map(x=>FCOLOR[x[0]]);
+  setAurora(top); return r;
+}
+function pickOpt(f,e){
+  if(busy) return;
+  let p=picks[idx]; if(!p||p.none) p=picks[idx]={rank1:null,rank2:null,why:null};
+  if(p.rank1===f){ p.rank1=p.rank2; p.rank2=null; p.why=null; }           // undo #1: #2 moves up
+  else if(p.rank2===f){ p.rank2=null; p.why=null; }                          // undo #2
+  else if(!p.rank1){ p.rank1=f; }
+  else if(!p.rank2){ p.rank2=f; }
+  else { p.rank2=f; }                                                        // both set: tapping a dismissed one swaps it in as #2
+  drawOpts(false);
+  const el=$(`.opt[data-f="${f}"]`); if(el&&el.classList.contains('picked')){ const r=el.getBoundingClientRect(); burst(e&&e.clientX?e.clientX:r.left+r.width/2, e&&e.clientY?e.clientY:r.top+20, el.style.getPropertyValue('--c')||'#a78bfa', reduce?0:22); chime(idx+(p.rank2===f?2:0)); }
+  recompute();
+}
+function setWhy(w){ const p=picks[idx]; if(!p||!p.rank1||!p.rank2) return; p.why=w; drawOpts(false); recompute(); setTimeout(()=>advance(),260); }
+let busy=false;
+function advance(force){
+  if(busy) return; const p=picks[idx]; if(!p) return;
+  if(!force && !(p.rank1&&p.rank2)) return;
+  busy=true; recompute();
+  $('#qbody').classList.add('out');
+  setTimeout(()=>{ idx++; busy=false; if(idx<N) renderQ('in'); else finish(); },reduce?0:300);
+}
+$('#backBtn').addEventListener('click',()=>{ if(idx>0&&!busy){ idx--; recompute(); renderQ('in'); } });
+addEventListener('keydown',e=>{
+  if(!$('#quiz').classList.contains('active') || busy) return;
+  if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+  const n=parseInt(e.key,10), it=take[idx], st=stageOf(picks[idx]);
+  if(e.key==='Enter'){ const p=picks[idx]; if(p&&p.rank1&&p.rank2){ e.preventDefault(); advance(); } return; }
+  if(e.key==='Escape'){ picks[idx]=null; drawOpts(false); recompute(); return; }
+  if(!isNaN(n)){
+    if((st==='pick'||st==='pick2') && n>=1 && n<=6) return pickOpt(it.shown[n-1]);
+    if(st==='why' && n>=1 && n<=5) return setWhy(WHY_KEYS[n-1]);
+  }
+  if((e.key==='ArrowLeft'||e.key==='Backspace') && st==='pick') $('#backBtn').click();
+});
+/* ---------- name gate ---------- */
+let takerName='';
+const nameInput=$('#nameInput');
+nameInput.addEventListener('input',()=>{ $('#startBtn').disabled = nameInput.value.trim().length===0; });
+$('#nameForm').addEventListener('submit',e=>{
+  e.preventDefault(); const v=nameInput.value.trim().replace(/\s+/g,' ').slice(0,40); if(!v) return;
+  takerName=v; const r=$('#startBtn').getBoundingClientRect(); burst(r.left+r.width/2,r.top+r.height/2,'#a78bfa',60);
+  startTake();
+});
+
+/* ---------- Supabase save ---------- */
+function newId(){ return crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&3|8)).toString(16);}); }
+function clientId(){
+  try{ let id=localStorage.getItem('constellation_client_id');
+    if(!id){ id=newId(); localStorage.setItem('constellation_client_id',id); }
+    return id; }catch(e){ return null; }
+}
+const supaReady = ()=> typeof SUPABASE_URL==='string' && !/YOUR-PROJECT/.test(SUPABASE_URL) && !/YOUR-ANON/.test(SUPABASE_ANON_KEY);
+async function supaInsert(table,rec){
+  if(!supaReady()) throw new Error('not-configured');
+  const res = await fetch(SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/'+table,{method:'POST',headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok) throw new Error('HTTP '+res.status+' '+(await res.text()).slice(0,200));
+}
+async function saveResult(rec){ return supaInsert('quiz_results',rec); }
+function buildRecord(r){
+  const t=r.top, round=x=>Math.round(x*1000)/1000, coins={}, tp={};
+  for(const c of COINS) coins[c]=round(r.coins[c]); for(const k in r.types) tp[k]=round(r.types[k]);
+  return { id:currentResultId, name:takerName, client_id:clientId(), quiz_version:QUIZ_VERSION,
+    type:t.type, subtype:t.key, dom:t.dom, other:t.other, subtype_pos:t.pos,
+    lead: t.sign.OD>0?'Observer':'Decider', animal:t.animal,
+    type_prob:round(r.types[t.type]), subtype_prob:round(t.p), coins, type_probs:tp,
+    answers: take.map((it,i)=>{ const p=picks[i]||{}; return { n:i+1, probe:it.probe, scenario:it.scen, item_id:it.id, q:it.q, shown:it.shown,
+      picked:p.rank1||null, t:p.rank1?it.text[p.rank1]:null, second:p.rank2||null, t2:p.rank2?it.text[p.rank2]:null,
+      dismissed:(p.rank1&&p.rank2)?it.shown.filter(f=>f!==p.rank1&&f!==p.rank2):[], why:p.why||null, none_fit:!!p.none }; }),
+    consistency: round(r.consistency), core_default: r.core, learned_fns: r.learned, context_fns: r.context, ideal_gap: r.idealGap, stress_profile: r.stressTop };
+}
+function renderSave(state,msg){
+  const el=$('#saveChip'); if(!el) return;
+  el.className='savechip '+(state==='ok'?'ok':state==='err'?'err':'');
+  el.innerHTML = state==='saving'?'Saving your result…': state==='ok'?'✓ Result saved': state==='off'?'Saving isn\'t set up on this copy':'Couldn\'t save. <button id="retrySave">Try again</button>';
+  if(msg) el.title=msg;
+  const rb=$('#retrySave'); if(rb) rb.addEventListener('click',()=>doSave());
+}
+let lastRecord=null, currentResultId=null, resultSaved=false;
+async function doSave(){
+  if(!lastRecord) return;
+  if(!supaReady()){ renderSave('off'); return; }
+  renderSave('saving');
+  try{ await saveResult(lastRecord); resultSaved=true; renderSave('ok'); }catch(e){ renderSave('err',String(e.message||e)); }
+}
+
+/* ================= GROWTH GUIDE ================= */
+const unp=s=>String(s).replace(/[.。!?…]+$/,'');
+function weakestScenario(r){
+  let worst=null, low=2;
+  ['work','social','alone'].forEach(sc=>{ let n=0,c=0; take.forEach((it,i)=>{ const p=picks[i]; if(it.scen!==sc||!p||!p.rank1) return; n++; if(r.core.includes(p.rank1)) c++; });
+    if(n>=3 && c/n<low){ low=c/n; worst=sc; } });
+  return low<0.6?worst:null;
+}
+function patternsHtml(r){
+  const fc2=n=>`<b style="color:${FCOLOR[n]}">${n}</b>`;
+  const core=r.core, steady=r.steady.slice(0,5).map(s=>s.label.toLowerCase());
+  const ctx=r.context.length? r.context.map(c=>`<li>${SCEN[c.scen]}: you shift to ${fc2(c.fn)}</li>`).join('') : '<li>You stayed pretty much the same across settings.</li>';
+  const ideal=r.idealGap.length? `You picked ${r.idealGap.map(fc2).join(', ')} answers mostly because you <i>should</i>.`: 'No big gap between what you do and what you think you should do.';
+  const dflt=FORDER.filter(f=>r.defaultCnt[f]>0); const dfltTxt=dflt.length?`What you tagged "just what I do": ${dflt.map(fc2).join(', ')}.`:'';
+  const stress=r.stressTop.length? r.stressTop.map(fc2).join(' + ') : '—';
+  return `<div class="grid2 pats">
+    <div class="panel pat"><div class="pk">Your core default</div><div class="pv">${core.map(fc2).join(' + ')}</div>
+      <div class="meter"><i style="width:${Math.round(r.consistency*100)}%"></i></div><div class="pm">${Math.round(r.consistency*100)}% consistent across scenes${r.loose?' · loose read':''}</div>
+      ${steady.length?`<p>Held steady in: ${steady.join(', ')}.</p>`:''}</div>
+    <div class="panel pat"><div class="pk">You adapt when…</div><ul>${ctx}</ul></div>
+    <div class="panel pat"><div class="pk">Automatic vs. built up</div>${dfltTxt?`<p>${dfltTxt}</p>`:''}${r.learned.length?`<p>You've <b>worked hard</b> to build ${r.learned.map(fc2).join(', ')}. Effort like that usually points at functions further down your stack, not your default.</p>`:''}<p class="muted2">${ideal}</p></div>
+    <div class="panel pat"><div class="pk">Under stress you go to</div><div class="pv">${stress}</div><p class="muted2">Taken from the ${take.filter(t=>t.scen==='stress').length} stress scenes. These don't count toward your type.</p></div></div>`;
+}
+function guideHtml(r, focus){
+  const t=r.top, st=STACKS[t.type], f1=st[0], aux=st[1], tert=st[2], f4=st[3];
+  const G1=GUIDE[f1], G4=GUIDE[f4], intro=FN[f1].att==='i';
+  const fc = focus==='general'?null:focus;
+  const applyList = fc ? `<p class="hl">→ <b>${FOCI[fc]}:</b> ${G1.first.apply[fc]}</p>` :
+     `<ul class="apply">${Object.entries(G1.first.apply).map(([k,v])=>`<li><b>${FOCI[k]}:</b> ${v}</li>`).join('')}</ul>`;
+  // loop
+  const loopPair = `<b style="color:${FCOLOR[f1]}">${f1}</b> + <b style="color:${FCOLOR[tert]}">${tert}</b>`;
+  const loopCore = intro
+    ? `When you're stressed, you tend to retreat inward into ${loopPair}: ${GUIDE[f1].loop}, and ${GUIDE[tert].loop}. It feels safe because it skips your <b style="color:${FCOLOR[aux]}">${aux}</b>, the outward function that actually moves you forward.`
+    : `When you're stressed, you tend to go full speed outward with ${loopPair}: ${GUIDE[f1].loop}, and ${GUIDE[tert].loop}. It skips your <b style="color:${FCOLOR[aux]}">${aux}</b>, the inward pause that gives you direction.`;
+  const loopFrame = t.pos==='tert'
+    ? `Your result is the <b>${f1}–${tert}</b> subtype, so this pairing is your home base, not a flaw. The trap is staying there too long.`
+    : `Your result is the balanced <b>${f1}–${aux}</b> subtype, so the loop mostly shows up under pressure.`;
+  // from their own answers (v2: why-tags, stress profile)
+  const quotes=[]; const fc2=n=>`<b style="color:${FCOLOR[n]}">${n}</b>`;
+  const fearFns=FORDER.filter(f=>r.fearSig[f]>0);
+  if(fearFns.length) quotes.push(`You tagged ${fearFns.map(fc2).join(' and ')} answers as <i>"it avoids something bad."</i> Choices driven by fear often point at a blind spot.`+(fearFns.includes(f4)?` That matches your #4, ${fc2(f4)}.`:''));
+  if(r.idealGap.length) quotes.push(`You picked ${r.idealGap.map(fc2).join(' and ')} answers mostly because they're what you <i>"should"</i> do. That's who you're aiming to be, not your default, so it was weighted lower.`);
+  if(r.stressTop.length){ const st2=r.stressTop; const loopHit=st2.some(f=>f===f1||f===tert);
+    quotes.push(`Under stress you reached for ${st2.map(fc2).join(' and ')}.`+(loopHit?` That lines up with your ${f1} + ${tert} loop.`:st2.includes(f4)?` That's your #4 taking over, the classic "grip" pattern.`:` Worth noticing, since it's outside your usual stack order.`)); }
+  // experiments
+  const weak=weakestScenario(r);
+  const ex=[ fc? G4.last.exp[fc] : G4.last.exp.general[0], fc? G4.last.exp.general[0] : G4.last.exp.general[1], `When you catch yourself in the loop: <b>${GUIDE[aux].exit}</b>.` ];
+  if(weak) ex.push(`You were least like yourself in <b>${SCEN[weak].toLowerCase()}</b> scenes. Try one of these there first.`);
+  // adaptive notes
+  const notes=[];
+  if (r.funcs[f4] > .35) notes.push(`Your answers show more ${f4} than most ${t.type}s, so it may be less of a blind spot for you. Read the section below as "things to keep an eye on."`);
+  const sorted=Object.entries(r.types).sort((a,b)=>b[1]-a[1]);
+  if (sorted[0][1] < .45) { const alt=sorted[1][0], a1=STACKS[alt][0], a4=STACKS[alt][3];
+    notes.push(`Your result was close. <b>${alt}</b> came in second at ${pct(sorted[1][1])}%. If the guide below doesn't land, try reading it as ${alt}, with ${a1} first and ${a4} last.`); }
+  return `
+   ${notes.map(n=>`<div class="note">${n}</div>`).join('')}
+   <div class="gblock" style="--c:${FCOLOR[f1]}"><div class="gk">Your #1 function · ${f1} · ${FNAME[f1]}</div>
+     <p>${G1.first.real}</p><div class="chips2">${G1.first.strengths.map(s=>`<span>${s}</span>`).join('')}</div>
+     <div class="gs">Where to use it</div>${applyList}</div>
+   <div class="gblock" style="--c:${FCOLOR[f4]}"><div class="gk">Your #4 function · ${f4} · the blind spot</div>
+     <p>${G4.last.struggle}</p><div class="gs">Early warning signs</div><ul>${G4.last.signs.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+   <div class="gblock" style="--c:${FCOLOR[tert]}"><div class="gk">Your stuck loop</div><p>${loopCore}</p><p class="muted2">${loopFrame}</p></div>
+   ${quotes.length?`<div class="gblock" style="--c:#c4b5fd"><div class="gk">From your own answers</div>${quotes.map(q=>`<p>${q}</p>`).join('')}</div>`:''}
+   <div class="gblock try" style="--c:#fcd34d"><div class="gk">Try this week${fc?` · ${FOCI[fc]}`:''}</div><ol>${ex.map(e=>`<li>${e}</li>`).join('')}</ol>
+     <div class="muted2">Small experiments, not rules. Notice what changes after a week, then retake if you like.</div></div>
+   <div class="care">These are self-reflection ideas, not therapy. If you're dealing with something heavy, talking it through with someone you trust or a professional helps more than any type description.</div>`;
+}
+let currentFocus='general';
+function wireGuide(r){
+  currentFocus='general';
+  const draw=()=>{ $('#guide').innerHTML=guideHtml(r,currentFocus); };
+  draw();
+  document.querySelectorAll('#foci .focus').forEach(b=>b.addEventListener('click',()=>{
+    currentFocus=b.dataset.f; document.querySelectorAll('#foci .focus').forEach(x=>x.classList.toggle('on',x===b));
+    $('#guide').style.opacity=0; setTimeout(()=>{ draw(); $('#guide').style.opacity=1; },180);
+  }));
+}
+/* ================= FEEDBACK ================= */
+function wireFeedback(){
+  let fit=null;
+  document.querySelectorAll('#fit button').forEach(b=>b.addEventListener('click',()=>{
+    fit=+b.dataset.v; document.querySelectorAll('#fit button').forEach(x=>x.classList.toggle('on',+x.dataset.v<=fit)); $('#fbSend').disabled=false; }));
+  $('#fbSend').addEventListener('click',async()=>{
+    if(!fit) return;
+    const rec={ result_id:currentResultId, fit, off:[...document.querySelectorAll('.offs input:checked')].map(i=>i.value),
+      self_type:$('#selfType').value||null, focus:currentFocus, note:($('#fbNote').value||'').trim().slice(0,300)||null };
+    const msg=$('#fbMsg');
+    if(!supaReady()){ msg.textContent='Feedback saving isn\'t set up on this copy.'; return; }
+    if(!resultSaved){ msg.textContent='Your result hasn\'t saved yet. Use "Try again" above first.'; return; }
+    $('#fbSend').disabled=true; msg.textContent='Sending…';
+    try{ await supaInsert('quiz_feedback',rec); $('#fbPanel').innerHTML='<div class="fb-thanks">✦ Thank you. This helps make the quiz better for everyone.</div>'; }
+    catch(e){ msg.textContent='Couldn\'t send. Try again.'; msg.title=String(e.message||e); $('#fbSend').disabled=false; }
+  });
+}
+
+/* ================= FUNCTION EXPLORER ================= */
+const XPOS = { Si:[150,150], Ni:[300,150], Se:[150,390], Ne:[300,390], Ti:[500,150], Fi:[650,150], Te:[500,390], Fe:[650,390] };
+const PARTNER = { Ni:'Se', Se:'Ni', Si:'Ne', Ne:'Si', Fi:'Te', Te:'Fi', Ti:'Fe', Fe:'Ti' };
+const KIND = f=>FN[f].kind==='O'?'Observer':'Decider';
+const ATT = f=>FN[f].att==='i'?'Introverted':'Extroverted';
+const LETTERW = { N:'Intuition', S:'Sensing', T:'Thinking', F:'Feeling' };
+function explorerSvg(you){
+  const axis = (a,b)=>`<line class="xaxis" data-ax="${a}${b}" x1="${XPOS[a][0]}" y1="${XPOS[a][1]}" x2="${XPOS[b][0]}" y2="${XPOS[b][1]}"/>`;
+  const node = f=>{ const [x,y]=XPOS[f], mine=you.includes(f);
+    return `<g class="xnode${mine?' mine':''}" data-f="${f}" tabindex="0" role="button" aria-label="${FNAME[f]}" transform="translate(${x},${y})" style="--c:${FCOLOR[f]}">
+      <g class="sz"><circle class="halo" r="58"/><circle class="ring" r="50"/><circle class="body" r="42"/>
+      <text class="rk" y="-19"></text><text class="fx" y="4">${f}</text><text class="fk" y="24">${KIND(f).toUpperCase()}</text><text class="you" y="-60">YOUR SAVIOR</text></g></g>`; };
+  return `<svg viewBox="0 0 800 540" class="xsvg">
+    <defs><radialGradient id="xg" cx="35%" cy="30%"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".35" stop-color="#fff" stop-opacity=".15"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs>
+    <rect x="20" y="40" width="370" height="460" rx="22" class="xq"/><rect x="410" y="40" width="370" height="460" rx="22" class="xq"/>
+    <line x1="20" y1="270" x2="780" y2="270" class="xmid"/>
+    <text x="205" y="28" class="xh">OBSERVERS · information</text><text x="595" y="28" class="xh">DECIDERS · values & logic</text>
+    <text x="34" y="66" class="xs">INTROVERTED</text><text x="34" y="490" class="xs">EXTROVERTED</text>
+    <text x="424" y="66" class="xs">INTROVERTED</text><text x="424" y="490" class="xs">EXTROVERTED</text>
+    <text x="150" y="526" class="xl">Sensing</text><text x="300" y="526" class="xl">Intuition</text><text x="500" y="526" class="xl">Thinking</text><text x="650" y="526" class="xl">Feeling</text>
+    ${axis('Ni','Se')}${axis('Si','Ne')}${axis('Fi','Te')}${axis('Ti','Fe')}
+    ${Object.keys(XPOS).map(node).join('')}</svg>`;
+}
+const SIZES=[1.28,1.04,.84,.62], OFF=.46;
+// Stack size always follows position: 1st biggest, 2nd, 3rd, then a big drop to the 4th.
+// A jumper (dom + tert subtype) uses the 3rd as a savior, but the 2nd stays naturally bigger,
+// and the drop to the 4th is steeper.
+function subOf(type,subKey){ return SUBTYPES.find(x=>x.key===subKey&&x.type===type)||SUBTYPES.find(x=>x.type===type&&x.pos==='aux'); }
+function applySizing(root,type,subKey,isYou){
+  const st=STACKS[type], sub=subOf(type,subKey), saviors=[sub.dom,sub.other], jumper=sub.pos==='tert';
+  root.querySelectorAll('.xnode').forEach(n=>{ const f=n.dataset.f, i=st.indexOf(f);
+    const s = i<0 ? OFF : (i===3 && jumper ? .52 : SIZES[i]);
+    n.querySelector('.sz').style.transform=`scale(${s})`;
+    n.classList.toggle('offstack',i<0); n.classList.toggle('mine',isYou&&saviors.includes(f)); n.classList.toggle('savior',saviors.includes(f));
+    n.querySelector('.rk').textContent = i<0?'':'#'+(i+1)+(saviors.includes(f)?' · SAVIOR':''); });
+  const lab=root.querySelector('.xsizing');
+  lab.innerHTML = `${isYou?'Sized to <b>your result</b>':'Sized to'}: <b>${type}</b> ${sub.dom}–${sub.other} (${jumper?'Dom + Tert, a jumper':'Dom + Aux, balanced'}). Bigger means higher in the stack, and rings mark the two saviors.${jumper?' Jumpers lean on their #3, but their #2 is still naturally bigger, and the drop to #4 is steeper.':''}${isYou?'':' <button class="xback">Back to my result</button>'}`;
+  const bb=lab.querySelector('.xback'); if(bb) bb.addEventListener('click',()=>root.dispatchEvent(new Event('xreset')));
+}
+function typesUsing(f){ return SUBTYPES.filter(s=>s.dom===f||s.other===f); }
+function funcPanel(f){
+  const g=GUIDE[f], d=FDESC[f], p=PARTNER[f], lead=SUBTYPES.filter(s=>s.dom===f);
+  return `<div class="xp-h" style="--c:${FCOLOR[f]}"><span class="xdot"></span><div><div class="xp-t">${FNAME[f]} <span>(${f})</span></div>
+    <div class="xp-tags"><span>${ATT(f)}</span><span>${KIND(f)}</span><span>${LETTERW[f[0]]}</span><span>Axis partner: <b style="color:${FCOLOR[p]}">${p}</b></span></div></div></div>
+    <div class="xp-grid"><div><div class="xk">Core mechanism</div><p>${d.core}</p><div class="xk">The void it leaves</div><p>${d.void}</p><div class="xk">Biggest fear</div><p>${d.fear}</p></div>
+    <div><div class="xk">As someone's #1</div><p>${g.first.real}</p><div class="chips2" style="--c:${FCOLOR[f]}">${g.first.strengths.map(s=>`<span>${s}</span>`).join('')}</div>
+      <div class="xk">As someone's #4 (blind spot)</div><p>${g.last.struggle}</p></div></div>
+    <div class="xk">Leads these subtypes</div><div class="xsubs">${lead.map(s=>subChip(s)).join('')}</div>
+    <div class="xhint">Tip: pick one observer and one decider to see what that combination makes.</div>`;
+}
+function subChip(s){ return `<button class="xsub" data-t="${s.type}" style="--c:${FCOLOR[s.dom]}"><b>${s.type}</b> ${s.dom}–${s.other}<i>${SUBTRAITS[s.key]}</i></button>`; }
+function comboPanel(o,d){
+  const subs=SUBTYPES.filter(s=>s.obs===o&&s.dec===d), an=subs[0].animal;
+  return `<div class="xp-h"><span class="xdot" style="--c:${FCOLOR[o]}"></span><span class="xdot" style="--c:${FCOLOR[d]};margin-left:-14px"></span><div><div class="xp-t">${o} + ${d} <span>savior pair</span></div>
+    <div class="xp-tags"><span>${ANIMALS[an].icon} ${an} animal (${ANIMALS[an].pair})</span><span>${FN[o].att===FN[d].att?'Same attitude: dom + tert (looping) types':'Opposite attitudes: dom + aux (balanced) types'}</span></div></div></div>
+    <p class="xlead">${ANIMALS[an].d}</p>
+    <div class="xcombo">${subs.map(s=>{ const st=STACKS[s.type]; return `<div class="xc" style="--c:${FCOLOR[s.dom]}">
+      <div class="xc-t">${s.type} <span>${s.dom}–${s.other}</span></div><div class="xc-m">${s.dom===o?'Observer':'Decider'}-led · ${s.pos==='aux'?'Dom + Aux (balanced)':'Dom + Tert (looping)'}</div>
+      <div class="xc-tr">${SUBTRAITS[s.key]}</div>
+      <div class="stack">${st.map((f,i)=>`<span style="--c:${FCOLOR[f]}" class="${f===s.dom||f===s.other?'sv':''}"><i>${i+1}</i>${f}</span>`).join('')}</div>
+      <button class="xopen" data-t="${s.type}">Open ${s.type} →</button></div>`; }).join('')}</div>`;
+}
+function typePanel(t){
+  const st=STACKS[t], subs=SUBTYPES.filter(s=>s.type===t);
+  return `<div class="xp-h"><div><div class="xp-t">${t} <span>${st.join(' · ')}</span></div>
+    <div class="xp-tags"><span>${['IJ','EP'].includes(t[0]+t[3])?'Observer-led (single observer)':'Decider-led (single decider)'}</span><span>#1 ${st[0]} · #4 ${st[3]}</span></div></div></div>
+    <div class="stack big">${st.map((f,i)=>`<span style="--c:${FCOLOR[f]}"><i>${['#1 Dominant','#2 Auxiliary','#3 Tertiary','#4 Inferior'][i]}</i>${f}</span>`).join('')}</div>
+    <div class="xp-grid"><div><div class="xk">#1 ${st[0]} in real life</div><p>${GUIDE[st[0]].first.real}</p></div><div><div class="xk">#4 ${st[3]}, the blind spot</div><p>${GUIDE[st[3]].last.struggle}</p></div></div>
+    <div class="xk">Its two subtypes · tap one to resize the map</div><div class="xcombo">${subs.map(s=>`<div class="xc pickable" data-sub="${s.key}" data-ty="${t}" style="--c:${FCOLOR[s.dom]}"><div class="xc-t">${s.dom}–${s.other} <span>${s.pos==='aux'?'Dom + Aux':'Dom + Tert'}</span></div><div class="xc-tr">${SUBTRAITS[s.key]}</div><div class="xc-m">${ANIMALS[s.animal].icon} ${s.animal} · loop when stressed: ${st[0]} + ${st[2]}</div></div>`).join('')}</div>`;
+}
+function wireExplorer(r){
+  const root=$('#explorer'); const you=[r.top.dom,r.top.other];
+  root.querySelector('.xmap').innerHTML=explorerSvg(you);
+  const mine=()=>applySizing(root,r.top.type,r.top.key,true);
+  mine(); root.addEventListener('xreset',()=>{ selO=null; selD=null; mark(); mine(); show(introPanel()); });
+  let selO=null, selD=null;
+  const panel=root.querySelector('.xpanel');
+  const show=(html)=>{ panel.style.opacity=0; setTimeout(()=>{ panel.innerHTML=html; panel.style.opacity=1; wirePanel(); },150); };
+  const mark=()=>{ root.querySelectorAll('.xnode').forEach(n=>{ const f=n.dataset.f; n.classList.toggle('sel',f===selO||f===selD); n.classList.toggle('dim',!!(selO||selD)&&f!==selO&&f!==selD&&f!==PARTNER[selO]&&f!==PARTNER[selD]); });
+    root.querySelectorAll('.xaxis').forEach(l=>{ const ax=l.dataset.ax; l.classList.toggle('on',[selO,selD].some(f=>f&&ax.includes(f))); });
+    root.querySelectorAll('.xtype').forEach(b=>b.classList.remove('on')); };
+  function pick(f){
+    if(FN[f].kind==='O') selO = selO===f?null:f; else selD = selD===f?null:f;
+    mark();
+    if(selO&&selD) show(comboPanel(selO,selD)); else if(selO||selD) show(funcPanel(selO&&FN[f].kind==='O'?selO:(selD||selO))); else show(introPanel());
+  }
+  function openType(t){ selO=null; selD=null; mark(); applySizing(root,t,null,t===r.top.type&&false);
+    root.querySelectorAll('.xtype').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); show(typePanel(t));
+    setTimeout(()=>{ const c=panel.querySelector('.xc.pickable'); if(c) c.classList.add('on'); },200); root.querySelector('.xpanel').scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'}); }
+  function wirePanel(){ panel.querySelectorAll('[data-t]').forEach(b=>b.addEventListener('click',()=>openType(b.dataset.t)));
+    panel.querySelectorAll('.xc.pickable').forEach(c=>c.addEventListener('click',()=>{ const isYou=c.dataset.sub===r.top.key&&c.dataset.ty===r.top.type; applySizing(root,c.dataset.ty,c.dataset.sub,isYou);
+      panel.querySelectorAll('.xc.pickable').forEach(x=>x.classList.toggle('on',x===c)); })); }
+  root.querySelectorAll('.xnode').forEach(n=>{ n.addEventListener('click',()=>pick(n.dataset.f)); n.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(n.dataset.f);} }); });
+  root.querySelectorAll('.xtype').forEach(b=>b.addEventListener('click',()=>openType(b.dataset.t)));
+  const introPanel=()=>`<div class="xintro">Tap any function to read about it. Pick <b>one observer and one decider</b> to see the subtypes that pair makes. Your two saviors, <b style="color:${FCOLOR[you[0]]}">${you[0]}</b> and <b style="color:${FCOLOR[you[1]]}">${you[1]}</b>, have a ring around them.</div>`;
+  panel.innerHTML=introPanel();
+}
+
+/* ================= RESULTS ================= */
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function pct(x){ return Math.round(x*100); }
+function finish(){
+  $('#pfill').style.width='100%';
+  const r=recompute(), top=r.top, sorted=Object.entries(r.types).sort((a,b)=>b[1]-a[1]);
+  const g1=FCOLOR[top.dom], g2=FCOLOR[top.other];
+  const posLabel = top.pos==='aux' ? 'Growth / Balanced subtype · Dom + Aux' : 'Internal / Looping subtype · Dom + Tert';
+  const lead = top.sign.OD>0 ? 'Observer' : 'Decider';
+  const sN = FN[top.obs].N>0?'N':'S', sT = FN[top.dec].T>0?'T':'F';
+  const coinArr = COINS.map(c=>{
+    const p=r.coins[c], L=COINLABELS[c]; const leftWin=p>=.5; const d=Math.abs(p-.5);
+    const colL='#67e8f9', colR='#f472b6';
+    const bar = leftWin ? `<i style="right:50%;width:0;background:linear-gradient(270deg,${colL},transparent)" data-w="${d*100}"></i>` : `<i style="left:50%;width:0;background:linear-gradient(90deg,${colR},transparent)" data-w="${d*100}"></i>`;
+    return `<div class="coin"><div class="row"><span class="${leftWin?'win':''}">${L[0]} · ${pct(p)}%</span><span class="${leftWin?'':'win'}">${pct(1-p)}% · ${L[1]}</span></div><div class="bar">${bar}</div>${L[2]?`<div class="sub">${leftWin?L[2]:L[3]}</div>`:''}</div>`;
+  });
+  const typeCards = sorted.map(([t,p],i)=>`<div class="tc${i===0?' top':''}"><div class="code">${t}</div><div class="pct">${(p*100).toFixed(1)}% likelihood</div><div class="fill" data-w="${p/sorted[0][1]*100}" style="background:linear-gradient(90deg,${FCOLOR[STACKS[t][0]]},${FCOLOR[STACKS[t][1]]})"></div></div>`).join('');
+  const alts = r.subs.slice(0,6).map(s=>`<div class="alt"><span class="k" style="color:${FCOLOR[s.dom]}">${s.type}</span><span class="m">${s.dom}–${s.other} · ${SUBTRAITS[s.key]}</span><span class="p">${(s.p*100).toFixed(1)}%</span></div>`).join('');
+  const an = top.animal, A=ANIMALS[an];
+  const savior = f=>`<div class="panel savior" style="--c:${FCOLOR[f]}"><div class="fh"><div class="orb"></div><div><div class="fn">${f} Savior</div><div class="fl">${FNAME[f]} · ${pct(r.funcs[f])}% signal</div></div></div>
+    <p>${FDESC[f].core}</p><div class="lbl">The void you leave</div><p>${FDESC[f].void}</p><div class="lbl">Biggest fear</div><p>${FDESC[f].fear}</p></div>`;
+  const conf = top.p;
+  const confWord = r.loose?'Loose read: your answers shifted a lot between scenes':conf>.5?'Strong read':conf>.25?'Moderate read':'Loose read: retake later or compare runners-up';
+  $('#results').innerHTML = `
+    <div class="res-hero" style="--g1:${g1};--g2:${g2}">
+      <div class="orbit-wrap" style="width:min(460px,90vw)"><canvas id="orbitRes"></canvas></div>
+      <div class="eyebrow">${esc(takerName)}, your constellation reads as</div>
+      <div class="typecode" style="--g1:${g1};--g2:${g2}">${top.type}</div>
+      <div class="subline"><span style="color:${g1}">${top.dom}</span>–<span style="color:${g2}">${top.other}</span><span class="dot">·</span>${lead}-led<span class="dot">·</span>${A.icon} ${an}</div>
+      <div class="traits">${SUBTRAITS[top.key]} — ${posLabel}</div>
+      <div class="conf">${confWord} · top subtype <b>${pct(conf)}%</b> · type <b>${pct(r.types[top.type])}%</b></div><span class="savechip" id="saveChip"></span>
+    </div>
+    <div class="section"><h3>Your two saviors</h3><div class="grid2">${savior(top.dom)}${savior(top.other)}</div></div>
+    <div class="section"><h3>Your patterns</h3>${patternsHtml(r)}</div>
+    <div class="section"><h3>The coins</h3><div class="grid2"><div class="panel">${coinArr.slice(0,4).join('')}</div><div class="panel">${coinArr.slice(4).join('')}</div></div>
+    <div class="section"><h3>Lead animal & runners-up</h3><div class="grid2">
+      <div class="panel"><div class="animal"><div class="glyph">${A.icon}</div><div><div class="an">${an} <span style="font:500 .8rem Manrope;color:var(--muted)">${A.pair}</span></div><p>${A.d}</p></div></div>
+        <div class="minis">${Object.entries(r.animals).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="mini">${ANIMALS[k].icon} ${k} ${pct(v)}%</span>`).join('')}</div></div>
+      <div class="panel">${alts}</div></div></div>
+    <div class="section"><h3>All 16 types</h3><div class="panel"><div class="types" style="--g1:${g1}">${typeCards}</div></div></div>
+    <div class="section"><h3>Your savior letters</h3><div class="panel"><div class="letter"><b>${sN}</b> — ${LETTERS[sN]}</div><div class="letter"><b>${sT}</b> — ${LETTERS[sT]}</div></div></div>
+    <div class="section"><h3>Your growth map</h3>
+      <div class="panel"><div class="focus-k">What's on your mind right now?</div><div class="foci" id="foci">${Object.entries(FOCI).map(([k,v])=>`<button class="focus${k==='general'?' on':''}" data-f="${k}">${v}</button>`).join('')}</div>
+      <div id="guide"></div></div></div>
+    <div class="section"><h3>Function explorer</h3><div class="panel" id="explorer">
+      <div class="xsizing"></div>
+      <div class="xmap"></div>
+      <div class="xcap">Lines connect axis partners: <b>Ni–Se</b>, <b>Si–Ne</b>, <b>Fi–Te</b>, <b>Ti–Fe</b>. Every type has one observer axis and one decider axis.</div>
+      <div class="xtypes">${['IJ','EP','IP','EJ'].map(g=>`<div class="xtg"><span>${{IJ:'IxxJ',EP:'ExxP',IP:'IxxP',EJ:'ExxJ'}[g]}</span>${Object.keys(STACKS).filter(t=>t[0]+t[3]===g).sort().map(t=>`<button class="xtype${t===top.type?' yours':''}" data-t="${t}">${t}</button>`).join('')}</div>`).join('')}</div>
+      <div class="xpanel"></div></div></div>
+    <div class="section"><h3>Did this fit?</h3><div class="panel" id="fbPanel">
+      <div class="fb-q">How well does this result fit you?</div>
+      <div class="fit" id="fit">${[1,2,3,4,5].map(n=>`<button data-v="${n}">${n}</button>`).join('')}</div><div class="fit-l"><span>Not me at all</span><span>Spot on</span></div>
+      <div class="fb-q">What felt off? <span class="opt-l">(optional)</span></div>
+      <div class="offs">${[['type','My type'],['saviors','My two saviors'],['descriptions','The descriptions'],['growth','The growth tips'],['questions','Some questions']].map(([k,v])=>`<label class="off"><input type="checkbox" value="${k}"><span>${v}</span></label>`).join('')}</div>
+      <div class="fb-row"><div><div class="fb-q">What type do you think you are? <span class="opt-l">(optional)</span></div>
+        <select id="selfType"><option value="">Not sure</option>${Object.keys(STACKS).sort().map(t=>`<option>${t}</option>`).join('')}</select></div></div>
+      <div class="fb-q">Anything else? <span class="opt-l">(optional)</span></div>
+      <textarea id="fbNote" maxlength="300" placeholder="What surprised you, or what was missing?"></textarea>
+      <div class="fb-actions"><button class="ghost" id="fbSend" disabled>Send feedback</button><span id="fbMsg" class="fb-msg"></span></div>
+    </div></div>
+    <div class="actions"><button class="cta" id="retake">Retake</button><button class="ghost" id="copyBtn">Copy my result</button></div>
+    <p class="disclaimer">Built from the Objective Personality framework (Dave &amp; Shan Powers) and your own notes. OPS isn't peer-reviewed science, and a self-report quiz can't see your blind spots: the transcripts point out that people mostly see their middle functions, not their first and last. Treat this as a hypothesis to test against how you actually live over time, not a verdict.</p>`;
+  show('results');
+  currentResultId=newId(); resultSaved=false; lastRecord=buildRecord(r); doSave();
+  wireGuide(r); wireFeedback(); wireExplorer(r);
+  const ro=new Orbit($('#orbitRes'),{labels:true}); ro.size={...r.funcs}; ro.set(r.funcs); ro.highlight=[top.dom,top.other]; orbits.push(ro);
+  setAurora([g1,g2,g1,g2]);
+  const panels=[...document.querySelectorAll('#results .panel')];
+  panels.forEach((p,i)=>setTimeout(()=>p.classList.add('show'),250+i*140));
+  setTimeout(()=>{ document.querySelectorAll('#results [data-w]').forEach(el=>el.style.width=el.dataset.w+'%'); },700);
+  if(!reduce) for(let k=0;k<5;k++) setTimeout(()=>burst(W*(.2+Math.random()*.6),H*(.2+Math.random()*.3),[g1,g2][k%2],50),k*220);
+  chime(3); setTimeout(()=>chime(5),300);
+  $('#retake').addEventListener('click',()=>{ orbits.splice(2); startTake(); });
+  $('#copyBtn').addEventListener('click',async()=>{
+    const txt=`${takerName}'s constellation: ${top.type} (${top.dom}–${top.other}, ${SUBTRAITS[top.key]}) · ${lead}-led · ${an} · type likelihood ${pct(r.types[top.type])}%`;
+    try{ await navigator.clipboard.writeText(txt); $('#copyBtn').textContent='Copied ✓'; }catch(e){ $('#copyBtn').textContent=txt; }
+  });
+}
+})();
+
+</script>
+</body>
+</html>
